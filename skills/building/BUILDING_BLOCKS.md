@@ -24,15 +24,15 @@ Inline row a(c,c) pad(10,20) s(hug,hug) rd(8). Primary: solid dark fill + white 
 H-row g(0-2). Buttons as children sharing a visual container. With gap: uniform rd per button. Without gap: first rd(8,0,0,8), middle rd(0), last rd(0,8,8,0). Active: filled. Inactive: stroke or tinted bg.
 
 ### Segmented Control
-H-row pad(3) g(2) f[(f1,#F1F5F9)] rd(10). Each segment: centered row pad(6,14) rd(8). Active: white fill + shadow + sb text. Inactive: no fill + muted text(13-14,m).
+H-row pad(3) g(2) f[(#F1F5F9)] rd(10). Each segment: centered row pad(6,14) rd(8). Active: white fill + shadow + sb text. Inactive: no fill + muted text(13-14,m).
 
 ### Toggle Switch
 Knob position via main-axis alignment — `a(e,c)` for on, `a(s,c)` for off:
 ```
-al(h,a(e,c),pad(3)) s(44,26) f[(f1,#8B5CF6)] rd(9999) "On"
-  al(h,a(c,c)) s(20,20) f[(f1,#FFF)] rd(9999) shadow(#000,o(0.15),y(1),blur(2)) "Knob"
-al(h,a(s,c),pad(3)) s(44,26) f[(f1,#E4E4E7)] rd(9999) "Off"
-  al(h,a(c,c)) s(20,20) f[(f1,#FFF)] rd(9999) shadow(#000,o(0.15),y(1),blur(2)) "Knob"
+al(h,a(e,c),pad(3)) s(44,26) f[(#8B5CF6)] rd(9999) "On"
+  al(h,a(c,c)) s(20,20) f[(#FFF)] rd(9999) shadow(#000,o(0.15),y(1),blur(2)) "Knob"
+al(h,a(s,c),pad(3)) s(44,26) f[(#E4E4E7)] rd(9999) "Off"
+  al(h,a(c,c)) s(20,20) f[(#FFF)] rd(9999) shadow(#000,o(0.15),y(1),blur(2)) "Knob"
 ```
 
 ### Floating Action Button (FAB)
@@ -83,11 +83,11 @@ V-stack a(sb,c) pad(12,0) s(64-240,fill) dark fill. Top(V-stack: logo + divider 
 ```
 al(h,a(s,e),pad(0,16)) s(hug,hug) "Tab Bar"
   al(v,a(c,e),pad(12,16,0,16)) s(hug,hug) "Active"
-    t("Tab",Inter,13,sb) f[(f1,#3B82F6)] "Lbl"
-    r s(fill,2) f[(f1,#3B82F6)] "Indicator"
+    t("Tab",Inter,13,sb) f[(#3B82F6)] "Lbl"
+    r s(fill,2) f[(#3B82F6)] "Indicator"
   al(v,a(c,e),pad(12,16,0,16)) s(hug,hug) "Inactive"
-    t("Tab",Inter,13,m) f[(f1,#64748B)] "Lbl"
-    r s(fill,2) f[(f1,parent-bg-color)] "Indicator"
+    t("Tab",Inter,13,m) f[(#64748B)] "Lbl"
+    r s(fill,2) f[(parent-bg-color)] "Indicator"
 ```
 Key: `a(s,e)` pushes indicators to bottom. Inactive indicator uses parent bg color (invisible). Optional content panel V-stack below.
 
@@ -104,11 +104,11 @@ H-row a(c,c) g(4). Prev/next: icon buttons (arrow-left, arrow-right) or text. Pa
 ```
 al(h,a(c,s),g(0)) s(hug,hug) "Steps"
   al(v,a(c,c),g(6)) s(hug,hug) "Step"
-    al(h,a(c,c)) s(28,28) f[(f1,accent)] rd(9999) "Circle"
-      t("\u2713",Inter,14,b,c) f[(f1,#FFF)] "Mark"
-    t("Label",Inter,11,m,c) f[(f1,accent)] "Name"
+    al(h,a(c,c)) s(28,28) f[(accent)] rd(9999) "Circle"
+      t("\u2713",Inter,14,b,c) f[(#FFF)] "Mark"
+    t("Label",Inter,11,m,c) f[(accent)] "Name"
   al(h,a(c,c)) s(48,28) "Connector"
-    r s(48,2) f[(f1,accent-or-muted)] "Line"
+    r s(48,2) f[(accent-or-muted)] "Line"
   ... repeat step + connector ...
 ```
 Completed: accent fill + checkmark. Current: accent fill + number. Future: stroke-only circle + muted text. Connector: accent if completed, muted if pending.
@@ -132,12 +132,12 @@ Centered frame s(32-48,32-48) rd(9999) accent fill. Initials text(13-16,sb) whit
 ### Avatar Stack
 ```
 al(h,g(-8)) s(hug,hug) "Stack"
-  al(h,a(c,c)) s(32,32) f[(f1,#3B82F6)] st[(s1,#FFF,2)] rd(9999) "A1"
-    t("A",Inter,13,sb) f[(f1,#FFF)]
-  al(h,a(c,c)) s(32,32) f[(f1,#8B5CF6)] st[(s1,#FFF,2)] rd(9999) "A2"
-    t("M",Inter,13,sb) f[(f1,#FFF)]
-  al(h,a(c,c)) s(32,32) f[(f1,#E2E8F0)] st[(s1,#FFF,2)] rd(9999) "More"
-    t("+3",Inter,12,sb) f[(f1,#64748B)]
+  al(h,a(c,c)) s(32,32) f[(#3B82F6)] st[(#FFF,2)] rd(9999) "A1"
+    t("A",Inter,13,sb) f[(#FFF)]
+  al(h,a(c,c)) s(32,32) f[(#8B5CF6)] st[(#FFF,2)] rd(9999) "A2"
+    t("M",Inter,13,sb) f[(#FFF)]
+  al(h,a(c,c)) s(32,32) f[(#E2E8F0)] st[(#FFF,2)] rd(9999) "More"
+    t("+3",Inter,12,sb) f[(#64748B)]
 ```
 `g(-8)` creates overlap. White 2px stroke separates. Last item: "+N" counter with muted fill.
 
@@ -156,7 +156,7 @@ Inline row a(c,c) pad(2-4,8-12) s(hug,hug) rd(9999). Text(12,m). Tinted bg + sat
 V-stack g(4-8) pad(16-20) s(fill,hug). Label text(12-13,m, muted) + value text(24-32,sb) + optional delta row: H-row g(4) — arrow-up/arrow-down icon(12x12, green/red) + percentage text(13,m, green/red). **Parent:** typically 3-4 siblings in `al(h,g(8-12))` — parent gap spaces the tiles apart.
 
 ### Rating
-H-row g(2). Star icons(16-20x16-20). **Conventional ordering:** filled stars on the left, empty stars on the right. Filled: `st[(s1,#F59E0B,2)]`. Empty: `st[(s1,#E2E8F0,2)]`. Optional value text(14,sb) and count text(14, muted) after stars.
+H-row g(2). Star icons(16-20x16-20). **Conventional ordering:** filled stars on the left, empty stars on the right. Filled: `st[(#F59E0B,2)]`. Empty: `st[(#E2E8F0,2)]`. Optional value text(14,sb) and count text(14, muted) after stars.
 
 ### Quote / Testimonial
 V-stack g(12-16) pad(20-24). Large open-quote `t("\u201C",serif-font,48-64)` muted, or quote icon. Quote text(16-18, italic or regular, s(fill,hug)). Attribution: H-row g(12) — avatar(32x32) + V-stack(name(14,sb) + role(13, muted)).
@@ -165,7 +165,7 @@ V-stack g(12-16) pad(20-24). Large open-quote `t("\u201C",serif-font,48-64)` mut
 V-stack g(0). Node: H-row a(s,c) g(8) pad(4,8+indent). Indent via increasing left padding (16-24px per depth level). Expandable: caret-right icon(12x12, rot(90) when expanded) + label(14). Leaf: no caret, extra left padding to align with sibling labels. Optional file/folder icons.
 
 ### Image
-Rect s(fill,H) f[(f1,#F1F5F9)] rd(8) clip. Placeholder: centered image icon(32x32, muted). With content: `f[(f1,img(url))]`. Common ratios: 16:9 (hero), 4:3 (card), 1:1 (avatar/thumb), 3:2 (gallery).
+Rect s(fill,H) f[(#F1F5F9)] rd(8) clip. Placeholder: centered image icon(32x32, muted). With content: `f[(img(url))]`. Common ratios: 16:9 (hero), 4:3 (card), 1:1 (avatar/thumb), 3:2 (gallery).
 
 ---
 
@@ -192,9 +192,9 @@ V-stack s(360-480,fill) white fill + high shadow. Positioned at left or right ed
 
 ### Bottom Sheet
 ```
-al(v) s(SCREEN_W,hug) f[(f1,#FFF)] rd(20,20,0,0) shadow(#000,o(0.12),y(-4),blur(16)) "Sheet"
+al(v) s(SCREEN_W,hug) f[(#FFF)] rd(20,20,0,0) shadow(#000,o(0.12),y(-4),blur(16)) "Sheet"
   al(h,a(c),pad(12,0)) s(fill,hug) "Handle"
-    r s(36,4) f[(f1,#D1D5DB)] rd(9999) "Bar"
+    r s(36,4) f[(#D1D5DB)] rd(9999) "Bar"
   al(v,g(4),pad(8,16,16,16)) s(fill,hug) "Content"
     ... option items: H-row a(s,c) g(12) pad(12) s(fill,hug) rd(8) — icon(20x20) + label(16)
 ```
@@ -212,17 +212,17 @@ Compact pad(6-8,12) s(hug,hug) dark fill (#1E293B) rd(6). White text(12-13). Sin
 ### Progress Bar
 **Flex variant** (resizes with parent, no math):
 ```
-al(h) s(200,6) f[(f1,#E2E8F0)] rd(9999) clip "Progress"
-  r s(fill:3,fill) f[(f1,#3B82F6)] rd(9999) "Fill"
+al(h) s(200,6) f[(#E2E8F0)] rd(9999) clip "Progress"
+  r s(fill:3,fill) f[(#3B82F6)] rd(9999) "Fill"
   r s(fill:1,fill) "Empty"
 ```
 75% filled. Ratio = percentage: `fill:4`+`fill:1` = 80%, `fill:1`+`fill:1` = 50%. **Group variant** for exact pixels: Track-and-Fill from LAYOUTS.md.
 
 ### Spinner
-Circle with partial arc stroke: `c s(24-32,24-32) arc(0,75) ratio(1) st[(s1,#3B82F6,3)]`. Larger: s(48,48) with thicker stroke. Or use arrows-clockwise icon.
+Circle with partial arc stroke: `c s(24-32,24-32) arc(0,75) ratio(1) st[(#3B82F6,3)]`. Larger: s(48,48) with thicker stroke. Or use arrows-clockwise icon.
 
 ### Skeleton
-Rects mimicking the layout of loading content. Each placeholder: rd(4-8) f[(f1,#E2E8F0)]. Text line: s(60-80% width, 14-16). Heading: s(40-50% width, 20-24). Image area: s(fill, aspect-height). Match gap/spacing of the real content structure.
+Rects mimicking the layout of loading content. Each placeholder: rd(4-8) f[(#E2E8F0)]. Text line: s(60-80% width, 14-16). Heading: s(40-50% width, 20-24). Image area: s(fill, aspect-height). Match gap/spacing of the real content structure.
 
 ### Empty State
 V-stack a(c,c) g(12-16) pad(40-60) s(fill,hug). Large icon(48-64x48-64, muted) or illustration. Title(18,sb, centered) + description(14, muted, centered, s(400-500,hug)) + optional CTA button.
@@ -232,7 +232,7 @@ V-stack a(c,c) g(12-16) pad(40-60) s(fill,hug). Large icon(48-64x48-64, muted) o
 ## Layout Components
 
 ### Separator / Divider
-Horizontal: `r s(fill,1) f[(f1,#E2E8F0)]`. Vertical: `r s(1,fill) f[(f1,#E2E8F0)]`. With label: H-row a(c,c) g(12) — divider s(fill,1) + text(12, muted) + divider s(fill,1).
+Horizontal: `r s(fill,1) f[(#E2E8F0)]`. Vertical: `r s(1,fill) f[(#E2E8F0)]`. With label: H-row a(c,c) g(12) — divider s(fill,1) + text(12, muted) + divider s(fill,1).
 
 ### Header
 spaceBetween row pad(16-20,24-32) s(fill,hug). Logo left + optional nav center + actions right. Bottom: 1px stroke or subtle shadow. See Navbar for full structure.
@@ -259,17 +259,17 @@ V-stack g(16-20) pad(24-32) s(fill or 400-500, hug). Sequential field groups (ea
 ### Chat Bubble
 Asymmetric radius indicates direction:
 ```
-al(v,pad(10,14)) s(240,hug) f[(f1,#3B82F6)] rd(16,16,4,16) "Sent"
-  t("Message text",Inter,14) s(fill,hug) f[(f1,#FFF)]
-  t("2:34 PM",Inter,11) f[(f1,solid(#FFF,0.6))]
-al(v,pad(10,14)) s(240,hug) f[(f1,#F1F5F9)] rd(16,16,16,4) "Received"
-  t("Reply text",Inter,14) s(fill,hug) f[(f1,#0F172A)]
-  t("2:35 PM",Inter,11) f[(f1,#94A3B8)]
+al(v,pad(10,14)) s(240,hug) f[(#3B82F6)] rd(16,16,4,16) "Sent"
+  t("Message text",Inter,14) s(fill,hug) f[(#FFF)]
+  t("2:34 PM",Inter,11) f[(solid(#FFF,0.6))]
+al(v,pad(10,14)) s(240,hug) f[(#F1F5F9)] rd(16,16,16,4) "Received"
+  t("Reply text",Inter,14) s(fill,hug) f[(#0F172A)]
+  t("2:35 PM",Inter,11) f[(#94A3B8)]
 ```
 Sent: `rd(16,16,4,16)` small bottom-right. Received: `rd(16,16,16,4)` small bottom-left. Width ~60-70% of container.
 
 ### Notification Dot
-Numberless: `c s(8-10,8-10) f[(f1,#EF4444)]` positioned at **true top-right corner** of parent (often slightly overlapping: a few px up/right). With count: centered frame s(18-20,18-20) rd(9999) red fill + `t("3",Inter,11,sb)` white.
+Numberless: `c s(8-10,8-10) f[(#EF4444)]` positioned at **true top-right corner** of parent (often slightly overlapping: a few px up/right). With count: centered frame s(18-20,18-20) rd(9999) red fill + `t("3",Inter,11,sb)` white.
 
 ---
 
@@ -278,8 +278,8 @@ Numberless: `c s(8-10,8-10) f[(f1,#EF4444)]` positioned at **true top-right corn
 ### Accent Bar / Edge Stripe
 Thin colored strip at card edge. **CRITICAL: `clip` required on parent.**
 ```
-al(v,g(12),pad(0)) clip s(W,hug) f[(f1,#FFF)] st rd(12) shadow "Card"
-  r s(fill,4) f[(f1,linear(90,#3B82F6,#8B5CF6))] "Accent"
+al(v,g(12),pad(0)) clip s(W,hug) f[(#FFF)] st rd(12) shadow "Card"
+  r s(fill,4) f[(linear(90,#3B82F6,#8B5CF6))] "Accent"
   al(v,g(12),pad(20,24)) s(fill,hug) "Content"
     ... title, description, etc.
 ```
@@ -292,10 +292,10 @@ Top bar: s(fill,4). Side bar: s(4,fill) in al(h). Without `clip`, bar extends be
 Use `spans[...]` continuation lines for per-character styling within one text element.
 
 ### Accent Word
-One word pops with color: `t("Build something amazing",Inter,48,b) f[(f1,#1C1917)]` then `spans[("amazing",b,#3B82F6)]`. Variants: italic `("word",i,#hex)`, lighter weight `("word",w(400),#hex)`, different font `("word",f(Playfair Display),i)`.
+One word pops with color: `t("Build something amazing",Inter,48,b) f[(#1C1917)]` then `spans[("amazing",b,#3B82F6)]`. Variants: italic `("word",i,#hex)`, lighter weight `("word",w(400),#hex)`, different font `("word",f(Playfair Display),i)`.
 
 ### Price Format
-Mixed sizes in one element: `t("$49/month",Inter,14) f[(f1,#0F172A)]` then `spans[("$49",s(36),b,#3B82F6),("/month",#64748B)]`.
+Mixed sizes in one element: `t("$49/month",Inter,14) f[(#0F172A)]` then `spans[("$49",s(36),b,#3B82F6),("/month",#64748B)]`.
 
 ### Mixed Typeface
-Serif + sans-serif: `t("The art of modern design",Lora,44,b) f[(f1,#1C1917)]` then `spans[("modern design",f(Inter))]`.
+Serif + sans-serif: `t("The art of modern design",Lora,44,b) f[(#1C1917)]` then `spans[("modern design",f(Inter))]`.

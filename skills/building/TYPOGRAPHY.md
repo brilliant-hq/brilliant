@@ -166,7 +166,7 @@ Styled ranges are the single highest-leverage typography upgrade. They transform
 ### Pattern: Price with Mixed Formatting
 
 ```
-t("$49/month",Inter,32,b) f[(f1,#0F172A)] "Price"
+t("$49/month",Inter,32,b) f[(#0F172A)] "Price"
   spans[("$49",s(48),b,#10B981),("/month",#64748B,s(16))]
 ```
 
@@ -186,7 +186,7 @@ t("$0 forever",Inter,32,b) "Price"
 ### Pattern: Stat with Unit
 
 ```
-t("2,847 users",Inter,32,b) f[(f1,#0F172A)] "Stat"
+t("2,847 users",Inter,32,b) f[(#0F172A)] "Stat"
   spans[("users",w(600),s(16),#64748B)]
 ```
 
@@ -204,7 +204,7 @@ Making one keyword bold in body text draws the eye to the benefit. Use in featur
 ### Pattern: Tag / Badge with Emphasis
 
 ```
-t("NEW FEATURE",Inter,11,sb) f[(f1,#3B82F6)] "Tag"
+t("NEW FEATURE",Inter,11,sb) f[(#3B82F6)] "Tag"
   spans[("NEW",b,s(12))]
 ```
 

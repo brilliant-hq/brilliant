@@ -67,18 +67,18 @@ Inner effects are specified as fills using the compact DSL:
 
 | Type | Syntax | Example |
 |------|--------|---------|
-| Inner shadow | `f[(id,inner(#color,opacity,offsetX,offsetY,blur))]` | `f[(f2,inner(#000000,0.5,0,2,4))]` |
-| Inner glow | `f[(id,glow(#color,opacity,blur))]` | `f[(f2,glow(#FFFFFF,0.6,4))]` |
-| Background blur | `f[(id,blur(radius))]` | `f[(f2,blur(12))]` |
-| Metaballs shader | `f[(id,metaballs(#colors...,params...))]` | `f[(f1,metaballs(#000,#F72798,count(15)))]` |
+| Inner shadow | `f[(id,inner(#color,opacity,offsetX,offsetY,blur))]` | `f[(inner(#000000,0.5,0,2,4))]` |
+| Inner glow | `f[(id,glow(#color,opacity,blur))]` | `f[(glow(#FFFFFF,0.6,4))]` |
+| Background blur | `f[(id,blur(radius))]` | `f[(blur(12))]` |
+| Metaballs shader | `f[(id,metaballs(#colors...,params...))]` | `f[(metaballs(#000,#F72798,count(15)))]` |
 
-All `inner()` positional params are optional with defaults: color=#000000, opacity=0.5, offsetX=0, offsetY=2, blurRadius=4. Named params `sp(n)` (spread, default 0) and `blend(mode)` (default srcOver) can follow the positional params. Examples: `f[(f1,inner())]` all defaults · `f[(f1,inner(#FF0000))]` red · `f[(f1,inner(#000,0.3,0,4,8,sp(2)))]` with spread.
+All `inner()` positional params are optional with defaults: color=#000000, opacity=0.5, offsetX=0, offsetY=2, blurRadius=4. Named params `sp(n)` (spread, default 0) and `blend(mode)` (default srcOver) can follow the positional params. Examples: `f[(inner())]` all defaults · `f[(inner(#FF0000))]` red · `f[(inner(#000,0.3,0,4,8,sp(2)))]` with spread.
 
-All `glow()` positional params are optional with defaults: color=#FFFFFF, opacity=0.6, blurRadius=4. Named params `sp(n)` (spread, default 0) and `blend(mode)` (default screen) can follow the positional params. Examples: `f[(f1,glow())]` all defaults · `f[(f1,glow(#3B82F6))]` blue · `f[(f1,glow(#3B82F6,0.8,12,sp(4)))]` with spread.
+All `glow()` positional params are optional with defaults: color=#FFFFFF, opacity=0.6, blurRadius=4. Named params `sp(n)` (spread, default 0) and `blend(mode)` (default screen) can follow the positional params. Examples: `f[(glow())]` all defaults · `f[(glow(#3B82F6))]` blue · `f[(glow(#3B82F6,0.8,12,sp(4)))]` with spread.
 
-`blur(radius)` has one optional param, default 8. Pair with a low-opacity fill for frosted glass: `f[(f1,solid(#FFF,0.1)),(f2,blur(12))]`.
+`blur(radius)` has one optional param, default 8. Pair with a low-opacity fill for frosted glass: `f[(solid(#FFF,0.1)),(f2,blur(12))]`.
 
-`metaballs(#colors...,key(value)...)` — bare `#hex` values are colors, `key(value)` are named params. All optional. Params: `count` (1-20, default 10), `size` (0.05-1.0, default 0.83), `speed` (0-3, default 1.0). Default colors: #000000, #F72798, #F57D1F, #EBF400. Examples: `f[(f1,metaballs())]` all defaults · `f[(f1,metaballs(#3B82F6,#EF4444))]` custom colors · `f[(f1,metaballs(count(8),speed(2)))]` custom params.
+`metaballs(#colors...,key(value)...)` — bare `#hex` values are colors, `key(value)` are named params. All optional. Params: `count` (1-20, default 10), `size` (0.05-1.0, default 0.83), `speed` (0-3, default 1.0). Default colors: #000000, #F72798, #F57D1F, #EBF400. Examples: `f[(metaballs())]` all defaults · `f[(metaballs(#3B82F6,#EF4444))]` custom colors · `f[(metaballs(count(8),speed(2)))]` custom params.
 
 Outer effects (drop shadow, outer glow, layer blur) can be added via commands: `add_drop_shadow`, `add_outer_glow`, `add_layer_blur`.
 

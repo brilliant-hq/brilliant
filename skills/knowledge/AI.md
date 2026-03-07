@@ -262,3 +262,39 @@ These shortcuts focus and expand (if minimized) the AI chat session assigned to 
 - **Resize width** — Drag between sessions or at panel edges (160–640px)
 - **Resize height** — Drag top edge of panel
 - **Queue follow-up** — Send a message while the model is processing; it executes when ready
+
+---
+
+## AI Image Generation
+
+Brilliant can generate images using Google's Nano Banana 2 (Gemini Image) model. Generated images are saved to the project Assets folder and can be placed on the canvas.
+
+### Requirements
+
+A Google API key or OAuth authentication must be configured (see "Setting Up API Keys" above).
+
+### How It Works
+
+1. The AI agent calls the `generate_image` tool with a text prompt
+2. The image is generated and saved to the project's Assets folder
+3. The returned asset path is used with `img(assetPath)` in element fills
+
+### Quality Settings
+
+| Setting | Image Size | Speed | Best For |
+|---------|-----------|-------|----------|
+| Quick draft | 512px or 1K | ~5s | Iterations, placeholders |
+| High quality | 2K | ~15-20s | Hero images, product photos |
+| Maximum quality | 4K | Slowest | Final marketing assets |
+
+### Prompt Tips
+
+- Write descriptive paragraphs, not keyword lists
+- Be specific about subjects, lighting, composition, and style
+- Use photography terminology (focal length, depth of field, lighting)
+- For text in images, state exactly what the text should read
+- When editing with reference images, change one thing at a time
+
+### Supported Aspect Ratios
+
+1:1, 3:2, 2:3, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9, 1:4, 4:1, 1:8, 8:1

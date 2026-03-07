@@ -37,7 +37,7 @@
 **Auto-smooth curves:** Mark nodes as `mi` for automatic smooth bezier handles — no manual handle coordinates needed. The system computes tangent-based handles at 30% of edge length. Edges without explicit handles default to `(0,0,0,0)` and are auto-computed for `mi` nodes. If edges are omitted entirely, they're generated sequentially (node 0→1→2→...).
 
 ```
-v(nodes[(0,0,20,mi),(1,30,8,mi),(2,60,6,mi)]) s(60,24) st[(s1,#3B82F6,1.5)]
+v(nodes[(0,0,20,mi),(1,30,8,mi),(2,60,6,mi)]) s(60,24) st[(#3B82F6,1.5)]
 ```
 
 For area fills, close the path with straight bottom nodes (default `st`):
@@ -64,29 +64,29 @@ Duplicate words: add 0-based occurrence index — `("the",0,b),("the",1,i)`. Mod
 
 ### Fills
 
-`f[(id,spec),...]` — multiple fills stack in ID order. Multi: `f[(f1,#3B82F6),(f2,inner(#000,0.3,0,2,4))]`
+`f[(spec),...]` — multiple fills stack in order. IDs are optional (auto-generated). Multi: `f[(#3B82F6),(inner(#000,0.3,0,2,4))]`
 
-**Solid:** `(f1,#hex)` · `(f1,solid(#hex,0.8))` with opacity
+**Solid:** `(#hex)` · `(solid(#hex,0.8))` with opacity
 
-**Linear gradient** — directional sweep: `(f1,linear())` default (180°, black→white) · `(f1,linear(angle,#start,#end))` · `(f1,linear(#start,#end))` default 180° · `(f1,linear(angle,stop(#hex,pos),...))` with stops
+**Linear gradient** — directional sweep: `(linear())` default (180°, black→white) · `(linear(angle,#start,#end))` · `(linear(#start,#end))` default 180° · `(linear(angle,stop(#hex,pos),...))` with stops
 
-**Radial gradient** — point-source light: `(f1,radial())` default (centered, white→black) · `(f1,radial(#center,#edge))` · `(f1,radial(solid(#hex,0.3),solid(#hex,0)))` with opacity · `(f1,radial(cx(25),cy(15),r(50),#hex,#hex))` named % (cx/cy: 0=left/top, 50=center; r/rx/ry: 50=edge from center) · `(f1,radial(rx(80),ry(40),#hex,#hex))` elliptical · `(f1,radial(cx,cy,rx,ry,stop(#hex,pos),...))` positional
+**Radial gradient** — point-source light: `(radial())` default (centered, white→black) · `(radial(#center,#edge))` · `(radial(solid(#hex,0.3),solid(#hex,0)))` with opacity · `(radial(cx(25),cy(15),r(50),#hex,#hex))` named % (cx/cy: 0=left/top, 50=center; r/rx/ry: 50=edge from center) · `(radial(rx(80),ry(40),#hex,#hex))` elliptical · `(radial(cx,cy,rx,ry,stop(#hex,pos),...))` positional
 
-**Angular gradient** — colors sweep around a center point (conic/sweep): `(f1,angular())` default (centered, black→white) · `(f1,angular(#start,#end))` · `(f1,angular(cx,cy,ax,ay,stop(#hex,pos),...))` full · `(f1,angular(cx,cy,ax,ay,w(wx,wy),stop(#hex,pos),...))` elliptical
+**Angular gradient** — colors sweep around a center point (conic/sweep): `(angular())` default (centered, black→white) · `(angular(#start,#end))` · `(angular(cx,cy,ax,ay,stop(#hex,pos),...))` full · `(angular(cx,cy,ax,ay,w(wx,wy),stop(#hex,pos),...))` elliptical
 
-**Image:** `(f1,img(path))`
+**Image:** `(img(path))`
 
-**Effects as fills:** `(f1,inner())` inner shadow · `(f1,inner(#hex,opacity,offsetX,offsetY,blur))` custom · `(f1,glow())` inner glow · `(f1,glow(#hex,opacity,blur))` custom · `(f1,blur())` background blur · `(f1,blur(16))` custom radius · named: `sp(n)` spread, `blend(mode)`
+**Effects as fills:** `(inner())` inner shadow · `(inner(#hex,opacity,offsetX,offsetY,blur))` custom · `(glow())` inner glow · `(glow(#hex,opacity,blur))` custom · `(blur())` background blur · `(blur(16))` custom radius · named: `sp(n)` spread, `blend(mode)`
 
-**Shaders:** `(f1,metaballs())` defaults · `(f1,metaballs(#hex,...,count(n),size(n),speed(n)))` custom
+**Shaders:** `(metaballs())` defaults · `(metaballs(#hex,...,count(n),size(n),speed(n)))` custom
 
 ### Region Fills (Vectors)
 
 Vectors with multiple closed regions show per-region sub-paths as `vr()` continuation lines:
 ```
 abc123 v() s(200,200) "Logo"
-  vr(r1, M0,0 C50,-20 100,0 100,100 C50,120 0,100 0,0 Z) f[(f1,#FF6611)]
-  vr(r2, M30,30 L70,30 L70,70 L30,70 Z) f[(f2,inner(#000,0.3,0,2,4))]
+  vr(r1, M0,0 C50,-20 100,0 100,100 C50,120 0,100 0,0 Z) f[(#FF6611)]
+  vr(r2, M30,30 L70,30 L70,70 L30,70 Z) f[(inner(#000,0.3,0,2,4))]
   vr(r3, M40,40 L60,40 L60,60 L40,60 Z) hole
 ```
 
@@ -99,15 +99,15 @@ abc123 v() s(200,200) "Logo"
 
 ### Strokes
 
-`st[(id,paintStyle,width,startCap,endCap,position),...]` — trailing defaults can be omitted. **Strokes support ALL fill types** — solid, gradients, and shaders.
+`st[(paintStyle,width,startCap,endCap,position),...]` — IDs are optional (auto-generated). Trailing defaults can be omitted. **Strokes support ALL fill types** — solid, gradients, and shaders.
 
-- `st[(s1,#E5E7EB,1)]` — 1pt solid, all defaults
-- `st[(s1,solid(#3B82F6,0.5),2)]` — 50% opacity stroke
-- `st[(s1,linear(90,#3B82F6,#8B5CF6),2)]` — gradient stroke
-- `st[(s1,metal(),2)]` — liquid metal shader stroke
-- `st[(s1,holo(intensity(0.5)),3)]` — holographic shader stroke
-- Caps: `n` none, `r` round, `sq` square, `ar` arrow — e.g. `st[(s1,#000,2,n,ar)]`
-- Position: `c` center, `i` inside, `o` outside — e.g. `st[(s1,#000,1,r,r,i)]`
+- `st[(#E5E7EB,1)]` — 1pt solid, all defaults
+- `st[(solid(#3B82F6,0.5),2)]` — 50% opacity stroke
+- `st[(linear(90,#3B82F6,#8B5CF6),2)]` — gradient stroke
+- `st[(metal(),2)]` — liquid metal shader stroke
+- `st[(holo(intensity(0.5)),3)]` — holographic shader stroke
+- Caps: `n` none, `r` round, `sq` square, `ar` arrow — e.g. `st[(#000,2,n,ar)]`
+- Position: `c` center, `i` inside, `o` outside — e.g. `st[(#000,1,r,r,i)]`
 
 ### Effects (Drop Shadow, Outer Glow, Element Blur)
 
@@ -146,7 +146,7 @@ To move an element into a different parent, **indent its modify line under the n
 
 # Reparent #8 into #3, and also change its fill
 #3
-  #8 f[(f1,#FF0000)]
+  #8 f[(#FF0000)]
 
 # Reparent #10 before a specific sibling in the new parent
 #10 before(#11)
@@ -162,11 +162,11 @@ To move an element into a different parent, **indent its modify line under the n
 
 ```
 clone(abc123) p(400,0) "Card — Dark Theme"
-  def456 f[(f1,#1E293B)]
-  match("Title") f[(f1,#F8FAFC)]
+  def456 f[(#1E293B)]
+  match("Title") f[(#F8FAFC)]
 
 clone(abc123) p(800,0) "Card — Gradient"
-  def456 f[(f1,linear(135,#6366F1,#EC4899))]
+  def456 f[(linear(135,#6366F1,#EC4899))]
 ```
 
 - **Top-level overrides** (position, size, name, fills) apply to the cloned parent
@@ -181,12 +181,12 @@ When modifying existing elements, **list all modifications flat at depth 0** —
 ```
 WRONG — re-nesting modifications (accidentally reparents #10 into #4):
 #4 s(800,hug)
-  #10 f[(f1,#FF0000)]
+  #10 f[(#FF0000)]
     #11 t("Updated")
 
 RIGHT — flat modifications (no parent changes):
 #4 s(800,hug)
-#10 f[(f1,#FF0000)]
+#10 f[(#FF0000)]
 #11 t("Updated")
 ```
 
@@ -196,7 +196,7 @@ RIGHT — flat modifications (no parent changes):
 
 ### SVG Import
 
-`svg(icon:house)` bundled Phosphor · `svg(https://...)` URL (fetched at import — don't `curl` to `/tmp/`) · `svg(/tmp/file.svg)` local. Fills/strokes on SVG lines override imported fills/strokes — all fill types work (solid, shader, gradient, image). Example: `svg(icon:house) f[(f1,#3B82F6)]`, `svg(https://...) f[(f1,metal())]`. To recolor after creation, use `recolor_children` command.
+`svg(icon:house)` bundled Phosphor · `svg(https://...)` URL (fetched at import — don't `curl` to `/tmp/`) · `svg(/tmp/file.svg)` local. Fills/strokes on SVG lines override imported fills/strokes — all fill types work (solid, shader, gradient, image). Example: `svg(icon:house) f[(#3B82F6)]`, `svg(https://...) f[(metal())]`. To recolor after creation, use `recolor_children` command.
 
 #### Bundled Phosphor Icons (324)
 
@@ -213,10 +213,28 @@ RIGHT — flat modifications (no parent changes):
 
 | Source | Fill Syntax |
 |--------|-------------|
-| Photos | `f[(f1,img(https://picsum.photos/id/{n}/800/400))]` |
-| Avatars | `f[(f1,img(https://i.pravatar.cc/150?img={n}))]` |
-| Letter avatars | `f[(f1,img(https://ui-avatars.com/api/?name=John+Smith&size=150&background=3B82F6&color=fff))]` |
+| Photos | `f[(img(https://picsum.photos/id/{n}/800/400))]` |
+| Avatars | `f[(img(https://i.pravatar.cc/150?img={n}))]` |
+| Letter avatars | `f[(img(https://ui-avatars.com/api/?name=John+Smith&size=150&background=3B82F6&color=fff))]` |
 | SVG avatars | Use `svg(https://api.dicebear.com/9.x/notionists/svg?seed={name})` |
+
+### AI Image Generation (`generate_image`)
+
+Generate custom images with Nano Banana 2 (Gemini Image). The tool saves the image to the project Assets folder and returns an `assetPath` for use in fills: `f[(img(assetPath))]`.
+
+**Parameters:** `prompt` (required), `canvasId` (required), `aspectRatio`, `imageSize`, `referenceElementIds`
+
+| Quality | imageSize | Speed |
+|---------|-----------|-------|
+| Quick draft | `"1K"` | ~5s |
+| High quality | `"2K"` | ~15-20s |
+| Maximum quality | `"4K"` | Slowest |
+
+**Aspect ratios:** `1:1` (default), `3:2`, `2:3`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9`, `1:4`, `4:1`, `1:8`, `8:1`
+
+**Workflow:** Generate → get `assetPath` → place on canvas: `r s(400,300) f[(img(assetPath))] rd(8) clip "Hero Image"`
+
+**Prompt tips:** Write descriptive paragraphs (not keywords). Include subject, style, composition, lighting. Be specific. For text in images, state the exact text. For reference-based edits, change one thing at a time.
 
 ## execute_commands
 
@@ -256,21 +274,15 @@ Multiple commands execute sequentially in one call.
 
 **Background:** `set_background_color` (params: `{ "value": "#hex" }`) — automatically enables background visibility if it was off. Only change the canvas background if the user explicitly asks or it's clearly needed to resolve the user's request.
 
+**Provider API Keys:** `set_anthropic_api_key`, `set_openai_api_key`, `set_google_api_key`, `set_openrouter_api_key` — opens the API key input for the given provider. The user pastes their key, it's validated and saved securely.
+
 **Keybindings:** `list_keybindings` (params: `{ "group": "drawingToolsAndShapes", "search": "align" }` both optional — `group` filters by command group, `search` is a case-insensitive regex matched against id/name/description), `set_keybinding` (params: `{ "bindings": [{ "commandId": "change_tool_pen", "key": "P", "modifiers": ["shift"] }] }` — batch set; omit key/modifiers to clear). Group names: `drawingToolsAndShapes`, `colorManagement`, `size`, `cornerRadius`, `scale`, `moveElements`, `transformationAndAlignment`, `selectionAndEditing`, `canvasManagement`, `undoAndRedo`, `applicationControl`, `views`, `text`, `windowManagement`, `canvasManagement`, `layout`.
 
 ## Reading Canvas State
 
 Every `create_modify_elements` and `execute_commands` response includes a `blueprint` field with element names and IDs in the same format as the DSL input. **Use these IDs for subsequent operations** — don't re-read the canvas.
 
-If you need the full canvas state:
-```bash
-".claude/scripts/get-blueprint.sh" "{canvasId}"
-```
-
-For raw YAML element data (rare — only for vector path `d` data):
-```bash
-".claude/scripts/get-element.sh" "{canvasId}" ELEMENT_ID
-```
+If you need the full canvas state, use `get_blueprint` (with no `elementIds` — but only on small canvases). For targeted inspection, pass specific `elementIds`.
 
 ## DSL Gotchas
 

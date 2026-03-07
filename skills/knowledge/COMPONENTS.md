@@ -188,9 +188,9 @@ Components and instances can be created in blueprint syntax using the `component
 Add the `comp` bare flag to create a component master:
 
 ```
-a1b2c3d4 al(h,g(8),pad(12,16)) s(hug,48) f[(f1,#3B82F6)] rd(8) comp "Button"
+a1b2c3d4 al(h,g(8),pad(12,16)) s(hug,48) f[(#3B82F6)] rd(8) comp "Button"
   b1b2c3d4 fr s(24,24) slot "Icon"
-  c1b2c3d4 t("Button",Inter,14,sb) s(fill,hug) f[(f1,#FFFFFF)] "Label"
+  c1b2c3d4 t("Button",Inter,14,sb) s(fill,hug) f[(#FFFFFF)] "Label"
 ```
 
 **What happens:**
@@ -219,8 +219,8 @@ d1b2c3d4 inst(a1b2c3d4) p(300,100) "Submit"
 Mark a child with the `slot` bare flag to designate it as instance-owned content:
 
 ```
-e1b2c3d4 al(v,g(16),pad(24)) s(320,hug) f[(f1,#FFFFFF)] rd(12) comp "Card"
-  f1b2c3d4 t("Card Title",Inter,20,b) s(fill,hug) f[(f1,#0F172A)] "Header"
+e1b2c3d4 al(v,g(16),pad(24)) s(320,hug) f[(#FFFFFF)] rd(12) comp "Card"
+  f1b2c3d4 t("Card Title",Inter,20,b) s(fill,hug) f[(#0F172A)] "Header"
   a2b2c3d4 fr s(fill,hug) slot "Content"
 ```
 

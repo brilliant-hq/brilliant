@@ -75,7 +75,8 @@ skills/
 │   ├── RECIPES.md               ← Effect combos, glass, neon, button states, dark mode, claymorphism (load for effects-heavy designs)
 │   ├── DATA_VISUALIZATION.md    ← Charts, sparklines, tables, progress rings, heatmaps (load for data)
 │   ├── COLORS.md                ← Deep color: palettes, psychology, gradients, dark mode
-│   └── TYPOGRAPHY.md            ← Deep type: scales, pairing, hierarchy, styled ranges
+│   ├── TYPOGRAPHY.md            ← Deep type: scales, pairing, hierarchy, styled ranges
+│   └── IMAGE_GENERATION.md     ← AI image gen: prompt engineering, quality settings, use-case templates
 │
 ├── recreation/                  ← RECREATING FROM REFERENCES
 │   ├── SKILL.md                 ← Entry point: sub-skill routing
@@ -121,6 +122,7 @@ Look at the tree above, identify ALL files relevant to your task, and **load the
 | **Recreating from image** | Foundation + `get_skill("recreation/IMAGE")` (section-by-section building, color/proportion matching) |
 | **Deep color choices** | Add `get_skill("building/COLORS")` to any task where palette matters (branding, dark mode, data viz) |
 | **Deep typography choices** | Add `get_skill("building/TYPOGRAPHY")` to any task where type matters (heroes, editorial, pricing) |
+| **Design with real images** | Add `get_skill("building/IMAGE_GENERATION")` when design needs photos, product shots, textures, or illustrations |
 | **Answer a question** | `get_skill("knowledge")` + relevant knowledge sub-skills |
 
 ```
@@ -145,11 +147,11 @@ Connect via WebSocket using `websocat`. Each line you send is processed and rend
 
 # Build an array of blueprint lines, then send each with a small delay
 lines=(
-  'al(v,g(16),pad(24)) p(100,100) s(hug,hug) f[(f1,#FFFFFF)] st[(s1,#E2E8F0,1)] rd(12) "Card"'
-  '  t("Dashboard",Inter,24,b) f[(f1,#0F172A)] "Title"'
-  '  t("Welcome back",Inter,14) s(fill,hug) f[(f1,#64748B)] "Subtitle"'
-  '  al(h,a(c,c),pad(10,20)) s(hug,hug) f[(f1,#3B82F6)] rd(8) "Button"'
-  '    t("Get Started",Inter,14,sb) f[(f1,#FFFFFF)] "Label"'
+  'al(v,g(16),pad(24)) p(100,100) s(hug,hug) f[(#FFFFFF)] st[(#E2E8F0,1)] rd(12) "Card"'
+  '  t("Dashboard",Inter,24,b) f[(#0F172A)] "Title"'
+  '  t("Welcome back",Inter,14) s(fill,hug) f[(#64748B)] "Subtitle"'
+  '  al(h,a(c,c),pad(10,20)) s(hug,hug) f[(#3B82F6)] rd(8) "Button"'
+  '    t("Get Started",Inter,14,sb) f[(#FFFFFF)] "Label"'
 )
 
 (for line in "${lines[@]}"; do echo "$line"; sleep 0.05; done) \
@@ -183,8 +185,8 @@ curl -s -X POST \
   'STREAMING_API_URL?canvasId=CANVAS_ID' \
   -H 'Content-Type: text/plain' \
   --data-binary @- <<'BLUEPRINT'
-al(v,g(16),pad(24)) p(100,100) s(hug,hug) f[(f1,#FFFFFF)] rd(12) "Card"
-  t("Dashboard",Inter,24,b) f[(f1,#0F172A)] "Title"
+al(v,g(16),pad(24)) p(100,100) s(hug,hug) f[(#FFFFFF)] rd(12) "Card"
+  t("Dashboard",Inter,24,b) f[(#0F172A)] "Title"
 BLUEPRINT
 ```
 

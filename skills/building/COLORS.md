@@ -152,25 +152,25 @@ Colors trigger specific associations. Match your palette to the domain's emotion
 
 | Situation | Gradient? | Why |
 |-----------|-----------|-----|
-| Hero background | Maybe — very subtle tonal shift only | `f[(f1,linear(180,#F8FAFC,#E2E8F0))]`, not a color ramp |
+| Hero background | Maybe — very subtle tonal shift only | `f[(linear(180,#F8FAFC,#E2E8F0))]`, not a color ramp |
 | Card accent bar | Maybe — small surface, not attention-grabbing | Keep it to analogous hues |
 | CTA button | **No** — solid colors only | Gradient CTAs are the #1 AI design tell. Use solid dark or solid accent |
 | Text headline | Sparingly — one per page max | Gradient text can be a show-stopper, but not every design needs it |
-| Sparkline area fills | Yes — fading to transparent | `f[(f1,linear(180,stop(#hex,0,0.15),stop(#hex,1,0.0)))]` for polished charts |
+| Sparkline area fills | Yes — fading to transparent | `f[(linear(180,stop(#hex,0,0.15),stop(#hex,1,0.0)))]` for polished charts |
 | Every surface | **No** | Modern design uses solid colors + whitespace, not gradients |
 
 ### Gradient Types by Mood
 
 | Mood | From to To | Hex | Angle |
 |------|-----------|-----|-------|
-| Subtle depth | Background to slightly darker | `f[(f1,linear(180,#F8FAFC,#E2E8F0))]` | top to bottom |
-| Premium dark | Dark to slightly lighter | `f[(f1,linear(90,#0F172A,#1E293B))]` | left to right |
-| Warm energy | Amber to Rose | `f[(f1,linear(135,#F59E0B,#F43F5E))]` | diagonal |
-| Ocean calm | Teal to Blue | `f[(f1,linear(90,#14B8A6,#3B82F6))]` | left to right |
-| Tech depth | Dark navy to Slate | `f[(f1,linear(135,#0F172A,#334155))]` | diagonal |
-| Sunrise | Rose to Amber | `f[(f1,linear(90,#F43F5E,#F59E0B))]` | left to right |
-| Forest | Emerald to Teal | `f[(f1,linear(180,#10B981,#14B8A6))]` | top to bottom |
-| Frost | Sky to White | `f[(f1,linear(180,#0EA5E9,#F8FAFC))]` | top to bottom |
+| Subtle depth | Background to slightly darker | `f[(linear(180,#F8FAFC,#E2E8F0))]` | top to bottom |
+| Premium dark | Dark to slightly lighter | `f[(linear(90,#0F172A,#1E293B))]` | left to right |
+| Warm energy | Amber to Rose | `f[(linear(135,#F59E0B,#F43F5E))]` | diagonal |
+| Ocean calm | Teal to Blue | `f[(linear(90,#14B8A6,#3B82F6))]` | left to right |
+| Tech depth | Dark navy to Slate | `f[(linear(135,#0F172A,#334155))]` | diagonal |
+| Sunrise | Rose to Amber | `f[(linear(90,#F43F5E,#F59E0B))]` | left to right |
+| Forest | Emerald to Teal | `f[(linear(180,#10B981,#14B8A6))]` | top to bottom |
+| Frost | Sky to White | `f[(linear(180,#0EA5E9,#F8FAFC))]` | top to bottom |
 
 ### Linear vs Radial vs Angular
 
@@ -198,11 +198,11 @@ Linear gradients simulate directional light — a tilted plane, a sweep across a
 
 1. **Default is no gradient.** Modern SaaS sites use solid colors + whitespace. Only add a gradient when it genuinely improves the design — most of the time it doesn't.
 2. **Never gradient a CTA button.** Solid dark (`#1C1917`) or solid accent. Gradient CTAs are the #1 AI design tell.
-3. **Never use blue-purple.** `#3B82F6` to `#8B5CF6` is the most recognizable AI gradient. If you need a gradient, use subtle tonal shifts (`f[(f1,linear(180,#F8FAFC,#E2E8F0))]`) or domain-matched hues.
+3. **Never use blue-purple.** `#3B82F6` to `#8B5CF6` is the most recognizable AI gradient. If you need a gradient, use subtle tonal shifts (`f[(linear(180,#F8FAFC,#E2E8F0))]`) or domain-matched hues.
 4. **One good color, shifted.** The best gradients start from ONE color and shift its lightness or hue by small amounts — not two unrelated colors. Blue-to-slightly-more-purple-blue always beats blue-to-orange.
 5. **Two stops usually, three strategically.** A carefully placed third stop creates a "knee" that prevents the uniform wash of a two-color blend — but only when you choose the mid-stop color intentionally.
 6. **One gradient per visual group.** Card with gradient accent bar + gradient background = competing. Pick one.
-7. **Per-stop opacity for overlays.** `f[(f1,linear(180,stop(#000000,0,0.4),stop(#000000,1,0.85)))]` — semi-transparent top, dark bottom. Always specify opacity on BOTH stops.
+7. **Per-stop opacity for overlays.** `f[(linear(180,stop(#000000,0,0.4),stop(#000000,1,0.85)))]` — semi-transparent top, dark bottom. Always specify opacity on BOTH stops.
 8. **Angle matches reading direction.** `135` (diagonal) for dynamic energy. `180` (top to bottom) for grounding. `0` (bottom to top) for lift.
 
 ---
@@ -244,10 +244,10 @@ Series 6: #06B6D4 (cyan)
 
 | Metric type | Stroke | Area fill gradient | Example |
 |-------------|--------|-------------------|---------|
-| Revenue / growth | `#10B981` | `f[(f1,linear(180,stop(#10B981,0,0.15),stop(#10B981,1,0.0)))]` | Revenue $45.2K |
-| Users / signups | `#3B82F6` | `f[(f1,linear(180,stop(#3B82F6,0,0.15),stop(#3B82F6,1,0.0)))]` | Users 2,350 |
-| Performance / latency | `#F59E0B` | `f[(f1,linear(180,stop(#F59E0B,0,0.15),stop(#F59E0B,1,0.0)))]` | Latency 42ms |
-| Errors / issues | `#F43F5E` | `f[(f1,linear(180,stop(#F43F5E,0,0.15),stop(#F43F5E,1,0.0)))]` | Errors 12 |
+| Revenue / growth | `#10B981` | `f[(linear(180,stop(#10B981,0,0.15),stop(#10B981,1,0.0)))]` | Revenue $45.2K |
+| Users / signups | `#3B82F6` | `f[(linear(180,stop(#3B82F6,0,0.15),stop(#3B82F6,1,0.0)))]` | Users 2,350 |
+| Performance / latency | `#F59E0B` | `f[(linear(180,stop(#F59E0B,0,0.15),stop(#F59E0B,1,0.0)))]` | Latency 42ms |
+| Errors / issues | `#F43F5E` | `f[(linear(180,stop(#F43F5E,0,0.15),stop(#F43F5E,1,0.0)))]` | Errors 12 |
 
 ---
 
@@ -276,7 +276,7 @@ Dark mode is NOT "invert everything." It's a specific mapping:
 3. **Reduce accent saturation on dark.** Vibrant colors on dark backgrounds feel radioactive. Consider `#60A5FA` (lighter blue) instead of `#3B82F6` on dark surfaces.
 4. **Borders become optional.** Dark surfaces naturally separate from each other with slight lightness differences. Remove most borders.
 5. **Shadows become invisible.** Dark mode cards don't need drop shadows — the surface color difference does the work.
-6. **Images need darkened overlay.** Bright images on dark pages create jarring contrast. Add `f[(f1,solid(#000000,0.2))]` overlay.
+6. **Images need darkened overlay.** Bright images on dark pages create jarring contrast. Add `f[(solid(#000000,0.2))]` overlay.
 
 ---
 

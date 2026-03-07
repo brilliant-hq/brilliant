@@ -48,19 +48,19 @@ Elements appear on the canvas as they stream in — the user sees them being bui
 If the sessionCanvasId above is `Projects/Dashboard`, you would write:
 
 <objects canvasId="Projects/Dashboard">
-al(v,g(16),pad(24)) p(100,100) s(hug,hug) f[(f1,#FFFFFF)] st[(s1,#E2E8F0,1)] rd(12) "Card" #1
-  t("Dashboard",Inter,24,b) f[(f1,#0F172A)] "Title" #2
-  t("Welcome back",Inter,14) s(fill,hug) f[(f1,#64748B)] "Subtitle" #3
-  al(h,a(c,c),pad(10,20)) s(hug,hug) f[(f1,#3B82F6)] rd(8) "Button" #4
-    t("Get Started",Inter,14,sb) f[(f1,#FFFFFF)] "Label" #5
+al(v,g(16),pad(24)) p(100,100) s(hug,hug) f[(#FFFFFF)] st[(#E2E8F0,1)] rd(12) "Card" #1
+  t("Dashboard",Inter,24,b) f[(#0F172A)] "Title" #2
+  t("Welcome back",Inter,14) s(fill,hug) f[(#64748B)] "Subtitle" #3
+  al(h,a(c,c),pad(10,20)) s(hug,hug) f[(#3B82F6)] rd(8) "Button" #4
+    t("Get Started",Inter,14,sb) f[(#FFFFFF)] "Label" #5
 </objects>
 
 ### Rules
 
 - **Substitute the real `sessionCanvasId`** from above into the `canvasId` attribute — do NOT use a placeholder.
 - Multiple `<objects>` blocks can appear in one response. Text before, between, and after blocks is shown to the user normally.
-- **Do NOT include IDs for new elements** — the server generates them automatically. Only use an ID as the first token to **modify** an existing element — e.g., `abc12345def67890 f[(f1,#FF0000)]`.
-- **Use `#N` session refs** to reference newly created elements. Append `#N` (auto-incrementing) at the end of each create line. Use `#N` as the first token to modify a previously created element — e.g., `#1 f[(f1,#FF0000)]`.
+- **Do NOT include IDs for new elements** — the server generates them automatically. Only use an ID as the first token to **modify** an existing element — e.g., `abc12345def67890 f[(#FF0000)]`.
+- **Use `#N` session refs** to reference newly created elements. Append `#N` (auto-incrementing) at the end of each create line. Use `#N` as the first token to modify a previously created element — e.g., `#1 f[(#FF0000)]`.
 - **No `previewIds` or `previewScale`** — these are MCP-only parameters. In hosted mode, elements appear live on the canvas. Use `export_to_png` to verify modifications when iterating on size or layout changes.
 - **Modifications go flat, not nested.** When modifying existing elements, list each `#N` at depth 0 — don't re-express hierarchy with indentation. Only indent when creating new children or overriding children inside a `clone()` line.
 - After loading skills, your very next step MUST be outputting an `<objects>` block. Do NOT describe what you will build — just build it.
@@ -119,7 +119,8 @@ Brilliant's domain knowledge is spread across **skill files** organized in a tre
 │   ├── RECIPES.md               ← Effect combos, glass, neon, button states, dark mode, claymorphism (load for effects-heavy designs)
 │   ├── DATA_VISUALIZATION.md    ← Charts, sparklines, tables, progress rings, heatmaps (load for data)
 │   ├── COLORS.md                ← Deep color: palettes, psychology, gradients, dark mode
-│   └── TYPOGRAPHY.md            ← Deep type: scales, pairing, hierarchy, styled ranges
+│   ├── TYPOGRAPHY.md            ← Deep type: scales, pairing, hierarchy, styled ranges
+│   └── IMAGE_GENERATION.md     ← AI image gen: prompt engineering, quality settings, use-case templates
 │
 ├── recreation/                  ← RECREATING FROM REFERENCES
 │   ├── SKILL.md                 ← Entry point: sub-skill routing
@@ -167,6 +168,7 @@ Look at the tree above, identify ALL files relevant to your task, and **`Read` t
 | **Recreating from website URL** | Foundation + `recreation/WEBSITE.md` (fetch HTML/CSS, extract values, download assets) |
 | **Deep color choices** | Add `COLORS.md` to any task where palette matters (branding, dark mode, data viz) |
 | **Deep typography choices** | Add `TYPOGRAPHY.md` to any task where type matters (heroes, editorial, pricing) |
+| **Design with real images** | Add `IMAGE_GENERATION.md` when design needs photos, product shots, textures, or illustrations |
 | **Answer a question** | `knowledge/SKILL.md` + relevant knowledge sub-skills |
 
 ```

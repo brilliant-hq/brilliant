@@ -70,6 +70,8 @@ When a user asks a question, **read** the relevant sub-skill file from the table
 | "How do I set up an API key?" | AI.md |
 | "What AI providers are supported?" | AI.md |
 | "How do I add attachments to chat?" | AI.md |
+| "How do I generate an image?" | AI.md (→ "AI Image Generation") |
+| "Can AI create images?" | AI.md (→ "AI Image Generation") |
 | "How do I add a shadow?" | EFFECTS.md |
 | "How do I add noise/grain?" | SHADERS.md |
 | "How do I blur an element?" | EFFECTS.md |

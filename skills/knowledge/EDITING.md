@@ -181,7 +181,7 @@ Use `execute_commands` with `skew_elements`:
 Use `skew(x,y)` property:
 
 ```
-a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[(f1,#3B82F6)] "Hero BG"
+a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[(#3B82F6)] "Hero BG"
 ```
 
 ### Common Values

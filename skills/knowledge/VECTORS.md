@@ -208,7 +208,7 @@ A vector element's bounding box is defined by `WxH` in the element declaration. 
 
 ```
 # A 60x24 sparkline positioned at (10,5) inside a group
-Sparkline v 60x24 p(10,5) st[(s1,#3B82F6,1.5)] s(fixed,fixed) path:d(M0,20 C10,16 20,12 30,8 C40,6 50,4 60,2)
+Sparkline v 60x24 p(10,5) st[(#3B82F6,1.5)] s(fixed,fixed) path:d(M0,20 C10,16 20,12 30,8 C40,6 50,4 60,2)
 ```
 
 **The path fills the WxH box.** If your path coordinates exceed `WxH`, the overflow is clipped. If they're smaller, the element has dead space. Design paths to match your declared size.
@@ -230,7 +230,7 @@ Sparkline v 60x24 p(10,5) st[(s1,#3B82F6,1.5)] s(fixed,fixed) path:d(M0,20 C10,1
 ### Sparkline (Stroke Only)
 
 ```
-Spark v 60x24 st[(s1,#3B82F6,1.5)] s(fixed,fixed) path:d(M0,22 C6,21 12,20 18,17 C22,16 26,18 30,15 C36,12 42,10 48,8 C52,7 56,5 60,4)
+Spark v 60x24 st[(#3B82F6,1.5)] s(fixed,fixed) path:d(M0,22 C6,21 12,20 18,17 C22,16 26,18 30,15 C36,12 42,10 48,8 C52,7 56,5 60,4)
 ```
 
 **Always use `C` (cubic bezier) for smooth curves.** `L`-only paths look jagged. See `building/DATA.md` → "Realistic Path Shapes" for metric-specific paths (revenue, latency, error rate, etc.) — each metric type has a distinct visual signature.
@@ -244,10 +244,10 @@ To fill the area under a curve, **close the path at the bottom** and wrap in a *
 # Close at bottom:      L60,24 L0,24 Z
 # Full closed path in clip frame:
 Spark al(v) s(hug,hug) clip pad(2,0,0,0)
-  Area v 60x24 f[(f1,solid(#3B82F6,0.12))] st[(s1,#3B82F6,1.5,n,n,o)] s(fixed,fixed) path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z)
+  Area v 60x24 f[(solid(#3B82F6,0.12))] st[(#3B82F6,1.5,n,n,o)] s(fixed,fixed) path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z)
 ```
 
-The `L60,24 L0,24 Z` closes the path along the bottom edge, creating a filled region. The `pad(2,0,0,0)` adds 2px top padding (≥ stroke width) so the curve stroke isn't clipped, while 0 padding on bottom/left/right keeps closing-edge strokes cropped. Use `f[(f1,solid(#hex,0.12))]` (12% opacity) for a simple translucent area, or a gradient for a polished fade effect.
+The `L60,24 L0,24 Z` closes the path along the bottom edge, creating a filled region. The `pad(2,0,0,0)` adds 2px top padding (≥ stroke width) so the curve stroke isn't clipped, while 0 padding on bottom/left/right keeps closing-edge strokes cropped. Use `f[(solid(#hex,0.12))]` (12% opacity) for a simple translucent area, or a gradient for a polished fade effect.
 
 ### Sparkline + Area Fill (Combined)
 
@@ -255,22 +255,22 @@ Use ONE closed vector with both stroke and fill, wrapped in a clip frame. For a 
 
 ```
 Spark al(v) s(hug,hug) clip pad(2,0,0,0)
-  Line v 60x24 f[(f1,linear(180,stop(#3B82F6,0,0.15),stop(#3B82F6,1,0.0)))] st[(s1,#3B82F6,1.5,n,n,o)] s(fixed,fixed) path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z)
+  Line v 60x24 f[(linear(180,stop(#3B82F6,0,0.15),stop(#3B82F6,1,0.0)))] st[(#3B82F6,1.5,n,n,o)] s(fixed,fixed) path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z)
 ```
 
-The clip frame + outside stroke combination ensures only the top curve stroke is visible. Top padding prevents the curve stroke from being clipped. The gradient (`180` = top-to-bottom) creates the modern area chart look. For simplicity, `f[(f1,solid(#3B82F6,0.12))]` (solid at low opacity) also works.
+The clip frame + outside stroke combination ensures only the top curve stroke is visible. Top padding prevents the curve stroke from being clipped. The gradient (`180` = top-to-bottom) creates the modern area chart look. For simplicity, `f[(solid(#3B82F6,0.12))]` (solid at low opacity) also works.
 
 ### Common Mistakes
 
 | Wrong | Correct |
 |-------|---------|
 | Two separate vectors in a group (one stroke, one fill) for sparkline + area | ONE closed vector with both `fill` and `stroke` in a clip frame |
-| Placing a colored `rect` behind a sparkline stroke to simulate area fill | Use a **closed vector path** with `f[(f1,solid(#hex,opacity))]` — the rect can't follow the curve |
-| Using centered stroke on closed sparkline paths | Use `st[(s1,#hex,1.5,n,n,o)]` (outside stroke) + clip frame to hide closing-edge strokes |
+| Placing a colored `rect` behind a sparkline stroke to simulate area fill | Use a **closed vector path** with `f[(solid(#hex,opacity))]` — the rect can't follow the curve |
+| Using centered stroke on closed sparkline paths | Use `st[(#hex,1.5,n,n,o)]` (outside stroke) + clip frame to hide closing-edge strokes |
 | Using `L` segments for smooth sparklines | Use `C` cubic beziers — `L` creates jagged zigzags |
 | Creating vectors without `WxH` | Always declare size: `v 60x24` — the path renders within this box |
 | Fighting vector positioning with repeated @X,Y adjustments | Design path coordinates relative to `0,0`, set `WxH` to match path bounds, position with `p(X,Y)` |
-| Creating separate triangle `vector` elements for arrowheads | Use `st[(s1,#hex,width,n,ar)]` on a `line` or `vector` — the arrow cap renders automatically at the endpoint |
+| Creating separate triangle `vector` elements for arrowheads | Use `st[(#hex,width,n,ar)]` on a `line` or `vector` — the arrow cap renders automatically at the endpoint |
 
 ### Vector Regions
 
@@ -278,8 +278,8 @@ Vectors with multiple closed regions (e.g. imported SVG logos) expose per-region
 
 ```
 abc123 v() s(200,200) "Logo"
-  vr(r1, M0,0 C50,-20 100,0 100,100 Z) f[(f1,#FF6611)]
-  vr(r2, M30,30 L70,30 L70,70 L30,70 Z) f[(f2,#00FF00)]
+  vr(r1, M0,0 C50,-20 100,0 100,100 Z) f[(#FF6611)]
+  vr(r2, M30,30 L70,30 L70,70 L30,70 Z) f[(#00FF00)]
   vr(r3, M40,40 L60,40 L60,60 L40,60 Z) hole
 ```
 
@@ -291,8 +291,8 @@ abc123 v() s(200,200) "Logo"
 **Modify per-region fills** — reference by region ID, no path data needed:
 ```
 abc123
-  vr(r1) f[(f1,solid(#3B82F6,0.15)),(f2,blur(12)),(f3,inner(#000,0.2,0,2,4))]
-  vr(r2) f[(f1,solid(#8B5CF6,0.1)),(f2,blur(8))]
+  vr(r1) f[(solid(#3B82F6,0.15)),(f2,blur(12)),(f3,inner(#000,0.2,0,2,4))]
+  vr(r2) f[(solid(#8B5CF6,0.1)),(f2,blur(8))]
 ```
 
 Only listed regions are modified — others keep their current fills. Flat `f[...]` on the element line still applies uniformly to all regions.
@@ -306,25 +306,25 @@ Only listed regions are modified — others keep their current fills. Flat `f[..
 | Icons | `svg` — NEVER `vector` |
 | Sparklines, trend lines | `vector` with stroke, `C` curves |
 | Area charts (filled region under curve) | `vector` with closed path + fill (one element, both stroke and fill) |
-| Arrows (straight) | `line` with `st[(s1,#hex,width,n,ar)]` arrow cap |
-| Arrows (curved) | `vector` with `st[(s1,#hex,width,n,ar)]` arrow cap and `C` curves |
+| Arrows (straight) | `line` with `st[(#hex,width,n,ar)]` arrow cap |
+| Arrows (curved) | `vector` with `st[(#hex,width,n,ar)]` arrow cap and `C` curves |
 | Simple colored rectangles | `rect` |
 | Circles, dots | `circle` |
 | Decorative wavy dividers | `vector` with `C` curves |
-| Progress rings | Track = `circle` with stroke; progress arc = `circle` with `arc(start,sweep)` — e.g. `c s(80,80) st[(s1,#3B82F6,4,r,r)] arc(0,75) ratio(1)` for 75% (see `building/DATA.md` "Circular Progress Ring") |
+| Progress rings | Track = `circle` with stroke; progress arc = `circle` with `arc(start,sweep)` — e.g. `c s(80,80) st[(#3B82F6,4,r,r)] arc(0,75) ratio(1)` for 75% (see `building/DATA.md` "Circular Progress Ring") |
 
 ### Arrows
 
-Use `st[(s1,#hex,width,n,ar)]` to add an arrowhead at the endpoint (`ar` = arrow endCap). Works on both `line` and `vector` elements — no separate triangle elements needed.
+Use `st[(#hex,width,n,ar)]` to add an arrowhead at the endpoint (`ar` = arrow endCap). Works on both `line` and `vector` elements — no separate triangle elements needed.
 
 **Straight arrow:**
 ```
-Arrow l p(50,100) s(200,100) st[(s1,#374151,1.5,n,ar)]
+Arrow l p(50,100) s(200,100) st[(#374151,1.5,n,ar)]
 ```
 
 **Curved arrow:**
 ```
-Arrow v 200x100 st[(s1,#374151,1.5,n,ar)] s(fixed,fixed) path:d(M0,50 C60,50 140,0 200,0)
+Arrow v 200x100 st[(#374151,1.5,n,ar)] s(fixed,fixed) path:d(M0,50 C60,50 140,0 200,0)
 ```
 
 The arrow cap renders at the last node, oriented along the path tangent. It scales with stroke width automatically.
