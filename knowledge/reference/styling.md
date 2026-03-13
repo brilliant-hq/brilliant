@@ -93,6 +93,15 @@ Add/remove/reposition color stops directly on the gradient bar.
 
 Import an image (Cmd+K) or paste from clipboard. The image becomes a rectangle with an image fill.
 
+**Image Manager:** Click an image fill's color swatch in the right toolbar to open the color picker in image mode. The color picker replaces its color controls with an image preview and replacement UI. From there you can:
+- **Select** a new image file from disk
+- **Drop** an image file from Finder onto the image area
+- **Paste** an image with Cmd+V (works with screenshots, browser copies, and Finder-copied files)
+
+The design tokens, canvas colors, and recent colors sections remain visible below the image area. A replace button is also available in the expanded image fill config row.
+
+**Supported formats:** PNG, JPG, GIF, BMP, WebP on all platforms. TIFF, HEIC, and AVIF are additionally supported on macOS (converted to PNG via native decoding). On Windows/Linux these formats are excluded from file pickers and drop targets.
+
 **Image Scale Modes:**
 
 | Mode | Description |

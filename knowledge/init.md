@@ -6,6 +6,8 @@ Load knowledge via `get_knowledge(keys: [...])`. Prerequisites are automatic —
 
 Tell the user what you're doing before loading so they see activity.
 
+**NEVER answer questions about Brilliant's capabilities from your own knowledge.** Your training data does not know what Brilliant can or can't do. When the user asks "can we...", "does Brilliant support...", "how do I...", or any question about features, formats, shortcuts, or workflows — ALWAYS `get_knowledge` with the relevant `reference/*` key first. Answering from memory leads to confidently wrong answers.
+
 ## Knowledge Keys
 
 | Category | Keys | Required for |
@@ -36,6 +38,10 @@ Tell the user what you're doing before loading so they see activity.
 
 > **Which `design/blocks/*`?** `actions` (buttons) for everything. `layout` (hero, header, footer) for pages. `data-display` (cards, stats, tables) for dashboards. `navigation` for multi-page. `inputs` for forms. `feedback` (modals, toasts) for interactive UI. When unsure, load all — they're small.
 
+## Visual Feedback
+
+`previewIds` is **required** on every `<objects>` tag — specify at least one `#ref` for the top-level elements to screenshot (e.g., the outermost card, not individual children). After an `<objects>` block, end your turn immediately — do NOT call `export_to_png` or any other tool. You will automatically receive a screenshot of the `previewIds` elements. Self-review it: check **Spacing** (even gaps, spacious grouping) · **Typography** (readable sizes, clear hierarchy) · **Contrast** (text stands out from bg) · **Alignment** (vertical lanes consistent across repeated rows) · **Clipping** (no content cut off at edges). Fix any issues, otherwise move on.
+
 ## Large Designs: Chunked Creation
 
 Split `create_modify_elements` calls into ~20-25 elements per chunk. Structure chunks around logical groups (one card, one section) so undo remains useful.
@@ -47,3 +53,7 @@ Every `create_modify_elements` and `execute_commands` response includes a `bluep
 ## Bundled Icons
 
 All **Phosphor regular-weight** icons bundled. Use `svg(icon:name)` with kebab-case. Browse at [phosphoricons.com](https://phosphoricons.com). **ALL ICONS = SVGs.** Never `vector` for icons. Never emoji.
+
+## Feedback
+
+When users want to provide feedback, request features, or report issues with Brilliant, use the `/feedback` slash command in the chat input. It files directly to the Brilliant team. Don't tell users you can't pass along feedback — you can.

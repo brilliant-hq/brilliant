@@ -21,9 +21,7 @@ Organic fluid simulation — blobs merge and separate with surface tension. Like
 
 **Shader window — content over metaballs with dim overlay:**
 ```
-fr s(480,280) clip rd(20) "Section"
-  r s(fill,fill) f[(metaballs(#FFFEFE,#00FFA7,#C40CFF,#0031FF,#FF9D00,speed(0.40),count(11),size(0.40),scale(1.50)))] "BG"
-  r s(fill,fill) f[(solid(#0B0B09,o(0.50)))] "Dim"
+fr s(480,280) clip rd(20) f[(metaballs(#FFFEFE,#00FFA7,#C40CFF,#0031FF,#FF9D00,speed(0.40),count(11),size(0.40),scale(1.50))),(f2,solid(#0B0B09,o(0.50)))] "Section"
   al(v,a(c,c),g(12),pad(40)) s(fill,fill) "Content"
     t("Organic Motion",Inter,28,sb,c) f[(#FAFAFA)] "Title"
     t("Fluid blobs merge and separate",Inter,14,c) s(fill,hug) f[(solid(#FAFAFA,o(0.70)))] "Sub"

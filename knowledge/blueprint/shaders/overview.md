@@ -19,9 +19,11 @@ Four shader types simulate real-world materials. Each is a physical surface, not
 Shaders produce busy patterns that make text unreadable. Separate shader from text:
 
 1. **Shader on stroke, solid fill for text** — `f[(#18181B)] st[(steel(),w(2))]`
-2. **Shader as background, glass card on top** — blur creates readable zone
+2. **Shader as background with dim overlay** — stack shader + semi-transparent solid as fills on the SAME frame: `f[(metaballs(#0D1B3E,#1A3A5C)),(_,solid(#000,o(0.4)))]`
 3. **Shader under solid fill** — `f[(#1C1917),(f2,steel(opacity(0.12)))]`
 4. **Shader on decorative element** — accent bar beside text
+
+**Shader backgrounds are fills, not child elements.** Never create a separate `r s(fill,fill) f[(shader(...))]` child as a background — put the shader fill directly on the frame. Add a dim overlay as a second fill layer, not a second child element.
 
 ## UV Controls (all types)
 

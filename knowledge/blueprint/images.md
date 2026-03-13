@@ -18,7 +18,9 @@ Place images on rectangles: `r s(400,300) f[(img(path))] rd(8) clip "Hero"`
 
 ## SVG Import
 
-`svg(icon:house)` bundled Phosphor · `svg(https://...)` URL (fetched at import) · `svg(/tmp/file.svg)` local
+`svg(icon:house)` bundled Phosphor · `svg(https://...)` URL (fetched at import) · `svg(/tmp/file.svg)` local · `svg(<svg>...</svg>)` inline
+
+Inline SVGs must be collapsed to a single line (no newlines inside the `svg()` token). Use for custom shapes or icons not available in Phosphor.
 
 Fills/strokes on SVG lines override imported fills — all fill types work:
 - `svg(icon:house) f[(#3B82F6)]`

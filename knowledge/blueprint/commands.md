@@ -5,7 +5,7 @@ assumes: blueprint/core
 
 Assumes: `blueprint/core`
 
-Use `execute_commands` only for operations the DSL **cannot** express — alignment, distribution, selection, canvas management.
+Use `execute_commands` only for operations the DSL **cannot** express — alignment, distribution, selection, canvas management. Element creation, deletion (`delete()`), and property changes are all Blueprint DSL operations — never `execute_commands`.
 
 ## execute_commands
 

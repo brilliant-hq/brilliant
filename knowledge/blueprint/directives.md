@@ -55,5 +55,12 @@ WRONG (accidentally reparents #10 into #4):
 RIGHT (modifies both independently):
 #4 s(800,hug)
 #10 f[(#FF0000)]
+
+WRONG (creates a DUPLICATE icon — new svg has no ID so it's a create, not modify):
+#statsRow
+  svg(icon:wind) s(16,16) f[(#7DD3FC)]
+
+RIGHT (modifies the existing icon by ref):
+#windIcon f[(#7DD3FC)]
 ```
-Only indent modify lines when you intentionally want to reparent. Never delete+recreate to move — reparenting preserves IDs and undo.
+Only indent modify lines when you intentionally want to reparent. A line without an ID/ref is always a **create** — indenting it under a parent adds a new child, never replaces an existing one. To modify a child, use its ID or `#ref` as first token (flat). Never delete+recreate to move — reparenting preserves IDs and undo.

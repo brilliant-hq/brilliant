@@ -3,7 +3,21 @@ assumes: blueprint/core
 ---
 # Blueprint Paint
 
-**Fills are your compositing system.** The fill stack works like a layer compositor — each fill renders in order. Tint, blur, glow, inner shadow, gradient warmth — these are all fill layers on the element itself. If you find yourself creating a separate element behind another to add a visual effect, stop — it's almost certainly a fill layer. Group Overlay (`gr`) is for positioned content that needs independent size/rotation, not for backgrounds or effects.
+**Fills are your compositing system.** The fill stack works like a layer compositor — each fill renders in order. Tint, blur, glow, inner shadow, gradient warmth, shaders, dim overlays — these are all fill layers on the element itself. **NEVER create a separate child rectangle for a background, overlay, or tint — use a fill layer instead.** Group Overlay (`gr`) is for positioned decorative content that needs independent size/rotation, not for backgrounds or effects.
+
+**WRONG — separate child elements for backgrounds:**
+```
+fr s(340,480) rd(28) clip "Widget"
+  r s(fill,fill) f[(metaballs(...))] "ShaderBG"       ← WRONG: should be a fill
+  r s(fill,fill) f[(solid(#000,o(0.4)))] "DimOverlay"  ← WRONG: should be a fill
+  al(...) "Content"
+```
+**RIGHT — fills stacked on the frame itself:**
+```
+fr s(340,480) rd(28) clip f[(metaballs(...)),(f2,solid(#000,o(0.4)))] "Widget"
+  al(...) "Content"
+```
+This applies to shaders, solid tints, gradient backgrounds, dim overlays — anything that covers the full element. Fewer elements, cleaner hierarchy, correct semantics.
 
 ## Fills: `f[(spec),...]` — stack multiple, render in order
 
@@ -45,5 +59,5 @@ Caps: `cap(start,end)` — `n` none · `r` round · `sq` square · `ar` arrow. P
 Vectors with multiple closed regions show `vr()` lines in blueprint output. Modify by region ID only — no geometry needed: `vr(rN) f[...]`.
 
 ## SVG icons
-`svg(icon:house)` bundled Phosphor (kebab-case) · `svg(https://...)` URL · `svg(/tmp/file.svg)` local.
+`svg(icon:house)` bundled Phosphor (kebab-case) · `svg(https://...)` URL · `svg(/tmp/file.svg)` local · `svg(<svg>...</svg>)` inline.
 Fills on SVG lines override imported fills. **SVG fills are creation-only** — recolor after with `recolor_children` command.

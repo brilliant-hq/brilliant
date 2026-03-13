@@ -30,19 +30,28 @@ Parent frame uses `g(0)` — sections manage their own vertical padding.
 Match to brand personality. Most sections don't need these.
 Diagonal stripe (bold, SaaS — rotated rect in group overlay with `clip`, -8° to -12°, 0.04-0.08 opacity) · dot grid (technical — 4x4px circles, 40-60px apart, 0.06-0.15 opacity) · corner shapes (luxury — 1-3 shapes tucked into corners, 0.03-0.06 filled) · floating shapes (dev tools, SaaS) · glassmorphism (cards over rich backgrounds).
 
-## Background Overlays (glow, gradient, texture)
+## Backgrounds Are Fills, Not Child Elements
 
-Decorative background layers (radial glows, texture rects, gradient washes) must NOT be children of auto-layout — they take up flow space and push content down.
+**Solid colors, gradients, shaders, and dim overlays belong in the fill stack** — never as separate child rectangles. Stack multiple fills on the frame itself:
+```
+fr s(W,H) f[(metaballs(...)),(f2,solid(#000,o(0.4)))] clip "Section"
+  al(...) "Content"
+```
 
-Use frame + group overlay + auto-layout sibling:
+## Positioned Decorative Layers (glow, texture)
+
+Decorative elements that need **independent positioning** (off-center radial glows, positioned texture rects, rotated shapes) use a group overlay — but only when a fill can't express the effect:
+
 ```
 fr s(W,H) f[(bg)] clip "Section"
   gr p(0,0) s(W,H) "BG Effects"        ← group: free positioning, no layout flow
-    r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 1
-    r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 2
+    r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 1 — needs custom position
+    r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 2 — needs custom position
   al(v,a(c,c),g(N),pad(...)) p(0,0) s(W,H) "Content"  ← content overlaps group
     ...structured content...
 ```
+
+**Rule of thumb:** if the "background" is full-size and uniform → fill layer. If it needs position/rotation/size independent from the frame → group overlay child.
 
 ## DO NOT
 

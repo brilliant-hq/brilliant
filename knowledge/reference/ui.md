@@ -72,7 +72,7 @@ Shows properties for selected elements. Sections appear dynamically.
 
 **Strokes Section** — Color swatch, thickness, position per stroke. Add/delete buttons.
 
-**Fills Section** — Color swatch per fill. Add/delete buttons.
+**Fills Section** — Color swatch per fill. Add/delete buttons. Clicking an image fill swatch opens the color picker in **image mode** (select file, drag-and-drop, or Cmd+V paste to replace).
 
 **Colors Section** — Unified color editing for selected elements (combines fill and stroke color controls).
 
@@ -155,6 +155,7 @@ Access AI input by pressing **/** or clicking the text field in the bottom toolb
 | Layer search | Cmd+L |
 | Font selector | Cmd+Shift+F |
 | Color selector | Ctrl+C |
+| Image manager | Click image fill swatch |
 | Settings | Cmd+, |
 | Keyboard shortcuts | Shift+? |
 | Combos | Cmd+Shift+M |
