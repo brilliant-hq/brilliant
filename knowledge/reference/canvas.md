@@ -15,8 +15,8 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 |--------|----------|
 | Zoom in (2x) | Cmd+= |
 | Zoom out (0.5x) | Cmd+- |
-| Zoom 100%–900% | 1 through 9 (Move/Hand tool only; press again to reset to 100%) |
-| Reset zoom | 0 (Move/Hand tool only) |
+| Zoom 100%–900% | 1 through 9 (Move/Hand tool only; press again to toggle back to 100%) |
+| Toggle zoom | 0 (Move/Hand tool only) |
 | Cmd+scroll/trackpad | Zoom around cursor |
 
 ### Zoom Behavior (Figma-Compatible)
@@ -34,7 +34,7 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 | Fit all content | Cmd+Ctrl+A | Zoom and pan to show all elements |
 | Zoom to selection | Cmd+Ctrl+F | Zoom and pan to fit selected elements in view |
 | Center on selection | Cmd+Ctrl+C | Pan to center without changing zoom |
-| Reset zoom | 0 (Move/Hand tool only) | Reset to 1.0x and center |
+| Toggle zoom | 0 (Move/Hand tool only) | Toggle between current zoom and 1.0x (restores last zoom state if available) |
 
 ### Scroll and Trackpad
 
@@ -226,7 +226,7 @@ Layout grids are visual guides that help you align content within frames. They a
 | Action | Shortcut |
 |--------|----------|
 | Toggle layout grids | Shift+G |
-| Add layout grid | Ctrl+Shift+G |
+| Add layout grid | Command palette |
 
 ### Grid Types
 
@@ -244,7 +244,7 @@ Layout grids are visual guides that help you align content within frames. They a
 4. Change the type using the dropdown in the grid row header (Grid, Columns, or Rows)
 5. Click the settings icon on a grid row to expand configuration options
 
-**Shortcuts:** Ctrl+Shift+G adds a layout grid, Shift+G toggles all grids visibility.
+**Shortcuts:** Shift+G toggles all grids visibility. Add a layout grid via the command palette ("Add Layout Grid").
 
 ### Grid Options
 

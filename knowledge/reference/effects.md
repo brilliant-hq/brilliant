@@ -39,14 +39,13 @@ They share the fills list with solid, gradient, image, and shader fills. You can
 
 ### Effects (Drop Shadow, Outer Glow, Element Blur)
 
-Click the **+** button in the Effects section of the right toolbar.
+Click the **+** button in the Effects section of the right toolbar. This adds a drop shadow with default settings. To add a different type, change the type dropdown after adding.
 
 ### Inner Shadow, Inner Glow, Background Blur
 
 These are fill types — add them as fills:
 1. Click "+" in the Fills section
-2. Use the type dropdown to switch to an inner effect type
-3. Or use the color picker's library view to browse all effect and shader types
+2. Use the type dropdown to switch to an inner effect type (under the "Static" category)
 
 ### Via Commands
 
@@ -60,6 +59,7 @@ Use the command palette (Cmd+Shift+P) to add effects by name:
 | Add Inner Shadow | `add_inner_shadow_fill` | Adds inner shadow fill with defaults |
 | Add Inner Glow | `add_inner_glow_fill` | Adds inner glow fill with defaults |
 | Add Background Blur | `add_background_blur_fill` | Adds background blur fill with defaults |
+| Add Color Adjust | `add_color_adjust_fill` | Adds color adjust filter fill with defaults |
 
 ### Via Compact Format
 
@@ -74,11 +74,11 @@ Inner effects are specified as fills using the compact blueprint syntax:
 
 All `inner()` params are named and optional with defaults: color=#000000, opacity=0.5, offsetX=0, offsetY=2, blurRadius=4, spread=0, blendMode=srcOver. Only non-default params needed. Examples: `f[(inner())]` all defaults · `f[(inner(#FF0000))]` red · `f[(inner(#000,o(0.3),y(4),blur(8),sp(2)))]` with spread.
 
-All `glow()` params are named and optional with defaults: color=#FFFFFF, opacity=0.6, blurRadius=4, spread=0, blendMode=screen. Only non-default params needed. Examples: `f[(glow())]` all defaults · `f[(glow(#3B82F6))]` blue · `f[(glow(#3B82F6,o(0.8),blur(12),sp(4)))]` with spread.
+All `glow()` params are named and optional with defaults: color=#FFFFFF, opacity=0.6, blurRadius=4, spread=0, blendMode=screen. Only non-default params needed. Examples: `f[(glow())]` all defaults · `f[(glow(#10B981))]` green · `f[(glow(#10B981,o(0.8),blur(12),sp(4)))]` with spread.
 
 `blur(radius)` has one optional param, default 8. Pair with a low-opacity fill for frosted glass: `f[(solid(#FFF,o(0.1))),(f2,blur(12))]`.
 
-`metaballs(#colors...,key(value)...)` — bare `#hex` values are colors, `key(value)` are named params. All optional. Params: `count` (1-20, default 10), `size` (0.05-1.0, default 0.83), `speed` (0-3, default 1.0). Default colors: #000000, #FF3377, #FF9900, #FFDD00, #0080FF. Examples: `f[(metaballs())]` all defaults · `f[(metaballs(#3B82F6,#EF4444))]` custom colors · `f[(metaballs(count(8),speed(2)))]` custom params.
+`metaballs(#colors...,key(value)...)` — bare `#hex` values are colors, `key(value)` are named params. All optional. Params: `count` (1-30, default 10), `size` (0.05-1.0, default 0.3), `speed` (0-3, default 1.0). Default colors: #000000, #FF3377, #FF9900, #FFDD00, #0080FF. Examples: `f[(metaballs())]` all defaults · `f[(metaballs(#EC4899,#EF4444))]` custom colors · `f[(metaballs(count(8),speed(2)))]` custom params.
 
 Outer effects (drop shadow, outer glow, element blur) also have compact blueprint syntax as standalone tokens (not inside `f[...]`):
 
@@ -162,21 +162,22 @@ Effect opacity can be bound to a design system token. When bound, the opacity re
 
 | Action | How |
 |--------|-----|
-| Add effect | Click "+" in Effects section, or command palette: "Add Drop Shadow", "Add Outer Glow", etc. |
-| Remove effect | Click "-" on the effect row, or command palette: "Remove Effect" |
-| Toggle visibility | Click the eye icon, or command palette: "Toggle Effect Visibility" |
-| Expand properties | Click the slider icon |
-| Change type | Use the type dropdown (Drop Shadow, Outer Glow, Element Blur) |
-| Reorder | Drag handle (when multiple effects) |
+| Add effect | Click "+" in Effects section (adds a drop shadow by default), then change type with the dropdown. Or use command palette: "Add Drop Shadow", "Add Outer Glow", "Add Element Blur" |
+| Remove effect | Click the "-" button on the effect row |
+| Toggle visibility | Expand the effect (see below), then click the eye icon in the expanded view |
+| Expand properties | Click the sliders icon on the effect row to expand/collapse the property fields |
+| Change type | Use the type dropdown on the collapsed row (Drop Shadow, Outer Glow, Element Blur) |
+| Reorder | Drag handle on the left (only visible when multiple effects exist) |
 
 ### Inner Shadow / Inner Glow / Background Blur (Fills Section)
 
 | Action | How |
 |--------|-----|
-| Add effect fill | Click "+" in Fills section, then switch type |
+| Add effect fill | Click "+" in Fills section, then switch type via the dropdown |
 | Remove | Click delete button on the fill row |
-| Edit color | Click color swatch in expanded view |
-| Change type | Use the type dropdown (shared with shaders) |
+| Edit color | Click color swatch on the type dropdown (inner shadow and inner glow only; background blur has no color) |
+| Edit parameters | Expand the fill row with the sliders icon, then adjust fields (inner shadow and inner glow only; background blur shows its radius inline on the collapsed row with no expand toggle) |
+| Change type | Use the type dropdown (shared with shaders and image filters) |
 | Reorder | Drag to change z-order relative to other fills |
 
 ## Rendering Order
@@ -185,7 +186,7 @@ Effect opacity can be bound to a design system token. When bound, the opacity re
 1. Opacity layer (if element.opacity < 1.0)
 2.   Element blur layer (if element blur enabled)
 3.     Effects (drop shadows + outer glows)
-4.     Fills (solid, gradient, image, shaders, inner shadow, inner glow — ALL in z-order)
+4.     Fills (solid, gradient, image, shaders, inner shadow, inner glow, image filters, color adjust — ALL in z-order)
 5.     Strokes
 6.   Restore element blur
 7. Restore opacity
@@ -198,7 +199,7 @@ Background blur is handled separately at the widget level using a backdrop filte
 | Format | Effects Support |
 |--------|----------------|
 | PNG/JPEG/WebP | Full support (rasterized) |
-| SVG | Drop shadow, outer glow, and layer blur via SVG filter primitives. Inner shadow, inner glow, and background blur are pre-rasterized as embedded PNG images |
+| SVG | Drop shadow, outer glow, and layer blur via SVG filter primitives. Inner shadow, inner glow, background blur, shaders, image filters, and color adjust are pre-rasterized as embedded PNG images |
 | PDF | Full support. All effects rasterized with transparency via soft masks; background blur rasterizes preceding content |
 
 ## Color Adjust (Fill)

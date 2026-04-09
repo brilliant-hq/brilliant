@@ -9,24 +9,29 @@ Assumes: `blueprint/core`, `blueprint/layout`
 
 Flex segments — proportional, no pixel math:
 ```
-al(h) s(280,12) rd(9999) clip "Stacked"
-  r s(fill:40,fill) f[(#6366F1)] "Seg 1"
-  r s(fill:30,fill) f[(#818CF8)] "Seg 2"
-  r s(fill:20,fill) f[(#EC4899)] "Seg 3"
-  r s(fill:10,fill) f[(#F97316)] "Seg 4"
+$seg1=#6366F1
+$seg2=#818CF8
+$seg3=#EC4899
+$seg4=#F97316
+al(h,g($spacing.none),pad($spacing.none)) s(280,12) rd($radius.full) clip "Stacked" #stacked
+  r s(fill:40,fill) f[($seg1)] "Seg 1"
+  r s(fill:30,fill) f[($seg2)] "Seg 2"
+  r s(fill:20,fill) f[($seg3)] "Seg 3"
+  r s(fill:10,fill) f[($seg4)] "Seg 4"
 ```
 
-Parent `rd(9999) clip` rounds ends. `s(fill,12)` for responsive.
+Parent `rd($radius.full) clip` rounds ends. `s(fill,12)` for responsive.
 
-**Legend:** Dot + label with `comp`:
+**Legend:** Dot + label with `comp` — reuse the same `$var` colors:
 ```
-al(h,a(s,c),g(16)) s(hug,hug) "Legend"
-  al(h,a(s,c),g(6)) s(hug,hug) comp #leg
-    r s(8,8) f[(#6366F1)] rd(9999) "Dot"
-    t("Deep Sleep",Inter,12) f[(#64748B)] "Label"
+$neutral=#64748B
+al(h,a(s,c),g(16),pad($spacing.none)) s(hug,hug) "Legend" #legend
+  al(h,a(s,c),g(6),pad($spacing.none)) s(hug,hug) comp #leg
+    r s(8,8) f[($seg1)] rd($radius.full) "Dot" #leg_dot
+    t("Deep Sleep",Inter,12) f[($neutral.50)] "Label" #leg_label
   inst(#leg)
-    "Dot" f[(#818CF8)]
-    "Label" t("Light Sleep")
+    override(#leg_dot) f[($seg2)]
+    override(#leg_label) t("Light Sleep")
 ```
 
 ## Contribution Heatmap

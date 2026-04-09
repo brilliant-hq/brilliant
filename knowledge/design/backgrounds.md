@@ -33,7 +33,7 @@ Diagonal stripe (bold, SaaS — rotated rect in group overlay with `clip`, -8° 
 ## Backgrounds Are Fills, Not Child Elements
 
 **Solid colors, gradients, shaders, and dim overlays belong in the fill stack** — never as separate child rectangles. Stack multiple fills on the frame itself:
-```
+```text
 fr s(W,H) f[(metaballs(...)),(f2,solid(#000,o(0.4)))] clip "Section"
   al(...) "Content"
 ```
@@ -42,7 +42,7 @@ fr s(W,H) f[(metaballs(...)),(f2,solid(#000,o(0.4)))] clip "Section"
 
 Decorative elements that need **independent positioning** (off-center radial glows, positioned texture rects, rotated shapes) use a group overlay — but only when a fill can't express the effect:
 
-```
+```text
 fr s(W,H) f[(bg)] clip "Section"
   gr p(0,0) s(W,H) "BG Effects"        ← group: free positioning, no layout flow
     r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 1 — needs custom position
@@ -51,7 +51,7 @@ fr s(W,H) f[(bg)] clip "Section"
     ...structured content...
 ```
 
-**Rule of thumb:** if the "background" is full-size and uniform → fill layer. If it needs position/rotation/size independent from the frame → group overlay child.
+**Rule of thumb:** if the "background" is full-size and uniform → fill layer. If it needs position/rotation/size independent from the frame → `abs` child inside auto layout, or group overlay outside auto layout.
 
 ## DO NOT
 

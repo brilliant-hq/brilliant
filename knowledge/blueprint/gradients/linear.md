@@ -47,11 +47,3 @@ f[(linear(180,stop(#000,0,o(0.4)),stop(#000,1,o(0.85))))]
 ```
 
 Semi-transparent top, dark bottom — specify opacity on BOTH stops.
-
-## Sparkline Area Fill Gradient
-
-```
-f[(linear(180,stop(#3B82F6,0,o(0.15)),stop(#3B82F6,1,o(0))))]
-```
-
-Same color, fades from 15% to 0% — polished chart fill.

@@ -44,16 +44,20 @@ Brilliant supports exporting designs to multiple formats and copying to clipboar
 
 ### Export Options
 
+Configure export settings in the **Export panel** in the right toolbar (appears when elements are selected).
+
 | Option | Values | Default |
 |--------|--------|---------|
-| **Scale** | 0.25x, 0.5x, 0.75x, 1x, 1.5x, 2x, 3x, 4x, 5x, 6x, 8x, 10x (or any value 0.1–10x via drag) | 1x |
+| **Format** | PNG, JPEG, WebP, SVG, PDF, MP4, MOV | PNG |
+| **Resolution** | Original (1x), Original (2x), Original (3x), Original (4x), 720p, 1080p, 1440p, 4K, 8K, Instagram Post, Instagram Story, iPhone 16 Pro, MacBook Pro 14", Custom | Original (1x) |
+| **Width/Height** | Target pixel dimensions (MCP `export` tool: `width`, `height` params). Provide one to scale proportionally, or both for exact size. Mutually exclusive with scale. | — |
+| **Fit mode** | Fit, Fill, Stretch, Repeat (when target dimensions are set) | Fit |
+| **Background** | Transparent, Canvas (when format supports alpha) | Transparent |
 
 **Notes:**
-- Exports use transparent background by default (JPEG substitutes the canvas background color since it has no transparency support)
+- Exports use transparent background by default. JPEG does not support transparency -- if "Transparent" background is selected with JPEG, it automatically uses the canvas background color instead
 - JPEG quality is fixed at 90
-- Configure export settings in the **Export panel** in the right toolbar (appears when elements are selected)
-
-**Note:** JPEG does not support transparency. If "transparent" background is selected, it automatically uses the canvas background color instead.
+- For raster formats, the Resolution dropdown controls output dimensions; for vector formats (SVG, PDF), resolution is not applicable
 
 ### Context Menu
 
@@ -108,10 +112,10 @@ Video export renders animated shader fills frame-by-frame into a hardware-accele
 
 | Option | Values | Default |
 |--------|--------|---------|
-| **Duration** | 0.5–60 seconds (presets: 1, 2, 3, 5, 10, 30, 60) | 3s |
-| **FPS** | 15, 24, 30, 60 | 30 |
+| **Duration** | 0.5–60 seconds (presets: 1, 2, 3, 5, 10, 30, 60) | 10s |
+| **FPS** | 15, 24, 30, 60 | 60 |
 | **Quality** | Low, Medium, High | Medium |
-| **Scale** | 0.1x–10x (same presets as image export) | 1x |
+| **Resolution** | Same presets as image export (Original, 2x, 3x, 4x, named resolutions, Custom) | Original (1x) |
 
 ### Codecs
 
@@ -151,7 +155,7 @@ SVG export produces standards-compliant SVG with:
 ## PDF Export Details
 
 PDF export produces vector output with:
-- Embedded fonts (resolved from Google Fonts cache)
+- Embedded fonts (resolved from Google Fonts cache and system fonts, with Helvetica fallback)
 - Effects rasterized as embedded images for maximum fidelity
 - Proper gradient rendering via PDF shading patterns
 - Ancestor clipping for nested frame hierarchies
@@ -173,12 +177,12 @@ PDF export produces vector output with:
 
 | Action | How |
 |--------|-----|
-| **Import image file** | **Cmd+K** or command palette "Import Image" |
+| **Import file** | **Cmd+Shift+O** or command palette "Import" (supports images, SVG, and .design files) |
 | **Paste from clipboard** | **Cmd+V** with an image on the clipboard |
 | **Drag and drop** | Drag image files onto the canvas |
 | **Import from Figma** | Command palette "Import from Figma" — opens the import section in the right toolbar, where you paste a Figma URL (OAuth-authenticated API import) |
 
-Supported image formats: **PNG, JPEG, GIF, BMP, WebP**
+Supported image formats: **PNG, JPEG, GIF, BMP, WebP**. On macOS, also **TIFF, HEIC, HEIF, AVIF** (via native conversion).
 
 Imported images become rectangle elements with an image fill, placed at the canvas center.
 
@@ -186,7 +190,8 @@ Imported images become rectangle elements with an image fill, placed at the canv
 
 | Action | How |
 |--------|-----|
-| **Import SVG file** | Command palette "Import SVG" |
+| **Import SVG file** | **Cmd+Shift+O** (select .svg file) or command palette "Import SVG" |
+| **Paste SVG markup** | **Cmd+V** with SVG text on the clipboard |
 
 SVG import parses the file and creates native Brilliant elements:
 - SVG rectangles become rectangle elements
@@ -206,15 +211,28 @@ Imported elements are placed at the canvas center and selected automatically.
 
 "Import Sketch File" opens the Sketch import section in the right toolbar, where you can browse for a `.sketch` file. After parsing, a page selection UI lets you choose which pages to import. Each page is imported as a separate canvas with its elements converted to native Brilliant elements.
 
+### .design File Import
+
+| Action | How |
+|--------|-----|
+| **Import .design file** | **Cmd+Shift+O** (select .design file) |
+
+Import automatically detects the `.design` file format:
+- **Native YAML** (current format) -- copies the `.design` file and its referenced images into an `Imports/` folder within the current workspace, rewrites asset paths, registers the new canvas, and switches to it
+- **Legacy compressed JSON** (older Save As format) -- decompresses and imports via the legacy import pipeline, also registering and switching to the new canvas
+
+Both paths require an open workspace (repository mode).
+
 ### Paste
 
 **Cmd+V** detects clipboard content and handles these types (checked in order):
-- **Brilliant elements** — Pastes with full hierarchy and properties (same or cross-canvas)
+- **Brilliant elements** — Pastes with full hierarchy and properties (same or cross-canvas). Uses internal clipboard if unchanged since last copy.
 - **Image data** — Creates a rectangle with image fill
 - **SVG markup** — Detected automatically; imported as native Brilliant elements
-- **Figma JSON** — Detected automatically; converted to native elements
+- **Figma JSON** — Detected automatically (from Brilliant Figma plugin); converted to native elements
 - **Design YAML** — Brilliant's YAML serialization format; reconstructs elements
 - **Blueprint format** — Brilliant's blueprint format; reconstructs elements
+- **HTML** — Detected automatically; converted to native elements via the HTML-to-element pipeline
 - **Plain text** — Creates a text element (fallback)
 
 ---

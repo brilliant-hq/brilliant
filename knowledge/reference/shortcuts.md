@@ -21,7 +21,7 @@ If you're new to Brilliant, learn these first:
 | **Must know** | / | AI input (natural language commands) |
 | **Must know** | Shift+? | Shortcuts reference (this panel) |
 | **Core drawing** | R, O, T, F, L | Rectangle, Circle, Text, Frame, Line |
-| **Core editing** | Cmd+D, Cmd+G, Cmd+Shift+G, Backspace | Duplicate, Group, Ungroup, Delete |
+| **Core editing** | Cmd+D, Cmd+G, Cmd+Shift+G, Cmd+F, Backspace | Duplicate, Group, Ungroup, Frame Selection, Delete |
 | **Navigation** | Enter / Escape | Enter frame / Exit to parent |
 | **Navigation** | Tab / Shift+Tab | Previous / Next sibling |
 | **Layout** | Shift+A | Add auto layout |
@@ -32,7 +32,7 @@ Once comfortable, add alignment (Alt+Shift+L/R/T/B), z-order (]/[), and quick co
 ## Limitations
 
 - **No chord (multi-key) shortcuts** — Each shortcut is a single key combination (one key + optional modifiers). You cannot bind sequences like `Ctrl+K, Ctrl+C`. Use **Combos** (Cmd+Shift+M) to chain multiple actions behind a single shortcut.
-- **Modifier-only behaviors are not remappable** — Hold-modifiers like Space (temporary hand tool), Alt+hover (measurements), Alt+drag (duplicate while moving), Shift+drag (constrain proportions), and Ctrl+drag (scale mode during resize) are built-in and cannot be reassigned in the Shortcuts panel.
+- **Modifier-only behaviors are not remappable** — Hold-modifiers like Space (temporary hand tool), Alt+hover (measurements), Alt+drag (duplicate while moving), Shift+drag (constrain proportions), and Ctrl+drag (scale mode during resize) are built-in and cannot be reassigned in the Shortcuts panel. Note: the **K** key toggles persistent scale mode as an alternative to holding Ctrl during resize.
 
 ## Coming From Figma?
 
@@ -77,7 +77,7 @@ All shortcuts are fully remappable — you can match any tool's layout via **Shi
 | Text tool | T |
 | Frame tool | F |
 | Snip tool | S |
-| Eraser tool | E |
+| Scale mode (toggle) | K |
 
 ### Temporary Tool Switching
 
@@ -129,6 +129,8 @@ All shortcuts are fully remappable — you can match any tool's layout via **Shi
 | Shift | Proportional (maintain aspect ratio) |
 | Ctrl | Scale mode: proportional resize + scales font sizes, strokes, corner radii, and descendant elements |
 | Cmd | Preserve crop position (image stays in place) |
+
+**Scale mode toggle (K):** Pressing K enables persistent scale mode — all resizes behave as if Ctrl is held until K is pressed again or you switch tools. See [tools.md](./tools.md#scale-mode-k).
 
 ### Rotation Modifiers
 
@@ -192,8 +194,10 @@ Undo history is per-canvas — each canvas has its own undo stack. When the file
 | Action | Shortcut |
 |--------|----------|
 | Group selection | Cmd+G |
+| Frame selection | Cmd+F |
 | Ungroup | Cmd+Shift+G |
 | Add auto layout | Shift+A |
+| Flatten | Cmd+Enter |
 
 ## Text Styling
 
@@ -289,13 +293,11 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Zoom in (2x) | Cmd+= |
 | Zoom out (0.5x) | Cmd+- |
 | Zoom 100%–900% | 1 through 9 (Move/Hand tool only) |
-| Reset zoom | 0 (Move/Hand tool only) |
+| Toggle zoom | 0 (Move/Hand tool only — toggles between current zoom and last zoom state) |
 | Center on selection | Cmd+Ctrl+C |
 | Zoom to selection | Cmd+Ctrl+F |
 | Fit all content | Cmd+Ctrl+A |
 | Disable zoom out | Cmd+Ctrl+D |
-| Toggle pixel grid | Cmd+' |
-| Toggle snap to pixel grid | Shift+Cmd+' |
 | Cmd+scroll zoom | Cmd + scroll/trackpad |
 
 ## Grids
@@ -303,8 +305,8 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Action | Shortcut |
 |--------|----------|
 | Toggle layout grids | Shift+G |
-| Add layout grid | Ctrl+Shift+G |
 | Toggle pixel grid | Cmd+' |
+| Toggle snap to pixel grid | Shift+Cmd+' |
 | Toggle rulers | Shift+U |
 
 ## Window & Background
@@ -342,19 +344,19 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Action | Shortcut |
 |--------|----------|
 | Open folder | Cmd+O |
+| Import (images, SVGs, design files) | Cmd+Shift+O |
 | Save as | Cmd+Shift+S |
-| Save workspace as | Cmd+Ctrl+S |
-| Import image | Cmd+K |
 | Export to PNG | Cmd+E |
-| Save workspace | Cmd+S |
 
 ## UI Panels
 
 | Action | Shortcut |
 |--------|----------|
 | Command palette | Cmd+Shift+P |
+| Global search | Cmd+K |
 | Canvas search | Cmd+P |
 | Layer search | Cmd+L |
+| Chat search | Cmd+Shift+I |
 | Settings | Cmd+, |
 | Shortcuts reference | Shift+? |
 | Font selector | Cmd+Shift+F |
@@ -364,9 +366,9 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Bottom toolbar | Cmd+Shift+↓ |
 | File explorer | Cmd+Shift+E |
 | Layers explorer | Cmd+Shift+R |
-| Focus AI search | / |
+| Focus AI chat | / |
 | Check for updates | Cmd+Shift+U |
-| Launch onboarding | Cmd+Shift+O |
+
 
 ## Chat Sessions
 
@@ -377,10 +379,12 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Focus next chat | Cmd+Shift+] |
 | Focus previous chat | Cmd+Shift+[ |
 | Close AI chat | Cmd+W |
+| Toggle chat explorer | Cmd+Shift+A (when AI chat is open) |
+| New chat | Cmd+N (when AI chat is open) |
 
 These shortcuts focus (and expand if minimized) the AI chat session assigned to that number.
 
-## Boolean Operations
+## Boolean Operations & Masks
 
 | Action | Shortcut |
 |--------|----------|
@@ -388,6 +392,8 @@ These shortcuts focus (and expand if minimized) the AI chat session assigned to 
 | Boolean Subtract | Alt+Shift+S |
 | Boolean Intersect | Alt+Shift+I |
 | Boolean Exclude | Alt+Shift+E |
+| Mask | Ctrl+Cmd+M |
+| Outline Text (Text to Path) | Cmd+Ctrl+O |
 
 ## Components
 

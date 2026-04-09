@@ -25,16 +25,16 @@ Assumes: `images/prompts`
 ## Image in Layout
 
 ```
-fr s(fill,400) f[(img(Assets/hero.png))] clip rd(16) "Hero Image"
+fr s(fill,400) f[(img(Assets/hero.png))] clip rd($radius.md) "Hero Image" #hero_img
 ```
 
 ## Text Over Image
 
 Always add overlay for readability:
 ```
-fr s(fill,500) f[(img(Assets/hero.png)),(f2,solid(#09090B,o(0.55)))] clip "Hero"
-  al(v,a(c,c),g(20),pad(80)) s(fill,fill)
-    t("Headline",Inter,48,sb,c) f[(#FFF)]
+fr s(fill,500) f[(img(Assets/hero.png)),(f2,solid(#09090B,o(0.55)))] clip "Hero" #hero
+  al(v,a(c,c),g($spacing.4),pad($spacing.16)) s(fill,fill) #hero_content
+    t("Headline",Inter,48,sb,align(c)) f[(#FFF)] #hero_title
 ```
 
 ## Parallel Generation

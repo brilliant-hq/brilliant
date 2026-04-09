@@ -30,7 +30,7 @@ shadow(#000,o(0.06),blur(6)) shadow(#000,o(0.10),y(12),blur(32)) shadow(#000,o(0
 
 Tint shadow to match element's fill — looks like colored light cast onto surface:
 ```
-shadow(#3B82F6,o(0.10),y(2),blur(4)) shadow(#3B82F6,o(0.08),y(8),blur(20))
+shadow(#8B5CF6,o(0.10),y(2),blur(4)) shadow(#8B5CF6,o(0.08),y(8),blur(20))
 ```
 
 On dark backgrounds, colored shadows double as ambient glow — increase opacity (0.12-0.20).

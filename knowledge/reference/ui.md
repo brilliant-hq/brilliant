@@ -1,6 +1,6 @@
 ---
 name: "knowledge-ui"
-description: "All UI panels in Brilliant: left toolbar, right toolbar, bottom toolbar, command palette, color picker, and context menus."
+description: "All UI panels in Brilliant: top toolbar, left toolbar, right toolbar, bottom toolbar, command palette, color picker, code editor, Claude Code chat, combos, and context menus."
 ---
 
 > **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
@@ -13,12 +13,16 @@ Centered at the top of the screen. Displays workspace breadcrumbs showing the na
 
 - **Double-click** the canvas name (last breadcrumb) to **rename** it inline. Press **Enter** to confirm, **Escape** to cancel.
 - **Hover** the toolbar to reveal a **copy path** button (left side). Click it to copy the full filesystem path of the current canvas's `.design` file to the clipboard.
-- In scratch workspace, a **Save...** chip appears to save the workspace to a named location.
+- **Notification indicator** — a small blue dot appears on the top-right corner when there are pending notifications. Hover the toolbar to show a **clear notifications** button (right side).
+- **Unsaved changes** are indicated by dimmed breadcrumb text (60% opacity); saved state shows at full brightness (90% opacity).
 - Color-suffixed folders/canvases display their assigned color in the breadcrumb text.
+- **Vim mode indicator** — when editing a text file with vim mode enabled, the current vim mode (NORMAL, INSERT, etc.) is shown before the breadcrumbs.
 
 ## Left Toolbar
 
-Contains the **File Explorer** and **Layers Explorer**. Toggle between them using tab buttons.
+Contains the **File Explorer** (top) and **Layers Explorer** (bottom) displayed simultaneously in a vertically split layout. Drag the divider between them to resize each panel's share of the toolbar height.
+
+The header (top-right) has: reset position, close (toggle left toolbar), and account avatar buttons.
 
 | Action | Shortcut |
 |--------|----------|
@@ -28,9 +32,9 @@ Contains the **File Explorer** and **Layers Explorer**. Toggle between them usin
 
 ### File Explorer
 
-Tree hierarchy of all canvases and folders. Features: folder expand/collapse, multi-selection (Cmd/Shift+Click), right-click context menu, drag and drop, inline renaming (double-click or Alt+Enter), keyboard navigation, search/filter.
+Tree hierarchy of all canvases and folders. Features: folder expand/collapse, multi-selection (Cmd/Shift+Click), right-click context menu, drag and drop, inline renaming (double-click or Enter), keyboard navigation, search/filter.
 
-**Canvas search** (Cmd+P) opens a dedicated searchable canvas list.
+**Canvas search** (Cmd+P) opens a searchable canvas list (global search filtered to files).
 
 ### Layers Explorer
 
@@ -43,7 +47,7 @@ Features:
 - Drag to reorder (z-order)
 - Inline renaming (double-click a layer row or Cmd+R)
 
-**Layer search** (Cmd+L) opens a searchable layer list.
+**Layer search** (Cmd+L) opens a searchable layer list (global search filtered to layers).
 
 **Layer order:** Top of list = front (highest z-order). Drag to reorder.
 
@@ -58,31 +62,31 @@ Shows properties for selected elements. Sections appear dynamically.
 
 ### Sections
 
-**Header** — Pin, reset position, close, and toggle sections (expand/collapse all) buttons on the left. Zoom percentage (drag to adjust, or click for preset dropdown) on the right.
+**Header** — Reset position, close (toggle right toolbar), and toggle sections (expand/collapse all) buttons on the left. Zoom percentage (drag to adjust, or click for preset dropdown) on the right.
 
-**Canvas Section** — Canvas-level properties (visible when a canvas is active).
+**Canvas Section** — Background color swatch and toggle (visible when Move tool is active and nothing is selected).
 
-**Current Stroke / Current Fill Sections** — Default stroke and fill color controls, shown when nothing is selected. Set the default colors used by newly created elements.
+**Current Stroke / Current Fill Sections** — Default stroke and fill color controls for newly created elements. Always visible. When elements are selected, these sections also apply changes to the selected elements' strokes/fills (subtitle shows "+ selected").
 
-**Element Section** — X, Y, W, H, sizing behavior (hug/fill/fixed), rotation, corner radius (expand for per-corner). More: scale, align buttons, arrange buttons.
+**Element Section** — Rows in order: X/Y position, W/H with constrain proportions toggle, sizing behavior (hug/fill/fixed, shown for elements inside auto layout frames or parent elements), rotation and opacity, corner radius (expand for per-corner or top/bottom pairs) and flex (for auto layout children), circle arc properties (start angle, sweep, inner ratio for circle elements). In vector edit mode with nodes/handles selected: shows node/handle position and point type instead of W/H/rotation/opacity. More (expandable): blend mode, scale, align buttons, arrange buttons, boolean operations (union, subtract, intersect, exclude — shown when 2+ elements selected).
 
-**Parent Section** — Parent Type dropdown (Frame/Group/Auto Layout), Clip Content toggle, auto layout controls (direction, main/cross alignment, spacing, padding sliders).
+**Parent Section** — Parent Type dropdown (Frame, Group, Auto Layout, Union, Subtract, Intersect, Exclude, Mask), Clip Content toggle, auto layout controls (direction, main/cross alignment, gap spacing, padding — shown when type is Auto Layout).
 
-**Typography Section** — Font family, size, weight, italic, line height, text alignment, underline toggle, text sizing mode (auto size, auto height, auto width, fixed).
+**Typography Section** — Rows in order: font family (click to open font selector) + font size + text direction toggle, line height + letter spacing, font weight dropdown + text sizing mode (Auto Size, Auto Height, Auto Width, Fixed), text alignment (left/center/right) + italic toggle + underline toggle.
 
-**Strokes Section** — Color swatch, thickness, position per stroke. Add/delete buttons.
+**Strokes Section** — Color swatch, thickness, position per stroke. Stroke caps (start/end for open paths and arcs, unified cap for complex vectors). Add/delete buttons.
 
-**Fills Section** — Color swatch per fill. Add/delete buttons. Clicking an image fill swatch opens the color picker in **image mode** (select file, drag-and-drop, or Cmd+V paste to replace).
+**Fills Section** — Color swatch per fill. Add/delete buttons. For vector elements with regions, shows per-region fill controls. Clicking an image fill swatch opens the color picker in **image mode** (select file, drag-and-drop, or Cmd+V paste to replace).
 
-**Colors Section** — Unified color editing for selected elements (combines fill and stroke color controls).
+**Selection Colors Section** — Unified color editing showing all unique colors from fills and strokes across the selection, with color swatches for each.
 
 **Effects Section** — Drop shadow, outer glow, element blur. Add/remove effects, toggle visibility, configure properties per effect. Inner shadow, inner glow, and background blur are fill types in the Fills section.
 
-**Layout Grid Section** — Layout grid editing for frames (columns, rows, grid).
+**Layout Guides Section** — Layout guide editing for frames (columns, rows, grid).
 
 **Export Section** — Export options for the current selection.
 
-**Figma Import Section** — Figma file import controls.
+**Import Section** — Figma file import controls (section title is "Import").
 
 ### Interactive Fields
 
@@ -136,33 +140,45 @@ Most numeric fields support: typing exact values, dragging left/right, arrow key
 | Toggle all UI | Cmd+\\ |
 | Presentation mode | Alt+P |
 
-### Tool Buttons (Left Side)
+### Buttons
 
-Selection Tools dropdown (Move, Hand), Shape Tools dropdown (Rectangle, Line, Arrow, Circle), Drawing Tools dropdown (Pen, Pencil), Frame (F), Text (T). Snip (S) and Eraser (E) are accessible via keyboard shortcuts only.
+All buttons are in a single horizontal row. From left to right:
 
-### AI Input (Center)
+Reset position, Toggle toolbar | Global Search (Cmd+K), Keyboard Shortcuts (Shift+?) | Selection Tools dropdown (Move, Scale, Hand), Shape Tools dropdown (Rectangle, Line, Arrow, Circle), Drawing Tools dropdown (Pen, Pencil), Frame (F), Text (T) | AI input field or connection indicator.
 
-Type natural language commands. Press **/** to focus, type command, press **Enter** to execute, **Escape** to unfocus. **Ctrl+C** clears the input when focused. Command history is preserved.
+Groups are separated by vertical dividers. The first group contains toolbar management buttons, the second group contains quick-access command palette buttons, the third group contains drawing tool buttons, and the fourth group contains the AI input area.
 
-Access AI input by pressing **/** or clicking the text field in the bottom toolbar.
+Snip (S) is accessible via keyboard shortcut only.
+
+### AI Input
+
+The AI input field appears inline after the tool buttons (separated by a divider). Press **/** to open AI chat, type a message, press **Enter** to send. **Escape** unfocuses. A collapse/expand chevron toggle allows hiding the AI input to save horizontal space. When collapsed, only the connection indicator and expand chevron are shown.
+
+When AI chat is open, the bottom toolbar shows a connection indicator instead of the full input field (chat input moves to the chat panel above).
+
+When an AI agent is running, small colored activity indicator bars appear next to the toolbar for each processing session. A "Claude is designing..." status text appears during complex queries, with a stop button to cancel.
 
 ## Command Palette
 
 | Mode | Shortcut |
 |------|----------|
+| Global search (all) | Cmd+K |
 | Command search | Cmd+Shift+P |
 | Canvas search | Cmd+P |
 | Layer search | Cmd+L |
+| Chat search | Cmd+Shift+I |
 | Font selector | Cmd+Shift+F |
 | Color selector | Ctrl+C |
-| Image manager | Click image fill swatch |
 | Settings | Cmd+, |
 | Keyboard shortcuts | Shift+? |
 | Combos | Cmd+Shift+M |
 | Updates | Cmd+Shift+U |
-| AI input | / |
+
+Note: **/** opens the AI chat panel (not the command palette). See AI Input section above.
 
 All modes support: type to search, arrow keys to navigate, Enter to execute, Escape to close, draggable title bar.
+
+**Unified Global Search** (Cmd+K) — A unified search that can filter across commands, files, layers, fonts, and chats. Individual mode shortcuts (Cmd+Shift+P for commands, Cmd+P for files, Cmd+L for layers, Cmd+Shift+F for fonts, Cmd+Shift+I for chats) open global search pre-filtered to that category.
 
 ### Keyboard Shortcuts View (Shift+?)
 
@@ -182,17 +198,34 @@ See `SHORTCUTS.md` → "Customizing Shortcuts" for full details on activation co
 
 Open by clicking any color swatch or pressing **Ctrl+C**.
 
-### Components
+### Layout (top to bottom)
 
-- **Color rectangle** — X = saturation, Y = brightness
-- **Hue slider** — 360-degree spectrum
-- **Opacity slider** — 0%–100%
-- **Format inputs** — Hex, RGB, HSB, CSS with copy buttons
-- **Gradient editor** — Gradient bar with color stops (add, remove, move, direction controls)
+- **Color rectangle** — X = saturation, Y = brightness (drag to pick color)
+- **Eyedropper + Hue slider row** — Eyedropper toggle button (Ctrl+Shift+C) + hue slider (360-degree spectrum)
+- **Opacity slider row** — Opacity slider (0%--100%)
+- **Gradient bar** — Gradient stops editor with add/remove/move controls (only shown in gradient mode)
+- **Format inputs** — Format selector dropdown (Hex, RGB, HSB, CSS) + color value fields + copy button
+- **Image mode** — When an image fill swatch is clicked, the color picker switches to image mode with file selection, drag-and-drop, and Cmd+V paste support
+
+### Bottom Section (always shown)
+
+- **Design tokens** — Color tokens from the active design system (if any)
+- **Canvas colors** — Unique colors currently used on the canvas
+- **Recent colors** — Recently used colors (separated by a divider)
 
 ### Eyedropper (Ctrl+Shift+C)
 
 Magnified 21x21 pixel grid. Click anywhere to sample color.
+
+## Code Editor
+
+When opening a non-design file (e.g., `.md`, `.dart`, `.json`, `.txt`) from the file explorer, a full CodeMirror 6 text editor appears in place of the canvas. Features:
+
+- **Syntax highlighting** for common languages
+- **Vim mode** (toggleable) with vimrc config support
+- **Search/replace** (standard CodeMirror keybindings)
+- **Auto-save** with unsaved indicator in the breadcrumbs
+- **File switching** between text files
 
 ## Claude Code Chat
 
@@ -231,6 +264,9 @@ Add context to messages using the attachment buttons:
 | Focus session 10 | Cmd+0 |
 | Next session | Cmd+Shift+] |
 | Previous session | Cmd+Shift+[ |
+| Toggle chat explorer | Cmd+Shift+A |
+| New chat | Cmd+N (when chat is focused) |
+| Chat search | Cmd+Shift+I |
 
 ### Resize
 
@@ -284,10 +320,16 @@ Combos persist across sessions (stored in `~/.config/brilliant/combos.json`).
 
 ## Context Menus
 
-Right-click on elements for: Select This Item, Add to Selection, Cut, Copy, Copy as (PNG, PNG @2x, PNG @4x, SVG, CSS, YAML, Blueprint), Paste, Duplicate, Delete, Rename, Group/Ungroup/Add Auto Layout, Operations (Union, Subtract, Intersect, Exclude), Component actions (Create Component, Create Instance, Detach Instance, Go to Master, Push Overrides, Reset Overrides) when applicable, Arrange (Bring to Front, Bring Forward, Send Backward, Send to Back), Align & Transform (for multi-selection: Align Left/Right/Top/Bottom, Align Horizontally/Vertically, Distribute Horizontally/Vertically; always: Flip Horizontally/Vertically, Scale Up/Down, Fit to Parent), Select Parent (for nested elements), Toggle Clip Content (for frames), Export as (PNG, PNG @2x, PNG @4x, SVG), Text formatting (for text elements), View (Zoom to Elements, Center on Elements).
+**Right-click on element** (in order): Select This Item + Add to Selection (if not already selected), Cut, Copy, Copy as (PNG, PNG @2x, PNG @4x, SVG, CSS, YAML, Blueprint), Paste, Duplicate, Delete, Rename, Group/Ungroup/Add Auto Layout + Operations submenu (Union, Subtract, Intersect, Exclude, Mask) when 2+ elements, Component submenu (Create Component, Create Instance, Detach Instance, Go to Master, Reset Overrides, Push Overrides to Master) when applicable, Arrange (Bring to Front, Bring Forward, Send Backward, Send to Back), Align & Transform (for multi-selection: Align Left/Right/Top/Bottom, Align Horizontally/Vertically, Distribute Horizontally/Vertically; always: Flip Horizontally/Vertically, Scale Up/Down, Fit to Parent), Select Parent (for nested elements), Toggle Clip Content (for frames), Export as (PNG, PNG @2x, PNG @4x, SVG), Text submenu (for text elements: Bold, Italic, Underline, Align Text Left/Center/Right, Size Auto Size/Auto Height/Fixed Size, Switch Font), View (Zoom to Elements, Center on Elements).
 
-Right-click on empty canvas: Paste, Select All, Create submenu (Text, Rectangle, Circle, Line, Arrow, Pencil, Frame), Canvas submenu (Toggle Background, Whiteboard, Blackboard, Toggle Alignment Guides, Clear All Elements), Import Image, Export as (PNG, PNG @2x, PNG @4x, SVG).
+**Right-click with selection** (items selected, click on selected element): Shows "[N] items selected" header, then same structure as element menu but operating on the full selection. Includes Canvas submenu (Toggle Background, Whiteboard, Blackboard, Toggle Alignment Guides).
 
-File explorer right-click on files: Open, Rename, Cut, Copy, Paste, Duplicate, Delete, Reveal in Finder, Copy Filename, Copy Relative Path, Copy Absolute Path.
+**Right-click on empty canvas**: Paste, Select All, Create submenu (Text, Rectangle, Circle, Line, Arrow, Pencil, Frame), Canvas submenu (Toggle Background, Whiteboard, Blackboard, Toggle Alignment Guides, Clear All Elements), Import..., Export as (PNG, PNG @2x, PNG @4x, SVG).
 
-File explorer right-click on folders: Expand/Collapse, Rename, New Canvas, New Folder, Cut, Copy, Paste, Duplicate, Expand All, Collapse All, Delete, Reveal in Finder, Copy Relative Path, Copy Absolute Path.
+**File explorer right-click on files**: Open, Rename, Cut, Copy, Paste, Duplicate, Delete, Reveal in Finder, Copy Filename, Copy Relative Path, Copy Absolute Path.
+
+**File explorer right-click on folders**: Expand/Collapse, Rename, New Canvas, New Folder, Cut, Copy, Paste, Duplicate, Expand All, Collapse All, Delete, Reveal in Finder, Copy Relative Path, Copy Absolute Path.
+
+**File explorer right-click on empty space**: Select All, New Canvas, New Folder, Paste, Expand All, Collapse All.
+
+**Layers explorer right-click on element**: Select (if not selected), Rename, Arrange (Bring to Front, Bring Forward, Send Backward, Send to Back), Align & Transform (Center Horizontally, Center Vertically, Flip Horizontally/Vertically, Scale Up/Down, Fit to Parent), View (Zoom to Elements, Center on Elements), Copy, Cut, Duplicate, Text submenu (for text elements), Shape options (for rectangles), Color submenu, Delete.

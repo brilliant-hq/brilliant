@@ -17,7 +17,7 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 
 2. **Build every element.** 6 nav links → build 6. Count page elements, count output.
 
-3. **One section at a time.** Container + navbar first, `export_to_png`, compare. Then hero. Then each section.
+3. **One section at a time.** Container + navbar first, `export`, compare. Then hero. Then each section.
 
 4. **Exact text.** Copy HTML text verbatim.
 

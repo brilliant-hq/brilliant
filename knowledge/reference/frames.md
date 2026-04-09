@@ -7,7 +7,7 @@ description: "Parent types (frame, group, auto layout), nesting, and parent prop
 
 > **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
 
-In Brilliant, any element that can contain children is called a **parent**. Parents come in three main types — **frame**, **group**, and **auto layout**. Boolean operations (Union, Subtract, Intersect, Exclude) also create parent elements that behave like groups — always w:hug h:hug sizing and not reparent targets.
+In Brilliant, any element that can contain children is called a **parent**. Parents come in four main types — **frame**, **group**, **auto layout**, and **mask**. Boolean operations (Union, Subtract, Intersect, Exclude) also create parent elements that behave like groups — always w:hug h:hug sizing and not reparent targets.
 
 ## Coming From Other Design Tools?
 
@@ -20,7 +20,9 @@ In Brilliant, any element that can contain children is called a **parent**. Pare
 | **Auto Layout Frame** | Parent (Auto Layout type) | Flexbox-like flow layout — children arranged in rows/columns |
 | "Component" | "Component" | Same concept — masters and instances. See [COMPONENTS.md](./COMPONENTS.md) |
 | "Artboard" | Canvas or Frame | A canvas is a separate page; a frame on a canvas serves as a design area |
+| **Mask** (Cmd+Option+M) | Mask (Ctrl+Cmd+M) | Topmost element = clip shape. Same concept, different shortcut |
 | Constraints (pin to edges) | Not available | Use auto layout with hug/fill/fixed sizing instead |
+| Absolute position (ignore auto layout) | Absolute position (pin icon / `abs` keyword) | Same concept — child ignores auto layout flow |
 
 **Key difference from Figma:** In Figma, "Frame" and "Group" are distinct top-level concepts. In Brilliant, they're all **parent** elements with a **parent type** that determines their layout behavior. You can convert between types freely via the Parent Type dropdown in the right toolbar.
 
@@ -30,7 +32,7 @@ In Brilliant, any element that can contain children is called a **parent**. Pare
 |-------------|-----------|-------|
 | **Artboard** | Canvas or Frame | Each canvas is a separate drawing surface; frames act as bounded areas within a canvas |
 | **Group** | Parent (Group type) | Same concept. Cmd+G to group |
-| **Clipping Mask** | Frame with Clip Content | Draw a frame (F key), place elements inside, enable "Clip content" in right toolbar |
+| **Clipping Mask** | Mask (Ctrl+Cmd+M) | Select elements, Ctrl+Cmd+M — topmost element defines clip shape. Or use Frame + "Clip content" for simple rectangular clipping |
 | **Appearance panel** (multiple fills) | Fills section in right toolbar | Click "+" to add fills; they stack bottom-to-top like Illustrator appearances |
 | **Symbols** | Components | Masters and instances with overrides. See [COMPONENTS.md](./COMPONENTS.md) |
 | **Pen tool** | Pen tool (P) | Same workflow: click for corners, click-drag for curves. See [VECTORS.md](./VECTORS.md) |
@@ -51,6 +53,7 @@ A **canvas** is the infinite drawing surface — like a page or document. A **fr
 | **Frame** | Free-positioning container — children placed with `@X,Y` coordinates | Any (hug/fill/fixed) | Yes | Frame tool (F) |
 | **Group** | Free-positioning container — always w:hug h:hug | Always w:hug h:hug | No | Cmd+G |
 | **Auto Layout** | Flow container — children arranged automatically in a row or column | Any | Yes | Shift+A |
+| **Mask** | Topmost child clips all others — defines the visible region | Always w:hug h:hug | No | Ctrl+Cmd+M |
 
 ### Shared Capabilities (All Parent Types)
 
@@ -62,6 +65,7 @@ All parent types support:
 **Type-specific differences:**
 - **Frame** and **Auto Layout** support all sizing modes (hug/fill/fixed) and accept reparenting (drag elements in/out)
 - **Group** is always w:hug h:hug — changing sizing from hug auto-converts to Frame. Groups are NOT reparent targets (dragging elements over a group won't reparent into it)
+- **Mask** is always w:hug h:hug. The topmost child (last in z-order) is the mask shape — it defines the clip path and is invisible. All other children are clipped to the mask shape
 
 **Clip defaults:** All parents do not clip by default. Use `clip` / `no-clip` to override.
 
@@ -111,6 +115,52 @@ Select a group and ungroup (**Cmd+Shift+G**, right-click context menu, or comman
 - **Sizing** — Always w:hug h:hug (changing from hug auto-converts to Frame)
 - **Name** — Rename (Cmd+R)
 
+## Masks
+
+Masks use one element to define the visible region for other elements — like a cookie cutter. The topmost element (highest in layers) becomes the mask shape, and everything below it is clipped to that shape.
+
+### Creating a Mask
+
+1. Select two or more elements
+2. Press **Ctrl+Cmd+M** (or right-click → Mask, or command palette → "Mask")
+3. A mask parent wraps the selection
+
+**What happens:**
+- The **topmost element** (last in z-order) becomes the mask shape
+- The mask shape is **invisible** — it only defines the clip region
+- All other children are clipped to the mask shape
+- The mask shape includes stroke geometry in the clip path
+- Per-parent masking: elements from multiple parents create separate masks
+
+### Editing the Mask Shape
+
+- **Double-click** the mask to enter edit mode — the mask shape becomes visible and selectable
+- Modify the mask shape (resize, change arc sweep, edit vector nodes, etc.)
+- Changes update the clip path live
+- Click outside or press **Escape** to exit edit mode
+
+### Mask Types
+
+| Type | Description |
+|------|-------------|
+| **Vector** (default) | Clips using the mask shape's vector outline (including stroke geometry) |
+| **Alpha** | Clips using the mask shape's alpha channel -- semi-transparent areas create semi-transparent clipping |
+| **Luminance** | Clips using the mask shape's luminance -- brighter areas are more visible |
+
+Mask type defaults to **Vector**. Alpha and Luminance types exist in the data model but are not currently exposed in the UI.
+
+### Mask Properties
+
+- **Sizing** — Always w:hug h:hug (auto-resizes to fit children)
+- **Mask type** — Vector (default). Alpha and Luminance types exist in the data model but are not currently exposed in the UI
+- **Name** — Defaults to "Mask" (rename with Cmd+R)
+
+### Tips
+
+- Any element type can be the mask shape: rectangles, circles, vectors, text
+- Stroke geometry is included in the clip path — a circle with a thick stroke masks a larger area than its fill alone
+- Reorder children in the layers panel to change which element is the mask shape (topmost = mask)
+
 ## Auto Layout
 
 Auto layout frames automatically arrange children in a row or column.
@@ -137,6 +187,8 @@ All editable in right toolbar **Parent** section:
 **Spacing:** Gap between children (in pixels). Use the slider or AI ("spacing 12").
 
 **Padding:** Space between frame edge and children. Three editing modes: **uniform** (one value for all sides), **horizontal/vertical** (separate h and v values), and **per-side** (individual top, right, bottom, left values). Toggle between modes using the padding section buttons in the right toolbar.
+
+**Wrap:** When enabled, children that overflow the main axis flow to the next row (horizontal) or column (vertical) instead of overflowing. Equivalent to CSS `flex-wrap: wrap`. Toggle via the wrap button (next to the gap field) in the right toolbar. Wrap only takes effect when the frame has a fixed or fill size on the main axis — if the frame hugs on the main axis, there's nothing to wrap against. The gap between rows/columns is the same as the item spacing. Fill children inside a wrapped row fill that row's width, not the frame's.
 
 **Main Axis Alignment:**
 
@@ -255,13 +307,33 @@ Fill collapses to content size on **both** axes — there is no main/cross disti
 | **Fill** | Frame expands to fill available space in parent |
 | **Fixed** | Frame keeps explicit size |
 
-### Drag Reorder
+### Absolute Position
 
-Inside auto layout, dragging a child reorders it:
+Children of auto layout frames can opt out of the layout flow with **absolute positioning**. An absolute child stays nested in the frame (clipping, coordinate space, z-order) but doesn't participate in positioning, spacing, or hug sizing — it moves and resizes freely like a regular frame child.
+
+**Toggle:** Select a child of an auto layout frame → click the pin icon in the right toolbar (next to the W/H sizing dropdowns), or use the "Toggle Absolute Position" command.
+
+**Blueprint:** Add `abs` keyword: `c abs p(200,-8) s(20,20) f[(#EF4444)]`
+
+**Use for:** Badges, notification dots, floating buttons, watermarks, decorative overlays — anything that should sit on top of auto layout content without disrupting the flow.
+
+**Behavior:** Absolute children don't affect siblings, don't consume gap space, and don't contribute to hug sizing. Toggling back to flow repositions the element at its z-order position in the auto layout.
+
+### Reordering Children
+
+Inside auto layout, children are reordered rather than freely positioned:
+
+**Drag reorder** (flow children only; absolute children move freely instead):
 1. Select and start dragging
 2. Insertion indicator shows placement
 3. Release to drop
 4. Siblings reflow
+
+**Keyboard reorder:** Arrow keys reorder flow children along the main axis instead of nudging:
+- **Horizontal layout:** Left arrow = move earlier, Right arrow = move later
+- **Vertical layout:** Up arrow = move earlier, Down arrow = move later
+- Cross-axis arrow keys are ignored (no effect)
+- Absolute-positioned children are not affected (arrow keys nudge them normally)
 
 ### What Happens on Operations
 
@@ -271,12 +343,14 @@ Inside auto layout, dragging a child reorders it:
 | Rotate a child | Converts to fixed, re-layouts |
 | Delete a child | Siblings reflow |
 | Add a child | Inserted at end, re-layouts |
-| Drag within frame | Reorders via drag |
+| Arrow keys | Reorders flow children along main axis (absolute children nudge normally) |
+| Drag within frame | Reorders via drag (flow children) or free move (absolute children) |
 | Drag to different frame | Reparents, both re-layout |
+| Toggle absolute position | Removes/adds child from layout flow |
 
 ### Converting Between Types
 
-In right toolbar **Parent** section, change the Parent Type dropdown:
+In right toolbar **Parent** section, change the Parent Type dropdown. The dropdown lists all 8 parent types: Frame, Group, Auto Layout, Union, Subtract, Intersect, Exclude, and Mask. Common conversions:
 - **Frame → Group**: Forces w:hug h:hug sizing, clears auto layout data
 - **Frame → Auto Layout**: Infers layout direction, spacing, and alignment from current child positions
 - **Group → Frame**: Unlocks sizing (keeps current values but allows changes)
@@ -316,6 +390,7 @@ Drag elements over a parent to auto-reparent:
 
 ### From Selection
 
+- **Cmd+F** — Frame (wrap selection in a frame parent)
 - **Cmd+G** — Group (always w:hug h:hug, not a reparent target)
 - **Shift+A** — Auto layout parent
 
@@ -341,7 +416,7 @@ Figma-style visual guides for alignment and spacing within parents.
 2. In right toolbar **Layout Guides** section, click **+** to add a guide (default type: Grid)
 3. Change the type using the dropdown in the guide row header (Grid, Columns, or Rows)
 
-**Shortcuts:** **Ctrl+Shift+G** adds a layout grid. **Shift+G** toggles all guides' visibility.
+**Shortcuts:** **Shift+G** toggles all guides' visibility. Use the **+** button in the Layout Guides section or command palette ("Add Layout Grid") to add guides.
 
 ### Column/Row Alignment Modes
 
@@ -383,8 +458,8 @@ Frames can have multiple layout guides. Each guide has its own visibility toggle
 | Element stopped stretching after resize | Resize converts to Fixed | Change back to Fill |
 | Fill child is invisible (0 width) | Fixed/hug siblings consume all space | Make parent larger or reduce sibling sizes |
 | Fill not working on main axis | Parent uses Hug sizing (circular dependency) | Use Fixed size on parent, or accept that fill acts as hug |
-| Children overlapping | Parent is a Group, not Auto Layout | Convert to Auto Layout (Shift+A or dropdown) |
-| Children overflow horizontally | Too many hug children for container width | Auto layout does NOT wrap — reduce children, use smaller sizing, or increase container width |
+| Children overlapping | Parent is a Group, not Auto Layout; or children have absolute position | Convert to Auto Layout (Shift+A), or toggle off absolute position |
+| Children overflow horizontally | Too many hug children for container width, and wrap is not enabled | Enable wrap (toggle in right toolbar next to gap field), or reduce children, use smaller sizing, or increase container width |
 | Unexpected gaps between children | Check spacing setting | Adjust itemSpacing in right toolbar |
 | spaceBetween not pushing items to edges | Only one child | spaceBetween centers a single child; add more children or use different alignment |
 | Text wrapping when it shouldn't | Text has `fill` width | Change to `hug` — fill width applies a constraint that causes wrapping |

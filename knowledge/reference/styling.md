@@ -28,10 +28,12 @@ description: "Colors, fills, strokes, opacity, and corner radius in Brilliant."
 
 Open by clicking any color swatch in the right toolbar, or press **Ctrl+C**.
 
-Components:
+Components (top to bottom):
 1. **Color rectangle** — X = saturation, Y = brightness. Drag the crosshair.
-2. **Hue slider** — Horizontal strip, 360-degree spectrum.
-3. **Opacity slider** — Alpha channel (0%–100%).
+2. **Eyedropper button + Hue slider** — Eyedropper toggle on the left, horizontal 360-degree hue strip on the right.
+3. **Opacity slider** — Alpha channel (0%–100%) for the focused fill or stroke.
+4. **Gradient bar** — Only shown in gradient mode. Click to add stops, drag to reposition.
+5. **Format inputs** — Format dropdown (Hex/RGB/HSB/CSS) + value fields + copy button.
 
 ### Color Formats
 
@@ -78,20 +80,22 @@ Click the fill color swatch in the right toolbar to open the color picker. Use C
 ### Gradient Fills
 
 1. Press **Ctrl+D** (dark gradient) or **Ctrl+L** (light gradient) for quick gradients
-2. Or open the color picker and switch to gradient mode
-3. Click color stops to edit, add stops by clicking the gradient bar, drag to reposition
+2. Or change the fill type to Linear/Radial/Angular via the type dropdown on the fill row in the right toolbar
+3. Click color stops to edit, add stops by clicking the gradient bar in the color picker, drag to reposition
 
 **Linear**, **radial**, and **angular** gradients are supported (diamond gradients are not available). Select the gradient type from the fill type dropdown in the right toolbar.
 
 **Linear gradients** are defined by start/end points — edit on canvas by dragging the gradient handles (start handle, end handle), or click the gradient line to add a color stop.
 
-**Radial gradients** are defined by center, radius, and width handles — drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to make the gradient elliptical (Shift constrains to circular).
+**Radial gradients** are defined by center, radius, and width handles — drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to make the gradient elliptical.
+
+**Angular gradients** (sweep/conic) rotate color stops around a center point — drag the center to reposition, drag the angle handle to rotate the gradient start direction.
 
 Add/remove/reposition color stops directly on the gradient bar.
 
 ### Image Fills
 
-Import an image (Cmd+K) or paste from clipboard. The image becomes a rectangle with an image fill.
+Import an image via Cmd+Shift+O (Import), drag-and-drop from Finder, or paste from clipboard. The image becomes a rectangle with an image fill.
 
 **Image Manager:** Click an image fill's color swatch in the right toolbar to open the color picker in image mode. The color picker replaces its color controls with an image preview and replacement UI. From there you can:
 - **Select** a new image file from disk
@@ -123,14 +127,14 @@ GPU-powered post-processing filters applied to all fills below them in the z-ord
 
 | Filter | Description |
 |--------|-------------|
-| **Noise / Grain** | Film-like grain overlay (monochrome/color, uniform/gaussian/film) |
-| **Halftone** | Classic print halftone dots (standard + CMYK mode, circle/diamond/line/soft shapes) |
-| **Pixelate** | Mosaic pixelation (square/hex/diamond/circle modes) |
+| **Noise / Grain** | Film-like grain overlay (monochrome/color, uniform/gaussian distribution, roughness and midtone bias) |
+| **Halftone** | Classic print halftone dots (standard + CMYK mode, circle/diamond/line shapes, square/hex grid, softness control) |
+| **Pixelate** | Mosaic pixelation (square/hexagonal/diamond/circle/triangle shapes) |
 | **Duotone** | Two-tone or tri-tone color mapping with gamma/midpoint control |
 | **Posterize** | Reduce color levels for poster-style banding (RGB/luminosity/HSL modes) |
-| **Dither** | Ordered dithering patterns (Bayer/white noise/blue noise) |
+| **Dither** | Ordered dithering patterns (Bayer/noise/blue noise, 2x2/4x4/8x8 matrix sizes) |
 
-Each filter has adjustable parameters, optional color inputs, and built-in presets. Filters work on fills, strokes, text, and vector regions.
+Each filter has adjustable parameters, optional color inputs, and built-in presets. Filters work on fills, strokes, text, and vector regions. See [IMAGE_FILTERS.md](./IMAGE_FILTERS.md) for detailed per-filter parameter reference.
 
 ### Color Adjust Fills
 
@@ -138,11 +142,11 @@ Non-destructive photo-style adjustments (exposure, contrast, saturation, whites,
 
 ### Multiple Fills
 
-Stack multiple fills on a single element. Rendered bottom-to-top in list order.
+Stack multiple fills on a single element. Rendered bottom-to-top in list order. Reorder fills by dragging them in the right toolbar.
 
 ### Text Fills
 
-Text uses fills for text color. Text supports all fill types — solid, gradient, shader, image filters, and color adjust — rendered through the text glyphs. Text also supports strokes (including shader and filter strokes), rendered around the text glyphs with inside/center/outside positioning.
+Text uses fills for text color. Text supports all fill types — solid, gradient, image, shader, image filters, and color adjust — rendered through the text glyphs. Text also supports strokes (including shader and filter strokes), rendered around the text glyphs with inside/center/outside positioning.
 
 ## Strokes
 
@@ -164,9 +168,9 @@ Text uses fills for text color. Text supports all fill types — solid, gradient
 | Center | Centered on the element edge (default) |
 | Outside | Drawn outside the element edge |
 
-**Thickness:** Adjust via right toolbar, size level shortcuts (0–9), or Shift+=.
+**Thickness:** Adjust via right toolbar, size level shortcuts (0–9), Shift+= to increase, or - to decrease.
 
-**Caps (Lines/Arrows/Arcs):** None, Round, Square, Arrow. Each endpoint has independent cap settings. For circles, caps appear when sweep < 100% (open arcs without inner ring).
+**Caps (Lines/Arrows/Arcs):** None, Round, Square, Arrow. Caps are per-endpoint (per-node on vector paths, per-arc-endpoint on circles). Only leaf nodes (path endpoints with degree 1) render caps. For circles, caps appear when sweep < 100% (any arc, including ring sectors).
 
 ### Stroke Style Types
 
@@ -179,7 +183,7 @@ Strokes support the same style types as fills:
 | **Radial** | Radial (elliptical) gradient on the stroke |
 | **Angular** | Angular (sweep) gradient on the stroke |
 | **Image** | Image pattern rendered on the stroke |
-| **Shader** | Animated procedural pattern (metaballs, liquid metal, holographic, liquid stainless steel, dithering, magnetic glow) |
+| **Shader** | Animated procedural pattern (metaballs, liquid metal, iridescent, liquid stainless steel, dithering, reactive grid) |
 | **Image Filter** | GPU post-processing (noise/grain, halftone, pixelate, duotone, posterize, dither) |
 | **Color Adjust** | Non-destructive photo-style adjustments |
 | **Background Blur** | Blurs content behind the stroke area (frosted glass) |
@@ -189,7 +193,7 @@ Switch the stroke type using the type dropdown on any stroke row in the right to
 
 ### Multiple Strokes
 
-Add multiple strokes with independent style, thickness, and position.
+Add multiple strokes with independent style, thickness, and position. Reorder strokes by dragging them in the right toolbar.
 
 ### Stroke on New Shapes
 
@@ -201,10 +205,10 @@ Blend modes control how elements, fills, strokes, and effects composite against 
 
 | Level | Where | Default |
 |-------|-------|---------|
-| **Element** | Right toolbar, Element section (Opacity row) | Normal |
+| **Element** | Right toolbar, Element section ("more" expandable subsection) | Normal |
 | **Fill** | Right toolbar, per-fill row (expanded config) | Normal |
 | **Stroke** | Right toolbar, per-stroke row (expanded config) | Normal |
-| **Effect** | Right toolbar, per-effect row | Normal (Screen for glow) |
+| **Effect** | Right toolbar, per-effect row (expanded config) | Normal (Screen for glow) |
 
 **16 blend modes:** Normal, Darken, Multiply, Color Burn, Lighten, Screen, Color Dodge, Overlay, Soft Light, Hard Light, Difference, Exclusion, Hue, Saturation, Color, Luminosity.
 
@@ -224,7 +228,9 @@ Blend modes are preserved across copy/paste, undo/redo, and all export formats (
 
 ### UI
 
-Adjust the opacity slider in the color picker, or type a percentage value.
+**Element-level opacity** is in the Element section of the right toolbar, on the same row as the rotation field. Drag or type a percentage (0%–100%).
+
+**Fill/stroke opacity** is controlled by the opacity slider in the color picker (affects the alpha of the focused fill or stroke color).
 
 ## Corner Radius
 
@@ -238,7 +244,10 @@ Adjust the opacity slider in the color picker, or type a percentage value.
 
 ### Per-Corner Radius
 
-Expand the corner radius section in the right toolbar to adjust each corner independently: top-left, top-right, bottom-right, bottom-left.
+The corner radius row has two toggle buttons for expanding into per-corner editing:
+
+1. **Top/Bottom mode** (first button) — Two fields: one for top corners (TL + TR), one for bottom corners (BL + BR).
+2. **Individual mode** (second button) — Four fields in a 2x2 grid: top-left, top-right, bottom-left, bottom-right.
 
 ### Parent Corner Radius
 
@@ -251,10 +260,10 @@ Circle elements have additional properties for creating arcs, pie sectors, and d
 | Property | Range | Description |
 |----------|-------|-------------|
 | **Sweep** | 0–100% | How much of the circle to fill. 100% = full circle |
-| **Start** | 0–360° | Where the arc begins. 0° = 12 o'clock, clockwise |
+| **Start** | 0–360° | Where the arc begins. 0° = 3 o'clock (right), counter-clockwise (90° = top) |
 | **Ratio** | 0–1 | Inner radius fraction. 0 = solid, >0 = donut/ring |
 
-**Stroke caps on arcs:** When sweep < 100% and ratio = 0 (open arc, not a ring), start/end cap controls appear in the stroke section. Use round caps for progress rings, arrow caps for directional arcs.
+**Stroke caps on arcs:** When sweep < 100% (any arc, including ring sectors), start/end cap controls appear in the stroke section. Use round caps for progress rings, arrow caps for directional arcs.
 
 **Common combinations:**
 - **Progress ring:** stroke-only circle + `arc(90, 75) ratio(1)` + round caps for 75% completion (90° = top)
@@ -270,7 +279,7 @@ Effects add visual enhancements like shadows, glows, blurs, and texture. Brillia
 
 ### Outer Effects (Effects Section)
 
-Render outside or around elements. Managed in the Effects section of the right toolbar, or add via the **command palette** (Cmd+Shift+P) by searching for "Add Drop Shadow", "Add Inner Shadow", etc. Effects can also be specified in blueprint syntax (see [EFFECTS.md](./EFFECTS.md) for the compact format).
+Render outside or around elements. Managed in the Effects section of the right toolbar, or add via the **command palette** (Cmd+Shift+P) by searching for "Add Drop Shadow", "Add Outer Glow", or "Add Element Blur". Effects can also be specified in blueprint syntax (see [EFFECTS.md](./EFFECTS.md) for the compact format).
 
 | Type | Description |
 |------|-------------|
@@ -288,7 +297,7 @@ Render within element bounds. Added as fills for full z-order control:
 | Inner Glow | Luminous glow inside the element edges |
 | Background Blur | Blurs content behind the element (frosted glass) |
 
-Inner effects share the type dropdown with shader fills and can be interleaved with other fill types.
+Inner effects are in the fill type dropdown under the **Static** group (alongside Image). The full dropdown groups are: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (shader fills), **Interactive** (shader fills), **Filters** (Color Adjust + 6 image filters). Inner effect fills can be interleaved with other fill types.
 
 ### Key Properties
 
@@ -302,14 +311,17 @@ Inner effects share the type dropdown with shader fills and can be interleaved w
 
 **Inner Glow:** Blur, spread, color, opacity, blend mode (default: Screen).
 
+Each effect row has: type dropdown (with color swatch prefix for non-blur effects), opacity field, expand toggle, and remove button. Expanding reveals the full property fields.
+
 | Action | How |
 |--------|-----|
-| Add effect | Command palette: "Add Drop Shadow", "Add Inner Shadow", etc., or click "+" in Effects/Fills section |
-| Remove effect | Command palette: "Remove Effect", or click delete button |
-| Toggle visibility | Command palette: "Toggle Effect Visibility", or click the eye icon |
+| Add outer effect | Command palette: "Add Drop Shadow" / "Add Outer Glow" / "Add Element Blur", or click "+" in Effects section |
+| Add inner effect | Command palette: "Add Inner Shadow" / "Add Inner Glow" / "Add Background Blur", or click "+" in Fills section and choose from the type dropdown |
+| Remove effect | Command palette: "Remove Effect", or click delete button on effect row |
+| Toggle visibility | Command palette: "Toggle Effect Visibility", or click the eye icon (in expanded view) |
 
 **Background Blur:** Radius (0-200).
 
-Elements can have multiple effects stacked. Reorder by dragging. Effects render in order: drop shadows → outer glows → fills (solid, gradient, image, shaders, inner shadow, inner glow — all in z-order) → strokes.
+Elements can have multiple effects stacked. Reorder by dragging. Render order: outer effects (drop shadows and outer glows in list order) → fills (solid, gradient, image, shaders, inner shadow, inner glow — all in z-order) → strokes.
 
 See `EFFECTS.md` for full details, default values, and tips.

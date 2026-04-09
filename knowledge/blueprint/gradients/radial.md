@@ -32,7 +32,7 @@ f[(radial(0,0,1,1,stop(#000,0,o(0)),stop(#000,0.6,o(0)),stop(#000,1,o(0.7))))]
 
 **Elliptical accent** — wider-than-tall using `w()`:
 ```
-f[(radial(0,0,0,-1,w(1,0),stop(#3B82F6,0,o(0.3)),stop(#3B82F6,1,o(0))))]
+f[(radial(0,0,0,-1,w(1,0),stop(#EC4899,0,o(0.3)),stop(#EC4899,1,o(0))))]
 ```
 
 **Radial + linear stack** — linear sets mood, radial adds highlight:

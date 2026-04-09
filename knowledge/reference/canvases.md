@@ -104,6 +104,7 @@ In the left toolbar (Cmd+Shift+E). Shows all canvases, folders, and Assets direc
 - Enter to rename, Cmd+Delete to delete
 - Double-tap to rename (canvases, folders, and assets)
 - Next/previous file (Alt+Arrow) navigates through canvases AND images
+- **Toggle Hidden Files** — Show/hide dotfiles and dotfolders (e.g., `.git`, `.env`) via the command palette ("Toggle Hidden Files"). Hidden by default. State resets on app restart.
 
 **Asset management** (image files in Assets folders):
 - Right-click context menu: Rename, Delete, Reveal in Finder, Copy Filename
@@ -120,17 +121,18 @@ To return to a canvas, click any canvas in the file explorer or use Alt+Arrow to
 
 ## Import & Export
 
-### Importing Images
+### Importing Files
 
 | Action | Shortcut |
 |--------|----------|
-| Import from file | Cmd+K |
+| Import from file | Cmd+Shift+O |
 | Paste from clipboard | Cmd+V |
 | Drag and drop | Drag image files onto canvas |
 
-**Supported formats:** PNG, JPG, JPEG, GIF, BMP, WebP, SVG
-
-Images become rectangle elements with an image fill.
+**Cmd+Shift+O** opens a file picker that accepts images, SVG files, and `.design` files. The import behavior depends on file type:
+- **Images** (PNG, JPG, JPEG, GIF, BMP, WebP; on macOS also TIFF, HEIC, HEIF, AVIF) become rectangle elements with an image fill
+- **SVG** files are imported as native editable vector elements
+- **`.design` files** are imported into an `Imports/` folder (auto-detects native YAML vs. legacy compressed JSON format)
 
 ### Importing from Figma
 
@@ -194,7 +196,7 @@ SVG files import as native editable vector elements:
 |--------|-----|
 | Command palette | Search "Import SVG" |
 | Paste | Copy SVG text, paste with Cmd+V |
-| File import | Cmd+K, select .svg file |
+| File import | Cmd+Shift+O, select .svg file |
 
 **Supported SVG elements:** rect, circle, ellipse, line, path, polygon, polyline, text, g (groups)
 
@@ -221,16 +223,12 @@ Export selected elements to various formats. Select elements first, then export.
 
 | Option | Description |
 |--------|-------------|
-| Scale | 1x, 2x, 3x, etc. Higher scales = larger file, more detail |
-| Format | PNG, JPEG, WebP, SVG, PDF |
-
-**Background options:**
-- **Clear** - Transparent background (PNG/WebP only)
-- **Window** - Uses the window/canvas background color
-- **Desktop** - Uses desktop background
+| Format | PNG, JPEG, WebP, SVG, PDF, MP4, MOV |
+| Resolution | Original (1x), Original (2x), Original (3x), Original (4x), 720p, 1080p, 1440p, 4K, 8K, Instagram Post, Instagram Story, iPhone 16 Pro, MacBook Pro 14", Custom |
+| Background | Transparent or Canvas (when format supports alpha) |
 
 **Tips:**
-- PNG supports transparency; JPEG does not (transparent areas become white)
+- PNG supports transparency; JPEG does not (transparent areas filled with canvas background color)
 - Use 2x scale for retina/high-DPI displays
 - SVG/PDF preserve vector paths and are infinitely scalable
 - Multiple export configs can be added to export at different scales simultaneously
@@ -260,20 +258,18 @@ Brilliant uses `.design` files for saving and sharing.
 
 | Action | Shortcut | Description |
 |--------|----------|-------------|
-| Save as | Cmd+Shift+S | Save current canvas |
-| Save workspace as | Cmd+Ctrl+S | Save all canvases and folders |
+| Save As... | Cmd+Shift+S | Save current canvas or focused item as a `.design` file + Assets folder |
 | Open folder | Cmd+O | Open a folder as a design workspace |
 | Copy canvas path | Hover top toolbar, click copy icon | Copies the full `.design` file path to clipboard |
 
 **In repository mode**, `.design` files contain element properties, hierarchy, and canvas metadata. Images are stored separately in `Assets/` directories and referenced by path.
 
-**Portable `.design` files** (created via Save As or Save Workspace As) additionally embed all referenced images inline (deduplicated and compressed), making them self-contained for sharing.
+**Save As `.design` files** (created via Cmd+Shift+S) save the native YAML `.design` file along with an `Assets/` folder containing all referenced images. Image paths in the YAML are rewritten to relative `Assets/filename` references, making the package portable for sharing.
 
 ### File Organization
 
-- **Single canvas** — Save as `.design` with Cmd+Shift+S
-- **Folder with canvases** — Save entire folder hierarchy as one file
-- **Full workspace** — Save everything with Cmd+Ctrl+S
+- **Single canvas** — Save As (Cmd+Shift+S) exports the `.design` YAML file + an `Assets/` folder with referenced images
+- **Folder with canvases** — Save As (Cmd+Shift+S) when a folder is focused exports the entire folder hierarchy (all `.design` files, subfolders, and referenced images) to a chosen directory
 
 ### Reveal in Finder
 
@@ -304,11 +300,9 @@ Brilliant auto-saves continuously:
 - Save status indicator appears in the top toolbar next to the canvas name
 
 **Manual save options:**
-- **Cmd+S** - Save workspace to a folder (in scratch mode, opens a folder picker to create a repository)
-- **Cmd+Shift+S** - Save current canvas as a portable `.design` file
-- **Cmd+Ctrl+S** - Save entire workspace as a single `.design` file
+- **Cmd+Shift+S** - Save current canvas or focused item (canvas or folder) as a `.design` file + Assets folder
 
-These "Save As" options create portable files you can share or archive, separate from the auto-saved working copies.
+This "Save As..." option creates a copy you can share or archive, separate from the auto-saved working copies. The exported `.design` file is native YAML with image paths rewritten to relative `Assets/` references, and referenced images are copied to a sibling `Assets/` folder.
 
 ---
 
@@ -343,7 +337,6 @@ my-workspace/
 
 **Switching modes:**
 - **Cmd+O** opens a folder as a workspace (enters repository mode)
-- **Cmd+S** in scratch mode opens a folder picker to save the workspace to a named location (converts to repository mode)
 - Brilliant remembers your last workspace and reopens it on startup
 
 ### .design Files
@@ -362,7 +355,7 @@ Images are stored in `Assets/` directories at each folder level:
 - Folder images: `workspace/Components/Assets/`
 - Nested: `workspace/Components/Buttons/Assets/`
 
-When you import an image (Cmd+K), it's saved to the appropriate Assets directory. Renaming an asset automatically updates all references in `.design` files.
+When you import an image (Cmd+Shift+O), it's saved to the appropriate Assets directory. Renaming an asset automatically updates all references in `.design` files.
 
 ### .brilliant/ Folder
 
@@ -373,6 +366,22 @@ The `.brilliant/` directory at the workspace root contains:
 ### Recent Workspaces
 
 Brilliant tracks recently opened workspaces (up to 20). On startup, it reopens the most recently used named workspace (scratch is excluded from this list).
+
+### Code Editor
+
+Clicking a text file in the file explorer opens it in Brilliant's built-in **code editor** (powered by CodeMirror 6). The editor replaces the canvas view while a text file is active.
+
+**Supported file types:** JavaScript, TypeScript, JSX/TSX, Python, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Dart, Go, Swift, SQL, Shell/Bash, XML/SVG, TOML/INI/conf, and plain text. `.styles` and `.styles.gen` files open with YAML highlighting.
+
+**Features:**
+- **Syntax highlighting** with VS Code Dark+/Light+ themes (auto-matches Brilliant's brightness)
+- **Vim mode** — Full vim keybinding support via @replit/codemirror-vim. Loads your config from `~/.config/nvim/init.vim`, `~/.config/nvim/init.lua`, or `~/.vimrc` automatically (custom key mappings, settings like relativenumber, expandtab, tabstop, etc.)
+- **Search & Replace** — Cmd+F opens the search panel
+- **Diff viewing** — Side-by-side merge view for comparing changes
+- **File navigation** — Alt+Right/Left to switch between files; Ctrl+Alt+Left for previously active file
+- **Vim mode indicator** — Shows current vim mode (Normal/Insert/Visual) in the top toolbar when active
+
+The code editor is particularly useful for editing `.styles` files (design system tokens) directly as YAML.
 
 ### .styles File Watching
 

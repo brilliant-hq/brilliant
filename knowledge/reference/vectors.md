@@ -38,7 +38,7 @@ The pen tool creates vector paths by placing nodes one at a time with optional b
 3. **Click and drag** to place a node with bezier handles (smooth curve)
 4. Continue clicking to add more nodes
 5. **Click the first node** to close the path into a shape
-6. Press **Escape** to finish an open path (first press clears node selection, second press finalizes the path)
+6. Press **Escape** to finish an open path (first press clears node selection, second press exits vector edit mode and switches to Move)
 
 ### Creating Straight Lines
 
@@ -67,6 +67,23 @@ Click on the first node to create a closed shape.
 - Closed paths can have fills and strokes
 - After creation, refine in vector edit mode (select path, press **Enter**)
 
+## Pencil Tool
+
+Press **Shift+P** to activate the Pencil tool. Also accessible via:
+- **Bottom toolbar:** Click the Drawing Tools dropdown and select "Pencil"
+- **Command Palette:** Press **Cmd+Shift+P**, search for "Pencil"
+
+The Pencil tool creates freehand vector paths by drawing with the mouse. It automatically smooths the stroke into cubic Bezier curves using Catmull-Rom interpolation. The result is a standard vector element that can be edited in vector edit mode.
+
+### Basic Usage
+
+1. Activate the pencil tool
+2. Click and drag on the canvas to draw a freehand path
+3. Release to finish the stroke
+4. The path is automatically smoothed into curves
+
+The pencil tool produces open paths with strokes (no fill). After drawing, you can refine the path in vector edit mode.
+
 ## Node Editing
 
 Enter vector edit mode by selecting a vector element and pressing **Enter** (or double-clicking it).
@@ -85,9 +102,17 @@ Enter vector edit mode by selecting a vector element and pressing **Enter** (or 
 
 Select nodes and drag. Snap guides work.
 
-- Hold **Shift** while dragging to constrain movement to 15-degree angle increments
+- Hold **Shift** while dragging to constrain movement to the horizontal or vertical axis (whichever has the larger delta)
 - Hold **Alt/Option** at the start of a drag to **duplicate** the selected nodes — the drag operates on the copies while the originals stay in place
 - When 2+ nodes are selected, you can drag anywhere inside the selection bounding box to move all selected nodes together
+
+### Moving Disconnected Regions
+
+Vectors with multiple separate shapes (e.g., a Venn diagram with 3 circles, or a multi-part icon) support dragging each shape independently:
+
+- **Click** on a disconnected region (fill area or stroke) to select all its nodes at once
+- **Drag** a disconnected region to move it — click-and-drag works in one gesture
+- **Shift+Click** another region to add its nodes to the selection, then drag to move multiple regions together
 
 ### Adding Nodes
 
@@ -216,24 +241,58 @@ Two separate toggles control snapping behavior:
 
 ---
 
+## Boolean Operations
+
+Boolean operations combine two or more selected shapes into a boolean group. The children remain editable inside the group -- you can double-click a boolean group to edit individual shapes.
+
+| Operation | Shortcut | Description |
+|-----------|----------|-------------|
+| **Union** | **Alt+Shift+U** | Combines all shapes into one merged outline |
+| **Subtract** | **Alt+Shift+S** | Subtracts front shapes from the back shape |
+| **Intersect** | **Alt+Shift+I** | Keeps only the overlapping area |
+| **Exclude** | **Alt+Shift+E** | Keeps only the non-overlapping areas (XOR) |
+
+Also accessible via the command palette (search "Boolean Union", etc.).
+
+Requires 2+ elements selected. If a single boolean or mask group is already selected, the command changes its boolean type instead of creating a new group.
+
+To bake a boolean group into a final single vector, use **Flatten** (see below).
+
+## Flatten
+
+The Flatten command converts any selection into a single vector element:
+
+| Input | Result |
+|-------|--------|
+| Single primitive (rect/circle/line) | Converts to vector |
+| Boolean group (union) | Concatenates children into one vector (lossless, per-child colors) |
+| Boolean group (subtract/intersect/exclude) | Bakes the computed result into a vector via path sampling |
+| Group/frame | Concatenates children into one vector |
+| Multiple selected elements | Concatenates all into one vector |
+| Single vector | No conversion needed — enters vector edit mode |
+
+**Shortcut:** **Cmd+Enter** (or search "Flatten" in the command palette).
+
+---
+
 ## Creating Vectors Programmatically
 
 When creating vectors via `create_modify_elements` (not the pen tool), you define paths using SVG path syntax. This is essential for sparklines, area charts, waveforms, and decorative curves.
 
 ### How Vector Positioning Works
 
-A vector element's bounding box is defined by `WxH` in the element declaration. Path coordinates render **within** that box:
+A vector element's bounding box is defined by `s(W,H)` in the element declaration. Path coordinates render **within** that box:
 
 - `M0,0` = top-left corner of the element
 - `M{W},{H}` = bottom-right corner
 - `p(X,Y)` positions the element within its parent (just like rects and frames)
 
 ```
-# A 60x24 sparkline positioned at (10,5) inside a group
-Sparkline v 60x24 p(10,5) st[(#3B82F6,w(1.5))] s(fixed,fixed) path:d(M0,20 C10,16 20,12 30,8 C40,6 50,4 60,2)
+# A 60x24 vector positioned at (10,5) inside a group
+v() s(60,24) p(10,5) st[(#F97316,w(1.5))] path:d(M0,20 C10,16 20,12 30,8 C40,6 50,4 60,2) "Curve"
 ```
 
-**The path fills the WxH box.** If your path coordinates exceed `WxH`, the overflow is clipped. If they're smaller, the element has dead space. Design paths to match your declared size.
+**The path fills the `s(W,H)` box.** If your path coordinates exceed the declared size, the overflow is clipped. If they're smaller, the element has dead space. Design paths to match your declared size.
 
 ### Path Syntax (SVG d attribute)
 
@@ -252,35 +311,21 @@ Sparkline v 60x24 p(10,5) st[(#3B82F6,w(1.5))] s(fixed,fixed) path:d(M0,20 C10,1
 ### Sparkline (Stroke Only)
 
 ```
-Spark v 60x24 st[(#3B82F6,w(1.5))] s(fixed,fixed) path:d(M0,22 C6,21 12,20 18,17 C22,16 26,18 30,15 C36,12 42,10 48,8 C52,7 56,5 60,4)
+v() s(60,24) st[(#F97316,w(1.5))] path:d(M0,22 C6,21 12,20 18,17 C22,16 26,18 30,15 C36,12 42,10 48,8 C52,7 56,5 60,4) "Spark"
 ```
 
-**Always use `C` (cubic bezier) for smooth curves.** `L`-only paths look jagged. See `building/DATA.md` → "Realistic Path Shapes" for metric-specific paths (revenue, latency, error rate, etc.) — each metric type has a distinct visual signature.
+**Always use `C` (cubic bezier) for smooth curves.** `L`-only paths look jagged. See `charts/sparklines` for metric-specific path shapes (revenue, latency, error rate, etc.).
 
 ### Area Fill (Closed Path)
 
-To fill the area under a curve, **close the path at the bottom** and wrap in a **clip frame with outside stroke and top padding**. The closing edges create ugly strokes at the bottom and sides — outside stroke pushes them beyond the vector's bounds, and the clip frame crops them away. Top padding gives the curve's outside stroke room so it isn't clipped:
+To fill the area under a curve, **close the path at the bottom** and wrap in a **clip frame with outside stroke and top padding**. Use ONE closed vector with both stroke and fill. The closing edges create ugly strokes at the bottom and sides — outside stroke pushes them beyond the vector's bounds, and the clip frame crops them away. Top padding gives the curve's outside stroke room so it isn't clipped:
 
 ```
-# Your curve:           M0,20 C5,18 ... C50,6 55,10 60,6
-# Close at bottom:      L60,24 L0,24 Z
-# Full closed path in clip frame:
-Spark al(v) s(hug,hug) clip pad(2,0,0,0)
-  Area v 60x24 f[(solid(#3B82F6,o(0.12)))] st[(#3B82F6,w(1.5),cap(n,n),pos(o))] s(fixed,fixed) path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z)
+al(v,g($spacing.none),pad(2,$spacing.none,$spacing.none,$spacing.none)) s(fill,hug) clip "Spark"
+  v() s(fill,24) f[(linear(180,stop(#F97316,0,o(0.15)),stop(#F97316,1,o(0.0))))] st[(#F97316,w(1.5),cap(n,n),pos(o))] path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z) "Line"
 ```
 
-The `L60,24 L0,24 Z` closes the path along the bottom edge, creating a filled region. The `pad(2,0,0,0)` adds 2px top padding (≥ stroke width) so the curve stroke isn't clipped, while 0 padding on bottom/left/right keeps closing-edge strokes cropped. Use `f[(solid(#hex,o(0.12)))]` (12% opacity) for a simple translucent area, or a gradient for a polished fade effect.
-
-### Sparkline + Area Fill (Combined)
-
-Use ONE closed vector with both stroke and fill, wrapped in a clip frame. For a polished look, use a gradient fill that fades from visible near the curve to transparent at the bottom:
-
-```
-Spark al(v) s(hug,hug) clip pad(2,0,0,0)
-  Line v 60x24 f[(linear(180,stop(#3B82F6,0,o(0.15)),stop(#3B82F6,1,o(0.0))))] st[(#3B82F6,w(1.5),cap(n,n),pos(o))] s(fixed,fixed) path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z)
-```
-
-The clip frame + outside stroke combination ensures only the top curve stroke is visible. Top padding prevents the curve stroke from being clipped. The gradient (`180` = top-to-bottom) creates the modern area chart look. For simplicity, `f[(solid(#3B82F6,o(0.12)))]` (solid at low opacity) also works.
+The `L60,24 L0,24 Z` closes the path along the bottom edge. The path scales to fill the clip frame, so closing edges always land at the clipped boundary. The `pad(2,0,0,0)` adds 2px top padding (≥ stroke width) so the curve stroke isn't clipped, while 0 padding on bottom/left/right keeps closing-edge strokes cropped. **The vector must be `s(fill,H)`** — a fixed-width vector smaller than its clip frame leaves the right closing edge visible. The gradient (`180` = top-to-bottom) creates the modern area chart look. For simplicity, `f[(solid(#F97316,o(0.12)))]` (solid at low opacity) also works.
 
 ### Common Mistakes
 
@@ -288,11 +333,12 @@ The clip frame + outside stroke combination ensures only the top curve stroke is
 |-------|---------|
 | Two separate vectors in a group (one stroke, one fill) for sparkline + area | ONE closed vector with both `fill` and `stroke` in a clip frame |
 | Placing a colored `rect` behind a sparkline stroke to simulate area fill | Use a **closed vector path** with `f[(solid(#hex,opacity))]` — the rect can't follow the curve |
-| Using centered stroke on closed sparkline paths | Use `st[(#hex,1.5,n,n,o)]` (outside stroke) + clip frame to hide closing-edge strokes |
+| Using centered stroke on closed sparkline paths | Use `st[(#hex,w(1.5),cap(n,n),pos(o))]` (outside stroke) + clip frame to hide closing-edge strokes |
+| Fixed-width vector `s(60,24)` inside area fill clip frame | Use `s(fill,24)` — path scales to fill the clip frame, keeping closing edges at the clipped boundary |
 | Using `L` segments for smooth sparklines | Use `C` cubic beziers — `L` creates jagged zigzags |
-| Creating vectors without `WxH` | Always declare size: `v 60x24` — the path renders within this box |
-| Fighting vector positioning with repeated @X,Y adjustments | Design path coordinates relative to `0,0`, set `WxH` to match path bounds, position with `p(X,Y)` |
-| Creating separate triangle `vector` elements for arrowheads | Use `st[(#hex,width,n,ar)]` on a `line` or `vector` — the arrow cap renders automatically at the endpoint |
+| Creating vectors without size | Always declare size: `v() s(60,24)` — the path renders within this box |
+| Fighting vector positioning with repeated @X,Y adjustments | Design path coordinates relative to `0,0`, set size with `s(W,H)` to match path bounds, position with `p(X,Y)` |
+| Creating separate triangle `vector` elements for arrowheads | Use `st[(#hex,w(N),cap(n,ar))]` on a `line` or `vector` — the arrow cap renders automatically at the endpoint |
 
 ### Vector Regions
 
@@ -313,13 +359,30 @@ abc123 v() s(200,200) "Logo"
 **Modify per-region fills** — reference by region ID, no path data needed:
 ```
 abc123
-  vr(r1) f[(solid(#3B82F6,o(0.15))),(f2,blur(12)),(f3,inner(#000,o(0.2),y(2),blur(4)))]
+  vr(r1) f[(solid(#F97316,o(0.15))),(f2,blur(12)),(f3,inner(#000,o(0.2),y(2),blur(4)))]
   vr(r2) f[(solid(#8B5CF6,o(0.1))),(f2,blur(8))]
 ```
 
 Only listed regions are modified — others keep their current fills. Flat `f[...]` on the element line still applies uniformly to all regions.
 
 **Single-region vectors** (or vectors with no regions) show the standard flat format — no `vr()` lines.
+
+### Stroke Caps (Per-Node)
+
+Vector path endpoints (leaf nodes with degree 1) can have individual stroke caps. Select a vector with a stroke, then configure caps in the right toolbar:
+
+| Cap Type | Description |
+|----------|-------------|
+| **None** | Butt cap -- no extension past the endpoint |
+| **Round** | Semicircle cap (default) |
+| **Square** | Extends by half stroke thickness past the endpoint |
+| **Arrow** | Arrow head pointing outward along the path tangent |
+
+**For open paths** (lines, curves): A unified dropdown sets both endpoints to the same cap. Appears in the stroke section of the right toolbar when the element has a stroke.
+
+**For circle arcs** (sweep < 100%): Separate start cap and end cap dropdowns appear side by side, allowing independent control of each endpoint.
+
+Arrow caps scale with stroke width automatically. Use `cap(n,ar)` in blueprint syntax for arrow endpoints (e.g., `st[(#374151,w(1.5),cap(n,ar))]`). See the Arrows section below for examples.
 
 ### When to Use Vectors vs Other Elements
 
@@ -333,7 +396,7 @@ Only listed regions are modified — others keep their current fills. Flat `f[..
 | Simple colored rectangles | `rect` |
 | Circles, dots | `circle` |
 | Decorative wavy dividers | `vector` with `C` curves |
-| Progress rings | Track = `circle` with stroke; progress arc = `circle` with `arc(start,sweep)` — e.g. `c s(80,80) st[(#3B82F6,w(4),cap(r,r))] arc(90,75) ratio(1)` for 75% starting at top (90°=top, 0°=right) |
+| Progress rings | Track = `circle` with stroke; progress arc = `circle` with `arc(start,sweep)` — e.g. `c s(80,80) st[(#F97316,w(4),cap(r,r))] arc(90,75) ratio(1)` for 75% starting at top (90°=top, 0°=right) |
 
 ### Arrows
 
@@ -341,14 +404,14 @@ Use `st[(#hex,w(width),cap(n,ar))]` to add an arrowhead at the endpoint (`ar` = 
 
 **Straight arrow:**
 ```
-Arrow l p(50,100) s(200,100) st[(#374151,w(1.5),cap(n,ar))]
+v() s(200,20) st[(#374151,w(1.5),cap(n,ar))] path:d(M0,10 L200,10) "Arrow"
 ```
 
 **Curved arrow:**
 ```
-Arrow v 200x100 st[(#374151,w(1.5),cap(n,ar))] s(fixed,fixed) path:d(M0,50 C60,50 140,0 200,0)
+v() s(200,100) st[(#374151,w(1.5),cap(n,ar))] path:d(M0,50 C60,50 140,0 200,0) "Arrow"
 ```
 
 The arrow cap renders at the last node, oriented along the path tangent. It scales with stroke width automatically.
 
-> **Cross-reference:** See `building/DATA.md` for complete sparkline, bar chart, and stacked bar patterns with exact coordinates.
+> **Cross-reference:** See `charts/sparklines`, `charts/bar-charts`, and `charts/line-charts` for complete chart patterns.

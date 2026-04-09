@@ -1,5 +1,5 @@
 ---
-assumes: blueprint/core, blueprint/layout
+assumes: blueprint/core, blueprint/variables, blueprint/layout
 ---
 # Blueprint Components & Instances
 
@@ -9,9 +9,9 @@ assumes: blueprint/core, blueprint/layout
 
 Add `comp` bare flag to a frame. **CRITICAL: assign `#ref` to EVERY child you plan to override in instances.** The `override(#ref)` syntax requires the exact same `#ref` that was assigned on the master child — element names alone don't work as override refs.
 ```
-al(v,g(16),pad(24)) s(300,hug) f[(#FFF)] st[(#E2E8F0,w(1))] rd(16) shadow(#000,o(0.06),y(2),blur(8)) "Card" comp #card
-  t("Title",Inter,18,b) f[(#0F172A)] "Title" #title
-  t("Description",Inter,14) s(fill,hug) f[(#64748B)] "Description" #desc
+al(v,g($spacing.4),pad($spacing.6)) s(300,hug) f[(#FFF)] st[($neutral.20,w(1))] rd($radius.md) shadow(#000,o(0.06),y(2),blur(8)) "Card" comp #card
+  t("Title",$font,18,b) f[($brand.90)] "Title" #title
+  t("Description",$font,14) s(fill,hug) f[($neutral.50)] "Description" #desc
 ```
 
 ## Create Instances
@@ -31,27 +31,17 @@ Only specified properties change — everything else syncs to master.
 
 Mark children with `slot` to let instances own that subtree:
 ```
-al(v,g(8)) s(fill,hug) "Features" slot
+al(v,g($spacing.2),pad($spacing.none)) s(fill,hug) "Features" slot
   t("3 projects",Inter,14) f[(#475569)]
 ```
 
 When you override a slot with indented children, existing children are **replaced** — the instance owns the slot content entirely.
 
-## Variables (`$var`) — text substitution before parsing
-```
-$bg=#F8FAFC
-$brand=#3B82F6
-$card_fill=f[($bg)] st[($brand,w(1))] rd(12)
-al(v,pad(24)) s(400,hug) $card_fill "Card"
-  t("Styled with variables",Inter,14) f[(#334155)]
-```
-Variables can reference earlier variables: `$gradient=linear(135,$brand,$accent)`.
-
 ## SVG Icon Overrides
 
 SVG icons inside components can be overridden with different icons:
 ```
-al(h,a(c,c),g(8),pad(10,16)) s(hug,hug) f[(#3B82F6)] rd(8) "NavItem" comp #navitem
+al(h,a(c,c),g($spacing.2),pad($spacing.3,$spacing.4)) s(hug,hug) f[(#10B981)] rd($radius.sm) "NavItem" comp #navitem
   svg(icon:house) s(16,16) f[(#FFF)] "Icon" #icon
   t("Home",Inter,14,m) f[(#FFF)] "Label" #label
 inst(#navitem) p(200,0) f[(#8B5CF6)]

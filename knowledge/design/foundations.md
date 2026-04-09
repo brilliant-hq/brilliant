@@ -16,6 +16,12 @@ Minimal: subtle/no shadows, skip effects (restraint IS premium), solid bg. Profe
 
 **Default to restraint.** White space is a feature, not wasted space.
 
+## Visual Weight & Composition
+
+Every screen needs **one dominant visual region** — the element that carries the most weight and draws the eye first. Secondary regions must be visually subordinate (smaller, lighter, less contrast). Avoid equal-weight zones competing for attention — if two sections feel equally important, one of them isn't designed yet.
+
+Ask: "If I squint, does one area clearly dominate?" If not, increase the contrast between primary and secondary.
+
 ## Content & Layout
 
 Hero headline 4-8 words · subtitle 12-25 words · section heading 3-6 words · card description 10-25 words.

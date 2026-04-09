@@ -33,19 +33,16 @@ Reference tokens with the `$` prefix in blueprint syntax. Tokens work in fills, 
 
 ```
 # Color tokens in fills and strokes
-Card frame auto-v w:320 h:hug fill:$brand.50 stroke:$neutral.30/1 r:12 gap:16 pad:24
-  Title text "Card Title" font:Inter/20/bold fill:$brand.90 w:fill h:hug
+al(v,g($spacing.4),pad($spacing.6)) s(320,hug) f[($brand.50)] st[($neutral.30,w(1))] rd(12) "Card"
+  t("Card Title",Inter,20,b) f[($brand.90)]
 
 # Spacing tokens in gap and padding
-Section frame auto-v w:fill h:hug gap:$spacing.4 pad:$spacing.6
-  Heading text "Features" font:Inter/24/bold fill:$brand.80 w:fill h:hug
+al(v,g($spacing.4),pad($spacing.6)) s(fill,hug) "Section"
+  t("Features",Inter,24,b) f[($brand.80)]
 
 # Radius tokens
-Button frame auto-h w:hug h:48 fill:$brand.50 r:$radius.md pad:12,16
-  Label text "Get Started" font:Inter/14/semibold fill:#FFFFFF
-
-# Font family from design system (omit family name to use DS default)
-Body text "Description" font:/14 fill:$neutral.50 w:fill h:hug
+al(h,a(c,c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,48) f[($brand.50)] rd($radius.md) "Button"
+  t("Get Started",Inter,14,sb) f[(#FFFFFF)]
 ```
 
 Token references resolve at creation time using the active design system. If a token doesn't exist, the property is skipped and the default value is used.
@@ -189,7 +186,7 @@ All 6 color seeds generate full 5–90 scales out of the box. Override any seed 
 
 ## Creating a Design System
 
-Brilliant automatically creates a root `.styles` file with default seeds when you open a repository that doesn't have one. You can also create or edit `.styles` files manually. The format is valid YAML — hex colors must be quoted:
+Brilliant automatically creates an empty root `.styles` file when you open a repository that doesn't have one. The built-in defaults (brand, neutral, success, etc.) are applied automatically during token resolution even without explicit seeds in the file -- you only need to add seeds when you want to customize them. You can also create or edit `.styles` files manually. The format is valid YAML -- hex colors must be quoted:
 
 ```yaml
 # Seeds - generate full scales
@@ -375,7 +372,7 @@ Then use `accent.10` for tag backgrounds, `accent.50` for secondary CTAs, `surfa
 
 ## Editing .styles Files
 
-`.styles` and `.styles.gen` files appear in the command palette file search and open with YAML syntax highlighting in the code editor.
+Use the **Open Design System File** command (command palette) to open the nearest `.styles` file in the code editor with YAML syntax highlighting. Files starting with `.` (including `.styles`) are hidden in the file explorer and command palette file search by default -- use the Open Design System File command for direct access.
 
 You can also modify the design system programmatically using commands (via command palette, keybindings, MCP, or AI natural language).
 
@@ -386,9 +383,9 @@ You can also modify the design system programmatically using commands (via comma
 | Command | Description | Example |
 |---------|-------------|---------|
 | **Set Color Seed** | Add or update a color seed | Set `brand` to `#3B82F6` |
-| **Remove Color Seed** | Remove a color seed and its mode variants | Remove the `accent` seed |
-| **Add Mode Seed** | Add a mode-specific variant for a color seed | Add `tint` mode for `brand` with `#8866CC` |
-| **Remove Mode Seed** | Remove a specific mode variant | Remove `tint` mode from `brand` |
+| **Remove Color Seed** | Remove a color seed and its mode variants (programmatic only) | Remove the `accent` seed |
+| **Add Mode Seed** | Add a mode-specific variant for a color seed (programmatic only) | Add `tint` mode for `brand` with `#8866CC` |
+| **Remove Mode Seed** | Remove a specific mode variant (programmatic only) | Remove `tint` mode from `brand` |
 
 ### Numeric Seed Commands
 
@@ -402,6 +399,8 @@ You can also modify the design system programmatically using commands (via comma
 
 Numeric seeds support relative operations: "add 2 to spacing" increases the base by 2, "multiply font size by 1.5" scales it up.
 
+**Note:** Stroke width base and opacity base do not have dedicated commands. To change these seeds, edit the `.styles` file directly (e.g., `stroke.width: 2` or `opacity: 0.5`).
+
 ### Other Seed Commands
 
 | Command | Description |
@@ -409,6 +408,8 @@ Numeric seeds support relative operations: "add 2 to spacing" increases the base
 | **Set Font Family** | Change the default font family (e.g., `Inter`, `SF Pro Display`) |
 
 ### Token Commands
+
+These commands are programmatic only (not visible in the command palette). They are used by AI agents and MCP tools to modify tokens.
 
 | Command | Description |
 |---------|-------------|

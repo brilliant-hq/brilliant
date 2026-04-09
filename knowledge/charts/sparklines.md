@@ -23,11 +23,12 @@ v(nodes[(0,0,21),(1,10,11),(2,17.68,19.32),(3,25.21,11),(4,32,18),(5,34.36,13.43
 
 Uses Clip-Outside-Stroke:
 ```
-al(v,pad(2,0,0,0)) s(hug,hug) clip "Spark"
-  v(nodes[(0,0,21.6,mi),(1,12,16.8,mi),(2,28,12,mi),(3,38,15.6,mi),(4,50,7.2,mi),(5,60,0,mi),(6,60,24),(7,0,24)],edges[(0,0,1),(1,1,2),(2,2,3),(3,3,4),(4,4,5),(5,5,6),(6,6,7),(7,7,0)],closed) s(60,24) f[(linear(180,stop(#3B82F6,0,o(0.40)),stop(#3B82F6,1,o(0))))] st[(#3B82F6,w(1.5),pos(o))]
+$brand=#14B8A6
+al(v,g($spacing.none),pad(2,$spacing.none,$spacing.none,$spacing.none)) s(fill,hug) clip "Spark" #spark
+  v(nodes[(0,0,21.6,mi),(1,12,16.8,mi),(2,28,12,mi),(3,38,15.6,mi),(4,50,7.2,mi),(5,60,0,mi),(6,60,24),(7,0,24)],edges[(0,0,1),(1,1,2),(2,2,3),(3,3,4),(4,4,5),(5,5,6),(6,6,7),(7,7,0)],closed) s(fill,24) f[(linear(180,stop($brand.50,0,o(0.40)),stop($brand.50,1,o(0))))] st[($brand.50,w(1.5),pos(o))] #spark_area
 ```
 
-**ONE vector** with fill + stroke. Clip frame `s(hug,hug)`. Vector `s(fixed)`.
+**ONE vector** with fill + stroke. Vector **must be `s(fill,H)`** so it stretches to the clip frame — the path scales with it, keeping closing edges at the clipped boundary. If the vector is fixed width and smaller than the clip frame, the right closing edge is visible.
 
 ## Realistic Path Shapes
 

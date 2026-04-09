@@ -7,12 +7,12 @@ Assumes: `blueprint/paint`
 
 Four shader types simulate real-world materials. Each is a physical surface, not an abstract effect.
 
-| Shader | Material | Mood | Best for |
-|--------|----------|------|----------|
-| `metaballs()` | Lava lamp, oil-in-water | Organic, playful | Creative tools, gaming, music |
-| `metal()` | Chrome, brushed aluminum | Premium, luxury | Fashion, jewelry, fintech |
-| `holo()` | Holographic foil | Futuristic, trendy | Web3, tech startups |
-| `steel()` | Liquid mercury | Industrial, professional | SaaS, enterprise, automotive |
+| Shader | What it looks like |
+|--------|--------------------|
+| `metaballs()` | Organic blobs merging and separating, like a lava lamp or oil in water |
+| `metal()` | Chrome surface with light-catching ridges and chromatic aberration |
+| `irid()` | Deep iridescent liquid crystal with shifting color bands |
+| `steel()` | Flowing mercury — smooth, reflective, industrial |
 
 ## CRITICAL: Never Place Text on Shaders
 
@@ -27,23 +27,33 @@ Shaders produce busy patterns that make text unreadable. Separate shader from te
 
 ## UV Controls (all types)
 
-`scale(N)` zoom · `uvx(N)`/`uvy(N)` pan · `uvrot(N)` rotate pattern · `opacity(N)` shader opacity · `frozen` disable animation · `shape(none|circle|metaballs)` shape-aware (metal & holo)
+`scale(N)` zoom · `uvx(N)`/`uvy(N)` pan · `uvrot(N)` rotate pattern · `opacity(N)` shader opacity · `frozen` disable animation · `shape(none|circle|metaballs)` shape-aware (metal, irid & steel)
 
-## Speed Rule
+For button strokes, `scale(2-4)` often looks better than `scale(1)` — the zoomed pattern shows more detail on small surfaces.
 
-Larger surface → slower speed. Small badge at `speed(2)` is fine. Full hero at `speed(2)` is nauseating.
+## Speed Guide
 
-| Context | Speed |
-|---------|-------|
-| Behind text | `0.2-0.4` |
-| Hero background | `0.5-1.0` |
-| Small accents | `1.0-2.0` |
-| Atmospheric | `0.1-0.3` |
-| Static export | `frozen` |
+| Shader | Background | Accents | Strokes |
+|--------|-----------|---------|---------|
+| `metaballs()` | `0.3-0.4` | `0.5-0.6` | `0.8-1.0` |
+| `metal()` | `0.4-0.6` | `0.6-0.8` | `0.8-1.2` |
+| `irid()` | `0.1-0.2` | `0.2-0.4` | `0.2-0.6` |
+| `steel()` | `0.6-1.0` | `1.0-1.5` | `1.5-2.5` |
+
+## Density (metaballs only)
+
+Size and count are coupled — think in terms of density:
+
+| Feel | Recipe |
+|------|--------|
+| Detailed, textured | `size(0.2),count(15)` |
+| Balanced (default) | `size(0.5),count(7)` |
+| Relaxed, organic | `size(0.7),count(5)` |
+| Slow ambient | `size(0.85),count(4)` |
 
 ## Shader Strokes
 
 Strokes support ALL fill types including shaders — one of the most underused capabilities:
 - `st[(metal(),w(2))]` — chrome edge
-- `st[(holo(intensity(0.5)),w(2))]` — rainbow shimmer border
+- `st[(irid(),w(2))]` — iridescent shimmer border
 - `st[(steel(#FFD700,#DAA520),w(2))]` — gold liquid steel border

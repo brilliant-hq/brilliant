@@ -10,9 +10,12 @@ Assumes: `blueprint/effects`
 ## Clay Card
 
 ```
-al(v,g(16),pad(24)) s(300,hug) f[(#DBEAFE),(f2,inner(#000,o(0.08),x(3),y(3),blur(6))),(f3,inner(#FFF,o(0.6),x(-2),y(-2),blur(4)))] rd(20) shadow(#000,o(0.06),y(2),blur(4)) shadow(#000,o(0.10),y(8),blur(24))
-  t("Clay Card",Inter,18,sb) f[(#1E3A5F)] "Title"
-  t("Dual inner shadows create a soft molded look",Inter,14) s(fill,hug) f[(#1E40AF)] "Body"
+$clay_dark=inner(#000,o(0.08),x(3),y(3),blur(6))
+$clay_light=inner(#FFF,o(0.6),x(-2),y(-2),blur(4))
+$clay_shadow=shadow(#000,o(0.06),y(2),blur(4)) shadow(#000,o(0.10),y(8),blur(24))
+al(v,g($spacing.4),pad($spacing.6)) s(300,hug) f[(#DBEAFE),(f2,$clay_dark),(f3,$clay_light)] rd($radius.lg) $clay_shadow #clay_card
+  t("Clay Card",Inter,18,sb) f[(#1E3A5F)] "Title" #clay_title
+  t("Dual inner shadows create a soft molded look",Inter,14) s(fill,hug) f[(#1E40AF)] "Body" #clay_body
 ```
 
 Dark inner shadow (bottom-right) + white inner shadow (top-left) = molded 3D look.
@@ -31,6 +34,9 @@ Dark inner shadow (bottom-right) + white inner shadow (top-left) = molded 3D loo
 Same technique at smaller scale for buttons/icon boxes — reduce inner shadow offsets to 1-2px:
 
 ```
-al(h,a(c,c),pad(10,20)) s(hug,hug) f[(#BBF7D0),(f2,inner(#000,o(0.06),x(1),y(1),blur(3))),(f3,inner(#FFF,o(0.5),x(-1),y(-1),blur(2)))] rd(12) shadow(#000,o(0.04),y(1),blur(3))
-  t("Clay Button",Inter,14,sb) f[(#166534)] "Label"
+$clay_dark_sm=inner(#000,o(0.06),x(1),y(1),blur(3))
+$clay_light_sm=inner(#FFF,o(0.5),x(-1),y(-1),blur(2))
+$clay_shadow_sm=shadow(#000,o(0.04),y(1),blur(3))
+al(h,a(c,c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,hug) f[(#BBF7D0),(f2,$clay_dark_sm),(f3,$clay_light_sm)] rd($radius.md) $clay_shadow_sm #clay_btn
+  t("Clay Button",Inter,14,sb) f[(#166534)] "Label" #clay_btn_label
 ```

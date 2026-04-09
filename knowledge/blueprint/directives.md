@@ -19,7 +19,7 @@ clone(abc123) p(400,0) "Card — Dark"
 
 ## `replace(elementId)` — delete old, insert new at same position
 ```
-replace(abc123) al(v,g(12),pad(20)) s(fill,hug) f[(#FFF)] rd(12) "New Card"
+replace(abc123) al(v,g($spacing.3),pad($spacing.4)) s(fill,hug) f[(#FFF)] rd($radius.md) "New Card"
 ```
 
 ## `delete(elementId)` — remove an element and its children
@@ -42,25 +42,41 @@ Elements render in z-order: earlier = behind, later = in front. `before()` inser
 abc123 before(def456)                       ← move existing element before sibling
 
 # Insert a backdrop BEHIND an existing widget (new element renders first = behind):
-fr p(96,96) s(368,412) f[(#07111F)] rd(24) clip before(#widget) "Backdrop"
+fr p(96,96) s(368,412) f[(#07111F)] rd($radius.xl) clip before(#widget) "Backdrop"
 ```
 **Common pattern — background behind existing element:** Put `before(#ref)` on the new element's line, NOT on the existing element. The new element is created before (behind) the referenced sibling.
 
-## Flat modify rule
+## Reparent with `parent()`
+
+Use `parent()` to move elements. Never indent modify lines — indentation changes the parent.
 ```
-WRONG (accidentally reparents #10 into #4):
-#4 s(800,hug)
-  #10 f[(#FF0000)]
+#badge parent(#glass_card)
+#title parent(#glass_card)
+#cta_row parent(#glass_card)
+```
 
-RIGHT (modifies both independently):
-#4 s(800,hug)
-#10 f[(#FF0000)]
+## Flat modify rule
 
-WRONG (creates a DUPLICATE icon — new svg has no ID so it's a create, not modify):
+Modify lines are **always flat** — one line per element, no indentation. Indenting a modify line under another element reparents it, which breaks layout.
+```
+WRONG (reparents children out of their nested containers):
+#card f[(#FF0000)]
+  #avatar_icon f[(#FFF)]
+  #name f[(#FFF)]
+
+RIGHT (modifies each element independently):
+#card f[(#FF0000)]
+#avatar_icon f[(#FFF)]
+#name f[(#FFF)]
+```
+
+A line **without** an ID/ref is always a **create** — indenting it under a parent adds a new child, never replaces an existing one.
+```
+WRONG (creates a DUPLICATE icon — no ID/ref so it's a create):
 #statsRow
   svg(icon:wind) s(16,16) f[(#7DD3FC)]
 
 RIGHT (modifies the existing icon by ref):
 #windIcon f[(#7DD3FC)]
 ```
-Only indent modify lines when you intentionally want to reparent. A line without an ID/ref is always a **create** — indenting it under a parent adds a new child, never replaces an existing one. To modify a child, use its ID or `#ref` as first token (flat). Never delete+recreate to move — reparenting preserves IDs and undo.
+Never delete+recreate to move — reparenting preserves IDs and undo.

@@ -11,16 +11,16 @@ Brilliant supports four image scale modes and an interactive crop editor for pre
 
 ## Image Scale Modes
 
-Every image fill has a scale mode that controls how the image fits within the element bounds:
+Every image fill or image stroke has a scale mode that controls how the image fits within the element bounds:
 
 | Mode | Behavior | Interactive Editing? |
 |------|----------|---------------------|
 | **Fill** (default) | Image covers the entire element, excess clipped. Aspect ratio preserved. | No |
 | **Fit** | Image fits entirely within the element, letterboxed if needed. Aspect ratio preserved. | No |
 | **Crop** | Image positioned by custom crop data. Full interactive control. | Yes |
-| **Repeat** | Image tiles at natural pixel size relative to the element. | No |
+| **Repeat** | Image tiles at natural pixel size relative to the element. No crop compensation during resize. | No |
 
-Change the scale mode in the right toolbar under the image fill section (dropdown).
+Change the scale mode in the right toolbar under the image fill or stroke section (dropdown).
 
 ## Entering Crop Mode
 
@@ -28,12 +28,13 @@ Change the scale mode in the right toolbar under the image fill section (dropdow
 |--------|-----|
 | **Double-click** | Double-click an element with an image fill |
 | **Enter key** | Select an image element and press **Enter** |
-| **Scale mode dropdown** | Change the scale mode to **Crop** in the right toolbar |
+| **Scale mode dropdown** | Change the scale mode to **Crop** in the right toolbar (works for both image fills and image strokes) |
 
 When entering crop mode:
 - The element is automatically selected
-- If the current scale mode is Fill or Fit, it's converted to Crop with equivalent positioning
+- If the current scale mode is Fill or Fit, it is converted to Crop with equivalent positioning
 - The crop editor overlay appears
+- If a specific image fill is focused in the selection (via the right toolbar), crop mode targets that fill
 
 ## Exiting Crop Mode
 
@@ -47,6 +48,8 @@ When entering crop mode:
 
 ## Crop Interactions
 
+Crop mode interactions require the **Move tool** (V) to be active. If another tool (e.g., Pen) is selected, crop handles and pan will not respond.
+
 Crop mode provides two layers of handles: **container handles** (blue L-brackets for the element boundary) and **image handles** (invisible hit zones for the image within).
 
 ### Pan Image
@@ -55,7 +58,7 @@ Click and drag anywhere on the image area to reposition the image within the con
 
 ### Resize Image
 
-Drag any of the 8 image resize handles (4 corners + 4 edge midpoints) to scale the image.
+Drag any of the 8 image resize zones (4 corners + 4 edges) to scale the image. The entire edge is interactive, not just the midpoint.
 
 | Modifier | Effect |
 |----------|--------|
@@ -95,27 +98,34 @@ Handle sizes scale inversely with zoom to remain consistently visible.
 
 ## Crop Compensation
 
-When you resize an element **outside crop mode** while holding the **Command key**, the crop data adjusts automatically so the image's world-space position is preserved (the image stays fixed while the container changes around it). Rotation outside crop mode does not trigger compensation.
+When you resize an element **outside crop mode** while holding the **Command key**, the crop data adjusts automatically so the image's world-space position is preserved (the image stays fixed while the container changes around it). This works for fill, fit, and crop scale modes. For fill/fit modes, the image is automatically converted to crop mode with equivalent positioning. **Repeat mode is not compensated** -- repeat images always tile relative to the element and scale normally with it.
 
-Without Command held, resizing outside crop mode does NOT compensate — the image scales with the container normally.
+Rotation outside crop mode does not trigger compensation.
+
+Without Command held, resizing outside crop mode does NOT compensate -- the image scales with the container normally.
+
+When resizing or rotating the container **during crop mode**, compensation happens automatically (no Command key needed) to keep the cropped image in place.
 
 ## Supported Elements
 
 Element types that support crop:
-- Rectangle and circle elements with image fills
+- Rectangle and circle elements with image fills or image strokes
+- Childless frames with image fills (used as clipped image containers)
 - Text elements enter text editing mode instead (not crop)
-- Frames and vector shapes do not support crop mode
+- Vector shapes enter vector editing mode instead (not crop)
+- Frames with children drill into children instead (not crop)
 
 ## Undo
 
-All crop operations (pan, resize image, rotate image) are individually undoable with **Cmd+Z**. Entering crop mode registers a single undo point that reverts the element to its pre-crop state.
+All crop operations (pan, resize image, rotate image) are individually undoable with **Cmd+Z**. Entering crop mode registers an undo point that reverts the element to its pre-crop state. Each subsequent operation (pan, resize, rotate) registers its own separate undo entry.
 
 ## Tips
 
 - **Start with Fill mode** for images that should cover the element completely, then switch to Crop only when you need precise positioning
 - **Use Fit mode** for images that must be fully visible (logos, icons)
 - **Proportional image resize** (Shift or Ctrl while dragging) keeps the image from distorting
-- **Cmd+Z to revert** if you've made crop changes you don't want to keep (Escape saves and exits)
+- **Cmd+Z to revert** if you have made crop changes you do not want to keep (Escape saves and exits)
+- **Image strokes** support the same scale modes and crop interactions as image fills
 
 ---
 

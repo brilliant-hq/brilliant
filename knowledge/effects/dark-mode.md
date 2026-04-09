@@ -22,30 +22,34 @@ Dark backgrounds are where Brilliant's effects truly shine. Inner glows, colored
 
 Use fill brightness, not shadows, for visual hierarchy:
 
+```text
+$neutral=#64748B
 ```
-Base:       f[(#09090B)]       ← deepest
-Surface 1:  f[(#18181B)]       ← cards, panels
-Surface 2:  f[(#27272A)]       ← elevated, active
-Surface 3:  f[(#3F3F46)]       ← popovers, tooltips
-```
+Base `$neutral.90` deepest · Surface 1 `$neutral.80` cards, panels · Surface 2 `$neutral.70` elevated, active · Surface 3 `$neutral.60` popovers, tooltips.
 
 ## Dark Cards
 
 ```
-al(v,g(16),pad(24)) s(340,hug) f[(#18181B)] rd(16) shadow(#000,o(0.30)) shadow(#000,o(0.20),y(12),blur(32))
-  t("Dark Card",Inter,18,sb) f[(#F8FAFC)] "Title"
-  t("Shadow creates depth on dark surfaces",Inter,14) s(fill,hug) f[(#A1A1AA)] "Body"
+$neutral=#64748B
+$dark_shadow=shadow(#000,o(0.30)) shadow(#000,o(0.20),y(12),blur(32))
+al(v,g($spacing.4),pad($spacing.6)) s(340,hug) f[($neutral.80)] rd($radius.md) $dark_shadow #dark_card
+  t("Dark Card",Inter,18,sb) f[($neutral.5)] "Title" #dark_title
+  t("Shadow creates depth on dark surfaces",Inter,14) s(fill,hug) f[($neutral.40)] "Body" #dark_body
 ```
 
 ## Dark Glass
 
 Lower tint opacity — dark bg does contrast work:
-```
-f[(solid(#FFF,o(0.06))),(f2,blur(16))] st[(solid(#FFF,o(0.08)),w(1))]
+```text
+$tint=solid(#FFF,o(0.06))
+$edge=solid(#FFF,o(0.08))
+f[($tint),(f2,blur(16))] st[($edge,w(1))]
 ```
 
 Inner glow replaces border on dark:
-```
-f[(solid(#FFF,o(0.06))),(f2,blur(16)),(f3,glow(#FFF,o(0.08),blur(8)))]
-  st[(solid(#FFF,o(0.06)),w(1))]
+```text
+$tint=solid(#FFF,o(0.06))
+$edge=solid(#FFF,o(0.06))
+f[($tint),(f2,blur(16)),(f3,glow(#FFF,o(0.08),blur(8)))]
+  st[($edge,w(1))]
 ```

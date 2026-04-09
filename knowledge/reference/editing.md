@@ -1,6 +1,6 @@
 ---
 name: "knowledge-editing"
-description: "Selection, movement, resize, rotation, alignment, distribution, z-order, and clipboard operations in Brilliant."
+description: "Selection, movement, resize, rotation, alignment, distribution, z-order, grouping, boolean, mask, flatten, and clipboard operations in Brilliant."
 ---
 
 > **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
@@ -50,15 +50,15 @@ When elements are selected across multiple frames, separate selection rectangles
 |--------|---------|
 | Blue outline | Selected |
 | Thin blue outline on hover | Hovered |
-| Resize handles (squares) | Can be resized |
-| Rotation handles (circles at corners) | Can be rotated |
+| Resize handles (squares at corners and edges) | Can be resized |
+| Rotation cursor (outside corners) | Can be rotated (hover outside corner handles to see rotation cursor) |
 | Dashed lines with pixel labels (Alt+hover) | Distance measurements (see [CANVAS.md](./CANVAS.md#measurement-overlays)) |
 
 ## Movement
 
 ### Drag to Move
 
-Select and drag. Snap guides appear automatically.
+Select and drag. Snap guides appear automatically. Hold **Shift** while dragging to constrain movement to the X or Y axis (whichever has the larger delta).
 
 ### Nudge with Arrow Keys
 
@@ -73,7 +73,7 @@ Hold **Alt/Option** while dragging to create a duplicate.
 
 ### Auto-Reparenting
 
-Dragging elements over a frame or auto layout frame automatically reparents them. **Groups are NOT reparent targets** — dragging over a group will not reparent into it. Children inside a group **cannot be dragged out** — they stay in the group. Hold **Space** to prevent reparenting.
+Dragging elements over a frame or auto layout frame automatically reparents them. **Groups, boolean parents, masks, and component instances are NOT reparent targets** -- dragging over them will not reparent into them. Children inside a group, boolean parent, or mask **cannot be dragged out** -- they stay in their parent. Hold **Space** to prevent reparenting.
 
 ### Precise Positioning
 
@@ -90,8 +90,11 @@ Right toolbar shows X and Y fields. Type exact values, drag to adjust, or use ma
 | Modifier | Effect |
 |----------|--------|
 | **Shift** | Maintain aspect ratio |
+| **Alt/Option** | Symmetric resize from center (both sides move equally) |
 | **Ctrl** | Scale mode: proportional resize + scales font sizes, strokes, corner radii, and descendant elements |
-| **Cmd** | Preserve crop position (image stays in place during resize) |
+| **Cmd** | Preserve image/shader position (image stays in place instead of scaling with the element) |
+
+**Scale mode toggle (K):** Instead of holding Ctrl during every resize, press **K** to enable persistent scale mode. All resizes will scale content proportionally until you press K again or switch tools. See [tools.md](./tools.md#scale-mode-k).
 
 ### Resize in Auto Layout
 
@@ -185,7 +188,7 @@ Use `execute_commands` with `skew_elements`:
 Use `skew(x,y)` property:
 
 ```
-a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[(#3B82F6)] "Hero BG"
+a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[(#F59E0B)] "Hero BG"
 ```
 
 ### Common Values
@@ -211,7 +214,7 @@ a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[(#3B82F6)] "Hero BG"
 | Align vertically | Alt+Shift+V |
 | Fit to parent | Ctrl+Alt+F |
 
-Alignment requires 2+ elements (centering works with a single element — it centers within the parent). When elements span multiple frames, alignment happens independently per parent.
+Alignment needs 2+ elements to have a visible effect — with a single element, it aligns against its own bounds (a no-op). Centering works with a single element — it centers within the parent. When elements span multiple frames, alignment happens independently per parent.
 
 ## Distribution
 
@@ -246,7 +249,56 @@ Use `front`, `front(N)`, `back`, `back(N)` tokens on modify lines: `#card front`
 | Boolean Intersect | Alt+Shift+I |
 | Boolean Exclude | Alt+Shift+E |
 
-Select 2+ elements and apply a boolean operation. The result is a boolean parent that combines the shapes. Also available via right-click context menu.
+Select 2+ elements and apply a boolean operation. The result is a boolean parent that combines the shapes. Also available via right-click context menu. Applying a boolean operation to an existing boolean or mask parent switches its type (e.g., union to subtract, or mask to intersect).
+
+## Grouping and Framing
+
+| Action | Shortcut |
+|--------|----------|
+| Group | Cmd+G |
+| Frame Selection | Cmd+F |
+| Ungroup | Cmd+Shift+G |
+| Add Auto Layout | Shift+A |
+
+**Group** wraps selected elements into a frame with hug sizing on both axes. If the selection spans multiple parents, one group is created per parent.
+
+**Frame Selection** wraps selected elements in a frame container.
+
+**Ungroup** removes the frame wrapper and moves children up to the frame's parent.
+
+**Add Auto Layout** wraps selected elements in an auto layout frame with automatic spacing.
+
+## Mask
+
+| Action | Shortcut |
+|--------|----------|
+| Mask | Ctrl+Cmd+M |
+
+Select 2+ elements. The topmost element becomes the clip shape and the elements below are clipped to it. The result is a mask parent.
+
+## Flatten
+
+| Action | Shortcut |
+|--------|----------|
+| Flatten | Cmd+Enter |
+
+Converts the selection into a single vector element. Handles primitives (rectangle, circle, line), boolean parents, groups/frames, and multiple selected elements. A single vector element is a no-op.
+
+## Outline Text
+
+| Action | Shortcut |
+|--------|----------|
+| Outline Text | Ctrl+Cmd+O |
+
+Converts text elements to a group of per-character vector outlines (macOS only).
+
+## Rename Layer
+
+| Action | Shortcut |
+|--------|----------|
+| Rename Layer | Cmd+R |
+
+Renames the selected element's layer name.
 
 ## Clipboard
 
@@ -293,9 +345,9 @@ Same as Copy, but also removes the selected elements from the canvas. In vector 
 - The duplicates are automatically selected
 
 **Alt/Option+drag** duplicates while moving:
-- The original stays at its starting position
+- The original is restored to its starting position
 - The duplicate moves with the cursor
-- Release Alt to cancel duplication (transfers position back to original)
+- Release Alt mid-drag to cancel duplication (the duplicate is removed and the original takes the dragged position instead)
 - Works with all element types including frames with children
 
 ### Vector Node Copy/Paste
@@ -347,3 +399,8 @@ All element operations are undoable:
 - Grouping, ungrouping, and reparenting
 - Auto layout changes
 - Z-order changes
+- Crop operations (pan, resize, rotate image within element)
+- Boolean operations
+- Mask operations
+- Flatten and outline text
+- Skewing and scaling

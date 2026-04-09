@@ -23,16 +23,16 @@ Place images on rectangles: `r s(400,300) f[(img(path))] rd(8) clip "Hero"`
 Inline SVGs must be collapsed to a single line (no newlines inside the `svg()` token). Use for custom shapes or icons not available in Phosphor.
 
 Fills/strokes on SVG lines override imported fills — all fill types work:
-- `svg(icon:house) f[(#3B82F6)]`
+- `svg(icon:house) f[(#F97316)]`
 - `svg(https://...) f[(metal())]`
 
 **SVG fills are creation-only.** To recolor after creation, use `recolor_children` command.
 
-Place SVGs inside icon box frames: `svg(icon:gear) s(20,20) st[(#3B82F6,w(2))]`
+Place SVGs inside icon box frames: `svg(icon:gear) s(20,20) st[(#EF4444,w(2))]`
 
 ## Bundled Phosphor Icons
 
-All **Phosphor regular-weight** icons bundled. Use `svg(icon:name)` with kebab-case names. Browse at [phosphoricons.com](https://phosphoricons.com). Never invent names.
+All **Phosphor regular-weight** icons bundled. Use `svg(icon:name)` with kebab-case names. Only regular weight — **no `-fill`, `-bold`, `-light`, `-thin`, `-duotone` suffixes**. Use `play` not `play-fill`, `heart` not `heart-fill`, `skip-forward` not `skip-forward-fill`.
 
 ## Other Icon Libraries (via URL)
 

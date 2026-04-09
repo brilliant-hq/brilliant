@@ -24,7 +24,7 @@ Layout guides (also called layout grids) are visual overlay lines on frames that
 3. Click the **+** button to add a guide (default type: Grid)
 4. Change the type using the dropdown in the guide row header (Grid, Columns, or Rows)
 
-**Keyboard shortcuts:** **Ctrl+Shift+G** adds a layout grid. **Shift+G** toggles global guide visibility (see below).
+**Keyboard shortcuts:** **Shift+G** toggles global guide visibility (see below). Use the command palette to search "Add Layout Grid" if you prefer keyboard access.
 
 ## Common Properties
 

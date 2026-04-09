@@ -23,15 +23,19 @@ Glass is a **material that communicates spatial relationships** — it separates
 
 ## Basic Glass
 
-```
-f[(solid(#FFF,o(0.10))),(f2,blur(12))] st[(solid(#FFF,o(0.12)),w(1))]
+```text
+$tint=solid(#FFF,o(0.10))
+$edge=solid(#FFF,o(0.12))
+f[($tint),(f2,blur(12))] st[($edge,w(1))]
 ```
 
 ## Glass + Inner Shadow (Thickness)
 
-```
-f[(solid(#FFF,o(0.10))),(f2,blur(12)),(f3,inner(#000,o(0.08),y(1),blur(3)))]
-  st[(solid(#FFF,o(0.15)),w(1))] rd(16)
+```text
+$tint=solid(#FFF,o(0.10))
+$edge=solid(#FFF,o(0.15))
+f[($tint),(f2,blur(12)),(f3,inner(#000,o(0.08),y(1),blur(3)))]
+  st[($edge,w(1))] rd($radius.md)
   shadow(#000,o(0.06),y(8),blur(24))
 ```
 
@@ -39,31 +43,36 @@ f[(solid(#FFF,o(0.10))),(f2,blur(12)),(f3,inner(#000,o(0.08),y(1),blur(3)))]
 
 Every ingredient: tint + blur + inner glow for edge refraction + layered shadows for float:
 
-```
-f[(solid(#FFF,o(0.15))),(f2,blur(16)),(f3,glow(#FFF,o(0.12),blur(6)))]
-  st[(solid(#FFF,o(0.20)),w(1))] rd(20)
+```text
+$tint=solid(#FFF,o(0.15))
+$edge=solid(#FFF,o(0.20))
+f[($tint),(f2,blur(16)),(f3,glow(#FFF,o(0.12),blur(6)))]
+  st[($edge,w(1))] rd($radius.lg)
   shadow(#000,o(0.04),y(2),blur(4)) shadow(#000,o(0.08),y(8),blur(24))
 ```
 
 ## Glass Over Shader (Signature Premium)
 
 Animated shader underneath, frosted glass card on top:
-```
-fr s(1280,600) f[(#000),(f2,metal(...))] clip "Hero"
-  al(v,a(c,c)) s(fill,fill)
-    al(v,a(c,c),g(20),pad(40)) s(480,hug)
+```text
+fr s(1280,600) f[(#000),(f2,metal(...))] clip "Hero" #glass_hero
+  al(v,a(c,c),g($spacing.none),pad($spacing.none)) s(fill,fill) #glass_center
+    al(v,a(c,c),g($spacing.4),pad($spacing.8)) s(480,hug)
       f[(inner(#B6B6B6,o(0.40),y(2),blur(32))),(f2,blur(16))]
-      st[(solid(#FFF,o(0.10)),w(1))] rd(9999) "Glass Card"
+      st[(solid(#FFF,o(0.10)),w(1))] rd($radius.full) "Glass Card" #glass_card
 ```
 
 ## Dark Mode Glass
 
 Lower tint opacity (dark bg does contrast work):
-```
-f[(solid(#FFF,o(0.06))),(f2,blur(16))] st[(solid(#FFF,o(0.08)),w(1))]
+```text
+$tint=solid(#FFF,o(0.06))
+$edge=solid(#FFF,o(0.08))
+f[($tint),(f2,blur(16))] st[($edge,w(1))]
 ```
 
 Inner glow replaces border on dark surfaces:
-```
-f[(solid(#FFF,o(0.06))),(f2,blur(16)),(f3,glow(#FFF,o(0.08),blur(8)))]
+```text
+$tint=solid(#FFF,o(0.06))
+f[($tint),(f2,blur(16)),(f3,glow(#FFF,o(0.08),blur(8)))]
 ```

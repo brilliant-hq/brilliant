@@ -20,15 +20,15 @@ Components let you create reusable design elements. A **master component** defin
 
 ## Creating a Component
 
-1. Select a frame on the canvas
-2. Use the **Create Component** command (via command palette)
-3. The frame becomes a master component
+1. Select one or more elements on the canvas
+2. Press **Cmd+Alt+K** (or use the **Create Component** command via command palette)
+3. The selection becomes a master component
 
 **What happens:**
 - The frame gains a `ComponentData` marker (no `elementRef` means it is the master)
 - All descendant elements get `ChildComponentData` linking them back to the master's children
 - The frame label turns **purple** on the canvas
-- In the layers panel, a **diamond outline** icon appears
+- In the layers panel, a **filled diamond** icon appears
 
 **Auto-wrapping:** If the selected element is not already a parent, it will be automatically wrapped in a frame before becoming a component. Multiple selected elements are also wrapped together. You don't need to manually group first.
 
@@ -62,8 +62,8 @@ You can also create instances at a specific position programmatically.
 
 | Icon | Meaning |
 |------|---------|
-| **Diamond outline** | Master component |
-| **Filled diamond** | Component instance |
+| **Filled diamond** | Master component |
+| **Diamond outline** | Component instance |
 
 Both diamond icons use a purple color (`#9B59B6`).
 
@@ -138,7 +138,7 @@ To restore an instance to match its master:
 To break the link between an instance and its master:
 
 1. Select a component instance
-2. Use the **Detach Instance** command (via command palette — no default shortcut)
+2. Press **Cmd+Alt+B** (or use the **Detach Instance** command via command palette)
 
 **What happens:**
 - `ComponentData` is removed from the instance root
@@ -167,14 +167,14 @@ This works when the master is on the same canvas. The selection jumps to the mas
 
 | Action | Shortcut |
 |--------|----------|
-| Create Component | Command palette |
+| Create Component | **Cmd+Alt+K** |
 | Create Instance | Command palette |
-| Detach Instance | Command palette |
+| Detach Instance | **Cmd+Alt+B** |
 | Reset Component Instance Overrides | Command palette |
 | Go to Master Component | Command palette |
 | Push Overrides to Master | Command palette |
 
-**Push Overrides to Master** — When you've made overrides on an instance that should become the new default, use this command to apply the instance's overrides back to the master component. All other instances will then sync to the updated master values.
+**Push Overrides to Master** — When you've made overrides on an instance that should become the new default, use this command to apply the instance's overrides back to the master component. All other instances will then sync to the updated master values. This command only works when the master is on the same canvas as the instance.
 
 ## Tips
 
@@ -188,22 +188,22 @@ This works when the master is on the same canvas. The selection jumps to the mas
 | Symptom | Likely Cause | Fix |
 |---------|--------------|-----|
 | Instance not updating when master changes | Property was overridden on the instance | Reset overrides, then re-apply only needed changes |
-| Cannot create component | No element selected, element is already a component, or element is inside a component (master or instance) | Select an element outside any component hierarchy. Non-parents are auto-wrapped in a frame. Detach the instance first if needed |
+| Cannot create component | No element selected, or element is a child inside a component instance | Select an element outside any component instance. Non-parents are auto-wrapped in a frame. Detach the instance first if needed |
 | Detached parent still looks like a component | Visual only — labels may not refresh immediately | The parent is a regular parent; verify `componentData` is gone |
 | Instance child not syncing | Child is marked as a slot | Slots are owned by the instance; edit directly |
 
 ## Creating Components via Blueprint
 
-Components and instances can be created in blueprint syntax using the `component`, `instance of:Name`, and `slot` keywords.
+Components and instances can be created in blueprint syntax using the `comp`, `inst(#ref)`, and `slot` keywords.
 
 ### Component Master
 
 Add the `comp` bare flag to create a component master:
 
 ```
-al(h,g(8),pad(12,16)) s(hug,48) f[(#3B82F6)] rd(8) comp #btn "Button"
-  fr s(24,24) slot "Icon"
-  t("Button",Inter,14,sb) s(fill,hug) f[(#FFFFFF)] "Label"
+al(h,a(c,c),g($spacing.2),pad($spacing.3,$spacing.6)) s(hug,hug) f[(#F1F5F9),(f2,inner(#000,o(0.06),x(2),y(2),blur(4))),(f3,inner(#FFF,o(0.5),x(-1),y(-1),blur(2)))] rd(10) shadow(#000,o(0.04),y(1),blur(2)) shadow(#000,o(0.08),y(4),blur(12)) comp #btn "Button"
+  svg(icon:sparkle) s(16,16) f[(#374151)] "Icon" #btn_icon
+  t("Get Started",Inter,14,sb) f[(#1E293B)] "Label" #btn_label
 ```
 
 **What happens:**
@@ -213,10 +213,12 @@ al(h,g(8),pad(12,16)) s(hug,48) f[(#3B82F6)] rd(8) comp #btn "Button"
 
 ### Component Instance
 
-Use `inst(#ref)` to create an instance of an existing component master:
+Use `inst(#ref)` to create an instance of an existing component master. Override children by `#ref`:
 
 ```
-inst(#btn) p(300,100) "Submit"
+inst(#btn) p(300,100) f[(#E0E7FF),(f2,inner(#000,o(0.06),x(2),y(2),blur(4))),(f3,inner(#FFF,o(0.5),x(-1),y(-1),blur(2)))]
+  override(#btn_icon) svg(icon:rocket) f[(#4338CA)]
+  override(#btn_label) t("Launch") f[(#312E81)]
 ```
 
 **What happens:**
@@ -232,7 +234,7 @@ inst(#btn) p(300,100) "Submit"
 Mark a child with the `slot` bare flag to designate it as instance-owned content:
 
 ```
-al(v,g(16),pad(24)) s(320,hug) f[(#FFFFFF)] rd(12) comp #card "Card"
+al(v,g($spacing.4),pad($spacing.6)) s(320,hug) f[(#FFFFFF)] rd($radius.md) comp #card "Card"
   t("Card Title",Inter,20,b) s(fill,hug) f[(#0F172A)] "Header"
   fr s(fill,hug) slot "Content"
 ```
