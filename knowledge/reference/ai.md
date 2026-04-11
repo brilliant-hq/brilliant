@@ -303,8 +303,7 @@ A Google API key or OAuth authentication must be configured (see "Setting Up API
 
 | Setting | Image Size | Speed | Best For |
 |---------|-----------|-------|----------|
-| Quick draft | 512px | Fastest | Quick iterations, throwaway tests |
-| Default | 1K | ~5s | Placeholders, good balance |
+| Quick draft | 1K | ~5s | Placeholders, good balance |
 | High quality | 2K | ~15-20s | Hero images, product photos |
 | Maximum quality | 4K | Slowest | Final marketing assets |
 

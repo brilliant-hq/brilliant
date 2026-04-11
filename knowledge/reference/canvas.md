@@ -134,8 +134,9 @@ Measurement guides appear as **dashed lines with pixel labels**. When elements a
 | Hover a non-selected element with Alt held | Show distance measurements |
 | Hover a parent frame with children selected | Show padding to frame edges |
 | Select a frame, hover a child inside it | Show padding from child to frame edges |
-| Elements touch (gap = 0) | No measurement shown |
-| Elements overlap on one axis | Only the non-overlapping axis shows measurement |
+| Elements touch (gap < 1px) | No measurement shown on that axis |
+| Elements have a gap on one axis, overlap on the other | Gap measurement on the non-overlapping axis, plus edge offset measurements on the overlapping axis |
+| Elements fully overlap on both axes | Edge offset measurements on both axes |
 | Start dragging | Measurements disappear |
 | Release Alt | Measurements disappear |
 

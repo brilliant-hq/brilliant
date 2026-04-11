@@ -42,7 +42,7 @@ Most Figma shortcuts work unchanged. Key differences:
 |--------|-------|-----------|-------|
 | Color picker | No default | **Ctrl+C** | Quick access to color picker |
 | Quick colors | No default | **Ctrl+R/G/B/Y/O/P/W/K** | Instant color application |
-| Export PNG | Ctrl+Shift+E | **Cmd+E** | Simpler shortcut |
+| Export PNG | Cmd+Shift+E | **Cmd+E** | Simpler shortcut |
 | Auto layout | Shift+A | **Shift+A** | Same |
 | Group | Cmd+G | **Cmd+G** | Same |
 | Overlay mode | N/A | **Ctrl+F** | Unique to Brilliant |
@@ -418,7 +418,7 @@ Keybindings can be queried and batch-updated via commands:
 - **`list_keybindings`** — returns all commands with current/default keybinding, `isCustom` flag, and command groups. Optional `group` param to filter by command group, optional `search` param for case-insensitive regex matching against id/name/description (e.g. `"align|distribute"`).
 - **`set_keybinding`** — batch set keybindings. Params: `{ "bindings": [{ "commandId": "...", "key": "L", "modifiers": ["shift"] }] }`. Omit key/modifiers to clear. Returns conflicts if any.
 
-Modifier names: `command` (Cmd/Ctrl), `shift`, `alt` (Option), `control`, `fn`. Changes persist to `~/.config/brilliant.design/keybindings.json`.
+Modifier names: `command` (Cmd/Ctrl), `shift`, `alt` (Option), `control`, `fn`. Changes persist to `~/.config/brilliant/keybindings.json`.
 
 ---
 

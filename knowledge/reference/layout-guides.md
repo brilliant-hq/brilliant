@@ -23,6 +23,7 @@ Layout guides (also called layout grids) are visual overlay lines on frames that
 2. Right toolbar → "Layout Guides" section
 3. Click the **+** button to add a guide (default type: Grid)
 4. Change the type using the dropdown in the guide row header (Grid, Columns, or Rows)
+5. Click the settings icon in the header row to expand additional properties (alignment, size, visibility toggle)
 
 **Keyboard shortcuts:** **Shift+G** toggles global guide visibility (see below). Use the command palette to search "Add Layout Grid" if you prefer keyboard access.
 
@@ -35,7 +36,7 @@ All guide types share these controls:
 | **Color swatch** | Click to change guide color (in header row) |
 | **Opacity %** | Guide color opacity (in header row, 0–100%) |
 | **Eye icon** | Toggle individual guide visibility (in expanded settings) |
-| **"−" button** | Delete the guide |
+| **"−" button** | Delete the guide (in header row) |
 
 ---
 
@@ -54,7 +55,7 @@ Create a uniform grid of equally-spaced lines.
 
 Create vertical sections for multi-column layouts.
 
-### Alignment Modes
+### Alignment Modes (default: Stretch)
 
 | Mode | Behavior |
 |------|----------|
@@ -69,9 +70,9 @@ Create vertical sections for multi-column layouts.
 |----------|-----------|-------------|
 | **Count** | All modes | Number of columns (default: 5) |
 | **Gutter** | All modes | Gap between columns in pixels (default: 20) |
-| **Margin** | Stretch only | Space from frame edges |
-| **Section Size** | Left/Right/Center | Width of each column |
-| **Offset** | Left/Right only | Starting offset from edge |
+| **Margin** | Stretch only | Space from frame edges (default: 0) |
+| **Width** | Left/Right/Center | Width of each column (default: 100) |
+| **Offset** | Left/Right only | Starting offset from edge (default: 0) |
 
 ### Gutter = 0 Behavior
 
@@ -83,7 +84,7 @@ When gutter is set to **0**, columns render as **crisp divider lines** instead o
 
 Create horizontal sections for multi-row layouts.
 
-### Alignment Modes
+### Alignment Modes (default: Stretch)
 
 | Mode | Behavior |
 |------|----------|
@@ -98,9 +99,9 @@ Create horizontal sections for multi-row layouts.
 |----------|-----------|-------------|
 | **Count** | All modes | Number of rows (default: 5) |
 | **Gutter** | All modes | Gap between rows in pixels (default: 20) |
-| **Margin** | Stretch only | Space from frame edges |
-| **Section Size** | Top/Bottom/Center | Height of each row |
-| **Offset** | Top/Bottom only | Starting offset from edge |
+| **Margin** | Stretch only | Space from frame edges (default: 0) |
+| **Height** | Top/Bottom/Center | Height of each row (default: 100) |
+| **Offset** | Top/Bottom only | Starting offset from edge (default: 0) |
 
 ### Gutter = 0 Behavior
 

@@ -381,8 +381,8 @@ Parents can nest inside other parents:
 
 Drag elements over a parent to auto-reparent:
 - **Frame** and **Auto Layout** parents are reparent targets — elements dropped on them are reparented
-- **Groups** are NOT reparent targets — dragging over a group will not reparent into it
-- Children inside a group **cannot be dragged out** — they stay in the group during drag
+- **Groups**, **Masks**, and **Boolean** parents are NOT reparent targets — dragging over them will not reparent into them
+- Children inside a group, mask, or boolean parent **cannot be dragged out** — they stay in their parent during drag
 - Coordinates transform to the target's local space
 - Hold **Space** to prevent reparenting during drag
 

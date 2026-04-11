@@ -260,7 +260,7 @@ Select 2+ elements and apply a boolean operation. The result is a boolean parent
 | Ungroup | Cmd+Shift+G |
 | Add Auto Layout | Shift+A |
 
-**Group** wraps selected elements into a frame with hug sizing on both axes. If the selection spans multiple parents, one group is created per parent.
+**Group** wraps selected elements into a group with hug sizing on both axes. Groups are structural containers that keep elements together but cannot be used as reparent targets (dragging over a group won't reparent into it). If the selection spans multiple parents, one group is created per parent.
 
 **Frame Selection** wraps selected elements in a frame container.
 
@@ -334,6 +334,7 @@ Same as Copy, but also removes the selected elements from the canvas. In vector 
   - **Figma JSON** — Imports Figma-formatted element data
   - **Design YAML** — Imports Brilliant's native `.design` format
   - **Blueprint text** — Imports Brilliant's blueprint format
+  - **HTML** — Imports HTML with inline CSS (e.g., from the Brilliant Capture browser extension)
   - **Plain text** — Creates a text element
 
 ### Duplicate

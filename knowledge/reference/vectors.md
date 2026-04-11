@@ -378,9 +378,9 @@ Vector path endpoints (leaf nodes with degree 1) can have individual stroke caps
 | **Square** | Extends by half stroke thickness past the endpoint |
 | **Arrow** | Arrow head pointing outward along the path tangent |
 
-**For open paths** (lines, curves): A unified dropdown sets both endpoints to the same cap. Appears in the stroke section of the right toolbar when the element has a stroke.
+**For two-endpoint open paths** (lines, simple curves) **and circle arcs** (sweep < 100%): Separate start cap and end cap dropdowns appear side by side, allowing independent control of each endpoint.
 
-**For circle arcs** (sweep < 100%): Separate start cap and end cap dropdowns appear side by side, allowing independent control of each endpoint.
+**For multi-endpoint vectors** (paths with 3+ leaf nodes): A unified dropdown sets all endpoints to the same cap.
 
 Arrow caps scale with stroke width automatically. Use `cap(n,ar)` in blueprint syntax for arrow endpoints (e.g., `st[(#374151,w(1.5),cap(n,ar))]`). See the Arrows section below for examples.
 
