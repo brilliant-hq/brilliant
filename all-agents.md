@@ -18,6 +18,7 @@ Load **all rows that apply** — most designs match 3-5 rows:
 | **Repeated elements** | + `blueprint/components` |
 | **Modify / iterate** | + `blueprint/directives` |
 | **Shaders** | + `blueprint/shaders/{overview,...}` |
+| **Export to web with shaders** | + `webgl/overview` + relevant `webgl/*` shader |
 | **Deep color / typography** | + `design/colors`, `design/typography` |
 | **AI images** | + `images/prompts`, `images/templates` |
 | **Answer a question** | relevant `reference/*` key |
@@ -46,6 +47,7 @@ RIGHT:  get_knowledge(keys: ["design/foundations", "design/colors", "design/typo
 - images/{prompts, templates, integration}
 - recreation/{from-image, from-web}
 - reference/{shortcuts, tools, ui, editing, canvas, frames, text, vectors, components, styling, effects, export, design-system, crop, shaders, canvases, layout-guides, ai}
+- webgl/{overview, setup, metaballs, liquid-metal, holographic, liquid-stainless-steel, dithering, reactive-grid, color-adjust, noise-grain, halftone, pixelate, duotone, posterize, dither}
 
 ## Canvas Exploration
 
