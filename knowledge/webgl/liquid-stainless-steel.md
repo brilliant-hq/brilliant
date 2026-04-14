@@ -259,7 +259,7 @@ void main() {
     float distort   = clamp(uDistortion, 0.0, 1.0);
     float depth     = clamp(uDepth, 0.0, 1.0);
     float angle     = radians(uAngle);
-    float t = uTime * 0.12;
+    float t = uTime * uSpeed * 0.12;
 
     float ca = cos(angle);
     float sa = sin(angle);

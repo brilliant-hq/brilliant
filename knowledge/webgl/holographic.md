@@ -300,7 +300,7 @@ void main() {
     float angle     = radians(uAngle);
     float complexity = clamp(uNoise, 0.0, 1.0);
     float metallic  = clamp(uMetallic, 0.0, 1.0);
-    float t = uTime * 0.1;
+    float t = uTime * uSpeed * 0.1;
 
     float ca = cos(angle);
     float sa = sin(angle);

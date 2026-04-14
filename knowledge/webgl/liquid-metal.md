@@ -298,7 +298,7 @@ void main() {
     float distortion = clamp(uDistortion, 0.0, 1.0);
     float contour   = clamp(uContour, 0.0, 3.0);
     float angle     = radians(uAngle);
-    float t = uTime * 0.15;
+    float t = uTime * uSpeed * 0.15;
 
     // ─── Shape system: edge field & mask ───
     float edge;

@@ -9,7 +9,7 @@ assumes: webgl/setup
 |-------|---------|-------|---------|-------------|
 | Count | uCount | 2–30 | 10 | Number of metaballs |
 | Size | uSize | 0.05–1.0 | 0.3 | Base radius of each ball |
-| Speed | uSpeed | 0–3 | 1.0 | Animation speed (handled by Dart ticker; uTime arrives pre-scaled) |
+| Speed | uSpeed | 0–3 | 1.0 | Animation speed multiplier |
 
 ## Colors
 - Color count: 5
@@ -148,7 +148,7 @@ void main() {
     int colorCount = int(clamp(uColorCount, 2.0, 5.0));
     int ballCount = int(clamp(uCount, 2.0, 30.0));
     float ballSize = clamp(uSize, 0.05, 1.0);
-    float t = uTime * 0.5;
+    float t = uTime * uSpeed * 0.5;
 
     // Pixel size for anti-aliasing
     float pixelSize = 1.0 / min(uResolutionX, uResolutionY);
