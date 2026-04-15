@@ -315,7 +315,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 |--------|----------|
 | Toggle overlay mode | Ctrl+F (global hotkey, works when unfocused — switches between studio and overlay) |
 | Toggle passthrough | Ctrl+A (overlay mode only — makes window click-through) |
-| Show/hide UI | Cmd+\\ (in overlay mode, hides all panels for a clean transparent drawing surface) |
+| Show/hide UI | Cmd+\\ (works in both modes; in overlay mode, creates a clean transparent drawing surface) |
 | Expand/collapse sections | Cmd+/ |
 | Toggle blackboard | Cmd+Shift+B |
 | Toggle whiteboard | Cmd+Shift+W |

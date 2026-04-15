@@ -303,9 +303,18 @@ A Google API key or OAuth authentication must be configured (see "Setting Up API
 
 | Setting | Image Size | Speed | Best For |
 |---------|-----------|-------|----------|
-| Quick draft | 1K | ~5s | Placeholders, good balance |
+| Fast draft | 512px | Fastest | Quick iteration, tiny placeholders |
+| Quick draft | 1K | ~5s | Placeholders, good balance (default) |
 | High quality | 2K | ~15-20s | Hero images, product photos |
 | Maximum quality | 4K | Slowest | Final marketing assets |
+
+### Reference Images
+
+You can pass existing canvas elements as reference images for style or structural guidance by providing their element IDs. Up to 14 reference images are supported (10 objects + 4 characters). This is useful for maintaining visual consistency across generated images or editing an existing image.
+
+### Parallel Generation
+
+When generating multiple images, the AI agent can emit all `generate_image` calls in a single turn. They execute concurrently for much faster results than sequential generation. A batch mode (`targets` parameter) is also available for generating multiple images with individual prompts and targets in a single tool call.
 
 ### Prompt Tips
 

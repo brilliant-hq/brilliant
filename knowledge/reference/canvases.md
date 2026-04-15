@@ -240,7 +240,6 @@ Brilliant can import `.sketch` files:
 | Method | How |
 |--------|-----|
 | Command palette | Search "Import Sketch File" |
-| Right toolbar | Sketch Import section (expand to browse for file) |
 
 ### Exporting to Sketch
 

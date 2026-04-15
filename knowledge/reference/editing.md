@@ -289,8 +289,11 @@ Converts the selection into a single vector element. Handles primitives (rectang
 | Action | Shortcut |
 |--------|----------|
 | Outline Text | Ctrl+Cmd+O |
+| Flatten Text | Cmd+Alt+O |
 
-Converts text elements to a group of per-character vector outlines (macOS only).
+**Outline Text** converts text elements to a group of per-character vector outlines. Each character becomes a separate vector element inside a group (macOS only).
+
+**Flatten Text** converts text elements to a single compound vector element. All characters are merged into one vector with per-character regions preserved (macOS only). This is the same operation as **Flatten** (Cmd+Enter) when applied to text.
 
 ## Rename Layer
 

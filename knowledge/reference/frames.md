@@ -5,7 +5,7 @@ description: "Parent types (frame, group, auto layout), nesting, and parent prop
 
 # Parents (Containers)
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
+> **Parent skill:** [reference/frames.md](./frames.md)
 
 In Brilliant, any element that can contain children is called a **parent**. Parents come in four main types — **frame**, **group**, **auto layout**, and **mask**. Boolean operations (Union, Subtract, Intersect, Exclude) also create parent elements that behave like groups — always w:hug h:hug sizing and not reparent targets.
 
@@ -18,7 +18,7 @@ In Brilliant, any element that can contain children is called a **parent**. Pare
 | **Frame** | Parent (Frame type) | Free-positioning container. Children placed manually with coordinates |
 | **Group** (Cmd+G) | Parent (Group type) | Always w:hug h:hug. Not a drop target for reparenting |
 | **Auto Layout Frame** | Parent (Auto Layout type) | Flexbox-like flow layout — children arranged in rows/columns |
-| "Component" | "Component" | Same concept — masters and instances. See [COMPONENTS.md](./COMPONENTS.md) |
+| "Component" | "Component" | Same concept — masters and instances. See [components.md](./components.md) |
 | "Artboard" | Canvas or Frame | A canvas is a separate page; a frame on a canvas serves as a design area |
 | **Mask** (Cmd+Option+M) | Mask (Ctrl+Cmd+M) | Topmost element = clip shape. Same concept, different shortcut |
 | Constraints (pin to edges) | Not available | Use auto layout with hug/fill/fixed sizing instead |
@@ -34,8 +34,8 @@ In Brilliant, any element that can contain children is called a **parent**. Pare
 | **Group** | Parent (Group type) | Same concept. Cmd+G to group |
 | **Clipping Mask** | Mask (Ctrl+Cmd+M) | Select elements, Ctrl+Cmd+M — topmost element defines clip shape. Or use Frame + "Clip content" for simple rectangular clipping |
 | **Appearance panel** (multiple fills) | Fills section in right toolbar | Click "+" to add fills; they stack bottom-to-top like Illustrator appearances |
-| **Symbols** | Components | Masters and instances with overrides. See [COMPONENTS.md](./COMPONENTS.md) |
-| **Pen tool** | Pen tool (P) | Same workflow: click for corners, click-drag for curves. See [VECTORS.md](./VECTORS.md) |
+| **Symbols** | Components | Masters and instances with overrides. See [components.md](./components.md) |
+| **Pen tool** | Pen tool (P) | Same workflow: click for corners, click-drag for curves. See [vectors.md](./vectors.md) |
 | **Direct Selection** (white arrow) | Vector Edit Mode | Select an element, press **Enter** to edit nodes directly |
 | **Pathfinder / Boolean ops** | Boolean operations | Select 2+ elements → Boolean Union (Alt+Shift+U), Subtract (Alt+Shift+S), Intersect (Alt+Shift+I), Exclude (Alt+Shift+E) |
 | **Blend modes** (element-level) | Blend mode dropdown | Blend modes on elements, fills, strokes, and effects (16 modes) |
@@ -241,8 +241,6 @@ Set via right toolbar sizing dropdowns.
 
 *(auto)* = applied by smart defaults — omit sizing and the system handles it. **Note:** In vertical auto layout, the smart default gives text `fill` width. This is correct for prose but wrong for labels/values — override with `s(hug,hug)` when text should not wrap.
 
-> **See also:** [building/LAYOUTS.md](../building/LAYOUTS.md) for worked examples of text wrapping, pricing grids, and spaceBetween rows.
-
 **Horizontal layout text rule:** In a horizontal auto layout with multiple text elements (e.g., bullet + item, label + value), only the expanding text should get `fill` width. Short labels/bullets should keep `hug` (default). Example: `Bullet Row frame auto-h w:fill h:hug` → bullet text stays hug, item text gets `w:fill h:hug`.
 
 #### How Fill Divides Space
@@ -442,7 +440,7 @@ Figma-style visual guides for alignment and spacing within parents.
 Elements snap to layout guide edges when moving or resizing:
 - Column edges (left and right of each column)
 - Row edges (top and bottom of each row)
-- Grid intersections
+- Grid lines (both horizontal and vertical)
 
 **Note:** Snapping works even with rotated frames.
 
@@ -468,5 +466,5 @@ Frames can have multiple layout guides. Each guide has its own visibility toggle
 | Nested parent not stretching | Auto layout parents default to Hug | Explicitly set Fill sizing on the nested parent |
 | Layout looks wrong after undo | Normal — undo restores previous state | Re-apply changes if needed |
 
-> **See also:** [knowledge/EDITING.md](./EDITING.md) for selection and navigation within parents
-> **See also:** [knowledge/LAYOUT_GUIDES.md](./LAYOUT_GUIDES.md) for detailed layout guide documentation
+> **See also:** [editing.md](./editing.md) for selection and navigation within parents
+> **See also:** [layout-guides.md](./layout-guides.md) for detailed layout guide documentation

@@ -5,7 +5,7 @@ description: "Column, row, and grid layout guides for precise alignment and spac
 
 # Layout Guides
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
+> **Parent skill:** [reference/layout-guides.md](./layout-guides.md)
 
 Layout guides (also called layout grids) are visual overlay lines on frames that help with alignment, spacing, and content organization.
 
@@ -136,10 +136,12 @@ A guide is only visible (and rendered) when **both** the global toggle is on AND
 ## Snapping to Guides
 
 Elements inside frames with visible layout guides snap to:
-- **Column/Row edges** — Left, right, top, bottom boundaries of each section
-- **Grid lines** — Horizontal and vertical grid lines
+- **Column/Row edges** — Left and right boundaries of each column, top and bottom of each row
+- **Grid lines** — Both horizontal and vertical grid lines (snapping works per axis)
 
 Snapping requires both visibility levels to be on — the global toggle (Shift+G) must be enabled AND the individual guide must be visible (eye icon). Turning off either disables snapping for that guide.
+
+Snapping works even with rotated frames — guide positions are transformed to world coordinates for accurate snapping.
 
 ---
 
@@ -155,5 +157,5 @@ Snapping requires both visibility levels to be on — the global toggle (Shift+G
 
 ## Related
 
-- [FRAMES.md](./FRAMES.md) — Parent types and auto layout
-- [SHORTCUTS.md](./SHORTCUTS.md) — Keyboard shortcuts
+- [frames.md](./frames.md) — Parent types and auto layout
+- [shortcuts.md](./shortcuts.md) — Keyboard shortcuts

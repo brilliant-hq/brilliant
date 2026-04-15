@@ -32,7 +32,7 @@ Change the scale mode in the right toolbar under the image fill or stroke sectio
 
 When entering crop mode:
 - The element is automatically selected
-- If the current scale mode is Fill or Fit, it is converted to Crop with equivalent positioning
+- If the current scale mode is not already Crop, it is automatically converted to Crop with equivalent positioning
 - The crop editor overlay appears
 - If a specific image fill is focused in the selection (via the right toolbar), crop mode targets that fill
 
@@ -44,7 +44,7 @@ When entering crop mode:
 | **Escape** | Save crop and exit |
 | **Click outside** | Save crop and exit |
 | **Double-click anywhere** | Save crop and exit |
-| **Change scale mode** | Selecting Fill or Fit exits crop mode |
+| **Change scale mode** | Selecting any non-Crop scale mode (Fill, Fit, or Repeat) exits crop mode |
 
 ## Crop Interactions
 
