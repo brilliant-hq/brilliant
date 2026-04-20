@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/paint
+dsl: [radial, cx, cy, rx, ry, elliptical]
 ---
 # Gradients: Radial
 

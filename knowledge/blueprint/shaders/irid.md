@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/shaders/overview
+dsl: [irid, spread, intensity, metallic]
 ---
 # Shader: Iridescent
 

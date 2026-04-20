@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/text
+dsl: [span, spans, styled-range]
 ---
 # Blueprint Styled Ranges
 

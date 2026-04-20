@@ -1,3 +1,6 @@
+---
+dsl: [$, $var, seed]
+---
 # Blueprint Variables & Seeds
 
 Define design building blocks at the top of an `<objects>` block. Persist across blocks in the same session.
@@ -17,11 +20,11 @@ Steps: 5 (97% lightness, subtle bg), 10 (94%, light bg), 20 (87%, borders), 30 (
 
 Always define `$brand` + `$neutral`. Add `$success`, `$error`, `$warning`, `$accent` as needed.
 
-### Spacing seed — base × multiplier
+### Spacing seed — base × multiplier (continuous)
 
-`$spacing=4` generates: `$spacing.none` (0), `$spacing.1` (4), `$spacing.2` (8), `$spacing.3` (12), `$spacing.4` (16), `$spacing.6` (24), `$spacing.8` (32), `$spacing.12` (48), `$spacing.16` (64).
+`$spacing=4` generates `$spacing.none` (0) plus `$spacing.N` for any positive integer N, resolving to `base × N`. So `$spacing.5` = 20, `$spacing.7` = 28, `$spacing.10` = 40, etc. Same model as Tailwind.
 
-Use anywhere you need spacing: `g($spacing.4)`, `pad($spacing.6)`, `pad($spacing.3,$spacing.6)`.
+Use anywhere you need spacing: `g($spacing.4)`, `pad($spacing.6)`, `pad($spacing.3,$spacing.6)`. Prefer multiples of the base you'd actually find on a 4px grid — common picks: 1, 2, 3, 4, 6, 8, 12, 16.
 
 ### Radius seed — base × multiplier
 

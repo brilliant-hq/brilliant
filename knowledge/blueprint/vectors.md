@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/paint
+dsl: [v(, mi, st, as, di]
 ---
 # Blueprint Vectors
 

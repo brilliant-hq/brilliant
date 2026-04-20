@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/paint
+dsl: [img, icon:, recolor_children]
 ---
 # Blueprint Images & SVGs
 

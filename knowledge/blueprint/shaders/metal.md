@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/shaders/overview
+dsl: [metal, chrome, softness, repetition, aberration]
 ---
 # Shader: Liquid Metal
 

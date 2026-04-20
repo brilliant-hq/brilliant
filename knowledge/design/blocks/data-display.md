@@ -40,6 +40,9 @@ al(v,g($spacing.3),pad($spacing.4)) s(240,hug) f[(#FFF)] rd($radius.md) st[($neu
 ## Stat / Metric Card
 V-stack `g($spacing.1) pad($spacing.4) s(fill,hug)`. Label text(12-13,m, muted) + value text(24-32,sb) + delta row: arrow icon(12x12, green/red) + percentage. Use `comp` + `inst()` for 3-4 stat tiles.
 
+## Progress Ring / Activity Meter
+Dashboards, health overviews, and fitness/usage stats frequently need partial circles. Load `blueprint/arcs` for correct syntax — `arc(start,sweep)` + `ratio(N)` on a `c` element, with stroke + `cap(r,r)`. Do **not** try to fake rings with rotated rectangles, conic gradients, or made-up props like `progress()` or `rd(50%)` with partial fill.
+
 ## Rating
 H-row `g(2)`. Filled stars: `st[(#F59E0B,w(2))]`. Empty: `st[(#E2E8F0,w(2))]`. Left = filled, right = empty.
 

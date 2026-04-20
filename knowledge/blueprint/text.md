@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/core
+dsl: [t(, lh, ls, eb, bl]
 ---
 # Blueprint Text
 

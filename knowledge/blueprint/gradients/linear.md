@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/paint
+dsl: [linear, angle, multi-stop]
 ---
 # Gradients: Linear
 

@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/core
+dsl: [execute_commands, select_elements, use_mask, detach_component, push_overrides, import_figma, create_canvas, boolean]
 ---
 # Blueprint Commands
 

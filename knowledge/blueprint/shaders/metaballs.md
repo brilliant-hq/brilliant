@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/shaders/overview
+dsl: [metaballs, count, density, speed]
 ---
 # Shader: Metaballs
 

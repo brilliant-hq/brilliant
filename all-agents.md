@@ -37,7 +37,7 @@ RIGHT:  get_knowledge(keys: ["design/foundations", "design/colors", "design/typo
 
 ### Available keys
 
-- blueprint/{core, variables, layout, layout-patterns, paint, text, styled-ranges, effects, vectors, components, arcs, images, commands, directives}
+- blueprint/{core, variables, layout, layout-patterns, paint, text, styled-ranges, effects, vectors, components, arcs (progress rings, donut/pie charts, activity meters, partial circles), images, commands, directives}
 - blueprint/gradients/{linear, radial, angular}
 - blueprint/shaders/{overview, metaballs, metal, irid, steel}
 - design/{foundations, colors, typography, shadows, backgrounds, gradients, brand}

@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/paint
+dsl: [uv, frozen]
 ---
 # Shaders Overview
 

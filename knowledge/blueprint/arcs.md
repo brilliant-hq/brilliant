@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/core
+dsl: [arc, ring, sweep, cap, ratio]
 ---
 # Blueprint Arcs & Rings
 

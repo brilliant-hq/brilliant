@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/core
+dsl: [fill, hug]
 ---
 # Blueprint Layout
 

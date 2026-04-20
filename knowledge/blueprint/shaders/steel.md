@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/shaders/overview
+dsl: [steel, mercury, distortion, depth]
 ---
 # Shader: Liquid Steel
 

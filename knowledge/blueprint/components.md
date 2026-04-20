@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/core, blueprint/variables, blueprint/layout
+dsl: [comp, inst, override, slot]
 ---
 # Blueprint Components & Instances
 

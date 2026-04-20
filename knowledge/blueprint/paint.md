@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/core
+dsl: [solid, metaballs, metal, irid, steel]
 ---
 # Blueprint Paint
 

@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/paint
+dsl: [shadow, outerglow, eblur, inner]
 ---
 # Blueprint Effects
 

@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/layout
+dsl: [abs, wrap, front, back, cb]
 ---
 # Blueprint Layout Patterns
 

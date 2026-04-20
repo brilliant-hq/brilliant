@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/paint
+dsl: [angular, conic, cx, cy, ax, ay]
 ---
 # Gradients: Angular
 

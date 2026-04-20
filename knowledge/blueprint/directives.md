@@ -1,5 +1,6 @@
 ---
 assumes: blueprint/core
+dsl: [parent, before, after, clone, replace, ungroup]
 ---
 # Blueprint Directives
 
