@@ -15,7 +15,7 @@ Brilliant supports exporting designs to multiple formats and copying to clipboar
 |--------|-----------|------|-------|
 | **PNG** | .png | Raster | Transparency supported |
 | **JPEG** | .jpg | Raster | No transparency (transparent areas filled with canvas background color) |
-| **WebP** | .webp | Raster | Transparency supported (internally PNG-encoded with .webp extension; native WebP encoding pending) |
+| **WebP** | .webp | Raster | Transparency supported. Native libwebp encoding on macOS (real WebP bytes); other platforms currently fall back to PNG bytes |
 | **SVG** | .svg | Vector | Effects via SVG filters; shader fills and some fill types rasterized as embedded images |
 | **PDF** | .pdf | Vector | Embedded fonts, effects rasterized for fidelity |
 | **MP4** | .mp4 | Video | H.264 or HEVC codec. Native hardware-accelerated encoding (macOS) |
@@ -75,6 +75,7 @@ Copy design elements to clipboard in various formats — useful for pasting into
 | Command | Description |
 |---------|-------------|
 | Copy as PNG | Copy as PNG image (at screen resolution) |
+| Copy as WebP | Copy as WebP image (macOS only; narrow app compatibility — use PNG for broad paste support) |
 | Copy as SVG | Copy as SVG markup text |
 | Copy as CSS | Copy as CSS properties (position, size, colors, borders, gradients, rotation) |
 | Copy as YAML | Copy as YAML serialization (full element data) |
@@ -83,7 +84,7 @@ Copy design elements to clipboard in various formats — useful for pasting into
 ### Context Menu
 
 Right-click selected elements to access:
-- **Copy As** submenu: PNG, PNG @2x, PNG @4x, SVG, CSS, YAML, Blueprint
+- **Copy As** submenu: PNG, PNG @2x, PNG @4x, WebP, SVG, CSS, YAML, Blueprint
 
 ### Clipboard Formats
 
