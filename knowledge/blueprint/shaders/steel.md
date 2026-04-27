@@ -28,7 +28,7 @@ Steel looks great at default `scale(1)` for fills. For button strokes, `scale(2-
 
 **Rose gold stroke button:**
 ```
-al(h,a(c,c),g($spacing.none),pad($spacing.3,$spacing.6)) s(hug,hug) f[(#18181B)] st[(steel(#B76E6E,#FFEEDD,flow(0.60),roughness(0.35),distortion(0.90),depth(0.75),angle(60),speed(2)),w(2))] rd($radius.full) #steel_btn
+al(h,x(c),y(c),g($spacing.none),pad($spacing.3,$spacing.6)) s(hug,hug) f[(#18181B)] st[(steel(#B76E6E,#FFEEDD,flow(0.60),roughness(0.35),distortion(0.90),depth(0.75),angle(60),speed(2)),w(2))] rd($radius.full) #steel_btn
   t("Subscribe",Inter,14,sb) f[(#FFEAE4)] #steel_btn_label
 ```
 

@@ -12,17 +12,34 @@ description: "All UI panels in Brilliant: top toolbar, left toolbar, right toolb
 Centered at the top of the screen. Displays workspace breadcrumbs showing the navigation path: **Workspace > Folder > Canvas**.
 
 - **Double-click** the canvas name (last breadcrumb) to **rename** it inline. Press **Enter** to confirm, **Escape** to cancel.
-- **Hover** the toolbar to reveal a **copy path** button (left side). Click it to copy the full filesystem path of the current canvas's `.design` file to the clipboard.
-- **Notification indicator** — a small blue dot appears on the top-right corner when there are pending notifications. Hover the toolbar to show a **clear notifications** button (right side).
-- **Unsaved changes** are indicated by dimmed breadcrumb text (60% opacity); saved state shows at full brightness (90% opacity).
-- Color-suffixed folders/canvases display their assigned color in the breadcrumb text.
-- **Vim mode indicator** — when editing a text file with vim mode enabled, the current vim mode (NORMAL, INSERT, etc.) is shown before the breadcrumbs.
+- **Hover** the toolbar to reveal a **copy path** button. Click it to copy the full filesystem path of the current canvas's `.design` file to the clipboard. Tooltip flips to "Copied!" for one second after click.
+- Color-suffixed folders/canvases display their assigned color in the breadcrumb text. The suffix (e.g. `.blue`) is preserved during inline rename.
+- The last breadcrumb is bold; earlier breadcrumbs are slightly dimmer.
+
+There is no save chip and no notification indicator in the top toolbar. Auto-save runs in the background via `AutoSaveManager` with a 500 ms debounce; there is no top-toolbar UI for it.
+
+## Window Modes
+
+Brilliant runs in two window modes, switched on a single window:
+
+- **Studio** (default): a regular desktop window with title bar, shadow, resizable. Visible in the Dock. Launched on startup.
+- **Overlay:** a borderless, always-on-top, transparent fullscreen layer above other apps. Hidden from the Dock. Summoned and dismissed via a global hotkey that works even when Brilliant is unfocused.
+
+| Action | Shortcut |
+|--------|----------|
+| Toggle overlay mode (global) | Ctrl+F |
+| Toggle passthrough (overlay only) | Ctrl+A |
+| Toggle desktop icons (overlay only) | Ctrl+I |
+
+In passthrough mode (overlay only), mouse clicks pass through Brilliant to the apps below. Studio window state (position, size, fullscreen, maximized) is saved before entering overlay and restored on exit.
+
+In overlay mode a small status dot appears at the top-left of the screen.
 
 ## Left Toolbar
 
 Contains the **File Explorer** (top) and **Layers Explorer** (bottom) displayed simultaneously in a vertically split layout. Drag the divider between them to resize each panel's share of the toolbar height.
 
-The header (top-right) has: reset position, close (toggle left toolbar), and account avatar buttons.
+The header is right-aligned and shows: reset position, toggle (collapse) button, optional team chip (visible when the user belongs to a team; tappable for admins to open the team settings page), and account avatar (opens an account dropdown).
 
 | Action | Shortcut |
 |--------|----------|
@@ -58,35 +75,39 @@ Shows properties for selected elements. Sections appear dynamically.
 | Action | Shortcut |
 |--------|----------|
 | Toggle right toolbar | Cmd+Shift+→ |
-| Expand/collapse all | Cmd+/ |
+| Expand or collapse all sections | Cmd+/ |
 
-### Sections
+### Sections (in order from top to bottom)
 
-**Header** — Reset position, close (toggle right toolbar), and toggle sections (expand/collapse all) buttons on the left. Zoom percentage (drag to adjust, or click for preset dropdown) on the right.
+**Header** — Reset position, close (toggle right toolbar), and toggle-sections (expand/collapse all) buttons on the left. Zoom percentage (drag to adjust, or click for a preset dropdown) on the right.
 
-**Canvas Section** — Background color swatch and toggle (visible when Move tool is active and nothing is selected).
+**Canvas Section** — Canvas background color swatch and toggle. Visible only when nothing is selected and the Move tool is active.
 
-**Current Stroke / Current Fill Sections** — Default stroke and fill color controls for newly created elements. Always visible. When elements are selected, these sections also apply changes to the selected elements' strokes/fills (subtitle shows "+ selected").
+**Current Stroke / Current Fill Sections** — Default stroke and fill color used for newly created elements. Always visible. When elements are selected, these sections also apply changes to the selected elements' strokes and fills (subtitle shows "+ selected").
 
-**Element Section** — Rows in order: X/Y position, W/H with constrain proportions toggle, sizing behavior (hug/fill/fixed, shown for elements inside auto layout frames or parent elements), rotation and opacity, corner radius (expand for per-corner or top/bottom pairs) and flex (for auto layout children), circle arc properties (start angle, sweep, inner ratio for circle elements). In vector edit mode with nodes/handles selected: shows node/handle position and point type instead of W/H/rotation/opacity. More (expandable): blend mode, scale, align buttons, arrange buttons, boolean operations (union, subtract, intersect, exclude — shown when 2+ elements selected).
+**Element Section** — Rows in order: X/Y position, W/H with constrain proportions toggle, sizing behavior (hug/fill/fixed for auto layout children), rotation and opacity, corner radius (expand for per-corner or top/bottom pairs) and flex (for auto layout children), circle arc properties (start angle, sweep, inner ratio) for circle elements. In vector edit mode with nodes or handles selected: shows node/handle position and point type instead of the W/H/rotation/opacity rows. The "More" expandable area exposes blend mode, scale, align buttons, arrange buttons, and boolean operations (union, subtract, intersect, exclude) when 2+ elements are selected.
 
-**Parent Section** — Parent Type dropdown (Frame, Group, Auto Layout, Union, Subtract, Intersect, Exclude, Mask), Clip Content toggle, auto layout controls (direction, main/cross alignment, gap spacing, padding — shown when type is Auto Layout).
+**Parent Section** — Parent Type dropdown (Frame, Group, Auto Layout), Clip Content toggle, auto layout controls (direction, 3x3 main + cross alignment grid, gap spacing, padding with progressive disclosure: unified, H/V pair, or all four sides). Auto layout controls are only shown when every selected frame is auto layout. Boolean parent types (Union, Subtract, Intersect, Exclude) and Mask are created by separate commands rather than via this dropdown.
 
-**Typography Section** — Rows in order: font family (click to open font selector) + font size + text direction toggle, line height + letter spacing, font weight dropdown + text sizing mode (Auto Size, Auto Height, Auto Width, Fixed), text alignment (left/center/right) + italic toggle + underline toggle.
+**Typography Section** — Rows in order: font family (click to open font selector) + font size + text direction toggle, line height + letter spacing, font weight dropdown + text sizing mode (Auto Size / Auto Height / Auto Width / Fixed), text alignment (left/center/right) + italic toggle + underline toggle. Visible when the effective selection contains a text element or when the text tool is active with nothing selected.
 
-**Strokes Section** — Color swatch, thickness, position per stroke. Stroke caps (start/end for open paths and arcs, unified cap for complex vectors). Add/delete buttons.
+**Selection Strokes Section** — Per-stroke color swatch, thickness, and position for the selected elements. Stroke caps (start/end for open paths and arcs; unified cap for complex vectors). Add/delete buttons.
 
-**Fills Section** — Color swatch per fill. Add/delete buttons. For vector elements with regions, shows per-region fill controls. Clicking an image fill swatch opens the color picker in **image mode** (select file, drag-and-drop, or Cmd+V paste to replace).
+**Selection Fills Section** — Per-fill color swatch for the selected elements. Add/delete buttons. For vector elements with regions, shows per-region fill controls. Clicking an image fill swatch opens the color picker in image mode (file picker, drag-and-drop, or Cmd+V paste to replace).
 
-**Selection Colors Section** — Unified color editing showing all unique colors from fills and strokes across the selection, with color swatches for each.
+**Selection Colors Section** — Unified editor of all unique colors used across fills and strokes of the current selection (only shown when frame descendants are part of the selection).
 
-**Effects Section** — Drop shadow, outer glow, element blur. Add/remove effects, toggle visibility, configure properties per effect. Inner shadow, inner glow, and background blur are fill types in the Fills section.
+**Effects Section** — Drop shadow, outer glow, element blur. Add and remove effects, toggle per-effect visibility, configure properties. Inner shadow, inner glow, and background blur are fill types and live in the Fills section instead.
 
-**Layout Guides Section** — Layout guide editing for frames (columns, rows, grid).
+**Layout Guides Section** — Layout grid editor for frames. Three grid types: Grid (uniform cells), Columns (vertical), Rows (horizontal). Each grid has visibility toggle, color swatch (opens color picker), expand toggle for properties, and remove button.
 
-**Export Section** — Export options for the current selection.
+**Export Section** — Multi-config export panel. Each config row has: format dropdown (PNG, JPEG, WebP, SVG, PDF, MP4, MOV), resolution preset (Original, 2x, 3x, 4x, 1080p, 4K, Custom), expand for advanced options (width/height with constrain-proportions, background, video codec for MP4/MOV), and a remove button. Add multiple configs with the + button to export several formats in one click.
 
-**Import Section** — Figma file import controls (section title is "Import").
+**Figma Import Section** — Figma file import. Visible only when nothing is selected and the Move tool is active (same condition as Canvas Section).
+
+There is no dedicated "Design System" section in the right toolbar. Design tokens are integrated into the color picker (token swatches at the bottom of the Color Picker) and into property fields like font size, line height, and font weight (which can be bound to tokens). Token management lives in the design system file itself; see `design-system.md`.
+
+The Sketch Import flow is implemented in code but is not currently wired into the right toolbar. Sketch import lands via the global Import command instead.
 
 ### Interactive Fields
 
@@ -139,6 +160,7 @@ Most numeric fields support: typing exact values, dragging left/right, arrow key
 | Toggle bottom toolbar | Cmd+Shift+↓ |
 | Toggle all UI | Cmd+\\ |
 | Presentation mode | Alt+P |
+| Focus AI input | / (slash) |
 
 ### Buttons
 
@@ -152,11 +174,11 @@ Snip (S) is accessible via keyboard shortcut only.
 
 ### AI Input
 
-The AI input field appears inline after the tool buttons (separated by a divider). Press **/** to open AI chat, type a message, press **Enter** to send. **Escape** unfocuses. A collapse/expand chevron toggle allows hiding the AI input to save horizontal space. When collapsed, only the connection indicator and expand chevron are shown.
+The AI input field appears inline after the tool buttons (separated by a divider). Press **/** to focus it, type a prompt, press **Enter** to send. **Escape** unfocuses. A collapse/expand chevron toggle hides the AI input to save horizontal space; when collapsed, only the connection indicator and expand chevron remain.
 
-When AI chat is open, the bottom toolbar shows a connection indicator instead of the full input field (chat input moves to the chat panel above).
+When the AI chat panel is expanded for an active session, the bottom toolbar shows a minimal connection indicator instead of the full input field (the chat input moves to the panel above).
 
-When an AI agent is running, small colored activity indicator bars appear next to the toolbar for each processing session. A "Claude is designing..." status text appears during complex queries, with a stop button to cancel.
+When an AI agent is running, small activity indicator bars appear next to the toolbar for each processing session, and a stop button is available to cancel. See `ai.md` for the full AI feature reference.
 
 ## Command Palette
 
@@ -227,51 +249,30 @@ When opening a non-design file (e.g., `.md`, `.dart`, `.json`, `.txt`) from the 
 - **Auto-save** with unsaved indicator in the breadcrumbs
 - **File switching** between text files
 
-## Claude Code Chat
+## AI Chat Panel
 
-The bottom toolbar integrates with Claude Code for AI-assisted design tasks.
+The chat panel surfaces AI design sessions above the bottom toolbar. It is multi-provider: Claude Code (local CLI), Anthropic, OpenAI, Google, and OpenRouter all run through the same UI. See `ai.md` for full coverage of providers, models, BYOK setup, slash commands, attachments, and tool execution.
 
-### Session Management
+### Session Tabs
 
-Session indicators appear to the right of the AI input:
-- Click to expand/minimize the chat panel
-- Drag to reorder sessions
+Tabs sit to the right of the AI input field:
+- Click a tab to expand or collapse the chat panel for that session
+- Drag tabs to reorder
+- Double-click a tab to rename
 - X button to close
 
-### Chat Panels
+### Expanded Panel
 
 Expanded sessions show:
-- **Conversation history** — Messages scroll with newest at bottom
-- **Input field** — Type messages, attach context
-- **Header** — Topic name (double-click to rename), minimize/close buttons
-
-### Attachments
-
-Add context to messages using the attachment buttons:
-- **Elements** — Attaches selected element summaries
-- **Images** — Paste from clipboard or pick a file
-- **Files** — Attach any file for reference
-
-### Keyboard
-
-| Action | How |
-|--------|-----|
-| Stop processing | Type `/stop` in input, or click the stop button |
-| Queue follow-up | Send while processing — executes when ready |
-| Unfocus input | ESC |
-| Close active session | Cmd+W |
-| Focus session 1-9 | Cmd+1 through Cmd+9 |
-| Focus session 10 | Cmd+0 |
-| Next session | Cmd+Shift+] |
-| Previous session | Cmd+Shift+[ |
-| Toggle chat explorer | Cmd+Shift+A |
-| New chat | Cmd+N (when chat is focused) |
-| Chat search | Cmd+Shift+I |
+- **Header:** topic, canvas link, copy-as-markdown button, minimize and close buttons
+- **Skill badges:** loaded skill categories, when applicable
+- **Conversation:** messages stream in with newest at the bottom; text is selectable
+- **Input bar:** attach button, model selector, thinking-level selector, context-usage indicator, undo/redo, send/stop
 
 ### Resize
 
-- **Width** — Drag between sessions or at panel edges (160-640px range)
-- **Height** — Drag top edge of panel (120px minimum, max fills available screen space)
+- **Width** — drag between sessions or at panel edges (160-640px range)
+- **Height** — drag top edge of panel (200px minimum, fills available screen space)
 
 ---
 

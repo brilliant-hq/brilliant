@@ -1,239 +1,260 @@
 ---
 name: "knowledge-ai"
-description: "AI features in Brilliant: natural language commands, multi-provider chat, attachments, and Claude Code integration."
+description: "AI features in Brilliant: multi-provider chat, Claude Code integration, BYOK setup, attachments, MCP tools, image generation, and slash commands."
 ---
 
 # AI Features
 
 > **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
 
-Brilliant has two AI systems: a **natural language command bar** for quick design operations, and a **multi-provider chat** system for conversational AI-assisted design.
+Brilliant has a single integrated AI system: a **multi-provider chat panel** that drives Claude Code (or another model) to design directly on the canvas. The bottom toolbar input is the entry point: type a prompt, press Enter, and a chat session is created. Brilliant is **bring-your-own-key (BYOK) only**: every chat call uses the user's own API key (Anthropic, OpenAI, Google, OpenRouter) or a local Claude CLI install. There is no hosted Brilliant inference at the moment.
+
+> **Note:** an older "natural language command parser" (the `NaturalLanguageCommandLegacy` class, served by a local Qwen endpoint) is still in the source tree but is not wired into the live UI. The active path always routes to Claude Code via a chat session. Phrases like "width 300" or "rotate 45" are sent to the chat model as natural language, not parsed by a deterministic command bar.
 
 ---
 
-## AI Natural Language Commands
+## AI Input Bar (Bottom Toolbar)
 
 ### Accessing AI Input
 
 | Action | Shortcut |
 |--------|----------|
-| Focus AI input in bottom toolbar | / |
+| Focus AI input in bottom toolbar | / (slash) |
+
+The input lives at the right end of the bottom toolbar. Click the field, press **/**, or use the **Focus AI Chat** command from the command palette.
 
 ### How It Works
 
-1. Select one or more elements on the canvas
-2. Focus the AI input (press **/** or click the text field in the bottom toolbar)
-3. Type a natural language command
-4. Press **Enter** to execute
+1. Optionally select one or more elements on the canvas, or attach context manually (see Attachments below).
+2. Focus the AI input.
+3. Type a prompt.
+4. Press **Enter** to send.
 
-### Operation Types
+Pressing Enter creates a new chat session (topic auto-derived from the first 60 characters of the prompt) and sends the message to the currently selected model. The chat panel opens above the bottom toolbar so the response can stream in.
 
-| Type | Example | Description |
-|------|---------|-------------|
-| Absolute | "width 300" | Set to exact value |
-| Add | "add 50 to width" | Add to current value |
-| Subtract | "subtract 20 from height" | Subtract from current |
-| Multiply | "3x width" | Multiply current value |
-| Percent | "50% opacity" | Set as percentage |
-| Increase | "bigger", "wider" | Increase by a step |
-| Decrease | "smaller", "thinner" | Decrease by a step |
+### Hint Cycle
 
-### Color Commands
+The input field cycles through ~60 example prompts as placeholder text (rotating every 5 seconds, shuffled per session). Categories include showcase designs, common UI patterns, canvas-aware prompts that reference the current selection ("convert this to dark mode"), creative prompts, bulk-generation, sub-agent prompts, and prompts with `#hashtag` modifiers.
 
-| Command | What It Does |
-|---------|-------------|
-| "red" / "green" / "blue" / etc. | Apply named color |
-| "#FF5733" | Apply hex color |
-| "coral" / "navy" / "mint" / etc. | Apply named color |
-| "convert to gradient" | Convert solid to gradient |
-| "convert to solid" | Convert gradient to solid |
-| "darker" / "lighter" | Adjust brightness |
+### Submission Behavior
 
-**42 supported named colors:** red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gray, grey, navy, teal, maroon, olive, lime, aqua, coral, salmon, turquoise, indigo, violet, gold, silver, brown, beige, tan, crimson, lavender, plum, orchid, khaki, azure, ivory, mint, peach, rose, charcoal, slate, transparent
+Every submission creates a fresh Claude Code chat session. The input clears on success and shows a brief success or failure indicator. While processing, the input shows a spinner and a stop button; clicking stop cancels the active session.
 
-### Opacity Commands
+### Prompt History
 
-| Command | What It Does |
-|---------|-------------|
-| "50% opacity" | Set opacity to 50% |
-| "transparent" | Set to 0% |
-| "opaque" | Set to 100% |
-| "half opacity" | Set to 50% |
+- **Up / Down arrow** keys navigate previously sent prompts (newest first)
+- **Ctrl+P** / **Ctrl+N** also navigate history (vim-style)
+- **Ctrl+R** activates reverse search; type to filter history; press **Ctrl+R** again to cycle to the next match
+- History is deduplicated and persisted to disk in `~/.config/brilliant/`
 
-### Position Commands
+### Hashtag Autocomplete
 
-| Command | What It Does |
-|---------|-------------|
-| "x 100" / "y 200" | Set position |
-| "position 100, 200" / "move to 100, 200" | Set both |
+Typing `#` in the input opens a dropdown of style/context modifiers (e.g. `#dark`, `#mobile`, `#minimal`). Selecting one inserts the hashtag into the prompt.
 
-### Size Commands
+### Slash Command Dropdown
 
-| Command | What It Does |
-|---------|-------------|
-| "width 300" / "w 300" | Set width |
-| "height 150" / "h 150" | Set height |
-| "w 200, h 100" / "size 200, 100" | Set both |
-| "make it wider/taller/smaller/bigger" | Adjust size |
+Typing `/` in the input opens a dropdown showing slash commands (see "Slash Commands" below) and recent chat sessions for quick resume.
 
-### Scale Commands
+### Element Mentions
 
-| Command | What It Does |
-|---------|-------------|
-| "scale 2x" / "3x bigger" | Multiply size |
-| "scale 50%" | Half the size |
-| "scale to width 300" / "scale to height 200" | Uniform scale |
-
-### Rotation Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "rotate 45" / "rotate 90" / "rotate 180" | Set rotation |
-| "no rotation" | Reset to 0 degrees |
-
-### Corner Radius Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "corner radius 16" / "radius 16" | Set all corners |
-| "top left radius 16" | Set one corner |
-| "top corners 8" / "bottom corners 12" | Set two corners |
-| "sharper corners" / "rounder corners" | Adjust radius |
-| "no radius" | Set to 0 |
-
-### Text Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "font size 24" / "text size 24" | Set font size |
-| "bigger text" / "smaller text" | Adjust size |
-| "bold" / "italic" / "underline" | Toggle style |
-| "align text left/center/right" | Set alignment |
-| "line height 1.5" | Set line height |
-| "auto size text" / "auto height text" / "auto width text" / "fixed size text" | Sizing mode |
-| "set font [name]" | Apply font |
-
-### Alignment Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "align left/right/top/bottom" | Align selection |
-| "center horizontally/vertically" | Center |
-| "distribute horizontally/vertically" | Equal spacing |
-| "fit to parent" | Fill parent bounds |
-
-### Transform Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "flip horizontally" / "flip vertically" | Mirror |
-
-### Stroke Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "stroke inside/center/outside" | Set position |
-| "3x stroke thickness" / "thicker" / "thinner" | Adjust thickness |
-| "round cap" / "square cap" | Set cap style |
-
-### Fill/Stroke Toggle Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "add fill" / "remove fill" | Toggle fill |
-| "add stroke" / "remove stroke" | Toggle stroke |
-| "dark theme" / "light theme" | Apply theme |
-
-### Layout Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "set direction horizontal/vertical" | Auto layout direction |
-| "select all" / "duplicate" | Element operations |
-| "rename [name]" | Rename layer |
-
-### Other Commands
-
-| Command | What It Does |
-|---------|-------------|
-| "switch tool" | Switch to different tool |
-| "enter" | Enter edit mode |
-| "zoom 200%" / "zoom to fit" | Zoom control |
-
-### Command History
-
-- **Up/Down arrow keys** in the AI input to navigate previously sent commands (newest first)
-- **Ctrl+R** activates reverse search mode — type to search through history (case-insensitive)
-- Press **Ctrl+R** again to cycle to the next search result
-- History is deduplicated and persists across sessions
-
-### Tips
-
-- Commands are case-insensitive
-- Combine related properties: "w 200, h 100"
-- Use fuzzy language: "make it bigger", "sharper", "bolder"
+Typing `@` inside the AI chat panel input (the multi-line follow-up area, not the bottom toolbar bar) opens an autocomplete dropdown listing canvas elements by name. Selecting one attaches that element as context.
 
 ---
 
-## Multi-Provider AI Chat
+## Multi-Provider Chat Panel
 
-Brilliant integrates a full chat system supporting multiple AI providers. The AI chat panel is a floating panel that appears above the bottom toolbar, containing a chat explorer sidebar and the active chat session.
+The chat panel is a floating panel that opens above the bottom toolbar. It contains an optional **chat explorer** (session list sidebar) and the active chat session.
 
 ### Providers
 
-| Provider | Models | Authentication |
-|----------|--------|----------------|
-| **Claude CLI** | Models discovered dynamically from local Claude CLI installation | Uses local Claude CLI installation |
-| **Anthropic HTTP** | Opus 4.6, Sonnet 4.6, Sonnet 4.5, Haiku 4.5 | API key |
-| **OpenAI HTTP** | GPT-5.4, GPT-5.4 Pro, GPT-5.3 Codex | API key |
-| **Google HTTP** | Gemini 3.1 Pro, Gemini 3 Pro, Gemini 3 Flash | API key or OAuth |
-| **OpenRouter HTTP** | Routes to Anthropic, OpenAI, Google, DeepSeek, Moonshot models | API key |
+| Provider | Backend | Models |
+|----------|---------|--------|
+| **Claude CLI** | Local `claude` binary subprocess | Models discovered from the installed Claude CLI (allowlisted: Opus 4.7, Opus 4.6, Sonnet 4.6, Sonnet 4.5, Haiku 4.5) |
+| **Anthropic HTTP** | Direct Anthropic API | Opus 4.7, Opus 4.6, Sonnet 4.6, Sonnet 4.5, Haiku 4.5 |
+| **OpenAI HTTP** | Direct OpenAI API | GPT-5.5, GPT-5.5 Pro, GPT-5.4, GPT-5.4 Pro, GPT-5.3 Codex |
+| **Google HTTP** | Direct Gemini API | Gemini 3.1 Pro, Gemini 3 Pro, Gemini 3 Flash |
+| **OpenRouter HTTP** | OpenRouter gateway | Curated set spanning Anthropic, OpenAI, Google, DeepSeek V3.2, Moonshot Kimi K2.5 |
 
-### Setting Up API Keys (BYOK)
+> Model lists are static in the build and may change between releases. The model selector only shows models whose provider has valid credentials.
 
-When no providers are configured, the chat panel shows a **Get Started** onboarding view with buttons to add API keys for each provider, instructions for installing Claude Code CLI, and info about MCP client connections.
+### BYOK: Setting Up API Keys
 
-To manage provider connections at any time:
+Brilliant chat is BYOK only. Keys are stored locally in the macOS Keychain (service `com.brilliant.credentials`) and are never sent to Brilliant servers.
 
-1. Hover the **connection indicator** (checkmark/X icon) in the bottom toolbar — a provider status popup appears showing all providers with green (connected) or dim (not connected) dots
-2. Click an unconnected provider row — the chat input field converts into an API key entry field (with "esc to close" and "Enter to set key" hints)
-3. Enter your API key and press Enter — the key is validated against the provider's API
-4. Keys are stored securely in platform-native credential storage (macOS Keychain)
-5. To remove a key, hover the connection indicator and click a connected provider row
+1. Open the chat panel (click the connection indicator in the bottom toolbar, or run **Toggle AI Chat**)
+2. If no providers are connected, an onboarding view appears with buttons for each provider. Otherwise, hover the **connection indicator** in the bottom toolbar to see a popup of all providers (green dot = connected, dim = not connected)
+3. Click an unconnected provider row. The chat input converts into an API key entry field with "Esc to close" and "Enter to set key" hints
+4. Paste the key and press **Enter**. Brilliant validates the key against the provider's `models` endpoint and stores it on success
+5. To remove a key: hover the connection indicator and click a connected provider row
 
-### Starting a Chat Session
+**Environment variable fallback** (read at startup if Keychain is empty): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`.
 
-Chat sessions live in the AI chat panel, a floating panel above the bottom toolbar. Open it by clicking the connection indicator in the bottom toolbar or using the Toggle AI Chat command. Each session is an independent conversation with its own provider, model, and history. Use Cmd+N (when focused) to create a new session, or use the chat explorer sidebar to browse and select sessions.
+**Google OAuth:** the Google provider also accepts OAuth tokens (localhost redirect flow) instead of an API key.
+
+**Claude CLI** has no key entry: install the `claude` CLI locally and Brilliant detects it on launch.
+
+### Starting a Session
+
+A new chat session is created in three ways:
+
+1. Submit a prompt from the bottom toolbar input
+2. Click the **+** button in the chat panel header
+3. Press **Cmd+N** while the AI input is focused
+
+Each session has its own provider, model, thinking level, conversation history, and per-session context tracking. Sessions persist to disk under `~/.config/brilliant/chat_sessions/`.
+
+### Session Tabs
+
+Each active session shows as a small tab to the right of the AI input field in the bottom toolbar:
+
+- **Minimized** (default width 150px): topic label, processing spinner, context-usage percentage. Click to expand. Double-click to rename.
+- **Expanded** (default width 400px, resizable 160-640px): full chat panel above the toolbar with messages, attachments, and follow-up input.
+
+Sessions can be reordered by dragging tabs. Multiple sessions run concurrently. The bottom toolbar scrolls horizontally if tabs exceed available width.
 
 ### Switching Models
 
-The input bar row (at the bottom of the chat panel) contains, from left to right: an attach button, the **model selector**, the **thinking level selector**, a **context usage indicator**, a keyboard hint, undo/redo buttons, and a send/stop button. Click the model selector to switch the model for the current session. You can also type `/model` in the chat input to change models. Changing the model also sets it as the default for future sessions.
+The input bar at the bottom of the chat panel contains, left to right: attach button, **model selector**, **thinking level selector**, **context usage indicator**, keyboard hint, undo/redo buttons, and send/stop button.
+
+- Click the model selector to switch the model for the current session. The new model becomes the default for subsequent sessions
+- Type `/model` in the chat input for an interactive provider then model picker
+- Subtitles like "Best", "Excellent", "Good + Fast" hint at relative quality and speed
 
 ### Thinking / Reasoning Levels
 
-Some models support configurable thinking levels that control how much internal reasoning the model performs:
+Some models support configurable reasoning depth:
 
-| Level | Description |
-|-------|-------------|
-| **Off** | No extended thinking (fastest) |
-| **Low** | Minimal reasoning |
-| **Medium** | Moderate reasoning |
-| **High** | Maximum reasoning (slowest, most capable) |
-| **Xhigh** | Extra-high reasoning (GPT-5.3 Codex only) |
+| Level | Notes |
+|-------|-------|
+| Off | No extended thinking. Claude only |
+| Low | Minimal reasoning |
+| Medium | Moderate reasoning |
+| High | Maximum reasoning |
+| Xhigh | Extra-high reasoning. GPT-5.3 Codex only |
 
-Available levels depend on the provider and model. Claude models support all levels including Off. Gemini models always reason and do not offer an Off level. OpenAI models (GPT-5.4, GPT-5.4 Pro) support Low/Medium/High reasoning levels without an Off option. GPT-5.3 Codex supports an additional Xhigh level (Low/Medium/High/Xhigh).
+Claude models support all four base levels including Off. Gemini and OpenAI reasoning models always reason and do not offer Off. GPT-5.3 Codex adds Xhigh.
 
-### Attachments
+---
 
-Add context to chat messages:
+## Context and Attachments (Explicit Consent)
 
-| Type | How to attach | Description |
-|------|---------------|-------------|
-| **Elements** | Type **@** in the input to mention canvas elements by name | Attaches element summaries and screenshots as context |
-| **Images** | Paste from clipboard, drag-and-drop, or use the attach button (paperclip icon) | Sends image data to the model for vision-capable providers |
-| **Files** | Use the attach button (paperclip icon) or drag-and-drop into the input area | Attaches file contents for reference |
+Brilliant **never auto-attaches** screenshots, file contents, app version, or other ambient context to chat messages. Every piece of context is opt-in per message; the default is none.
 
-### Slash Commands
+The two layers of context that can flow with a message:
+
+1. **Canvas context (initial message only):** when the first user message of a session is sent, Brilliant builds an MCP context payload containing the canvas snapshot in blueprint form and a canvas overview screenshot (PNG). This is necessary for the model to "see" the work-in-progress. Subsequent messages send a lighter follow-up context with only changed state. To send a prompt without canvas context, start a chat in an empty workspace or remove all elements first.
+2. **Per-message attachments (opt-in):** elements, images, files. Nothing is attached unless the user explicitly attaches it.
+
+### Adding Attachments
+
+| Type | How |
+|------|-----|
+| Element | Type **@** in the chat panel input and pick a canvas element by name. The element's blueprint and a PNG render are attached |
+| Image | Paste from clipboard (Cmd+V), drag-and-drop a file, or click the paperclip icon |
+| File | Drag-and-drop into the input, or click the paperclip icon |
+
+Attachments appear as chips above the input. Remove a chip with its X button before sending.
+
+---
+
+## Tool Execution (What the AI Can Call)
+
+Once a chat is running, Claude Code (or the chosen HTTP model) can call tools to read files, edit them, run shell commands, search the web, and modify the canvas.
+
+### Built-in tools
+
+Available to every HTTP provider:
+
+| Tool | Purpose |
+|------|---------|
+| `bash` | Run a shell command (default 120s timeout, configurable) |
+| `read` | Read a file with offset/limit |
+| `write` | Write a file (creates parents) |
+| `edit` | Replace `old_string` with `new_string` (uniqueness-checked unless `replace_all`) |
+| `glob` | File-name glob via `fd` (fallback `find`), respects .gitignore |
+| `grep` | Content search via `rg` |
+| `web_fetch` | HTTP GET with HTML to markdown conversion, 15-min cache, summarized via a lightweight model when configured |
+| `AskUserQuestion` | Pause the run and ask the user a multiple-choice or free-text question (rendered as numbered options in the chat) |
+| `web_search` | Provider-native web search where available (Anthropic, Google when no other tools are present, OpenAI Responses) |
+
+The Claude CLI provider has its own tool implementations and ignores the list above.
+
+### MCP Brilliant tools (canvas)
+
+These let the model design directly on the canvas:
+
+| Tool | Purpose |
+|------|---------|
+| `init` | Bootstrap session context (canvas IDs, design system, repo info) |
+| `get_knowledge` | Load `.claude-prod/knowledge/*.md` files (blueprint reference, design heuristics, etc.) |
+| `get_selection` | Read the user's current selection as blueprint |
+| `lookup` | Find or read elements. `scope` (canvas paths, element IDs, `#refs`) constrains where to look; filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) narrow within scope. `format` is `"summary"` (default, compact metadata) or `"blueprint"` (full trees with optional `depth`). |
+| `create_html` | Convert HTML + inline CSS to elements (default for new designs) |
+| `create_modify_elements` | Create or modify elements via Brilliant's blueprint DSL |
+| `execute_commands` | Dispatch any Brilliant canvas command (align, resize, group, set fill, etc.) — see "AI-Invocable Commands" below |
+| `export` | Render elements to PNG / JPEG / WebP / SVG / PDF (returns base64 image so the model can self-review) |
+| `generate_image` | Generate or edit an image with Google's "Nano Banana" image model and apply it as a fill |
+
+The Brilliant MCP server is auto-loaded by the user's local Claude Code instance when the workspace is opened from Brilliant (no manual setup). External MCP servers can also be configured; their tools are loaded lazily via the `load_mcp_server` tool when needed.
+
+### AI-Invocable Commands
+
+`execute_commands` lets the AI dispatch any command that implements the `AIInvocableCommand` interface. This includes selection ops (align, distribute, flip), property setters (corner radius, opacity, blend mode), tool changes, frame and component operations, and more — over 100 commands in total. The AI provides element IDs and parameters; the command runs through the same code path as a keyboard or button press, with full undo support.
+
+### Sub-Agents
+
+For large tasks, the main session can spawn parallel sub-agents via the `plan_agents` then `spawn_agent` tools. Each sub-agent runs in its own ChatOrchestrator (same provider, same API key) with a 5-minute timeout, returns a summary, and renders in the parent session as a collapsible card.
+
+---
+
+## AI Image Generation
+
+Image generation uses Google's "Nano Banana" image model (`gemini-3.1-flash-image-preview` via the Gemini API). Generated images are saved to the project's `Assets/` folder and applied as image fills on target elements.
+
+### Requirements
+
+A Google API key or Google OAuth credentials. Image generation is only available when the Google provider is connected, regardless of which chat model is active.
+
+### How It Works
+
+1. The AI calls the `generate_image` tool with a prompt and a `targetElementId`
+2. Brilliant generates the image, saves the PNG to `Assets/`, and applies it as an image fill on the target via `MCPToolsGenerate.fillElementWithImage()`
+3. The asset path can be reused in blueprint with `img(assetPath)`
+
+### Image Sizes
+
+The `imageSize` parameter accepts:
+
+| Value | Notes |
+|-------|-------|
+| `512px` | Fast, useful for tiny placeholders |
+| `1K` | Default. Good speed / quality tradeoff |
+| `2K` | Hero images |
+| `4K` | Highest detail, slowest |
+
+### Reference Images
+
+Pass element IDs in `referenceElementIds` to use existing canvas elements as visual references for style or structure. Up to 14 references (10 objects + 4 characters) are supported. This is how you "edit" a generated image: pass the original as a reference and prompt the change.
+
+### Parallel Generation
+
+For multiple images at once, the AI emits several `generate_image` calls in a single turn (parallel tool execution) or uses the batch `targets` parameter on a single call. Both run concurrently; the batch form keeps things in one tool call.
+
+### Prompt Tips (general guidance the AI follows)
+
+- Descriptive paragraphs work better than keyword lists
+- Be specific about subject, lighting, composition, style
+- Use photographic terminology (focal length, depth of field) where it helps
+- For text in images, state exactly what the text should read
+- When editing with a reference image, change one thing at a time
+
+### Aspect Ratios
+
+The Gemini image API accepts arbitrary ratios. Common ones are 1:1, 3:4, 4:3, 9:16, 16:9. Brilliant derives the target ratio from the target element's bounds.
+
+---
+
+## Slash Commands
 
 Type these in the chat input:
 
@@ -241,90 +262,62 @@ Type these in the chat input:
 |---------|-------------|
 | `/stop` | Stop the current response |
 | `/continue` | Nudge the model to continue |
-| `/context` | Show context window usage (token stats) |
+| `/context` | Show context window usage |
 | `/usage` | Show account usage |
 | `/compact` | Compact conversation history (LLM-driven summarization) |
 | `/feedback` | File feedback or report an issue |
 | `/archive` | Archive the current chat |
 | `/new` | Start a new chat |
 | `/clear` | Start a new chat (alias for /new) |
-| `/model` | Change the AI model |
+| `/model` | Change the AI model (interactive provider then model picker) |
 | `/rename` | Rename the current chat (e.g. `/rename My Chat`) |
-| `/copy` | Copy last assistant message |
+| `/copy` | Copy the last assistant message |
+| `/export-replay` | Export the session as a 1:1 MP4 replay |
 | `/help` | Show available commands |
-
-### Stopping a Response
-
-- Type `/stop` in the chat input, or click the stop button
-- The response stops immediately, aborting any in-progress HTTP request
-- If the model is in a tool-use loop, further tool execution is prevented
-
-### Chat Session Shortcuts
-
-| Action | Shortcut |
-|--------|----------|
-| Focus chat session 1–9 | Cmd+1 through Cmd+9 |
-| Focus chat session 10 | Cmd+0 |
-| Focus next chat session | Cmd+Shift+] |
-| Focus previous chat session | Cmd+Shift+[ |
-| Close/archive focused chat session | Cmd+W (when AI input is focused) |
-| Toggle chat explorer | Cmd+Shift+A |
-| New chat | Cmd+N (when AI input is focused) |
-| Chat search | Cmd+Shift+I |
-
-These shortcuts focus the AI chat session assigned to that number, opening the chat panel if it is not already visible. Session number assignments are shown as keybinding badges in the chat panel header and the chat explorer sidebar.
-
-### Chat Panel Controls
-
-- **Open/close** — Click the connection indicator (checkmark/X icon) in the bottom toolbar, or use the Toggle AI Chat command
-- **Rename** — Double-click the topic name in the chat header
-- **Resize width** — Drag panel left/right edges (300–1200px)
-- **Resize height** — Drag top edge of panel (min 200px)
-- **Queue follow-up** — Send a message while the model is processing; it queues and executes when the current response completes
-- **Chat explorer** — Toggle with Cmd+Shift+A; browse, search, and manage all chat sessions; drag the divider to resize or collapse it
+| `/login` | Sign in to Claude (Claude CLI only) |
 
 ---
 
-## AI Image Generation
+## Stopping and Cancellation
 
-Brilliant can generate images using Google's Nano Banana 2 (gemini-3.1-flash-image-preview) model. Generated images are saved to the project Assets folder and applied as image fills on target elements.
+- Click the stop button in the chat input bar, or type `/stop`
+- The active HTTP request aborts immediately
+- If the model is mid tool-use loop, no further tools are dispatched
+- Sub-agents inherit cancellation from the parent session
 
-### Requirements
+---
 
-A Google API key or OAuth authentication must be configured (see "Setting Up API Keys" above).
+## Chat Session Shortcuts
 
-### How It Works
+| Action | Shortcut |
+|--------|----------|
+| Focus chat session 1 to 9 | Cmd+1 through Cmd+9 |
+| Focus chat session 10 | Cmd+0 |
+| Focus next chat session | Cmd+Shift+] |
+| Focus previous chat session | Cmd+Shift+[ |
+| Close / archive focused chat session | Cmd+W (when AI input is focused) |
+| Toggle chat explorer | Cmd+Shift+A |
+| New chat | Cmd+N (when AI input is focused) |
+| Chat search | Cmd+Shift+I |
+| Toggle AI chat panel | Toggle AI Chat command (no default keybinding; assignable in shortcuts view) |
 
-1. The AI agent calls the `generate_image` tool with a text prompt
-2. The image is generated and saved to the project's Assets folder
-3. The returned asset path is used with `img(assetPath)` in element fills
+These shortcuts focus the chat session assigned to that number, opening the chat panel if it is hidden. Session number assignments show as keybinding badges in the chat panel header and chat explorer sidebar.
 
-### Quality Settings
+---
 
-| Setting | Image Size | Speed | Best For |
-|---------|-----------|-------|----------|
-| Fast draft | 512px | Fastest | Quick iteration, tiny placeholders |
-| Quick draft | 1K | ~5s | Placeholders, good balance (default) |
-| High quality | 2K | ~15-20s | Hero images, product photos |
-| Maximum quality | 4K | Slowest | Final marketing assets |
+## Chat Panel Controls
 
-### Reference Images
+- **Open / close:** click the connection indicator in the bottom toolbar, or run **Toggle AI Chat**
+- **Rename:** double-click the topic name in the chat header, or use `/rename`
+- **Resize width:** drag the panel edges (300 to 1200 px)
+- **Resize height:** drag the top edge (min 200 px)
+- **Queue follow-up:** sending a message while the model is processing queues it; it sends automatically when the current response finishes
+- **Edit and resend:** click the edit icon on a user message to revise and resend
+- **Copy chat:** the header has a copy button that exports the full conversation as markdown with YAML frontmatter (model, date, project, canvas, tokens, turns)
+- **Chat explorer:** toggle with **Cmd+Shift+A** to browse, search, and manage all sessions; drag the divider to resize or collapse it
 
-You can pass existing canvas elements as reference images for style or structural guidance by providing their element IDs. Up to 14 reference images are supported (10 objects + 4 characters). This is useful for maintaining visual consistency across generated images or editing an existing image.
+---
 
-### Parallel Generation
+## Streaming Element Creation
 
-When generating multiple images, the AI agent can emit all `generate_image` calls in a single turn. They execute concurrently for much faster results than sequential generation. A batch mode (`targets` parameter) is also available for generating multiple images with individual prompts and targets in a single tool call.
-
-### Prompt Tips
-
-- Write descriptive paragraphs, not keyword lists
-- Be specific about subjects, lighting, composition, and style
-- Use photography terminology (focal length, depth of field, lighting)
-- For text in images, state exactly what the text should read
-- When editing with reference images, change one thing at a time
-
-### Supported Aspect Ratios
-
-Aspect ratios are passed directly to the Google Gemini Image API. Commonly used ratios include: 1:1, 3:4, 4:3, 9:16, 16:9. Other ratios may also work depending on the API.
-
+When the AI emits `<objects canvasId="...">` blocks (or calls `create_modify_elements`), elements are created on the canvas line by line as they stream. The chat shows a small preview chip per object batch with element count, a scale indicator, and warnings or errors from the blueprint compiler if any lines failed validation.

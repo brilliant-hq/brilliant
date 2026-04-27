@@ -18,7 +18,7 @@ $spacing=4
 $radius=8
 $font=Inter
 al(v,g($spacing.6),pad($spacing.8)) s(400,hug) "Page" #page               ← v=vertical, g=gap, pad=padding
-  al(h,a(sb,c),g($spacing.4),pad($spacing.none)) s(fill,hug) "Header" #header              ← sb=spaceBetween, fill=stretch to parent
+  al(h,x(sb),y(c),g($spacing.4),pad($spacing.none)) s(fill,hug) "Header" #header              ← sb=spaceBetween, fill=stretch to parent
     t("Logo",$font,18,b) f[($brand.90)] #logo
     al(h,g($spacing.2),pad($spacing.none)) s(hug,hug) "Nav" #nav              ← hug=shrink to content
       t("Home",$font,14,m) f[($neutral.50)] #nav_home
@@ -44,7 +44,9 @@ Typical sizing: root component fixed-or-hug/hug · label/value omit `s()` · pro
 Gaps: 2-4 tightly coupled · 6-8 related items · 12-16 siblings in section · 20-32 major groups · 40-64 page-level.
 
 ## Centering and absolute positioning
-Use `c` in `p()` to center a child inside a `fr` or `gr` parent: `p(c,c)` centers both axes, `p(c,20)` centers horizontally at fixed y, `p(20,c)` centers vertically at fixed x. Only works when the parent has a known size (explicit `s()`).
+Use `c` in `p()` to center a child: `p(c,c)` centers both axes, `p(c,20)` centers horizontally at fixed y, `p(20,c)` centers vertically at fixed x. Two cases:
+- Inside a `fr` or `gr` parent: `p(c,c)` works directly (the child is positioned absolutely inside the frame).
+- Inside an auto-layout parent (`al(...)`): centering only applies to children that opt out of flow with `abs` — write `abs p(c,c)`. Without `abs`, auto-layout overrides the position and `p()` is ignored.
 
 ```
 fr s(120,120) f[(#1E293B)] rd(12)
@@ -62,11 +64,13 @@ fr s(120,120) f[(#1E293B)] rd(12)
 al(v,g(12),pad(16)) s(240,hug) f[(#FFF)] rd(8) "Card"
   t("Title",Inter,16,sb) f[(#000)]
   t("Description",Inter,14) s(fill,hug) f[(#666)]
-  al(h,a(c,c),g($spacing.none),pad($spacing.1,$spacing.3)) abs p(204,-12) s(hug,hug) f[(#EF4444)] rd(99) "Badge"
+  al(h,x(c),y(c),g($spacing.none),pad($spacing.1,$spacing.3)) abs p(204,-12) s(hug,hug) f[(#EF4444)] rd(99) "Badge"
     t("New",Inter,11,sb) f[(#FFF)]
 ```
 
 Use `abs` for badges, notification dots, floating buttons, watermarks — anything that overlays auto layout content. Without `abs` you'd need a `gr` wrapper around the whole thing, adding an extra nesting level. `abs p(c,c)` centers an element inside an auto layout frame without disrupting the flow.
+
+To clear the flag on an existing element (put it back into auto-layout flow), use `no-abs` — mirrors `no-clip`. Omitting `abs` on a modify call **preserves** the existing value; you must say `no-abs` explicitly to turn it off.
 
 ## Text wrapping
 ⚠ **Text overflows when hug width exceeds parent width.** Text defaults to `hug` (single line) — correct for labels, values, headings. But if the text content is wider than its parent's resolved width, it overflows. Use `s(fill,hug)` on descriptions, subtitles, and paragraphs so they wrap instead.

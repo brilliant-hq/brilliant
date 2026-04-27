@@ -25,6 +25,8 @@ To edit an existing vector element's nodes:
 3. Edit nodes, handles, and edges (see sections below)
 4. Press **Escape** to exit (first press clears any node/handle selection, second press exits vector edit mode)
 
+Vector edit mode also auto-converts shapes (rectangles with corner radii, circles, lines) into editable bezier vectors on entry, and reverts to the original shape type on exit if the geometry hasn't changed. Paths that drop below 2 nodes are deleted entirely (full undo restores).
+
 ---
 
 ## Pen Tool
@@ -56,6 +58,7 @@ Click and drag to pull out bezier handles:
 - Click (no drag) for sharp corners
 - Click and drag for smooth curves
 - Alternate freely between the two
+- **Alt/Option + drag** while placing a node creates an asymmetric handle (only the outgoing handle moves) and locks the node's point type to Disconnected
 
 ### Closing a Path
 
@@ -63,9 +66,10 @@ Click on the first node to create a closed shape.
 
 ### Tips
 
-- Hold **Shift** to constrain angles to 15-degree increments
+- Hold **Shift** while dragging out handles to snap to 15-degree increments
 - Closed paths can have fills and strokes
 - After creation, refine in vector edit mode (select path, press **Enter**)
+- Pen tool stays active after a path is finished — keep clicking to start another
 
 ## Pencil Tool
 
@@ -102,9 +106,10 @@ Enter vector edit mode by selecting a vector element and pressing **Enter** (or 
 
 Select nodes and drag. Snap guides work.
 
-- Hold **Shift** while dragging to constrain movement to the horizontal or vertical axis (whichever has the larger delta)
+- Hold **Shift** while dragging a node to constrain movement to the horizontal or vertical axis (whichever has the larger delta)
 - Hold **Alt/Option** at the start of a drag to **duplicate** the selected nodes — the drag operates on the copies while the originals stay in place
 - When 2+ nodes are selected, you can drag anywhere inside the selection bounding box to move all selected nodes together
+- When 2+ nodes are selected, a sub-selection bounding box appears with resize and rotation handles (see "Node Sub-Selection Transform" below)
 
 ### Moving Disconnected Regions
 
@@ -126,7 +131,11 @@ Select nodes, press **Delete** or **Backspace**. Adjacent edges merge.
 
 #### Toggling Handles
 
-**Cmd+Click** a node to show/hide handles. Control points extend from the node — one per connected edge (so a 2-edge node shows two handles, a leaf node shows one).
+**Cmd+Click** a node to show/hide handles. Control points extend from the node — one per connected edge (so a 2-edge node shows two handles, a leaf node shows one). Adding handles via Cmd+Click sets the point type to Mirrored; removing them sets the point type to Straight.
+
+#### Removing a Single Handle
+
+**Cmd+Click** a single handle endpoint to remove that handle (collapses to a straight segment on that side). If both handles end up null, the node's point type becomes Straight automatically.
 
 #### Dragging Handles
 
@@ -136,9 +145,13 @@ Drag a handle endpoint. Handle behavior depends on the node's **point type** (se
 
 Hold **Alt/Option** while dragging a handle to move only the dragged handle independently (disconnected behavior). This permanently changes the node's point type to Disconnected.
 
+### Adding Nodes on an Edge
+
+Hover over an existing edge — a blue circle with `+` previews where a new node will land. Click to insert. The new node splits the edge into two segments and preserves the original curvature.
+
 ### Deleting Edges
 
-**Shift+Click** an edge to delete it. This disconnects the nodes on either side. If removing an edge leaves a node with no remaining edges, that node is also removed.
+**Shift+Click** an edge to delete it (a red highlight previews the deletion on hover). This disconnects the nodes on either side. If removing an edge leaves a node with no remaining edges, that node is also removed.
 
 ### Point Types
 
@@ -153,7 +166,7 @@ Each node has a **point type** that controls how its bezier handles behave. Sele
 
 #### Changing Point Type
 
-Click the point type button in the right toolbar. The point type row appears when a node or handle is selected in vector edit mode.
+Click the point type button in the right toolbar. The point type row appears when a node or handle is selected in vector edit mode. Each of the four point-type commands (`set_point_type_straight`, `set_point_type_mirrored`, `set_point_type_asymmetric`, `set_point_type_disconnected`) is also available in the command palette and Shortcuts panel — none have a default keybinding, but you can assign one via **Shift+?**.
 
 #### Automatic Point Type Changes
 
@@ -183,6 +196,10 @@ In vector edit mode, you can copy and paste nodes:
 
 - **Cmd+C** copies the selected nodes (and their connecting edges)
 - **Cmd+V** pastes them — if still in vector edit mode, nodes are pasted into the current element; otherwise, a new vector element is created from the pasted nodes
+
+### Select All in Vector Mode
+
+**Cmd+A** in vector edit mode selects all nodes and handles in the current path (instead of selecting all elements on the canvas).
 
 ### Companion Display
 
@@ -234,16 +251,18 @@ If no geometric snap fires, handles fall back to alignment snapping (matching po
 
 ### Disabling Snaps
 
-Two separate toggles control snapping behavior:
+Several toggles control snapping behavior. None of the vector-specific snap toggles have default keybindings — find them in the command palette or assign keys via **Shift+?**.
 
 - **Snap guides** (alignment, spacing, equidistant): Toggle via the command palette — search "Toggle Snap Guides". No default keybinding.
 - **Snap to pixel grid** (rounds positions to whole pixels): Toggle via **Shift+Cmd+'**, or search "Snap to Pixel Grid" in the command palette.
+- **Vector snapping enabled**: master toggle for all vector-edit-mode snapping.
+- **Vector snap to geometry / self / others / grids / path curves**: fine-grained toggles for each vector snap source.
 
 ---
 
 ## Boolean Operations
 
-Boolean operations combine two or more selected shapes into a boolean group. The children remain editable inside the group -- you can double-click a boolean group to edit individual shapes.
+Boolean operations combine two or more selected shapes into a boolean group. The children remain editable inside the group: you can double-click a boolean group to edit individual shapes, and press **Escape** to exit boolean edit mode.
 
 | Operation | Shortcut | Description |
 |-----------|----------|-------------|
@@ -338,11 +357,12 @@ The `L60,24 L0,24 Z` closes the path along the bottom edge. The path scales to f
 | Using `L` segments for smooth sparklines | Use `C` cubic beziers — `L` creates jagged zigzags |
 | Creating vectors without size | Always declare size: `v() s(60,24)` — the path renders within this box |
 | Fighting vector positioning with repeated @X,Y adjustments | Design path coordinates relative to `0,0`, set size with `s(W,H)` to match path bounds, position with `p(X,Y)` |
-| Creating separate triangle `vector` elements for arrowheads | Use `st[(#hex,w(N),cap(n,ar))]` on a `line` or `vector` — the arrow cap renders automatically at the endpoint |
+| Creating separate triangle `vector` elements for arrowheads | Use `cap(n,ar)` on a `line(N)`, `connect(...)`, or `vector` — the arrow cap renders automatically at the endpoint |
+| Hand-routing dependency arrows with `v()` paths between elements | Use `connect(#A, #B, route(elbow))` — auto-routes from A to B at end of block, no math required |
 
 ### Vector Regions
 
-Vectors with multiple closed regions (e.g. imported SVG logos) expose per-region sub-paths via `vr()` continuation lines in `get_blueprint` output:
+Vectors with multiple closed regions (e.g. imported SVG logos) expose per-region sub-paths via `vr()` continuation lines in `lookup` output (when `format: "blueprint"`):
 
 ```
 abc123 v() s(200,200) "Logo"
@@ -391,8 +411,9 @@ Arrow caps scale with stroke width automatically. Use `cap(n,ar)` in blueprint s
 | Icons | `svg` — NEVER `vector` |
 | Sparklines, trend lines | `vector` with stroke, `C` curves |
 | Area charts (filled region under curve) | `vector` with closed path + fill (one element, both stroke and fill) |
-| Arrows (straight) | `line` with `st[(#hex,w(width),cap(n,ar))]` arrow cap |
-| Arrows (curved) | `vector` with `st[(#hex,w(width),cap(n,ar))]` arrow cap and `C` curves |
+| Arrows (straight) | `line(N)` with `cap(n,ar)` and `st[(#hex,w(width))]` |
+| Arrows connecting two existing elements | `connect(#A, #B)` with `cap(n,ar)` — auto-routes between refs |
+| Arrows (curved, freeform) | `vector` with `st[(#hex,w(width),cap(n,ar))]` arrow cap and `C` curves |
 | Simple colored rectangles | `rect` |
 | Circles, dots | `circle` |
 | Decorative wavy dividers | `vector` with `C` curves |
@@ -400,14 +421,30 @@ Arrow caps scale with stroke width automatically. Use `cap(n,ar)` in blueprint s
 
 ### Arrows
 
-Use `st[(#hex,w(width),cap(n,ar))]` to add an arrowhead at the endpoint (`ar` = arrow endCap). Works on both `line` and `vector` elements — no separate triangle elements needed.
+Use `cap(n,ar)` to add an arrowhead at the endpoint (`ar` = arrow endCap). Cap can go inline in the stroke or as a top-level token. Works on `line(N)`, `connect()`, and `vector` elements — no separate triangle elements needed.
 
-**Straight arrow:**
+**Straight arrow** — `line(N)` is the shortest path:
 ```
-v() s(200,20) st[(#374151,w(1.5),cap(n,ar))] path:d(M0,10 L200,10) "Arrow"
+line(200) cap(n,ar) st[(#374151,w(1.5))] "Arrow"
 ```
 
-**Curved arrow:**
+**Diagonal arrow** — `line(N)` with `rot()`:
+```
+line(200) p(40,40) rot(45) cap(n,ar) st[(#374151,w(1.5))] "Diagonal arrow"
+```
+`rot()` pivots around `p()` (the line's start), so the line extends from `p` along the rotated direction.
+
+**Connecting two existing elements** — `connect()` auto-routes with smart defaults (elbow shape + obstacle avoidance):
+```
+connect(#card1, #card2) cap(n,ar) st[(#888,w(1.5))]                      # smart defaults
+connect(#card1, #card2, intent(dependency))                              # preset bundles route + avoid + cap + stroke
+connect(#card1, #card2, route(straight), avoid(none))                    # opt out: literal straight line
+connect(#card1, #card2, from(r, 0.25), to(l, 0.75))                      # fractional anchors along edges
+connect(#card1, #card2, from(#card1_port), to(#card2_port))              # anchor on nested elements
+```
+**Defaults** (no params): `route(elbow)` + `avoid(all)` — picks an orthogonal shape and routes around any other elements between the endpoints. **Intents** (`dependency`/`flow`/`annotation`) seed defaults; explicit tokens always win. **Routes**: `elbow` (default — single right-angle bend, auto-promoted to 2-bend when needed), `elbow2` (always 2 bends), `straight`, `bezier`. **Avoid**: `all` (default), `endpoints` (only source/target), `none`. **Anchors**: bare side (`tl t tr l c r bl b br`), `(side, fraction)` for a position along an edge, or `(#ref)` to anchor on a nested element. Omit `from`/`to` to auto-pick the closest sides. Path resolves at end of block once both refs exist.
+
+**Curved freeform arrow** — `vector` with bezier:
 ```
 v() s(200,100) st[(#374151,w(1.5),cap(n,ar))] path:d(M0,50 C60,50 140,0 200,0) "Arrow"
 ```

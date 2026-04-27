@@ -11,7 +11,7 @@ Assumes: `blueprint/effects`
 
 ```
 $neon=#818CF8
-al(h,a(c,c),g($spacing.none),pad($spacing.1,$spacing.3)) s(hug,hug) f[(#1E1B4B),(f2,glow($neon,o(0.7),blur(6)))] st[(solid($neon,o(0.4)),w(1))] rd($radius.full) shadow($neon,y(0),blur(12)) #neon_badge
+al(h,x(c),y(c),g($spacing.none),pad($spacing.1,$spacing.3)) s(hug,hug) f[(#1E1B4B),(f2,glow($neon,o(0.7),blur(6)))] st[(solid($neon,o(0.4)),w(1))] rd($radius.full) shadow($neon,y(0),blur(12)) #neon_badge
   t("Live",Inter,12,sb) f[(#C7D2FE)] #neon_label
 ```
 

@@ -60,7 +60,7 @@ Most text in UI is labels and values that should never wrap. Only use fill for p
 
 **Example — bullet list row:**
 ```
-al(h,a(s,s),g(8),pad($spacing.none)) s(fill,hug) "Bullet Row"
+al(h,x(s),y(s),g(8),pad($spacing.none)) s(fill,hug) "Bullet Row"
   t("•",Inter,16) f[(#F97316)]
   t("Launch multiplayer cursors",Inter,16) s(fill,hug) f[(#334155)]
 ```
@@ -99,21 +99,22 @@ The font selector is a searchable overlay with fuzzy matching, live preview, and
 
 ### Available Fonts
 
-Brilliant bundles **~300 curated Google Fonts** plus all **system fonts** from your OS:
+Brilliant bundles a curated set of **~245 Google Fonts** plus all **system fonts** from your OS. Categories include:
 
 | Category | Examples |
 |----------|----------|
-| **Sans-Serif** (~60) | Inter, Roboto, Poppins, Montserrat, Open Sans, Lato, DM Sans |
-| **Serif** (~45) | Playfair Display, Merriweather, Lora, Crimson Text, Source Serif Pro |
-| **Display & Heading** (~48) | Bebas Neue, Oswald, Anton, Righteous, Abril Fatface |
-| **Script & Handwritten** (~46) | Dancing Script, Great Vibes, Satisfy, Pacifico, Caveat |
-| **Monospace** (~25) | Roboto Mono, Source Code Pro, JetBrains Mono, Fira Code |
-| **Rounded & Friendly** (~25) | Nunito, Quicksand, Varela Round, Fredoka |
-| **Completions** (~50) | Additional fonts for family coverage (condensed, slab, etc.) |
+| **Sans-Serif** | Inter, Roboto, Poppins, Montserrat, Open Sans, Lato, DM Sans |
+| **Serif** | Playfair Display, Merriweather, Lora, Crimson Text, Source Serif Pro |
+| **Display & Heading** | Bebas Neue, Oswald, Anton, Righteous, Abril Fatface |
+| **Script & Handwritten** | Dancing Script, Great Vibes, Satisfy, Pacifico, Caveat |
+| **Monospace** | Roboto Mono, Source Code Pro, JetBrains Mono, Fira Code |
+| **Rounded & Friendly** | Nunito, Quicksand, Varela Round, Fredoka |
 
 **System fonts** (from your OS) are also available — marked with a gear icon in the selector. Google Fonts are marked with a Google icon.
 
 **Platform defaults:** SF Pro Text (macOS), Segoe UI (Windows), Ubuntu (Linux).
+
+Custom font upload is not supported in-app. To use a font that isn't in the bundled list, install it as a system font on your OS and it will appear in the selector under the system fonts section.
 
 ### Font Size
 
@@ -189,7 +190,24 @@ You can apply different styles to portions of text within a single text element:
 2. Select a range of text (click and drag, or Shift+Arrow)
 3. Apply style changes (Cmd+B for bold, Cmd+I for italic, etc.)
 
-Supported per-range overrides: font weight, italic, underline, font size, font family, text color, and letter spacing. Line height is a base-level property and cannot be overridden per-range.
+Supported per-range overrides: font weight, italic, underline, font size, font family, text color, and letter spacing. Line height is a base-level property and cannot be overridden per-range. Per-range color is restricted to solid colors (no gradients, shaders, or image fills on a sub-string).
+
+Ranges are non-overlapping and stored sorted by character offset. Editing the surrounding text (insert, delete) shifts range offsets automatically.
+
+## Text and Design Tokens
+
+Text properties can be bound to design system tokens. Each binding resolves at render time, so changing the token updates every text element bound to it.
+
+| Property | Token type | Example |
+|----------|------------|---------|
+| Font size | `fontSize.*` | `fontSize.md` |
+| Font weight | `fontWeight.*` | `fontWeight.bold` |
+| Line height | `lineHeight.*` | `lineHeight.normal` |
+| Font family | `font.family` | `font.family.sans` |
+| Text color | color token (via fill) | `text.primary` |
+| Composite typography | `typography.*` | `typography.heading-md` |
+
+A **composite typography token** bundles font family, size, weight, line height, and letter spacing into one named style and supersedes the individual property tokens when applied. Useful for design system text styles like "Heading XL", "Body", or "Caption".
 
 ## Text Navigation While Editing
 
@@ -216,15 +234,30 @@ Supported per-range overrides: font weight, italic, underline, font size, font f
 
 ## Outline Text (Convert to Vectors)
 
-Select a text element and use **Cmd+Ctrl+O** (or search "Outline Text" in the command palette) to convert the text into a group of per-character vector outlines. Each character becomes its own editable vector element inside a group. This is a one-way conversion -- the text can no longer be edited as text. Useful for custom letter modifications, boolean operations with other shapes, or when you need the text as pure geometry. macOS only.
+Select a text element and use **Cmd+Ctrl+O** (or search "Outline Text" in the command palette) to convert the text into a group of per-character vector outlines. Each character becomes its own editable vector element inside a group. This is a one-way conversion: the text can no longer be edited as text. Useful for custom letter modifications, boolean operations with other shapes, or when you need the text as pure geometry. macOS only.
 
 ## Flatten Text (Convert to Single Vector)
 
-Select a text element and use **Cmd+Alt+O** (or search "Flatten Text" in the command palette) to convert the text into a single compound vector element. Unlike Outline Text (which creates one vector per character), Flatten Text merges all characters into one vector path. This is a one-way conversion. macOS only.
+Select a text element and run "Flatten Text" from the command palette to convert the text into a single compound vector element. Unlike Outline Text (which creates one vector per character), Flatten Text merges all characters into one vector path. This is a one-way conversion. No default keyboard shortcut. macOS only.
 
 ## Tips
 
 - **Enter** finishes editing and exits edit mode; use **Shift+Enter** to insert a new line
 - Escape exits text editing mode
-- Text color is set via fills (not strokes)
-- Text elements also support strokes (rendered as outlined text)
+- Text color is set via fills (not strokes). Text supports all fill types (solid, gradient, image, shader, image filter, color adjust). See [styling.md](./styling.md#text-fills).
+- Text elements also support strokes (rendered as outlined text), with inside/center/outside positioning
+- Text reflows from its top edge: when font size or family changes, the top stays anchored and the box grows downward
+- Multi-line text uses real newlines (`\n`). There is no separate paragraph spacing field; tune spacing via line height or insert blank lines.
+
+## Not Supported
+
+These typography features are not available in Brilliant today, so don't promise them to users:
+
+- Vertical alignment (top/middle/bottom). Text is anchored to the top edge.
+- Justified text alignment. Only left, center, and right.
+- Bulleted or numbered lists. Use literal bullet characters in front of each line if you need a list.
+- Per-paragraph spacing.
+- Text-on-path (text following a curve).
+- Find and replace within or across text elements.
+- Per-range line height. Line height is whole-element only.
+- Custom font upload. Install as a system font instead.

@@ -110,7 +110,7 @@ Before drafting, ask which extras (if any) to include. Default is **nothing** be
 Available extras:
 - **App version + OS** — read `version:` from `pubspec.yaml` and the user's OS.
 - **Canvas screenshot** — current view via `mcp__brilliant__export` (PNG). Skip this option if there's no active canvas.
-- **Selection details** — `mcp__brilliant__get_selection` followed by `mcp__brilliant__get_blueprint` for the selected IDs. Skip if nothing is selected.
+- **Selection details** — `mcp__brilliant__get_selection` followed by `mcp__brilliant__lookup` (`scope` set to the selected IDs, `format: "blueprint"`) for the selected elements. Skip if nothing is selected.
 
 Ask the user to pick which to include (a single question with these as options, or one quick yes/no each — whichever is less friction). If the user says "none" or skips, attach nothing.
 

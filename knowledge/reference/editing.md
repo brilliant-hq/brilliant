@@ -34,9 +34,9 @@ Click and drag on empty space to create a selection rectangle. Top-level frames 
 
 | Action | Result |
 |--------|--------|
-| Enter | Context-sensitive: exits edit mode (text/crop/vector) if active → drills into frames → narrows multi-selection to innermost → enters edit mode (text editing, crop mode for images, vector editing for shapes) |
+| Enter | Context-sensitive: exits edit mode (text/crop/vector) if active, drills into frames, narrows multi-selection to innermost, or enters edit mode (text editing, crop for images, vector editing for shapes) |
 | Shift+Enter | Select parent frame |
-| Escape | Deselect / cancel current action |
+| Escape | Deselect / cancel current action (also exits crop, vector, mask, boolean edit, and frame label modes) |
 | Tab | Select previous sibling |
 | Shift+Tab | Select next sibling |
 
@@ -60,6 +60,8 @@ When elements are selected across multiple frames, separate selection rectangles
 
 Select and drag. Snap guides appear automatically. Hold **Shift** while dragging to constrain movement to the X or Y axis (whichever has the larger delta).
 
+**Reparenting during drag:** Leaving a frame reparents to root immediately. Entering a frame is **deferred until drop** (the target frame is highlighted while you hover; reparenting happens on release).
+
 ### Nudge with Arrow Keys
 
 | Action | Shortcut |
@@ -67,13 +69,23 @@ Select and drag. Snap guides appear automatically. Hold **Shift** while dragging
 | Move 1px | Arrow keys |
 | Move 10px | Shift+Arrow keys |
 
+Rapid arrow-key presses are debounced into a single undo operation (1 second of inactivity finalizes the undo entry). Inside an auto layout frame, arrow keys **reorder** children along the layout axis instead of nudging spatially.
+
 ### Duplicate While Moving
 
-Hold **Alt/Option** while dragging to create a duplicate.
+Hold **Alt/Option** while dragging to create a duplicate. Releasing Alt mid-drag cancels duplication and the original element takes the dragged position. The full hierarchy duplicates (frames + children).
 
 ### Auto-Reparenting
 
-Dragging elements over a frame or auto layout frame automatically reparents them. **Groups, boolean parents, masks, and component instances are NOT reparent targets** -- dragging over them will not reparent into them. Children inside a group, boolean parent, or mask **cannot be dragged out** -- they stay in their parent. Hold **Space** to prevent reparenting.
+Dragging elements over a frame or auto layout frame automatically reparents them. **Groups, boolean parents, masks, and component instances are NOT reparent targets**: dragging over them will not reparent into them. Children inside a group, boolean parent, or mask **cannot be dragged out**: they stay in their parent. Children of an auto layout frame can be temporarily moved out of the layout flow with **Space** held (prevents reparenting). Self-containment is also blocked: an element cannot be dropped into its own descendant.
+
+### Snap Guides
+
+While dragging, snap guides show alignment, spacing (gap matching), equidistant centering, and (during create/resize) sizing. Snapping operates within the **primary parent's** coordinate space only: elements never snap across frame boundaries. Toggle all element snapping with the right-toolbar setting; it persists per session.
+
+### Pixel Grid Snap
+
+Default ON. Rounds positions to whole-pixel boundaries on axes where element-snap did not win. Applies to drag move, arrow-key nudge, paste, corner resize, and creation. Edge resize and rotation are exempt. Toggle with **Shift+Cmd+'** (apostrophe). Independent from the visual pixel-grid overlay (Cmd+').
 
 ### Precise Positioning
 
@@ -83,16 +95,18 @@ Right toolbar shows X and Y fields. Type exact values, drag to adjust, or use ma
 
 ### Resize Handles
 
-8 handles appear when selected: 4 corner (both directions) and 4 edge (one direction).
+8 handles appear when selected: 4 corner (resize both axes) and 4 edge (resize one axis). For rotated single elements, handles align to the element's OBB (rotated bounding box). Multi-selection handles are always axis-aligned (AABB) and operate per-parent.
 
 ### Resize Modifiers
 
 | Modifier | Effect |
 |----------|--------|
 | **Shift** | Maintain aspect ratio |
-| **Alt/Option** | Symmetric resize from center (both sides move equally) |
-| **Ctrl** | Scale mode: proportional resize + scales font sizes, strokes, corner radii, and descendant elements |
-| **Cmd** | Preserve image/shader position (image stays in place instead of scaling with the element) |
+| **Alt/Option** | Symmetric resize from center (both sides/corners move equally) |
+| **Ctrl** | Scale mode: proportional resize + scales font sizes, stroke thicknesses, corner radii, effects, and descendants |
+| **Cmd** | Compensate image/crop/shader fills for the aspect ratio change (the visible image content stays in place instead of stretching). Without Cmd, image/pattern fills scale with the element |
+
+Dragging past an anchor flips the element (sets `isFlippedH`/`isFlippedV`). Single rotated elements use OBB-based parallelogram-basis decomposition; axis-aligned elements (rotation % 90 == 0) use AABB resize. Lines/arrows have their own 2-endpoint resize.
 
 **Scale mode toggle (K):** Instead of holding Ctrl during every resize, press **K** to enable persistent scale mode. All resizes will scale content proportionally until you press K again or switch tools. See [tools.md](./tools.md#scale-mode-k).
 
@@ -202,19 +216,19 @@ a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[(#F59E0B)] "Hero BG"
 
 ## Alignment
 
-| Action | Shortcut |
-|--------|----------|
-| Align left | Alt+Shift+L |
-| Align right | Alt+Shift+R |
-| Align top | Alt+Shift+T |
-| Align bottom | Alt+Shift+B |
-| Center horizontally | Alt+H |
-| Center vertically | Alt+V |
-| Align horizontally | Alt+Shift+H |
-| Align vertically | Alt+Shift+V |
-| Fit to parent | Ctrl+Alt+F |
+| Action | Shortcut | What It Does |
+|--------|----------|--------------|
+| Align left | Alt+Shift+L | Line up left edges within the selection bounds |
+| Align right | Alt+Shift+R | Line up right edges |
+| Align top | Alt+Shift+T | Line up top edges |
+| Align bottom | Alt+Shift+B | Line up bottom edges |
+| Align horizontally | Alt+Shift+H | Line up Y-centers (same horizontal centerline) |
+| Align vertically | Alt+Shift+V | Line up X-centers (same vertical centerline) |
+| Center horizontally | Alt+H | Center the selection horizontally **within its parent** |
+| Center vertically | Alt+V | Center the selection vertically **within its parent** |
+| Fit to parent | Ctrl+Alt+F | Resize the selection to fill its parent |
 
-Alignment needs 2+ elements to have a visible effect — with a single element, it aligns against its own bounds (a no-op). Centering works with a single element — it centers within the parent. When elements span multiple frames, alignment happens independently per parent.
+Alignment (the first six rows) operates against the **selection bounds** and needs 2+ elements to do anything visible. Centering (Alt+H, Alt+V) operates against the **parent bounds** and works with a single element. When elements span multiple frames, every alignment/distribution operation happens **independently within each parent's coordinate space**: each parent gets its own selection bounds and its own centering reference.
 
 ## Distribution
 
@@ -223,7 +237,7 @@ Alignment needs 2+ elements to have a visible effect — with a single element, 
 | Distribute horizontally | Ctrl+Alt+H |
 | Distribute vertically | Ctrl+Alt+V |
 
-Requires 3+ elements. Calculates equal gaps between elements.
+Requires 3+ elements. Calculates equal gaps between elements while preserving the outer two as anchors. Operates per-parent: elements in different frames distribute independently.
 
 ## Z-Order
 
@@ -274,7 +288,7 @@ Select 2+ elements and apply a boolean operation. The result is a boolean parent
 |--------|----------|
 | Mask | Ctrl+Cmd+M |
 
-Select 2+ elements. The topmost element becomes the clip shape and the elements below are clipped to it. The result is a mask parent.
+Select 2+ elements. The topmost element becomes the clip shape and the elements below are clipped to it. The result is a mask parent. Applying a boolean operation to an existing mask switches it to that boolean type, and applying mask to an existing boolean parent switches it to a mask. Children of a mask cannot be dragged out (they stay clipped).
 
 ## Flatten
 
@@ -282,18 +296,25 @@ Select 2+ elements. The topmost element becomes the clip shape and the elements 
 |--------|----------|
 | Flatten | Cmd+Enter |
 
-Converts the selection into a single vector element. Handles primitives (rectangle, circle, line), boolean parents, groups/frames, and multiple selected elements. A single vector element is a no-op.
+Converts the selection into a single vector element. Behavior depends on what's selected:
+
+- **Single primitive** (rectangle, circle, line): converts to vector (lossless)
+- **Single vector**: no-op
+- **Boolean union parent or group/frame**: concatenates children's vector paths (lossless, per-child fills preserved as regions)
+- **Boolean subtract/intersect/exclude or mask parent**: combines paths with adaptive sampling
+- **Multiple selected elements**: concatenates all as vector paths
+- **Text mixed with other types**: text is auto-outlined first (macOS), then everything is concatenated
 
 ## Outline Text
 
 | Action | Shortcut |
 |--------|----------|
 | Outline Text | Ctrl+Cmd+O |
-| Flatten Text | Cmd+Alt+O |
+| Flatten Text | (no default shortcut, available via command palette) |
 
-**Outline Text** converts text elements to a group of per-character vector outlines. Each character becomes a separate vector element inside a group (macOS only).
+**Outline Text** converts text elements to a group of per-character vector outlines. Each character becomes a separate vector element inside a group. **macOS only.**
 
-**Flatten Text** converts text elements to a single compound vector element. All characters are merged into one vector with per-character regions preserved (macOS only). This is the same operation as **Flatten** (Cmd+Enter) when applied to text.
+**Flatten Text** converts text elements to a single compound vector element. All characters are merged into one vector with per-character regions preserved. **macOS only.** This is the same operation as **Flatten** (Cmd+Enter) when applied to text.
 
 ## Rename Layer
 

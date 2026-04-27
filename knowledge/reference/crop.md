@@ -111,9 +111,9 @@ When resizing or rotating the container **during crop mode**, compensation happe
 Element types that support crop:
 - Rectangle and circle elements with image fills or image strokes
 - Childless frames with image fills (used as clipped image containers)
-- Text elements enter text editing mode instead (not crop)
-- Vector shapes enter vector editing mode instead (not crop)
-- Frames with children drill into children instead (not crop)
+- Text elements enter text editing mode instead (not crop) — even when they have an image fill
+- Vector shapes enter vector editing mode instead (not crop) — even when they have an image fill
+- Frames with children drill into children instead (not crop) — only childless frames can be cropped
 
 ## Undo
 

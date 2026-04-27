@@ -36,7 +36,7 @@ f[(#F8FAFC),(f2,solid(#10B981,o(0.04)))]              ← multi-fill stacking
 Fills are a compositing system — tint, blur, glow, shader, gradient stacked on one element:
 ```
 al(v,g(10),pad(64)) s(hug,hug) f[(metaballs(#000,#FF3377,#FF9900,#FFDD00,#0080FF,count(10),size(0.30),speed(1)))] rd(16) clip "Backdrop"
-  al(v,a(c,c),g(8),pad(24,32)) s(280,hug) f[(solid(#FFF,o(0.12))),(f2,blur(16)),(f3,glow(#FFF,o(0.15),blur(8)))] st[(linear(135,solid(#FFF,o(0.25)),solid(#FFF,o(0.05))),w(1))] rd(16) shadow(#000,o(0.08),y(8),blur(24)) "Glass Card"
+  al(v,y(c),x(c),g(8),pad(24,32)) s(280,hug) f[(solid(#FFF,o(0.12))),(f2,blur(16)),(f3,glow(#FFF,o(0.15),blur(8)))] st[(linear(135,solid(#FFF,o(0.25)),solid(#FFF,o(0.05))),w(1))] rd(16) shadow(#000,o(0.08),y(8),blur(24)) "Glass Card"
     t("Glass Card",Inter,18,sb) f[(#FFF)]
     t("Five fill layers, one element",Inter,13) f[(solid(#FFF,o(0.6)))]
 ```

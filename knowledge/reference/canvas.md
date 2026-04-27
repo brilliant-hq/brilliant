@@ -15,26 +15,30 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 |--------|----------|
 | Zoom in (2x) | Cmd+= |
 | Zoom out (0.5x) | Cmd+- |
-| Zoom 100%–900% | 1 through 9 (Move/Hand tool only; press again to toggle back to 100%) |
-| Toggle zoom | 0 (Move/Hand tool only) |
-| Cmd+scroll/trackpad | Zoom around cursor |
+| Zoom 100%–900% | 1 through 9 (Move/Hand tool only; press the same number again to snap back to 100%). A 1000% command exists in the command palette but has no default shortcut. |
+| Toggle zoom | 0 (Move/Hand tool only) — toggles between 100% and the previous zoom state |
+| Cmd+scroll / Cmd+trackpad pan | Zoom around cursor |
+| Trackpad pinch | Zoom around focal point |
 
 ### Zoom Behavior (Figma-Compatible)
 
-- **Multiplicative steps:** Zoom in/out by 2x (100% → 200% → 400% → 800%)
-- **Max zoom:** 25600% (256x) — useful for pixel-perfect work
-- **Min zoom:** 2% (0.02x) — unless "Disable Zoom Out" is active, which clamps to 100%
-- **Keyboard zoom:** Centers on viewport
-- **Scroll/trackpad zoom:** Centers on cursor position
+- **Multiplicative steps:** Cmd+= and Cmd+- zoom by 2x (100% → 200% → 400% → 800%)
+- **Max zoom:** 25600% (256x), useful for pixel-perfect work
+- **Min zoom:** 2% (0.02x), unless "Disable Zoom Out" (Cmd+Ctrl+D) is active, which clamps to 100%
+- **Keyboard zoom (Cmd+= / Cmd+-):** centers on the viewport
+- **Cmd+scroll, Cmd+trackpad pan, trackpad pinch:** zoom around the cursor
+- **Smooth animation:** zoom transitions use a time-normalized exponential decay so retargeting mid-flight stays smooth
+- **Per-canvas zoom state:** each canvas remembers its own zoom and pan; switching canvases restores them. The first time you visit a canvas with content, Brilliant zoom-fits to its bounds automatically.
 
 ### Zoom to Content
 
 | Action | Shortcut | Description |
 |--------|----------|-------------|
-| Fit all content | Cmd+Ctrl+A | Zoom and pan to show all elements |
-| Zoom to selection | Cmd+Ctrl+F | Zoom and pan to fit selected elements in view |
-| Center on selection | Cmd+Ctrl+C | Pan to center without changing zoom |
-| Toggle zoom | 0 (Move/Hand tool only) | Toggle between current zoom and 1.0x (restores last zoom state if available) |
+| Fit all content | Cmd+Ctrl+A | Zoom and pan to show all elements on the canvas |
+| Zoom to selection | Cmd+Ctrl+F | Zoom and pan to fit the current selection |
+| Center on selection | Cmd+Ctrl+C | Pan to center the selection without changing zoom |
+| Reset zoom | (no default) | Snap back to 100% / zero pan; user-bindable in the Shortcuts panel |
+| Toggle zoom | 0 (Move/Hand tool only) | Toggle between 100% and the previous zoom state. If no previous state exists it jumps to 200%. |
 
 ### Scroll and Trackpad
 
@@ -46,7 +50,7 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 
 ### Zoom Percentage
 
-Displayed in the right toolbar header. Drag the value to adjust interactively.
+Displayed in the right toolbar header. Drag the value to adjust interactively. The displayed percentage is per-canvas and updates as you switch canvases.
 
 ### Disable Zoom Out
 
@@ -69,6 +73,76 @@ Hold **Space** while in any tool to temporarily pan. Release to return to previo
 ### Two-Finger Trackpad
 
 Two-finger drag on trackpad pans the canvas. Hold **Cmd** while dragging to zoom instead.
+
+### Scroll-Wheel Pan
+
+Mouse scroll wheel pans the canvas. Holding **Cmd** while scrolling zooms instead. Pan gestures (scroll, trackpad, hand-tool drag) include momentum, so a quick flick continues to glide and decelerate after you let go.
+
+## Selection and Hit Testing
+
+How Brilliant decides what you clicked on, and how it shows the result.
+
+### What counts as "clicking on" an element
+
+| Element kind | Hit test |
+|--------------|----------|
+| Filled shape (rectangle, circle, vector region) | Anywhere inside the visible fill |
+| Outlined shape with no fill | Within ~4 screen pixels of the stroke |
+| Vector path (line/curve) | Within ~4 screen pixels of the path |
+| Text | Inside the text bounding box |
+| Top-level frame (no parent) | Only the **frame label** above its top-left corner is clickable; clicking the frame body passes through to the children inside |
+| Nested frame (inside another frame) | Anywhere on the frame's fill or stroke |
+| Boolean / mask parent | Uses the resulting visible shape, not the rectangular bounding box |
+
+The 4-pixel tolerance is **screen-relative**: it scales with zoom so the click target always feels the same size regardless of zoom level.
+
+### Selection rectangles
+
+Brilliant's selection model is **per-parent**: if you select two elements in Frame A and three in Frame B, you see **two separate selection rectangles**, one per parent. Each rectangle has its own resize and rotate handles, and align/distribute commands operate within each parent's coordinate space independently.
+
+### Marquee (drag-to-select)
+
+Drag on empty canvas to draw a selection rectangle. Rules:
+- **Nested elements** are selected as soon as the marquee touches them
+- **Top-level frames** must be **fully contained** by the marquee to be selected (otherwise the frame's children are selected instead)
+- Hold **Cmd** during marquee to ignore frames and select children directly
+
+### Cursor states
+
+The cursor reflects the active tool and what's under it:
+
+| Cursor | When |
+|--------|------|
+| Arrow | Default (Move tool) |
+| Crosshair | Drawing tools (Rectangle, Circle, Line, Pen, Frame, Text) |
+| Open hand | Hand tool (H) idle |
+| Closed hand | Hand tool dragging, or window-drag in the top toolbar |
+| Resize arrows | Hovering a selection handle (axis-aware) |
+| Rotate | Hovering a corner just outside the selection bounds |
+| Eyedropper | Color pick mode (Ctrl+Shift+C) |
+| I-beam | Hovering a text element while in Move tool |
+
+### Highlights you'll see while working
+
+- **Hover highlight** — thin outline on the element under the cursor
+- **Selection rectangle(s)** — one per parent with selected children, plus resize/rotate handles
+- **Snap guides** — solid alignment lines and dashed spacing/distribution/size labels (see below)
+- **Measurement overlays** — Alt+hover shows pixel distances (see Measurement Overlays)
+- **Frame labels** — the frame name above top-level frames; click to select the frame
+- **Layout grids** — when enabled per-frame in the right toolbar
+
+## Rendering Performance
+
+Brilliant renders the canvas in two modes and switches between them automatically. You don't need to do anything; the behavior is described here so you know what to expect.
+
+| Mode | When | What it looks like |
+|------|------|---------------------|
+| **Widget mode** | Default for canvases with up to a few hundred visible elements | Each element is its own crisp Flutter widget; everything is fully interactive |
+| **Tile mode** | Engages automatically when frames start to drop (sustained jank) or when there are roughly 512+ visible elements | Brilliant draws all elements into cached GPU tile images; selected/dragged elements still render as live widgets on top |
+
+Tile mode is invisible to the user except for being smoother. As you zoom out, hide layers, or delete elements, Brilliant returns to widget mode automatically once the visible count drops back below the threshold.
+
+If you ever want raw FPS info, **Cmd+Shift+Alt+P** toggles the render profiler overlay.
 
 ## Snap Guides
 

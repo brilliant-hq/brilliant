@@ -47,7 +47,7 @@ fr s(W,H) f[(bg)] clip "Section"
   gr p(0,0) s(W,H) "BG Effects"        ← group: free positioning, no layout flow
     r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 1 — needs custom position
     r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 2 — needs custom position
-  al(v,a(c,c),g(N),pad(...)) p(0,0) s(W,H) "Content"  ← content overlaps group
+  al(v,y(c),x(c),g(N),pad(...)) p(0,0) s(W,H) "Content"  ← content overlaps group
     ...structured content...
 ```
 

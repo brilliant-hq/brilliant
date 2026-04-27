@@ -1,57 +1,138 @@
 ---
 assumes: blueprint/core, blueprint/variables, blueprint/layout
-dsl: [comp, inst, override, slot]
+dsl: [for, range, in, vars, step, flat, comp, inst, override]
 ---
-# Blueprint Components & Instances
+# Blueprint Components & Iteration
 
-**Default to `comp` + `inst()` whenever you'd write similar elements more than once.** This is a DRY rule, not a design-system rule — instances cut token cost roughly in half and render faster. Cards in a grid, rows in a table, tabs, chart columns, stat tiles, nav items — if it doesn't actively hurt to share structure, use components. Consistency and linked updates are free side effects.
+For 3+ similar elements (calendar days, nav items, stat tiles, dot grids,
+color swatches — anything you'd otherwise stamp by hand), use `for(...)`.
+It expands a uniform template and generates `comp + inst()` under the hood.
 
-## Create Master
+## Shapes
 
-Add `comp` bare flag to a frame. **CRITICAL: assign `#ref` to EVERY child you plan to override in instances.** The `override(#ref)` syntax requires the exact same `#ref` that was assigned on the master child — element names alone don't work as override refs.
+### `for(range(N))` — pure count
 ```
-al(v,g($spacing.4),pad($spacing.6)) s(300,hug) f[(#FFF)] st[($neutral.20,w(1))] rd($radius.md) shadow(#000,o(0.06),y(2),blur(8)) "Card" comp #card
-  t("Title",$font,18,b) f[($brand.90)] "Title" #title
-  t("Description",$font,14) s(fill,hug) f[($neutral.50)] "Description" #desc
+for(range(7))
+  al(v,x(c),y(c),pad(8)) s(60,80) "Slot $n" #slot
+    t("$n",Inter,14,sb)
 ```
+Implicit `$i` (0-based) and `$n` (1-based) are available in any body.
+`range(s,e)` is end-exclusive. `range(s,e,step(N))` skips by N.
+Name the index when you want both value and position: `for($step, range(3,9))`.
 
-## Create Instances
-
-`inst(#ref)` referencing master. Use `override(#ref)` to modify specific children — the `#ref` MUST match a `#ref` assigned on the master child:
+### `for($v, in([scalars]))` — single-var values
 ```
-inst(#card) p(320,0) f[(#1E293B)] st[(#334155,w(1))] "Pro Card" #pro
-  override(#title) t("Pro Plan") f[(#F8FAFC)]
-  override(#desc) t("For growing teams") f[(#94A3B8)]
+for($abbr, in([MON,TUE,WED,THU,FRI,SAT,SUN]))
+  al(v,x(c),y(c),pad(8)) s(fill,hug) "Day $abbr" #day
+    t("$abbr",JetBrains Mono,11,sb)
 ```
+`$abbr` substitutes inside any property — string literals, hex, refs, names.
 
-Only specified properties change — everything else syncs to master.
-
-**Common mistake:** Using an element's name as the override ref without assigning a matching `#ref`. If the master child is `"Title"` but has no `#title` ref, then `override(#title)` won't match. Always assign `#ref` on the master child first.
-
-## Slots
-
-Mark children with `slot` to let instances own that subtree:
+### `for(vars[...], in([(...),...]))` — multi-var tuples
+Tabular data with multiple values per iteration. Encode variants
+(color, signal, icon name) directly in the data:
 ```
-al(v,g($spacing.2),pad($spacing.none)) s(fill,hug) "Features" slot
-  t("3 projects",Inter,14) f[(#475569)]
-```
-
-When you override a slot with indented children, existing children are **replaced** — the instance owns the slot content entirely.
-
-## SVG Icon Overrides
-
-SVG icons inside components can be overridden with different icons:
-```
-al(h,a(c,c),g($spacing.2),pad($spacing.3,$spacing.4)) s(hug,hug) f[(#10B981)] rd($radius.sm) "NavItem" comp #navitem
-  svg(icon:house) s(16,16) f[(#FFF)] "Icon" #icon
-  t("Home",Inter,14,m) f[(#FFF)] "Label" #label
-inst(#navitem) p(200,0) f[(#8B5CF6)]
-  override(#icon) svg(icon:gear) f[(#FFF)]
-  override(#label) t("Settings")
+for(vars[$abbr,$num,$dColor], in([
+  (MON,20,#475569),
+  (TUE,21,#475569),
+  (WED,22,#10B981),
+]))
+  al(v,x(c),y(c),pad(8)) s(fill,hug) "Day $abbr" #day
+    t("$abbr",Inter,11,sb) f[($dColor)] #abbr
+    t("$num",Inter,16,sb) f[(#0F172A)] #num
 ```
 
-The replacement SVG inherits the original's size automatically. Fill/stroke overrides on the same line are applied to the new SVG.
+### Seed-scale composition
+For-loop substitution runs before var resolution, so `$brand.$step` works:
+```
+for($step, in([5,10,20,30,40,50,60,70,80,90]), flat)
+  r s(48,fill) f[($brand.$step)]
+```
 
-## `inst()` vs `clone()`
+## Per-iteration refs — the addressability win
 
-`inst()` = linked to master, stays synced. `clone()` = independent copy, no link. Both use `override(#ref)` for child overrides.
+Every iteration's outer frame and every ref'd inner child is addressable.
+The suffix is the first declared var (or `$i` for ranges):
+
+| Ref | Points to |
+|---|---|
+| `#day_MON` | The COMP (first iteration's frame). Modifying propagates to all instances. |
+| `#day_TUE`, `#day_WED`, ... | Each instance frame. Modifying one affects only that instance. |
+| `#abbr_MON` | Master's child. Propagates. |
+| `#abbr_TUE`, ... | Each instance's own child. |
+
+```
+# Highlight THU specifically
+#day_THU f[(#6366F1)]
+#abbr_THU f[(#FFFFFF)]
+#num_THU f[(#FFFFFF)]
+```
+
+For pure ranges, the suffix is `$i`: `#slot_0, #slot_1, ..., #slot_6`.
+
+## Active-state / exception override
+
+Use the loop for the uniform list, then flat-modify the one that differs.
+**Even with one different item, the loop is still right** — don't drop
+to hand-coded N-copies.
+
+```
+for(vars[$key,$icon,$label], in([
+  (home,squares-four,Dashboard),
+  (revenue,chart-line,Revenue),
+  (orders,shopping-bag,Orders),
+]))
+  al(h,x(s),y(c),g(12),pad(8,12)) s(fill,hug) "Nav $label" #nav
+    svg(icon:$icon) s(18,18) f[(#64748B)] #nav_icon
+    t("$label",Inter,13,m) f[(#64748B)] #nav_text
+
+# Active state — three flat-modify lines, not a second loop
+#nav_home f[(#F8FAFC)]
+#nav_icon_home f[(#0F172A)]
+#nav_text_home t("Dashboard",Inter,13,sb) f[(#0F172A)]
+```
+
+## `flat` opt-out — independent copies
+
+For genuinely independent copies (no comp+inst link, edits don't propagate):
+```
+for(range(8), flat)
+  c s(8,8) f[(#94A3B8)]
+```
+
+`for(...)` auto-falls-back to flat with a warning when the body root isn't
+a frame OR has multiple top-level elements per iteration. Wrap in `al(...)`
+or `fr` to enable comp+inst sharing.
+
+## Manual `comp` + `inst()` — the escape hatch
+
+When iterations differ heavily in shape (e.g., pricing tiers with 3, 5, 8
+features each), drop to manual. Same machinery `for(...)` generates:
+```
+al(v,g(16),pad(24)) s(300,hug) "Card" comp #card
+  t("Title",Inter,18,b) #title
+  t("Description",Inter,14) #desc
+inst(#card) p(320,0) "Pro" #pro
+  override(#title) t("Pro Plan")
+  override(#desc) t("For growing teams")
+```
+
+Mark a child `slot` to let instances fully replace that subtree
+(`#features` below):
+```
+al(v) "Card" comp #card
+  al(v) "Features" slot #features
+    t("3 projects",Inter,14)
+inst(#card) "Custom"
+  #features
+    t("Unlimited projects",Inter,14)
+    t("Priority support",Inter,14)
+```
+
+`inst()` stays synced to master. Use `clone(id)` for an independent copy.
+
+## Limits
+
+- **No nested `for(...)`** — flatten: write outer rows out, use `for(range(N))` per row.
+- **No expressions** — `$i+1` doesn't evaluate. Use `$n` for 1-based, or bake values into tuples.
+- **Multi-line `in([...])` works** (one tuple per line), but a single tuple `(...)` cannot span lines.

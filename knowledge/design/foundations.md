@@ -2,6 +2,27 @@
 
 Core guidance for every design. Load this for any building task.
 
+## Repeated Elements — Use `for(...)`, Don't Hand-Code
+
+**If your design has 3+ similar elements** (cards, tiles, list rows, buttons in a row, calendar days, color swatches, dot grids, table rows) — load `blueprint/components` and use `for(...)`. Hand-coding N near-identical lines is a smell, not a baseline. The loop version is shorter, lets you address each iteration with `#ref_<value>` after creation, and stays in sync if you tweak the master.
+
+```
+WRONG (5 nearly-identical hand-coded cards, no per-iteration ref):
+  al(v) "Stat 1" #s1
+    t("Revenue",...)
+    t("$48.2K",...)
+  al(v) "Stat 2" #s2
+    ...
+
+RIGHT (one loop, per-iteration refs minted automatically):
+  for(vars[$label,$val], in([(Revenue,$48.2K),(Users,1284),(Conv,3.2%)]))
+    al(v) "Stat $label" #stat
+      t("$label",...)
+      t("$val",...)
+```
+
+After expansion, `#stat_Revenue`, `#stat_Users`, `#stat_Conv` each address one tile. See `blueprint/components` for the full syntax (range, vars[...], variants, slots, flat).
+
 ## Before You Build
 
 **Read the intent.** Vague prompt + no visual context = user is evaluating you — deliver one tight, impressive deliverable. Specific product prompt = prioritize clarity and usability over style.

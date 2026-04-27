@@ -21,7 +21,7 @@ Components let you create reusable design elements. A **master component** defin
 ## Creating a Component
 
 1. Select one or more elements on the canvas
-2. Press **Cmd+Alt+K** (or use the **Create Component** command via command palette)
+2. Press **Cmd+Alt+K** (or use the **Create Component** command via command palette, or right-click and choose **Component → Create Component**)
 3. The selection becomes a master component
 
 **What happens:**
@@ -35,8 +35,8 @@ Components let you create reusable design elements. A **master component** defin
 ## Creating an Instance
 
 1. Select a master component
-2. Use the **Create Instance** command (via command palette)
-3. A linked copy appears offset 50px from the master
+2. Use the **Create Instance** command (via command palette, or right-click and choose **Component → Create Instance**)
+3. A linked copy appears offset 50px down and right from the master
 
 **What happens:**
 - A deep copy of the master's subtree is created with new element IDs
@@ -118,6 +118,17 @@ When you edit a master component, all instances automatically sync:
 
 **Slot children** (marked with `isSlot: true`) are skipped entirely during sync -- the instance fully owns their content.
 
+### What You Cannot Do on an Instance
+
+The structure of an instance is owned by its master. Brilliant prevents structural drift on instances:
+
+- You cannot drag elements into a component instance to add new children. The drop target is rejected during drag
+- You cannot drag elements out of an instance to reparent them somewhere else
+- New structural changes (add/remove children, reorder) must happen on the master and propagate via sync
+- The one exception is **slot subtrees**: any element nested at any depth inside a `slot`-marked child IS a normal target for adds and reparents. Slot content is owned by the instance
+
+If you need to fully diverge from the master, **detach** the instance first.
+
 ## Resetting Overrides
 
 To restore an instance to match its master:
@@ -138,7 +149,7 @@ To restore an instance to match its master:
 To break the link between an instance and its master:
 
 1. Select a component instance
-2. Press **Cmd+Alt+B** (or use the **Detach Instance** command via command palette)
+2. Press **Cmd+Alt+B** (or use the **Detach Instance** command via command palette, or right-click and choose **Component → Detach Instance**)
 
 **What happens:**
 - `ComponentData` is removed from the instance root
@@ -158,10 +169,24 @@ When you ungroup a component frame, the component links are automatically cleane
 
 When you have an instance selected:
 
-1. Use the **Go to Master Component** command (via command palette)
+1. Use the **Go to Master Component** command (via command palette, or right-click and choose **Component → Go to Master**)
 2. The master component is selected on the canvas
 
 This works when the master is on the same canvas. The selection jumps to the master element.
+
+## Cross-Canvas Components
+
+A master component can live on a different canvas than its instance. This lets you keep masters on a dedicated "components" canvas and use instances throughout the rest of your project.
+
+How it works:
+
+- An instance stores a `canvasPath` reference to the master's canvas file when the master lives elsewhere
+- When the instance's canvas is loaded, Brilliant resolves the cross-canvas master and syncs the instance with the latest master values
+- Editing a master propagates to instances on every loaded canvas
+- **Push Overrides to Master** and **Go to Master Component** only work when the master is on the same canvas as the instance. Switch to the master's canvas first to push or jump to it
+- Pasting a component master into a different canvas creates an instance whose master link still points to the original canvas, not a duplicate master
+
+**Caveat:** When you delete a master, instances on other canvases (not currently loaded) are not detached immediately. They will be cleaned up the next time their canvas is opened.
 
 ## Keyboard Shortcuts
 
@@ -175,6 +200,16 @@ This works when the master is on the same canvas. The selection jumps to the mas
 | Push Overrides to Master | Command palette |
 
 **Push Overrides to Master** — When you've made overrides on an instance that should become the new default, use this command to apply the instance's overrides back to the master component. All other instances will then sync to the updated master values. This command only works when the master is on the same canvas as the instance.
+
+## What's Not Supported
+
+Brilliant components are a master/instance system with property overrides, slots, and cross-canvas references. The following Figma-style concepts are NOT currently in Brilliant:
+
+- **Component variants / props** (no boolean props, enum variants, or variant matrices). Instead, create separate master components or rely on overrides
+- **Component descriptions or metadata** (no description field, no documentation popovers)
+- **Component publishing / library export** (no separate library file format; masters live on canvases inside your project)
+- **Component diff view** (no side-by-side master vs instance comparison UI)
+- **Nested overrides exposed as instance properties** (overriding a nested instance child works, but there is no "exposed property" surface on the parent instance)
 
 ## Tips
 
@@ -201,7 +236,7 @@ Components and instances can be created in blueprint syntax using the `comp`, `i
 Add the `comp` bare flag to create a component master:
 
 ```
-al(h,a(c,c),g($spacing.2),pad($spacing.3,$spacing.6)) s(hug,hug) f[(#F1F5F9),(f2,inner(#000,o(0.06),x(2),y(2),blur(4))),(f3,inner(#FFF,o(0.5),x(-1),y(-1),blur(2)))] rd(10) shadow(#000,o(0.04),y(1),blur(2)) shadow(#000,o(0.08),y(4),blur(12)) comp #btn "Button"
+al(h,x(c),y(c),g($spacing.2),pad($spacing.3,$spacing.6)) s(hug,hug) f[(#F1F5F9),(f2,inner(#000,o(0.06),x(2),y(2),blur(4))),(f3,inner(#FFF,o(0.5),x(-1),y(-1),blur(2)))] rd(10) shadow(#000,o(0.04),y(1),blur(2)) shadow(#000,o(0.08),y(4),blur(12)) comp #btn "Button"
   svg(icon:sparkle) s(16,16) f[(#374151)] "Icon" #btn_icon
   t("Get Started",Inter,14,sb) f[(#1E293B)] "Label" #btn_label
 ```
@@ -228,6 +263,17 @@ inst(#btn) p(300,100) f[(#E0E7FF),(f2,inner(#000,o(0.06),x(2),y(2),blur(4))),(f3
   - Named children match against the instance's existing children by name
   - Property changes are applied as overrides
   - Slot children can have new content injected
+
+### Cross-Canvas Instances in Blueprint
+
+To create an instance of a master that lives on a different canvas, pass the canvas path as a second argument with `canvas(...)`:
+
+```
+inst(#btn, canvas(components.design)) p(300,100)
+  override(#btn_label) t("Launch")
+```
+
+The path is relative to the current canvas's location in the project.
 
 ### Slots
 

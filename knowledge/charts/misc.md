@@ -7,31 +7,34 @@ Assumes: `blueprint/core`, `blueprint/layout`
 
 ## Stacked Horizontal Bar
 
-Flex segments — proportional, no pixel math:
+Flex segments — proportional, no pixel math. Encode each segment's weight,
+color, and label as one tuple:
 ```
-$seg1=#6366F1
-$seg2=#818CF8
-$seg3=#EC4899
-$seg4=#F97316
+$neutral=#64748B
 al(h,g($spacing.none),pad($spacing.none)) s(280,12) rd($radius.full) clip "Stacked" #stacked
-  r s(fill:40,fill) f[($seg1)] "Seg 1"
-  r s(fill:30,fill) f[($seg2)] "Seg 2"
-  r s(fill:20,fill) f[($seg3)] "Seg 3"
-  r s(fill:10,fill) f[($seg4)] "Seg 4"
+  for(vars[$w,$color,$name], in([
+    (40,#6366F1,Deep),
+    (30,#818CF8,Light),
+    (20,#EC4899,REM),
+    (10,#F97316,Awake),
+  ]))
+    r s(fill:$w,fill) f[($color)] "$name" #seg
 ```
 
 Parent `rd($radius.full) clip` rounds ends. `s(fill,12)` for responsive.
 
-**Legend:** Dot + label with `comp` — reuse the same `$var` colors:
+**Legend:** Dot + label per segment — same tuple data, separate loop:
 ```
-$neutral=#64748B
-al(h,a(s,c),g(16),pad($spacing.none)) s(hug,hug) "Legend" #legend
-  al(h,a(s,c),g(6),pad($spacing.none)) s(hug,hug) comp #leg
-    r s(8,8) f[($seg1)] rd($radius.full) "Dot" #leg_dot
-    t("Deep Sleep",Inter,12) f[($neutral.50)] "Label" #leg_label
-  inst(#leg)
-    override(#leg_dot) f[($seg2)]
-    override(#leg_label) t("Light Sleep")
+al(h,x(s),y(c),g(16),pad($spacing.none)) s(hug,hug) "Legend" #legend
+  for(vars[$color,$name], in([
+    (#6366F1,Deep Sleep),
+    (#818CF8,Light Sleep),
+    (#EC4899,REM),
+    (#F97316,Awake),
+  ]))
+    al(h,x(s),y(c),g(6),pad($spacing.none)) s(hug,hug) "Item $name" #leg
+      r s(8,8) f[($color)] rd($radius.full) #leg_dot
+      t("$name",Inter,12) f[($neutral.50)] #leg_label
 ```
 
 ## Contribution Heatmap

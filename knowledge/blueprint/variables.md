@@ -63,7 +63,7 @@ $font=Inter
 al(v,g($spacing.4),pad($spacing.6)) s(360,hug) f[($neutral.5)] st[($neutral.20,w(1))] rd($radius.md) shadow(#000,o(0.06),y(2),blur(8)) "Card"
   t("Dashboard",$font,20,sb) f[($brand.90)]
   t("Welcome back",$font,14) s(fill,hug) f[($neutral.50)]
-  al(h,a(c,c),g($spacing.none),pad($spacing.3,$spacing.4)) s(fill,hug) f[($brand.50)] rd($radius.sm) "Button"
+  al(h,x(c),y(c),g($spacing.none),pad($spacing.3,$spacing.4)) s(fill,hug) f[($brand.50)] rd($radius.sm) "Button"
     t("Open",$font,14,sb) f[(#FFF)]
 ```
 
@@ -75,20 +75,12 @@ One `$brand` hex generates a 10-step lightness scale (.90 near-black → .5 near
 $brand=#645DFC
 al(v,g($spacing.none),pad($spacing.none)) s(360,hug) f[($brand.20)] rd($radius.lg) clip "Palette"
   al(v,g($spacing.none),pad($spacing.6,$spacing.6,$spacing.5,$spacing.6)) s(fill,120) f[($brand.50)]
-    al(h,a(sb,c),g($spacing.none),pad($spacing.none)) s(fill,hug)
+    al(h,x(sb),y(c),g($spacing.none),pad($spacing.none)) s(fill,hug)
       t("Primary",Inter,20,sb) f[(#FFF)]
       t("#645DFC",Inter,16,m) f[(solid(#FFF,o(0.7)))]
   al(h,g($spacing.none),pad($spacing.none)) s(fill,48) "Scale"
-    r s(fill,fill) f[($brand.90)]
-    r s(fill,fill) f[($brand.80)]
-    r s(fill,fill) f[($brand.70)]
-    r s(fill,fill) f[($brand.60)]
-    r s(fill,fill) f[($brand.50)]
-    r s(fill,fill) f[($brand.40)]
-    r s(fill,fill) f[($brand.30)]
-    r s(fill,fill) f[($brand.20)]
-    r s(fill,fill) f[($brand.10)]
-    r s(fill,fill) f[($brand.5)]
+    for($step, in([90,80,70,60,50,40,30,20,10,5]), flat)
+      r s(fill,fill) f[($brand.$step)]
 ```
 
 ## Non-seed vars — plain text substitution

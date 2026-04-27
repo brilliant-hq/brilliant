@@ -15,6 +15,8 @@ GPU-powered post-processing filters applied as fill or stroke types. Each filter
 
 **Presets:** Every filter type has a preset dropdown in the expanded fill view. Selecting a preset applies a curated combination of parameter values (and colors where applicable). You can further customize after applying a preset. A reset button next to the dropdown restores the filter's defaults.
 
+> **Color Adjust** is also in the Filters category but covers photo-style adjustments (exposure, contrast, saturation, white balance, vignette, sepia, etc.). It is documented in [effects.md](./effects.md#color-adjust-fill).
+
 ---
 
 ## Noise / Grain
@@ -256,6 +258,7 @@ Use the command palette (Cmd+Shift+P) to add filters by name:
 | Add Duotone | `add_duotone_fill` | Adds duotone filter fill with defaults |
 | Add Posterize | `add_posterize_fill` | Adds posterize filter fill with defaults |
 | Add Dither | `add_dither_fill` | Adds dither filter fill with defaults |
+| Add Color Adjust | `add_color_adjust_fill` | Adds color adjust filter fill with defaults (see [effects.md](./effects.md#color-adjust-fill)) |
 
 ---
 

@@ -56,8 +56,8 @@ f[($tint),(f2,blur(16)),(f3,glow(#FFF,o(0.12),blur(6)))]
 Animated shader underneath, frosted glass card on top:
 ```text
 fr s(1280,600) f[(#000),(f2,metal(...))] clip "Hero" #glass_hero
-  al(v,a(c,c),g($spacing.none),pad($spacing.none)) s(fill,fill) #glass_center
-    al(v,a(c,c),g($spacing.4),pad($spacing.8)) s(480,hug)
+  al(v,y(c),x(c),g($spacing.none),pad($spacing.none)) s(fill,fill) #glass_center
+    al(v,y(c),x(c),g($spacing.4),pad($spacing.8)) s(480,hug)
       f[(inner(#B6B6B6,o(0.40),y(2),blur(32))),(f2,blur(16))]
       st[(solid(#FFF,o(0.10)),w(1))] rd($radius.full) "Glass Card" #glass_card
 ```

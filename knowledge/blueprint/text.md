@@ -16,7 +16,7 @@ t("Glow",Inter,28,b) f[(#FFF)] shadow(#8B5CF6,blur(12))
 ```
 
 First 3 positional: `t("content",family,size)`, then any order:
-Weights: `r`(400) body/descriptions · `m`(500) labels/captions · `sb`(600) subheadings/nav/card titles · `b`(700) headings/hero/CTAs · `eb`(800) display headlines · `bl`(900) watermarks. Align: `align(l)` left · `align(c)` center · `align(r)` right · `align(j)` justify. Direction: `rtl` or `ltr` (default) — RTL auto-defaults to right alignment unless overridden. `lh(N)` line height. `ls(N)` letter spacing. `italic`, `underline`. Escapes: `\"` quote, `\uXXXX` unicode.
+Weights: `r`(400) body/descriptions · `m`(500) labels/captions · `sb`(600) subheadings/nav/card titles · `b`(700) headings/hero/CTAs · `eb`(800) display headlines · `bl`(900) watermarks. Align: `align(l)` left · `align(c)` center · `align(r)` right · `align(j)` justify. Direction: `rtl` or `ltr` (default) — RTL auto-defaults to right alignment unless overridden. `lh(N)` line-height multiplier (e.g. `1.4`). `ls(N)` letter spacing as em multiplier of the rendered font size (`ls(0.12)` = 12% tracking, matches CSS `letter-spacing: 0.12em`). For absolute pixels, suffix with `px`: `ls(2px)`. Negative values tighten: `ls(-0.02)`. `italic`, `underline`. Escapes: `\"` quote, `\uXXXX` unicode.
 
 ~290 bundled Google Fonts. Unavailable fonts silently fall back. Omit `s()` for short labels (hug). Use `s(fill,hug)` for any text that could exceed its parent's width.
 

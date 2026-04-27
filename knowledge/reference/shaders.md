@@ -166,6 +166,8 @@ These controls transform the pattern independently of the element's own position
 
 **Cmd+Resize compensation:** When resizing an element while holding Command (macOS) or Ctrl (Windows), shader UV transforms are automatically compensated so the pattern stays fixed in world space — the element boundary reveals more or less of the pattern instead of stretching it. This matches the behavior of image crop compensation during resize.
 
+**Aspect ratio lock:** Shader fills also store an internal aspect ratio reference. During normal resize, the pattern distorts with the element. During Cmd+resize, the pattern keeps its original aspect ratio, so the boundary just reveals more or less of the same fixed pattern.
+
 ## Element-Aware Shapes
 
 Liquid Metal, Iridescent, and Liquid Stainless Steel have a **Shape** dropdown with three options:

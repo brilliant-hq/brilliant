@@ -31,7 +31,7 @@ f[(angular(stop(#C0C0C0,0),stop(#E8E8E8,0.25),stop(#A0A0A0,0.5),stop(#D0D0D0,0.7
 
 **Badge accents** — small angular on circular elements creates gem-like refraction:
 ```
-al(h,a(c,c),g($spacing.none),pad($spacing.none)) s(32,32) f[(angular(#10B981,#14B8A6,#0891B2,#10B981))] rd($radius.full) "Badge" #badge
+al(h,x(c),y(c),g($spacing.none),pad($spacing.none)) s(32,32) f[(angular(#10B981,#14B8A6,#0891B2,#10B981))] rd($radius.full) "Badge" #badge
 ```
 
 ## When to Reach for Angular

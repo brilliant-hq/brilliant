@@ -2,7 +2,7 @@
 
 Before any design task using Brilliant's DSL, load relevant knowledge.
 
-Over-load, never under-load (files are 5-50 lines). Max 8 keys per call — split across 2-3 calls. Many chats require 20-25 knowledge files.
+Over-load, never under-load (files are 5-50 lines). Max 6 keys per call — split across 2-4 calls. Many chats require 20-25 knowledge files.
 
 NEVER start designing via Brilliant's DSL before loading knowledge.
 
@@ -15,8 +15,8 @@ Load **all rows that apply** — most designs match 3-5 rows:
 | **Dashboard / analytics** | + relevant `charts/*` |
 | **Recreate from image** | `recreation/from-image` |
 | **Recreate from URL** | `recreation/from-web` |
-| **Repeated elements** | + `blueprint/components` |
-| **Modify / iterate** | + `blueprint/directives` |
+| **3+ similar elements** (cards, tiles, rows, buttons, list items, dots, swatches, calendar days, table cells, anything you'd otherwise hand-stamp) — use `for(...)`, NEVER hand-code N near-identical lines | + `blueprint/components` |
+| **Modify existing elements** (parent/before/clone/replace/delete) | + `blueprint/directives` |
 | **Shaders** | + `blueprint/shaders/{overview,...}` |
 | **Export to web with shaders** | + `webgl/overview` + relevant `webgl/*` shader |
 | **Deep color / typography** | + `design/colors`, `design/typography` |
@@ -51,8 +51,7 @@ RIGHT:  get_knowledge(keys: ["design/foundations", "design/colors", "design/typo
 
 ## Canvas Exploration
 
-- `search_elements` — find by name, text, type, fill color across all canvases. Use before asking the user which canvas.
-- `get_blueprint(elementIds: [...])` — inspect specific elements. **NEVER** call without elementIds on large canvases.
+- `lookup` — find or read elements. Pass `scope` (canvas paths, element IDs, or `#refs`) to constrain, and/or filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) to narrow. Default `format: "summary"` returns compact metadata; use `"blueprint"` (with optional `depth`) for full element trees. Examples: `lookup({query: "Card"})` discovery across canvases · `lookup({scope: ["#dashboard"], query: "Button"})` search a subtree · `lookup({scope: ["#card"], format: "blueprint"})` inspect a specific element. **NEVER** call `lookup` with no input on large repos — at least one of `scope` or a filter is required.
 - `export` — visual check (png, jpeg, webp, svg, pdf)
 
 ## Rules

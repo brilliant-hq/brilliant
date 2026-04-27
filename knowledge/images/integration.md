@@ -33,7 +33,7 @@ fr s(fill,400) f[(img(Assets/hero.png))] clip rd($radius.md) "Hero Image" #hero_
 Always add overlay for readability:
 ```
 fr s(fill,500) f[(img(Assets/hero.png)),(f2,solid(#09090B,o(0.55)))] clip "Hero" #hero
-  al(v,a(c,c),g($spacing.4),pad($spacing.16)) s(fill,fill) #hero_content
+  al(v,y(c),x(c),g($spacing.4),pad($spacing.16)) s(fill,fill) #hero_content
     t("Headline",Inter,48,sb,align(c)) f[(#FFF)] #hero_title
 ```
 

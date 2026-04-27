@@ -22,13 +22,22 @@ description: "Canvas management, folders, import/export, file operations, and au
 
 | Action | Shortcut |
 |--------|----------|
-| Next file (canvas or image) | Alt+→ |
-| Previous file (canvas or image) | Alt+← |
-| Previously active file | Ctrl+Alt+← |
+| Next file (canvas, image, text) | Alt+→ |
+| Previous file (canvas, image, text) | Alt+← |
+| Previously active canvas | Ctrl+Alt+← |
 | Focus active canvas in explorer | Cmd+Shift+K |
 | Search and select canvas | Cmd+P |
+| Global search (canvases, images, text files) | Cmd+K |
 
-**Undo behavior:** Each canvas has its own independent undo history. Switching canvases is not undoable — Cmd+Z on the new canvas undoes that canvas's last action, not the switch. When the file explorer is focused, Cmd+Z undoes canvas/folder operations (rename, create, delete, reorder) separately from canvas operations.
+**Undo behavior:** Each canvas has its own independent undo history. Switching canvases is **not** undoable — Cmd+Z on the new canvas undoes that canvas's last action, not the switch. When the file explorer is focused, Cmd+Z undoes canvas/folder operations (rename, create, delete, move, reorder) separately from canvas operations.
+
+**Per-canvas state that persists:**
+- Element data (saved to the `.design` file)
+- Zoom and pan position
+- Background color and blackboard/whiteboard mode
+- Ruler guides
+- Selection (within a session, not across app restarts)
+- Undo history (within a session, not across app restarts)
 
 ### MCP Canvas Tools
 
@@ -90,34 +99,96 @@ Folder operations (via right-click in file explorer):
 - New Canvas, New Folder (within the folder)
 - Expand / Collapse, Expand All / Collapse All
 - Reveal in Finder, Copy Relative Path, Copy Absolute Path
-- Move canvases between folders (drag and drop)
+- Move canvases between folders (drag and drop, including multi-select)
 - Nest folders inside other folders
+
+**Per-folder color tags:** Append a color suffix to a folder or canvas name to color its icon and breadcrumb. Supported suffixes: `.red`, `.green`, `.yellow`, `.orange`, `.purple`, `.pink`, `.gray` (and `.blue` is the default if no suffix). For example, naming a folder `Components.purple` shows it with a purple icon. The suffix is hidden from the displayed name and is preserved during rename.
 
 ### File Explorer
 
-In the left toolbar (Cmd+Shift+E). Shows all canvases, folders, and Assets directories in a tree view.
+The file explorer lives in the **left toolbar**. Open or focus it with **Cmd+Shift+E**. It shows all canvases, folders, asset (image) files, and other text/code files in the workspace as a tree.
 
-**Features:**
-- Multi-selection (Shift/Cmd click) for canvases and folders
-- Right-click context menu on canvases, folders, and assets
-- Keyboard navigation (arrow keys, j/k/h/l)
-- Enter to rename, Cmd+Delete to delete
-- Double-tap to rename (canvases, folders, and assets)
-- Next/previous file (Alt+Arrow) navigates through canvases AND images
-- **Toggle Hidden Files** — Show/hide dotfiles and dotfolders (e.g., `.git`, `.env`) via the command palette ("Toggle Hidden Files"). Hidden by default. State resets on app restart.
+**Layout (top to bottom):**
+1. Toolbar buttons: New Canvas, New Folder, Toggle Layers Explorer
+2. Workspace tree: folders (with disclosure triangle), canvases (`.design`), images, text files
+3. Empty state if the workspace has no canvases (offers to create one)
 
-**Asset management** (image files in Assets folders):
-- Right-click context menu: Rename, Delete, Reveal in Finder, Copy Filename
-- Renaming an asset automatically updates all references in `.design` files
-- Deleting checks for references first — warns if the image is used by canvases
-- Assets folders are shown even when empty (as long as the directory exists on disk)
-- **Clean Up Unused Assets** command (via Command Palette) removes images not referenced by any canvas
+**Selection:**
+- Click an item to select it (and switch to it if it's a canvas or previewable file)
+- **Cmd+click** to add or remove an item from the selection
+- **Shift+click** to select a range from the anchor to the clicked item; previously Cmd-selected items are pinned and stay selected
+- Selection works across canvases, folders, and assets simultaneously (used for batch move and bulk delete)
 
-### Image Preview
+**Keyboard navigation (when explorer is focused):**
 
-Clicking an image in the file explorer (or navigating to it with Alt+Arrow) enters **image preview mode**: the canvas shows the image full-size. The file explorer highlights the active image row the same way it highlights active canvases.
+| Key | Action |
+|-----|--------|
+| Arrow Up / Down, J / K | Move navigation focus |
+| Arrow Left / Right, H / L | Collapse / expand folder |
+| Space, O | Open / switch to the focused item (canvas, image, or text file) |
+| Enter | Start inline rename on the focused item |
+| Escape | Clear navigation focus or cancel a rename / cut-paste |
+| G | Jump to the bottom of the list (Shift+G also works) |
+| Cmd+A | Select all visible items in the explorer |
+| Tab | Move focus from the file explorer to the layers explorer |
+| Cmd+Backspace, Cmd+Delete | Delete the selected canvas/folder/asset |
+| Cmd+N | New canvas inside the focused folder |
+| Cmd+Shift+N | New folder inside the focused folder |
+| Cmd+C / Cmd+X / Cmd+V | Copy / cut / paste canvases or folders |
 
-To return to a canvas, click any canvas in the file explorer or use Alt+Arrow to navigate.
+**Renaming:**
+- **Double-click** the item name to rename inline
+- Press **Alt+Enter** while a canvas is focused (works in or out of the explorer) to rename it
+- Press **Escape** to cancel a rename
+
+**Drag-and-drop:**
+- Drag a canvas or folder onto another folder to move it
+- Multi-select then drag to move several items at once (single undo entry covers the batch)
+- Drag image files from Finder onto the explorer to import them as assets
+
+**Toggle Hidden Files** — Show/hide dotfiles and dotfolders (e.g., `.git`, `.env`) via the command palette ("Toggle Hidden Files"). Hidden by default. State resets on app restart.
+
+**Git integration** — In a Git repository, files matching `.gitignore` are dimmed in the explorer and can be excluded from search.
+
+### Top Toolbar (Workspace + Save Status)
+
+The top toolbar at the center of the window shows the current location as breadcrumbs:
+
+```
+Workspace / Folder / Subfolder / CanvasName
+```
+
+- **Click** a breadcrumb segment to navigate (folder segments are not clickable for navigation, but the canvas segment can be double-tapped to rename)
+- **Hover** the breadcrumb to reveal a "Copy Path" button (copies the absolute path of the active `.design` file or asset to the clipboard)
+- **Save status indicator** — when there are unsaved changes, the canvas name in the breadcrumb is dimmed (60% opacity); once auto-save completes it returns to full opacity. This is the only save indicator; there is no separate "save chip" or progress spinner.
+- The **window drag area** is the breadcrumb itself: click and drag to move the window (when not maximized/fullscreen)
+
+### Asset Management
+
+Image files live in `Assets/` folders next to canvases. Each folder level can have its own `Assets/` directory.
+
+**Asset operations** (right-click in file explorer):
+- **Rename** — automatically updates all references to the asset across every `.design` file in the workspace
+- **Delete** — checks for references first; warns if the image is used by any canvas, then moves it to `.brilliant/trash/` (recoverable via undo)
+- **Reveal in Finder**
+- **Copy Filename**
+
+**Other asset behavior:**
+- `Assets/` folders are shown in the explorer even when empty (as long as the directory exists on disk)
+- **Clean Up Unused Assets** command (Command Palette) removes images not referenced by any canvas; the cleanup is undoable
+- File watcher detects external changes (drop a new image into `Assets/` from Finder and it appears in the explorer)
+
+### Previews
+
+Clicking a non-canvas file in the file explorer (or navigating to it with Alt+Arrow) enters a **preview mode** that replaces the canvas view:
+
+| File type | Preview |
+|-----------|---------|
+| Image (PNG, JPG, JPEG, GIF, BMP, WebP, SVG; on macOS also TIFF, HEIC, HEIF, AVIF) | Full-size image preview, centered |
+| Text/code (JS, TS, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Go, Swift, SQL, Shell, XML, TOML/INI, plain text, `.styles`) | Built-in code editor (CodeMirror 6) with syntax highlighting and optional vim mode |
+| Unknown file types | Sniffed: text content shows in the code editor, binary shows an unsupported placeholder |
+
+The file explorer highlights the active preview row the same way it highlights active canvases. To return to a canvas, click it in the explorer or use Alt+Arrow to navigate. Text files larger than 5 MB are loaded as read-only.
 
 ## Import & Export
 
@@ -288,20 +359,21 @@ This opens Finder and selects the `.design` file or folder, useful for:
 
 ### Auto-Save
 
-Brilliant auto-saves continuously:
-- **Repository mode** (folder workspace): `.design` files are saved directly to the repository folder
-- **Scratch workspace**: Work is auto-saved to `~/.config/brilliant/scratch/`
+Brilliant auto-saves continuously. There is no Cmd+S; you do not need to save manually for normal use.
 
-**Save behavior:**
-- Changes are saved automatically as you work
-- No manual saving needed for normal use
-- Captures all element state, zoom, pan, and canvas metadata
-- Save status indicator appears in the top toolbar next to the canvas name
+- **Repository mode** (folder workspace): `.design` files are saved directly into the repository folder, mirroring the explorer hierarchy on disk
+- **Scratch mode**: work is auto-saved to `~/.config/brilliant/scratch/`
 
-**Manual save options:**
-- **Cmd+Shift+S** - Save current canvas or focused item (canvas or folder) as a `.design` file + Assets folder
+**Behavior:**
+- Each change starts a 500 ms debounce timer; if no further edits arrive in that window, the active canvas is written to disk in a background isolate (so saves never block interaction)
+- The save captures element state, hierarchy, fills/strokes/effects, components, design system bindings, ruler guides, zoom, pan, and per-canvas background settings
+- The dirty indicator is the **canvas name's opacity** in the top toolbar breadcrumb: dimmed while there are unsaved changes (or a save is in flight), full opacity once the canvas is up to date on disk
+- On app quit (and on workspace switch) all dirty canvases are flushed before the app exits/reopens
+- If a `.design` file fails to load (corrupt YAML, schema mismatch), Brilliant blocks saves on that canvas to avoid overwriting good data with empty/partial state
 
-This "Save As..." option creates a copy you can share or archive, separate from the auto-saved working copies. The exported `.design` file is native YAML with image paths rewritten to relative `Assets/` references, and referenced images are copied to a sibling `Assets/` folder.
+**Save As (Cmd+Shift+S):**
+
+Cmd+Shift+S exports the focused canvas or folder as a portable `.design` package — the YAML file plus a sibling `Assets/` folder containing all referenced images. Image paths in the YAML are rewritten to relative `Assets/filename` references. This is for sharing or archiving; it doesn't replace auto-save, which is always running in the background.
 
 ---
 
@@ -360,11 +432,34 @@ When you import an image (Cmd+Shift+O), it's saved to the appropriate Assets dir
 
 The `.brilliant/` directory at the workspace root contains:
 - **settings.json** — Per-workspace configuration
-- **trash/** — Recovery directory for deleted canvases and folders (supports undo)
+- **trash/** — Recovery directory for deleted canvases, folders, and assets (supports undo)
+
+### Deletion and Recovery
+
+Deletes are **never destructive**: Brilliant moves the file to `.brilliant/trash/` instead of erasing it, and registers an undo entry that puts it back.
+
+| What you delete | Where it goes |
+|-----------------|---------------|
+| Canvas | `.brilliant/trash/<path-with-underscores>.design` |
+| Folder (with all contents) | `.brilliant/trash/<path-with-underscores>/` |
+| Asset (image) | `.brilliant/trash/` with a unique filename |
+| Last canvas in the workspace | A new empty "Canvas" is created automatically; the original goes to trash and undo restores both |
+
+**Undo from the file explorer:** Focus the file explorer (Cmd+Shift+E) and press **Cmd+Z** to undo the last canvas/folder/asset operation (delete, rename, create, move, batch-move). The explorer has its **own** undo stack, separate from each canvas's per-canvas undo history.
+
+**Permanent cleanup:** Trash is not auto-cleared. To free space, delete `.brilliant/trash/` from Finder when you're confident you no longer need to recover anything.
 
 ### Recent Workspaces
 
 Brilliant tracks recently opened workspaces (up to 20). On startup, it reopens the most recently used named workspace (scratch is excluded from this list).
+
+### Recent Canvases & Files
+
+Within a workspace, Brilliant keeps two recency lists:
+- **Recent canvases** — surfaces in `Cmd+P` canvas search (recent canvases score higher)
+- **Recent files** — a unified list across canvases, images, and text files; surfaces in `Cmd+K` global search and drives the **Alt+→ / Alt+←** navigation order. **Ctrl+Alt+←** jumps back to the previously active canvas (canvases only).
+
+Both lists persist across app restarts (stored in `SharedPreferences`).
 
 ### Code Editor
 

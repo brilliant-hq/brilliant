@@ -20,19 +20,19 @@ If you're new to Brilliant, learn these first:
 | **Must know** | Cmd+Shift+P | Command palette (find any command) |
 | **Must know** | / | AI input (natural language commands) |
 | **Must know** | Shift+? | Shortcuts reference (this panel) |
-| **Core drawing** | R, O, T, F, L | Rectangle, Circle, Text, Frame, Line |
+| **Core drawing** | R, O, T, F, L, P | Rectangle, Circle, Text, Frame, Line, Pen |
 | **Core editing** | Cmd+D, Cmd+G, Cmd+Shift+G, Cmd+F, Backspace | Duplicate, Group, Ungroup, Frame Selection, Delete |
 | **Navigation** | Enter / Escape | Enter frame / Exit to parent |
 | **Navigation** | Tab / Shift+Tab | Previous / Next sibling |
 | **Layout** | Shift+A | Add auto layout |
 | **Zoom** | Cmd+Ctrl+C | Center on selection |
 
-Once comfortable, add alignment (Alt+Shift+L/R/T/B), z-order (]/[), and quick colors (Ctrl+R/G/B/K/W).
+Once comfortable, add alignment (Alt+Shift+L/R/T/B), z-order (]/[), boolean ops (Alt+Shift+U/S/I/E), Flatten (Cmd+Enter), and quick colors (Ctrl+R/G/B/K/W).
 
 ## Limitations
 
 - **No chord (multi-key) shortcuts** — Each shortcut is a single key combination (one key + optional modifiers). You cannot bind sequences like `Ctrl+K, Ctrl+C`. Use **Combos** (Cmd+Shift+M) to chain multiple actions behind a single shortcut.
-- **Modifier-only behaviors are not remappable** — Hold-modifiers like Space (temporary hand tool), Alt+hover (measurements), Alt+drag (duplicate while moving), Shift+drag (constrain proportions), and Ctrl+drag (scale mode during resize) are built-in and cannot be reassigned in the Shortcuts panel. Note: the **K** key toggles persistent scale mode as an alternative to holding Ctrl during resize.
+- **Modifier-only behaviors are not remappable** — Hold-modifiers like Space (temporary hand tool), Alt+hover (measurements), Alt+drag (duplicate while moving), Shift+drag (constrain proportions or angle), and Ctrl+drag (scale mode during resize) are built-in and cannot be reassigned in the Shortcuts panel. Note: the **K** key toggles persistent scale mode as an alternative to holding Ctrl during resize.
 
 ## Coming From Figma?
 
@@ -45,6 +45,8 @@ Most Figma shortcuts work unchanged. Key differences:
 | Export PNG | Cmd+Shift+E | **Cmd+E** | Simpler shortcut |
 | Auto layout | Shift+A | **Shift+A** | Same |
 | Group | Cmd+G | **Cmd+G** | Same |
+| Outline text | Cmd+Shift+O | **Cmd+Ctrl+O** | Different default |
+| Mask | Cmd+Alt+M | **Cmd+Ctrl+M** | Cmd+Alt+M is reserved by macOS ("Minimize All") |
 | Overlay mode | N/A | **Ctrl+F** | Unique to Brilliant |
 | AI input | N/A | **/** | Natural language commands |
 | Combos | N/A | **Cmd+Shift+M** | Macro system |
@@ -90,18 +92,43 @@ All shortcuts are fully remappable — you can match any tool's layout via **Shi
 | Modifier | Effect |
 |----------|--------|
 | Shift | Constrain proportions (square, circle, 45°) |
+| Space | Reposition the in-progress shape without changing its size |
+
+### Pen Tool Modifiers (While Placing Nodes)
+
+| Modifier | Effect |
+|----------|--------|
+| Click | Place a sharp corner node (no handles) |
+| Click and drag | Place a smooth node with mirrored handles |
+| Alt/Option + drag | Place an asymmetric node (only one handle moves) |
+| Shift + drag | Snap handles to 15-degree increments |
 
 ## Selection & Navigation
 
 | Action | Shortcut |
 |--------|----------|
-| Select all | Cmd+A |
+| Select all | Cmd+A (in vector edit mode: selects all nodes and handles) |
 | Select previous sibling | Tab |
 | Select next sibling | Shift+Tab |
-| Enter frame / edit element | Enter |
-| Exit to parent / cancel | Escape |
+| Enter frame / edit element / enter vector edit mode | Enter |
+| Exit / cancel (context-aware: clears selection, exits vector mode, exits crop, etc.) | Escape |
 | Select parent frame | Shift+Enter |
 | Rename selected layer | Cmd+R |
+
+### Escape Behavior (Context-Aware)
+
+A single Escape press picks one of these targets, in priority order:
+
+1. Close the command palette
+2. Exit color pick / eyedropper mode
+3. Cancel frame label editing
+4. Exit image crop mode
+5. Clear the current vector handle/node selection (first press in vector mode)
+6. Exit vector edit mode (second press) or pen tool
+7. Exit boolean group edit mode
+8. Exit mask edit mode
+9. Blur the AI input
+10. Clear the canvas selection
 
 ## Movement
 
@@ -121,6 +148,7 @@ All shortcuts are fully remappable — you can match any tool's layout via **Shi
 | Modifier | Effect |
 |----------|--------|
 | Alt/Option | Duplicate while moving |
+| Shift | Constrain movement to one axis |
 
 ### Resize Modifiers (While Dragging Handle)
 
@@ -154,6 +182,8 @@ All shortcuts are fully remappable — you can match any tool's layout via **Shi
 | Paste | Cmd+V |
 | Duplicate | Cmd+D |
 | Delete | Backspace |
+
+In vector edit mode, Cmd+C / Cmd+V copy and paste the selected nodes (and their connecting edges) inside the same vector path.
 
 ## Undo / Redo
 
@@ -197,7 +227,52 @@ Undo history is per-canvas — each canvas has its own undo stack. When the file
 | Frame selection | Cmd+F |
 | Ungroup | Cmd+Shift+G |
 | Add auto layout | Shift+A |
-| Flatten | Cmd+Enter |
+| Flatten (selection to single vector) | Cmd+Enter |
+
+## Boolean Operations & Masks
+
+| Action | Shortcut |
+|--------|----------|
+| Boolean Union | Alt+Shift+U |
+| Boolean Subtract | Alt+Shift+S |
+| Boolean Intersect | Alt+Shift+I |
+| Boolean Exclude | Alt+Shift+E |
+| Mask | Cmd+Ctrl+M |
+| Outline Text (text to vector path) | Cmd+Ctrl+O |
+
+Boolean ops require 2+ elements selected. If a single boolean or mask group is already selected, the same shortcut switches its operation type instead of creating a new group. Use Cmd+Enter (Flatten) to bake a boolean group into a single vector.
+
+## Components
+
+| Action | Shortcut |
+|--------|----------|
+| Create Component | Cmd+Alt+K |
+| Detach Instance | Cmd+Alt+B |
+| Go to Master Component | (no default — set in Shift+?) |
+| Reset Instance Overrides | (no default — set in Shift+?) |
+| Push Overrides to Master | (no default — set in Shift+?) |
+
+## Vector Edit Mode
+
+These shortcuts apply only while a vector path is open for editing.
+
+| Action | Shortcut |
+|--------|----------|
+| Enter vector edit mode | Enter (with vector selected) or double-click |
+| Exit vector edit mode | Escape (twice if a node/handle is selected) |
+| Select all nodes and handles | Cmd+A |
+| Delete selected nodes / handles | Backspace |
+| Toggle node handles (smooth ↔ corner) | Cmd+Click on node |
+| Remove a single handle | Cmd+Click on handle |
+| Delete an edge | Shift+Click on edge |
+| Add a node on an edge | Click on edge |
+| Constrain node move to one axis | Shift+drag node |
+| Duplicate selected nodes | Alt/Option+drag |
+| Detach a handle (set node to Disconnected) | Alt/Option+drag handle |
+| Snap rotation of multi-node selection | Shift+drag rotation handle |
+| Set Point Type to Straight / Mirrored / Asymmetric / Disconnected | (no defaults — set in Shift+?, or click the Point Type row in the right toolbar) |
+
+See [vectors.md](./vectors.md) for full pen / pencil / vector editing reference.
 
 ## Text Styling
 
@@ -300,7 +375,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Disable zoom out | Cmd+Ctrl+D |
 | Cmd+scroll zoom | Cmd + scroll/trackpad |
 
-## Grids
+## Grids & Snapping
 
 | Action | Shortcut |
 |--------|----------|
@@ -308,6 +383,9 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Toggle pixel grid | Cmd+' |
 | Toggle snap to pixel grid | Shift+Cmd+' |
 | Toggle rulers | Shift+U |
+| Toggle snap guides (alignment, spacing, equidistant) | (no default — search "Toggle Snap Guides" in command palette) |
+| Toggle vector snapping | (no default — search "Toggle Vector Snapping" in command palette) |
+| Toggle vector snap to geometry / self / others / grids / path curves | (no default — search "Toggle Vector Snap…" in command palette) |
 
 ## Window & Background
 
@@ -369,7 +447,6 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Focus AI chat | / |
 | Check for updates | Cmd+Shift+U |
 
-
 ## Chat Sessions
 
 | Action | Shortcut |
@@ -378,29 +455,11 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Focus chat session 10 | Cmd+0 |
 | Focus next chat | Cmd+Shift+] |
 | Focus previous chat | Cmd+Shift+[ |
-| Close AI chat | Cmd+W |
+| Close AI chat | Cmd+W (when chat is focused) |
 | Toggle chat explorer | Cmd+Shift+A (when AI chat is open) |
 | New chat | Cmd+N (when AI chat is open) |
 
-These shortcuts focus (and expand if minimized) the AI chat session assigned to that number.
-
-## Boolean Operations & Masks
-
-| Action | Shortcut |
-|--------|----------|
-| Boolean Union | Alt+Shift+U |
-| Boolean Subtract | Alt+Shift+S |
-| Boolean Intersect | Alt+Shift+I |
-| Boolean Exclude | Alt+Shift+E |
-| Mask | Ctrl+Cmd+M |
-| Outline Text (Text to Path) | Cmd+Ctrl+O |
-
-## Components
-
-| Action | Shortcut |
-|--------|----------|
-| Create Component | Cmd+Alt+K |
-| Detach Instance | Cmd+Alt+B |
+These shortcuts focus (and expand if minimized) the AI chat session assigned to that number. Cmd+N and Cmd+Shift+A are conditional: they only act on the chat when the AI chat surface is open or focused; otherwise Cmd+N creates a new canvas.
 
 ## Combo Presets
 

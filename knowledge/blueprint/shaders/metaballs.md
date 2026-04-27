@@ -33,7 +33,7 @@ Size and count are coupled — pick a density, then adjust speed:
 **Shader window — content over metaballs with dim overlay:**
 ```
 fr s(480,280) clip rd($radius.lg) f[(metaballs(#FFFEFE,#00FFA7,#C40CFF,#0031FF,#FF9D00,speed(0.40),count(11),size(0.40),scale(1.50))),(f2,solid(#0B0B09,o(0.50)))] "Section" #mb_section
-  al(v,a(c,c),g($spacing.3),pad($spacing.8)) s(fill,fill) "Content" #mb_content
+  al(v,y(c),x(c),g($spacing.3),pad($spacing.8)) s(fill,fill) "Content" #mb_content
     t("Organic Motion",Inter,28,sb,align(c)) f[(#FAFAFA)] "Title" #mb_title
     t("Fluid blobs merge and separate",Inter,14,align(c)) s(fill,hug) f[(solid(#FAFAFA,o(0.70)))] "Sub" #mb_sub
 ```

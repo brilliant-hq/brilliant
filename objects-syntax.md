@@ -15,7 +15,7 @@ $font=Inter
 al(v,g($spacing.4),pad($spacing.6)) p(100,100) s(hug,hug) f[(#FFFFFF)] st[($neutral.20,w(1))] rd($radius.md) "Card" #card
   t("Dashboard",$font,24,b) f[($brand.90)] "Title" #title
   t("Welcome back",$font,14) s(fill,hug) f[($neutral.50)] "Subtitle" #subtitle
-  al(h,a(c,c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,hug) f[($brand.50)] rd($radius.sm) "Button" #btn
+  al(h,x(c),y(c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,hug) f[($brand.50)] rd($radius.sm) "Button" #btn
     t("Get Started",$font,14,sb) f[(#FFF)] "Label" #label
 </objects>
 

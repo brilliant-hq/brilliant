@@ -26,7 +26,7 @@ Chrome or brushed aluminum with chromatic aberration. The material has weight â€
 **Glass card over metal background (inner shadow glass variant):**
 ```
 fr s(480,280) f[(#000),(f2,metal(#B0B3B8,#FFFFFF,softness(0.05),repetition(2.50),shiftRed(0.15),shiftBlue(0.20),contour(0.50),angle(60),speed(0.80)))] rd($radius.lg) clip "Hero" #metal_hero
-  al(v,a(c,c),g($spacing.3),pad($spacing.8)) s(320,hug) f[(solid(#FFF,o(0.08))),(f2,blur(12)),(f3,inner(#000,o(0.08),y(1),blur(3)))] st[(linear(135,solid(#FFF,o(0.20)),solid(#FFF,o(0.05))),w(1))] rd($radius.md) shadow(#000,o(0.12),y(8),blur(24)) abs p(80,71) "Glass" #metal_glass
+  al(v,y(c),x(c),g($spacing.3),pad($spacing.8)) s(320,hug) f[(solid(#FFF,o(0.08))),(f2,blur(12)),(f3,inner(#000,o(0.08),y(1),blur(3)))] st[(linear(135,solid(#FFF,o(0.20)),solid(#FFF,o(0.05))),w(1))] rd($radius.md) shadow(#000,o(0.12),y(8),blur(24)) abs p(80,71) "Glass" #metal_glass
     t("Liquid Metal",Inter,28,sb,align(c)) f[(#FAFAFA)] "Title" #metal_title
     t("Chrome surface catches light",Inter,14,align(c)) s(fill,hug) f[(solid(#FAFAFA,o(0.65)))] "Sub" #metal_sub
 ```

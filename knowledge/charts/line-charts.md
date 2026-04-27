@@ -9,7 +9,7 @@ Assumes: `blueprint/vectors`, `blueprint/components`
 
 Frame Overlay — gridlines, axis labels, and data curves overlap in `fr s(hug,hug) clip`.
 
-**Body:** Clipped frame. Gridlines = 1px rects at `p(offset,Y)`. Y labels at `p(0,Y)`. Data curves = `v()` with `mi` nodes at `p(offset,0)` sharing plot bbox. X-axis labels = `al(h,a(sb,c))` with left padding matching plot offset.
+**Body:** Clipped frame. Gridlines = 1px rects at `p(offset,Y)`. Y labels at `p(0,Y)`. Data curves = `v()` with `mi` nodes at `p(offset,0)` sharing plot bbox. X-axis labels = `al(h,x(sb),y(c))` with left padding matching plot offset.
 
 ```
 $brand=#F97316

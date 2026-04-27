@@ -39,12 +39,12 @@ They share the fills list with solid, gradient, image, and shader fills. You can
 
 ### Effects (Drop Shadow, Outer Glow, Element Blur)
 
-Click the **+** button in the Effects section of the right toolbar. This adds a drop shadow with default settings. To add a different type, change the type dropdown after adding.
+Click the **+** button on the Effects section header in the right toolbar. The first add inserts a drop shadow with default settings. To switch types, use the type dropdown on the effect row (Drop Shadow, Outer Glow, Element Blur).
 
 ### Inner Shadow, Inner Glow, Background Blur
 
-These are fill types — add them as fills:
-1. Click "+" in the Fills section
+These are fill types — add them as fills (they also work as strokes):
+1. Click "+" in the Fills section (or Strokes section)
 2. Use the type dropdown to switch to an inner effect type (under the "Static" category)
 
 ### Via Commands
@@ -156,18 +156,23 @@ All params are named and optional with defaults matching the effect defaults abo
 
 Effect opacity can be bound to a design system token. When bound, the opacity resolves from the token value rather than the stored numeric value, and the token name appears in the opacity field. Manually editing the opacity clears the token binding.
 
+### Composite Shadow Tokens
+
+The design system supports composite shadow tokens that bundle multiple drop shadow layers (color, offset, blur, spread, opacity per layer) into a single named token. Applying a shadow token replaces all existing drop shadows on the element while leaving outer glow and element blur effects alone. Manually editing any drop shadow on a token-bound element clears the binding.
+
 ## Managing Effects
 
 ### Effects (Effects Section)
 
 | Action | How |
 |--------|-----|
-| Add effect | Click "+" in Effects section (adds a drop shadow by default), then change type with the dropdown. Or use command palette: "Add Drop Shadow", "Add Outer Glow", "Add Element Blur" |
-| Remove effect | Click the "-" button on the effect row |
-| Toggle visibility | Expand the effect (see below), then click the eye icon in the expanded view |
+| Add effect | Click "+" on the section header (adds a drop shadow by default), then change type with the dropdown. Or use command palette: "Add Drop Shadow", "Add Outer Glow", "Add Element Blur" |
+| Remove effect | Click the delete button on the effect row |
+| Toggle visibility | Expand the effect, then click the eye icon in the expanded view |
 | Expand properties | Click the sliders icon on the effect row to expand/collapse the property fields |
 | Change type | Use the type dropdown on the collapsed row (Drop Shadow, Outer Glow, Element Blur) |
-| Reorder | Drag handle on the left (only visible when multiple effects exist) |
+| Set blend mode | Use the blend mode dropdown in the expanded view (any of the standard design blend modes) |
+| Reorder | Drag the handle on the row to change render order (later effects render on top) |
 
 ### Inner Shadow / Inner Glow / Background Blur (Fills Section)
 

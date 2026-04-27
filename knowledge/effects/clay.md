@@ -37,6 +37,6 @@ Same technique at smaller scale for buttons/icon boxes — reduce inner shadow o
 $clay_dark_sm=inner(#000,o(0.06),x(1),y(1),blur(3))
 $clay_light_sm=inner(#FFF,o(0.5),x(-1),y(-1),blur(2))
 $clay_shadow_sm=shadow(#000,o(0.04),y(1),blur(3))
-al(h,a(c,c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,hug) f[(#BBF7D0),(f2,$clay_dark_sm),(f3,$clay_light_sm)] rd($radius.md) $clay_shadow_sm #clay_btn
+al(h,x(c),y(c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,hug) f[(#BBF7D0),(f2,$clay_dark_sm),(f3,$clay_light_sm)] rd($radius.md) $clay_shadow_sm #clay_btn
   t("Clay Button",Inter,14,sb) f[(#166534)] "Label" #clay_btn_label
 ```

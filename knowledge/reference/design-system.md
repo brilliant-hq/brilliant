@@ -27,6 +27,23 @@ Design tokens are named values that represent design decisions. Instead of hardc
 
 Token-bound color swatches show a subtle blue-purple border to indicate they're linked to a token.
 
+## Binding Other Properties to Tokens
+
+Several inspector fields in the right toolbar accept token bindings via dropdowns or inline menus:
+
+| Property | Where | Tokens accepted |
+|----------|-------|-----------------|
+| Fill / stroke color | Color picker (any swatch) | Color tokens |
+| Fill / stroke opacity | Color picker, opacity field | Opacity tokens |
+| Corner radius (per corner) | Frame / rectangle section | Radius tokens |
+| Element opacity | Top of inspector | Opacity tokens |
+| Font size, weight, line height | Typography section | Corresponding `font.*` tokens |
+| Auto layout gap and padding (uniform or per-side) | Auto layout section | Spacing tokens |
+
+When a property is bound to a token, the field shows the token name. Manually editing the value clears the binding for that property. Composite tokens (typography and shadow) are applied via the **Apply Typography Token** and **Apply Shadow Token** commands and clear individual bindings on the same property group.
+
+**Note:** Stroke width currently has no inspector UI for token binding. Stroke width tokens still exist in the design system, but bindings have to be created via blueprint (e.g., `st[(#000,w($stroke.width.md))]`) or programmatically.
+
 ## Using Tokens in Blueprints
 
 Reference tokens with the `$` prefix in blueprint syntax. Tokens work in fills, strokes, gap, padding, and corner radius:
@@ -41,7 +58,7 @@ al(v,g($spacing.4),pad($spacing.6)) s(fill,hug) "Section"
   t("Features",Inter,24,b) f[($brand.80)]
 
 # Radius tokens
-al(h,a(c,c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,48) f[($brand.50)] rd($radius.md) "Button"
+al(h,x(c),y(c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,48) f[($brand.50)] rd($radius.md) "Button"
   t("Get Started",Inter,14,sb) f[(#FFFFFF)]
 ```
 
@@ -62,7 +79,7 @@ Token references resolve at creation time using the active design system. If a t
 | **Typography** | `typography.{name}` | `typography.h1`, `typography.body.md` | Composite: font size + weight + line height + family |
 | **Stroke Width** | `stroke.width.{step}` | `stroke.width.sm`, `stroke.width.lg` | Stroke thickness presets |
 | **Shadow** | `shadow.{step}` | `shadow.sm`, `shadow.md`, `shadow.lg` | Composite: one or more shadow layers |
-| **Boolean** | (custom) | (custom keys) | True/false values for custom tokens |
+| **Boolean** | (custom) | `feature.flag: true` | True/false values, useful for AI agents and feature switches in custom workflows |
 
 ## Color Token Scale
 
@@ -124,6 +141,8 @@ Spacing tokens use a configurable base (default 4px) with multipliers:
 | `stroke.width.md` | 2px | Default stroke |
 | `stroke.width.lg` | 4px | Thick stroke |
 | `stroke.width.xl` | 8px | Heavy stroke |
+
+**Known limitation:** Stroke widths bound to a token do not currently update when you switch design modes. The stroke width keeps the value it had when the binding was created. Color, spacing, radius, font size, line height, and opacity tokens DO re-resolve on mode switch.
 
 ## Font Size Token Scale
 
@@ -399,7 +418,7 @@ You can also modify the design system programmatically using commands (via comma
 
 Numeric seeds support relative operations: "add 2 to spacing" increases the base by 2, "multiply font size by 1.5" scales it up.
 
-**Note:** Stroke width base and opacity base do not have dedicated commands. To change these seeds, edit the `.styles` file directly (e.g., `stroke.width: 2` or `opacity: 0.5`).
+**Note:** Stroke width base and opacity base do not have dedicated set commands. To change these seeds, edit the `.styles` file directly (e.g., `stroke.width: 2` or `opacity: 0.5`), or use the AI to call **Set Token Value** with the seed key.
 
 ### Other Seed Commands
 
@@ -476,3 +495,15 @@ These typography composites are available by default (no `.styles` file needed):
 | `color.surface.container` | `neutral.10` | Card/container backgrounds |
 | `color.outline` | `neutral.50` | Primary borders |
 | `color.outline.variant` | `neutral.30` | Subtle borders |
+
+These aliases are themed: in dark mode they automatically resolve to the inverted scale (so `color.surface` becomes a near-black background and `color.on-surface` becomes near-white text).
+
+## What's Not Supported
+
+The following features are NOT currently in Brilliant's design system:
+
+- **Token export to CSS variables, Tailwind config, or design tokens JSON.** Tokens stay inside the `.styles` / `.styles.gen` pair; there is no built-in exporter
+- **Token search UI / favorites / recents.** The color picker shows all tokens grouped by category; other token dropdowns are flat lists
+- **Mode-aware preview thumbnails.** Mode preview happens by hovering the **Switch Design Mode** dropdown (the canvas updates live), not by per-token side-by-side swatches
+- **Numeric tokens with units.** Numbers are stored as plain doubles in points; there is no unit system (px, rem, em, %)
+- **Keyboard shortcut to switch modes.** Use the **Switch Design Mode** command in the command palette

@@ -29,11 +29,13 @@ description: "Colors, fills, strokes, opacity, and corner radius in Brilliant."
 Open by clicking any color swatch in the right toolbar, or press **Ctrl+C**.
 
 Components (top to bottom):
-1. **Color rectangle** — X = saturation, Y = brightness. Drag the crosshair.
+1. **Color rectangle** (280x280) — X = saturation, Y = brightness. Drag the crosshair.
 2. **Eyedropper button + Hue slider** — Eyedropper toggle on the left, horizontal 360-degree hue strip on the right.
 3. **Opacity slider** — Alpha channel (0%–100%) for the focused fill or stroke.
-4. **Gradient bar** — Only shown in gradient mode. Click to add stops, drag to reposition.
-5. **Format inputs** — Format dropdown (Hex/RGB/HSB/CSS) + value fields + copy button.
+4. **Gradient bar** — Only shown in gradient mode. Click empty space to add a stop, click an existing stop to focus it, drag to reposition, Delete/Backspace to remove the focused stop (minimum 2 stops).
+5. **Format inputs** — Format dropdown (Hex/RGB/HSB/CSS) + value fields + opacity field + copy button.
+
+When a fill is an image, the top section is replaced by an Image Manager (preview + replace UI). When a fill is a shader, you click the individual shader-color swatches in the right toolbar's expanded fill row to focus a specific color, then edit it in the picker. The bottom sections (Design Tokens, Canvas, Recent) remain visible in all modes.
 
 ### Color Formats
 
@@ -41,10 +43,12 @@ The color picker includes a format dropdown with these options:
 
 | Format | Example | Description |
 |--------|---------|-------------|
-| Hex | `#FF5733` | 6-digit hex code |
-| RGB | `255, 87, 51` | Red, green, blue values (0-255) |
-| HSB | `14, 80, 100` | Hue (0-360), saturation (0-100), brightness (0-100) |
-| CSS | `rgba(255, 87, 51, 1.0)` | CSS rgba notation |
+| Hex | `FF5733` | 6-digit uppercase hex (no `#` prefix in the input field). Token-aware: shows the bound color token name and a swatch when applicable. |
+| RGB | `R 255  G 87  B 51` | Red, green, blue (0–255). Each field is draggable. |
+| HSB | `H 14  S 80  B 100` | Hue (0–360°), saturation (0–100%), brightness (0–100%). Draggable. |
+| CSS | `rgba(255, 255, 255, 1)` | CSS rgba or hex notation. Submit-only (Enter to apply). |
+
+OKLCH and HSL formats are not exposed in the picker. Color tokens (e.g. `brand.50`) are stored in OKLCH internally and resolved at render time, but the picker UI displays the resolved sRGB value in the selected format.
 
 **Named colors** (e.g., `coral`, `navy`) are supported when entering colors via AI commands or the command palette, not as a color picker format.
 
@@ -54,15 +58,26 @@ red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gra
 
 ### Eyedropper (Ctrl+Shift+C)
 
-Sample a color from anywhere on screen. A magnified 21x21 pixel grid appears around your cursor. Click to apply the sampled color.
+Sample a color from anywhere on screen. A magnified 21x21 pixel grid appears around your cursor. Click to apply the sampled color, Escape to cancel. Sampling captures the entire screen via the system screen capture pipeline, so it works across other applications.
 
 ### Color Picker Sections
 
 The color picker includes additional sections below the main controls:
 
-- **Design Tokens** — Color tokens from the active design system (`.styles` file). Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color.
-- **Canvas Colors** — Colors currently used on the active canvas, collected automatically.
-- **Recent Colors** — Recently used colors across sessions.
+- **Design Tokens** — Color tokens from the active design system (`.styles` file). Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color. Tokens stay bound through theme/mode switches.
+- **Canvas Colors** — Unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
+- **Recent Colors** — Up to 24 recently used colors across sessions. Hover a swatch to see its value in the active format.
+
+In contexts that only support solid colors (canvas background, layout grid color, effect color, callback hex editing, text-range color), gradients and shader fills are filtered out of all three sections.
+
+### Token Bindings
+
+A `PaintStyle` has two independent token bindings:
+
+- **Color token** (e.g. `brand.50`) — chosen via the design tokens section or the hex field's token dropdown. Resolves to the actual color at render time.
+- **Opacity token** (e.g. `opacity.50`) — chosen via the opacity field's token dropdown when the design system has opacity tokens.
+
+You can bind both at once. Manually dragging the opacity slider clears the opacity token binding; manually editing hex/RGB/HSB clears the color token binding.
 
 ## Fills
 
@@ -83,15 +98,17 @@ Click the fill color swatch in the right toolbar to open the color picker. Use C
 2. Or change the fill type to Linear/Radial/Angular via the type dropdown on the fill row in the right toolbar
 3. Click color stops to edit, add stops by clicking the gradient bar in the color picker, drag to reposition
 
-**Linear**, **radial**, and **angular** gradients are supported (diamond gradients are not available). Select the gradient type from the fill type dropdown in the right toolbar.
+**Linear**, **radial** (elliptical), and **angular** (sweep/conic) gradients are supported. Diamond, conic-with-multi-axis, and mesh gradients are not available. Select the gradient type from the fill type dropdown in the right toolbar.
+
+Gradient handles are only visible on the canvas while the color picker is open for that element's fill or stroke. They disappear when the picker closes.
 
 **Linear gradients** are defined by start/end points — edit on canvas by dragging the gradient handles (start handle, end handle), or click the gradient line to add a color stop.
 
 **Radial gradients** are defined by center, radius, and width handles — drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to make the gradient elliptical.
 
-**Angular gradients** (sweep/conic) rotate color stops around a center point — drag the center to reposition, drag the angle handle to rotate the gradient start direction.
+**Angular gradients** (sweep/conic) rotate color stops around a center point — drag the center to reposition, drag the angle handle to rotate the gradient start direction. The angular sweep covers a full 360° with wrap-around interpolation across the seam.
 
-Add/remove/reposition color stops directly on the gradient bar.
+Add/remove/reposition color stops directly on the gradient bar in the color picker, or by clicking the canvas gradient line. Hovering a stop shows the position percentage and color hex; dragging shows just the percentage.
 
 ### Image Fills
 
@@ -138,15 +155,21 @@ Each filter has adjustable parameters, optional color inputs, and built-in prese
 
 ### Color Adjust Fills
 
-Non-destructive photo-style adjustments (exposure, contrast, saturation, whites, blacks, clarity, sharpness, vignette, and more). Processes all fills below it in the z-order. Includes built-in presets (Vivid, Cinematic, Vintage, B&W, etc.). Available in the **Filters** category alongside image filters. See `EFFECTS.md` for details.
+Non-destructive photo-style adjustments (exposure, contrast, saturation, whites, blacks, clarity, sharpness, vignette, hue, temperature, tint, and more). Processes all fills below it in the z-order. Includes built-in presets (Vivid, Cinematic, Vintage, B&W, etc.). Available in the **Filters** category alongside image filters. Hue-rotate and saturate adjustments live here, not as element-level CSS-style filters. See `EFFECTS.md` for details.
 
 ### Multiple Fills
 
 Stack multiple fills on a single element. Rendered bottom-to-top in list order. Reorder fills by dragging them in the right toolbar.
 
+### Vector Region Fills
+
+Vector elements with multiple enclosed regions (e.g. a path that crosses itself, or an outlined-and-flattened text glyph with counters) can be colored per region. Click a region while in vector edit mode to focus its fill, then change color in the picker. Each region keeps its own fill independently of the element's main fills list.
+
 ### Text Fills
 
 Text uses fills for text color. Text supports all fill types — solid, gradient, image, shader, image filters, and color adjust — rendered through the text glyphs. Text also supports strokes (including shader and filter strokes), rendered around the text glyphs with inside/center/outside positioning.
+
+Per-character color is supported via styled ranges: enter edit mode, select a character range, and apply a color. The range's color overrides the element-level fill color for those characters. See [text.md](./text.md) for the full set of per-range overrides.
 
 ## Strokes
 
@@ -323,5 +346,9 @@ Each effect row has: type dropdown (with color swatch prefix for non-blur effect
 **Background Blur:** Radius (0-200).
 
 Elements can have multiple effects stacked. Reorder by dragging. Render order: outer effects (drop shadows and outer glows in list order) → fills (solid, gradient, image, shaders, inner shadow, inner glow — all in z-order) → strokes.
+
+### Shadow Tokens
+
+Drop shadows can be bound to a composite shadow token from the design system (e.g. `shadow.sm`, `shadow.md`, `shadow.lg`). Applying a shadow token replaces the element's drop shadows with the token's shadow stack (a token can define multiple stacked drop shadows) and stores the token reference on the element. Other effect types (outer glow, element blur, inner shadow, inner glow, background blur) are preserved unchanged. Shadow tokens are useful for keeping a coherent shadow scale across components.
 
 See `EFFECTS.md` for full details, default values, and tips.
