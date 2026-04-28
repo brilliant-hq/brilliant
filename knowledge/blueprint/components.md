@@ -136,3 +136,36 @@ inst(#card) "Custom"
 - **No nested `for(...)`** — flatten: write outer rows out, use `for(range(N))` per row.
 - **No expressions** — `$i+1` doesn't evaluate. Use `$n` for 1-based, or bake values into tuples.
 - **Multi-line `in([...])` works** (one tuple per line), but a single tuple `(...)` cannot span lines.
+
+## Same-call modify of `svg(...)` iteration refs — split into a follow-up call
+
+`svg(...)` children import asynchronously. Per-iteration svg refs
+(`#nav_icon_home`, `#nav_icon_revenue`, ...) bind to their imported
+element ID only after the import drains, which happens AFTER the body of
+this `create_modify_elements` call has been parsed. Result: a flat-modify
+on a per-iteration svg ref **inside the same call** as the `for(...)`
+sometimes resolves before the binding lands and surfaces as `ref "#X" not found`.
+
+The runtime now retries those modifies after the SVG drain, so most cases
+just work — but if you see a `ref "#X" not found` warning whose siblings
+(`#X_inboxIcon`, `#X_revenueIcon`, ...) ARE in `successfulRefs`, the cleanest
+fix is to put the modify in a **second** `create_modify_elements` call:
+
+```
+# Call 1 — create the iteration:
+for(vars[$key,$icon,$label], in([
+  (home,squares-four,Dashboard),
+  (revenue,chart-line,Revenue),
+]))
+  al(h,...) "Nav $label" #nav
+    svg(icon:$icon) s(18,18) f[(#64748B)] #nav_icon
+    t("$label",Inter,13,m) #nav_text
+
+# Call 2 — modify per-iteration svg refs (refs are bound by now):
+#nav_icon_home f[(#0F172A)]
+#nav_icon_revenue f[(#0F172A)]
+```
+
+Non-svg per-iteration refs (`#nav_text_home`, frame refs like `#nav_home`)
+are bound synchronously and can be flat-modified in the same call as the
+`for(...)`. The split only matters for `svg(...)` children.

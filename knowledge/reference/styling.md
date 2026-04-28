@@ -26,16 +26,17 @@ description: "Colors, fills, strokes, opacity, and corner radius in Brilliant."
 
 ### Color Picker
 
-Open by clicking any color swatch in the right toolbar, or press **Ctrl+C**.
+Open by clicking any color swatch in the right toolbar. There is no global keybinding to open the picker. The picker opens on the swatch you click, focused on that fill/stroke/effect/text-range.
 
 Components (top to bottom):
-1. **Color rectangle** (280x280) — X = saturation, Y = brightness. Drag the crosshair.
-2. **Eyedropper button + Hue slider** — Eyedropper toggle on the left, horizontal 360-degree hue strip on the right.
-3. **Opacity slider** — Alpha channel (0%–100%) for the focused fill or stroke.
-4. **Gradient bar** — Only shown in gradient mode. Click empty space to add a stop, click an existing stop to focus it, drag to reposition, Delete/Backspace to remove the focused stop (minimum 2 stops).
-5. **Format inputs** — Format dropdown (Hex/RGB/HSB/CSS) + value fields + opacity field + copy button.
+1. **Color rectangle** (280x280) for solid/gradient/shader modes. X = saturation, Y = brightness. Drag the crosshair. In image mode this slot is replaced by the Image Manager (preview + drop/select/paste).
+2. **Eyedropper button + Hue slider** (width 280). Eyedropper toggle on the left, horizontal 360-degree hue strip on the right.
+3. **Opacity slider** (width 280). Alpha 0%-100% for the focused color.
+4. **Gradient bar** (width 280). Only in gradient mode. Click empty space to add a stop, click an existing stop to focus it, drag to reposition, Delete/Backspace removes the focused stop (minimum 2 stops).
+5. **Format inputs** row. Format dropdown (Hex/RGB/HSB/CSS) + value fields + opacity field + copy button.
+6. **Design Tokens / Canvas Colors / Recent Colors** sections (always visible regardless of fill type).
 
-When a fill is an image, the top section is replaced by an Image Manager (preview + replace UI). When a fill is a shader, you click the individual shader-color swatches in the right toolbar's expanded fill row to focus a specific color, then edit it in the picker. The bottom sections (Design Tokens, Canvas, Recent) remain visible in all modes.
+In shader mode, the rectangle/hue/opacity controls edit one shader-color slot at a time. To pick which slot, click the individual color swatches in the right toolbar's expanded shader fill row before opening the picker.
 
 ### Color Formats
 
@@ -58,15 +59,15 @@ red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gra
 
 ### Eyedropper (Ctrl+Shift+C)
 
-Sample a color from anywhere on screen. A magnified 21x21 pixel grid appears around your cursor. Click to apply the sampled color, Escape to cancel. Sampling captures the entire screen via the system screen capture pipeline, so it works across other applications.
+Command id: `toggle_color_pick_mode`. Sample a color from anywhere on screen. A magnified 20x20 pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
 
 ### Color Picker Sections
 
 The color picker includes additional sections below the main controls:
 
-- **Design Tokens** — Color tokens from the active design system (`.styles` file). Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color. Tokens stay bound through theme/mode switches.
-- **Canvas Colors** — Unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
-- **Recent Colors** — Up to 24 recently used colors across sessions. Hover a swatch to see its value in the active format.
+- **Design Tokens**: Color tokens from the active design system (`.styles` file). Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color. Tokens stay bound through theme/mode switches.
+- **Canvas Colors**: Unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
+- **Recent Colors**: Up to 24 recently used colors across sessions. Hover a swatch to see its value in the active format.
 
 In contexts that only support solid colors (canvas background, layout grid color, effect color, callback hex editing, text-range color), gradients and shader fills are filtered out of all three sections.
 
@@ -74,8 +75,8 @@ In contexts that only support solid colors (canvas background, layout grid color
 
 A `PaintStyle` has two independent token bindings:
 
-- **Color token** (e.g. `brand.50`) — chosen via the design tokens section or the hex field's token dropdown. Resolves to the actual color at render time.
-- **Opacity token** (e.g. `opacity.50`) — chosen via the opacity field's token dropdown when the design system has opacity tokens.
+- **Color token** (e.g. `brand.50`): chosen via the design tokens section or the hex field's token dropdown. Resolves to the actual color at render time.
+- **Opacity token** (e.g. `opacity.50`): chosen via the opacity field's token dropdown when the design system has opacity tokens.
 
 You can bind both at once. Manually dragging the opacity slider clears the opacity token binding; manually editing hex/RGB/HSB clears the color token binding.
 
@@ -102,11 +103,11 @@ Click the fill color swatch in the right toolbar to open the color picker. Use C
 
 Gradient handles are only visible on the canvas while the color picker is open for that element's fill or stroke. They disappear when the picker closes.
 
-**Linear gradients** are defined by start/end points — edit on canvas by dragging the gradient handles (start handle, end handle), or click the gradient line to add a color stop.
+**Linear gradients** are defined by start/end points: edit on canvas by dragging the gradient handles (start handle, end handle), or click the gradient line to add a color stop.
 
-**Radial gradients** are defined by center, radius, and width handles — drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to make the gradient elliptical.
+**Radial gradients** are defined by center, radius, and width handles: drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to make the gradient elliptical.
 
-**Angular gradients** (sweep/conic) rotate color stops around a center point — drag the center to reposition, drag the angle handle to rotate the gradient start direction. The angular sweep covers a full 360° with wrap-around interpolation across the seam.
+**Angular gradients** (sweep/conic) rotate color stops around a center point: drag the center to reposition, drag the angle handle to rotate the gradient start direction. The angular sweep covers a full 360° with wrap-around interpolation across the seam.
 
 Add/remove/reposition color stops directly on the gradient bar in the color picker, or by clicking the canvas gradient line. Hovering a stop shows the position percentage and color hex; dragging shows just the percentage.
 
@@ -136,7 +137,7 @@ Change the scale mode in the right toolbar under the image fill section.
 
 ### Shader Fills
 
-Animated, GPU-rendered procedural patterns. Choose from 6 shader types. See `SHADERS.md` for details.
+Animated, GPU-rendered procedural patterns. 6 shader types: Metaballs, Liquid Metal, Iridescent (`PaintStyleType.holographic`), Liquid Stainless Steel, Dithering, Reactive Grid. Reactive Grid lives in the Interactive group, the rest in Animated. See [shaders.md](./shaders.md) for full parameter reference.
 
 ### Image Filter Fills
 
@@ -155,7 +156,7 @@ Each filter has adjustable parameters, optional color inputs, and built-in prese
 
 ### Color Adjust Fills
 
-Non-destructive photo-style adjustments (exposure, contrast, saturation, whites, blacks, clarity, sharpness, vignette, hue, temperature, tint, and more). Processes all fills below it in the z-order. Includes built-in presets (Vivid, Cinematic, Vintage, B&W, etc.). Available in the **Filters** category alongside image filters. Hue-rotate and saturate adjustments live here, not as element-level CSS-style filters. See `EFFECTS.md` for details.
+Non-destructive photo-style adjustments (exposure, contrast, saturation, whites, blacks, clarity, sharpness, vignette, hue, temperature, tint, vibrance, brilliance, highlights, shadows, sepia, inversion). Processes all fills below it in the z-order. Includes built-in presets (Vivid, Cinematic, Vintage, B&W, etc.). Available in the **Filters** category alongside image filters. Data is stored as -1.0..1.0 (or 0..1, or 0..360 for hue) and the inspector displays it as percentages. Hue-rotate and saturate adjustments live here, not as element-level CSS-style filters. See [effects.md](./effects.md#color-adjust-fill) for the full parameter table.
 
 ### Multiple Fills
 
@@ -167,7 +168,7 @@ Vector elements with multiple enclosed regions (e.g. a path that crosses itself,
 
 ### Text Fills
 
-Text uses fills for text color. Text supports all fill types — solid, gradient, image, shader, image filters, and color adjust — rendered through the text glyphs. Text also supports strokes (including shader and filter strokes), rendered around the text glyphs with inside/center/outside positioning.
+Text uses fills for text color. Text supports all fill types: solid, gradient, image, shader, image filters, and color adjust: rendered through the text glyphs. Text also supports strokes (including shader and filter strokes), rendered around the text glyphs with inside/center/outside positioning.
 
 Per-character color is supported via styled ranges: enter edit mode, select a character range, and apply a color. The range's color overrides the element-level fill color for those characters. See [text.md](./text.md) for the full set of per-range overrides.
 
@@ -197,20 +198,7 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 
 ### Stroke Style Types
 
-Strokes support the same style types as fills:
-
-| Type | Description |
-|------|-------------|
-| **Solid** | Single color (default) |
-| **Linear** | Linear gradient along the stroke |
-| **Radial** | Radial (elliptical) gradient on the stroke |
-| **Angular** | Angular (sweep) gradient on the stroke |
-| **Image** | Image pattern rendered on the stroke |
-| **Shader** | Animated procedural pattern (metaballs, liquid metal, iridescent, liquid stainless steel, dithering, reactive grid) |
-| **Image Filter** | GPU post-processing (noise/grain, halftone, pixelate, duotone, posterize, dither) |
-| **Color Adjust** | Non-destructive photo-style adjustments |
-| **Background Blur** | Blurs content behind the stroke area (frosted glass) |
-| **Inner Shadow / Inner Glow** | Effect paint styles rendered on the stroke |
+Strokes support the same `PaintStyleType` set as fills (one unified dropdown is reused). Same dropdown groups: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (5 shaders), **Interactive** (Reactive Grid), **Filters** (Color Adjust + 6 image filters). Inner Shadow/Inner Glow as strokes render the inner-shadow/glow primitive over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
 
 Switch the stroke type using the type dropdown on any stroke row in the right toolbar.
 
@@ -269,8 +257,8 @@ Blend modes are preserved across copy/paste, undo/redo, and all export formats (
 
 The corner radius row has two toggle buttons for expanding into per-corner editing:
 
-1. **Top/Bottom mode** (first button) — Two fields: one for top corners (TL + TR), one for bottom corners (BL + BR).
-2. **Individual mode** (second button) — Four fields in a 2x2 grid: top-left, top-right, bottom-left, bottom-right.
+1. **Top/Bottom mode** (first button): Two fields: one for top corners (TL + TR), one for bottom corners (BL + BR).
+2. **Individual mode** (second button): Four fields in a 2x2 grid: top-left, top-right, bottom-left, bottom-right.
 
 ### Parent Corner Radius
 
@@ -298,57 +286,28 @@ See [DATA_VISUALIZATION.md](../building/DATA_VISUALIZATION.md#circular-progress-
 
 ## Effects
 
-Effects add visual enhancements like shadows, glows, blurs, and texture. Brilliant has two effect systems:
+Effects add shadows, glows, blurs, and texture. Brilliant has two parallel systems:
 
 ### Outer Effects (Effects Section)
 
-Render outside or around elements. Managed in the Effects section of the right toolbar, or add via the **command palette** (Cmd+Shift+P) by searching for "Add Drop Shadow", "Add Outer Glow", or "Add Element Blur". Effects can also be specified in blueprint syntax (see [EFFECTS.md](./EFFECTS.md) for the compact format).
+Live in `element.effects` (a separate list from fills). Managed in the Effects section of the right toolbar, or add via the command palette (Cmd+Shift+P): "Add Drop Shadow", "Add Outer Glow", "Add Element Blur". Compact blueprint tokens: `shadow(...)`, `outerglow(...)`, `eblur(...)`.
 
-| Type | Description |
-|------|-------------|
-| Drop Shadow | Shadow behind the element |
-| Outer Glow | Luminous glow around the element |
-| Element Blur | Blurs the element itself |
+| EffectType | Description |
+|------------|-------------|
+| `dropShadow` | Shadow behind the element |
+| `outerGlow` | Luminous glow around the element |
+| `layerBlur` (UI label "Element Blur") | Blurs the element itself |
 
 ### Inner/Fill Effects (Fills Section)
 
-Render within element bounds. Added as fills for full z-order control:
+Live in the `fills` list as `PaintStyleType` values, giving full z-order control alongside solid/gradient/image/shader fills. Added as fills, not effects.
 
-| Type | Description |
-|------|-------------|
-| Inner Shadow | Shadow inside the element edges |
-| Inner Glow | Luminous glow inside the element edges |
-| Background Blur | Blurs content behind the element (frosted glass) |
+| PaintStyleType | Description |
+|----------------|-------------|
+| `innerShadow` | Shadow inside the element edges |
+| `innerGlow` | Luminous glow inside the element edges |
+| `backgroundBlur` | Blurs content behind the element (frosted glass), rendered at the widget level via BackdropFilter |
 
-Inner effects are in the fill type dropdown under the **Static** group (alongside Image). The full dropdown groups are: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (shader fills), **Interactive** (shader fills), **Filters** (Color Adjust + 6 image filters). Inner effect fills can be interleaved with other fill types.
+Inner effects are in the fill type dropdown under the **Static** group (alongside Image). Inner effect fills can be interleaved with other fill types.
 
-### Key Properties
-
-**Drop Shadow:** X/Y offset, blur, spread, color, opacity, blend mode. "Show behind transparent areas" toggle.
-
-**Outer Glow:** Blur, spread, color, opacity, blend mode (default: Screen).
-
-**Element Blur:** Radius (0-200).
-
-**Inner Shadow:** X/Y offset, blur, spread, color, opacity, blend mode.
-
-**Inner Glow:** Blur, spread, color, opacity, blend mode (default: Screen).
-
-Each effect row has: type dropdown (with color swatch prefix for non-blur effects), opacity field, expand toggle, and remove button. Expanding reveals the full property fields.
-
-| Action | How |
-|--------|-----|
-| Add outer effect | Command palette: "Add Drop Shadow" / "Add Outer Glow" / "Add Element Blur", or click "+" in Effects section |
-| Add inner effect | Command palette: "Add Inner Shadow" / "Add Inner Glow" / "Add Background Blur", or click "+" in Fills section and choose from the type dropdown |
-| Remove effect | Command palette: "Remove Effect", or click delete button on effect row |
-| Toggle visibility | Command palette: "Toggle Effect Visibility", or click the eye icon (in expanded view) |
-
-**Background Blur:** Radius (0-200).
-
-Elements can have multiple effects stacked. Reorder by dragging. Render order: outer effects (drop shadows and outer glows in list order) → fills (solid, gradient, image, shaders, inner shadow, inner glow — all in z-order) → strokes.
-
-### Shadow Tokens
-
-Drop shadows can be bound to a composite shadow token from the design system (e.g. `shadow.sm`, `shadow.md`, `shadow.lg`). Applying a shadow token replaces the element's drop shadows with the token's shadow stack (a token can define multiple stacked drop shadows) and stores the token reference on the element. Other effect types (outer glow, element blur, inner shadow, inner glow, background blur) are preserved unchanged. Shadow tokens are useful for keeping a coherent shadow scale across components.
-
-See `EFFECTS.md` for full details, default values, and tips.
+See [effects.md](./effects.md) for default values, parameter ranges, blueprint syntax, and shadow tokens.

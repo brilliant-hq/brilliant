@@ -27,10 +27,15 @@ Components let you create reusable design elements. A **master component** defin
 **What happens:**
 - The frame gains a `ComponentData` marker (no `elementRef` means it is the master)
 - All descendant elements get `ChildComponentData` linking them back to the master's children
-- The frame label turns **purple** on the canvas
-- In the layers panel, a **filled diamond** icon appears
+- The frame label and selection chrome use a purple component color
+- In the layers panel, a filled diamond icon marks the master
 
-**Auto-wrapping:** If the selected element is not already a parent, it will be automatically wrapped in a frame before becoming a component. Multiple selected elements are also wrapped together. You don't need to manually group first.
+**Validation:** Selection is rejected if any selected element is a non-instance descendant of a component instance (you cannot wrap a child of someone else's instance into a new component). Existing component masters and component instance roots CAN be wrapped into a new outer component.
+
+**Auto-wrapping behavior:**
+- One non-frame element selected, or multiple elements selected: a wrapping frame is created at the combined bounds, the selection is reparented into it, and the frame is converted to a component master. The frame's name defaults to a unique `Component`/`Component 2`/etc.
+- One plain frame selected: in-place conversion (no extra wrapper). The frame is marked as the master and its existing children become master children.
+- The wrap path runs per-parent: selecting elements across multiple parents creates one component per parent group.
 
 ## Creating an Instance
 
@@ -54,18 +59,16 @@ You can also create instances at a specific position programmatically.
 
 | Visual | Meaning |
 |--------|---------|
-| **Purple label text** | Element is a component master or instance root |
-| **Purple selection outline** | Element is part of a component (master or instance) |
-| **Diamond prefix** on label | Master component (filled diamond on canvas) |
+| Purple frame label | Element is a component master or instance root |
+| Purple selection chrome | Element is part of a component (master or instance) |
+| Diamond glyph in frame label | Master vs instance distinguished by fill (filled = master, outlined = instance) |
 
 ### Layers Panel
 
 | Icon | Meaning |
 |------|---------|
-| **Filled diamond** | Master component |
-| **Diamond outline** | Component instance |
-
-Both diamond icons use a purple color (`#9B59B6`).
+| Filled diamond | Master component |
+| Diamond outline | Component instance |
 
 ## Overrides
 
@@ -91,9 +94,9 @@ When you modify a property on an instance or its children, that property is auto
 | `circleData` | Circle arc/ring properties |
 | `constrainProportions` | Aspect ratio lock |
 
-**Root vs child sync:** The sync engine treats instance roots differently from instance children. Instance **children** sync all 15 categories listed above. Instance **roots** sync a smaller subset — `name`, `textData`, `rectangleData`, and `vectorPath` are NOT synced for the root frame. This means renaming a master frame does not propagate the name to instance roots, but renaming a master's child does propagate to instance children. All other categories (fills, strokes, parentData, layoutBehavior, rotation, flips, effects, opacity, circleData, constrainProportions) sync for both roots and children.
+**Root vs child sync:** The sync engine treats instance roots differently from instance children. Instance **children** sync all 15 categories listed above plus the element `type` (structural, always copied). Instance **roots** sync a smaller subset: `name`, `textData`, `rectangleData`, `vectorPath`, and `type` are NOT synced for the root frame. Renaming a master frame does not propagate the name to instance roots, but renaming a master's child does propagate to instance children. All other categories (fills, strokes, parentData, layoutBehavior, rotation, flips, effects, opacity, circleData, constrainProportions) sync for both roots and children.
 
-**Unsynced properties:** `blendMode`, `opacityTokenRef`, `shadowTokenRef`, and `cropData` are not included in the component sync engine — changes to these on the master do not propagate to instances. `blendMode` is also not tracked for override detection, so changing it on an instance does not register as an override.
+**Unsynced properties:** `blendMode`, `opacityTokenRef` (element-level), `shadowTokenRef`, and `cropData` are not part of the component sync engine. Changes to these on the master do not propagate to instances. `blendMode` is also not tracked for override detection, so changing it on an instance does not register as an override. (Per-fill/per-stroke `opacityTokenRef` IS synced indirectly via the `fills` and `strokes` categories.)
 
 ### How Override Detection Works
 
@@ -133,16 +136,16 @@ If you need to fully diverge from the master, **detach** the instance first.
 
 To restore an instance to match its master:
 
-1. Select a component instance root (the command requires the instance root to be selected)
+1. Select a component instance root (the command's WhenClause activates only on instance roots)
 2. Use the **Reset Component Instance Overrides** command (via command palette)
 
 **What happens:**
-- All `overriddenProperties` are cleared on the selected elements
+- All `overriddenProperties` are cleared on the targeted elements
 - The instance re-syncs from the master, pulling fresh values for all properties
 - If you reset on the instance root, the entire subtree's overrides are cleared and re-synced
-- If you reset on an individual child (when included in a multi-selection with the instance root), that child's overrides are cleared and the full instance re-syncs from master — all non-overridden properties across the entire instance tree are refreshed, not just the reset child's
+- If you target an individual instance child (via MCP / programmatic invocation that includes both root and child), that child's overrides are cleared and the full instance re-syncs from the master. The whole instance subtree is refreshed, not just the reset child.
 
-**Note:** The command only appears in the command palette when a component instance root is selected. Selecting only an instance child without the root will not surface this command.
+**Keyboard vs MCP gap:** The command's WhenClause is `componentInstanceWhen` (instance roots only), so the keyboard/palette path requires an instance root to be selected. The execute body, however, accepts both instance roots and instance children, which is why MCP invocations can target individual children.
 
 ## Detaching an Instance
 
@@ -180,26 +183,28 @@ A master component can live on a different canvas than its instance. This lets y
 
 How it works:
 
-- An instance stores a `canvasPath` reference to the master's canvas file when the master lives elsewhere
+- An instance stores a `canvasPath` (relative path to the master's `.design` file) on its `componentData` when the master lives elsewhere
 - When the instance's canvas is loaded, Brilliant resolves the cross-canvas master and syncs the instance with the latest master values
-- Editing a master propagates to instances on every loaded canvas
-- **Push Overrides to Master** and **Go to Master Component** only work when the master is on the same canvas as the instance. Switch to the master's canvas first to push or jump to it
-- Pasting a component master into a different canvas creates an instance whose master link still points to the original canvas, not a duplicate master
+- Editing a master propagates to instances on every currently loaded canvas; instances on canvases not in the cache pick up the latest master values the next time their canvas loads
+- **Push Overrides to Master** and **Go to Master Component** only work when the master is resolvable on the current canvas's `CanvasElements` (same-canvas only). Switch to the master's canvas first to push or jump to it.
+- Pasting a component master into a different canvas creates an instance whose `canvasPath` points back to the source canvas (the master is not duplicated)
 
-**Caveat:** When you delete a master, instances on other canvases (not currently loaded) are not detached immediately. They will be cleaned up the next time their canvas is opened.
+**Caveats:**
+- When you delete a master, instances on other canvases that are not currently loaded are NOT detached immediately. They are cleaned up the next time that canvas loads.
+- Cross-canvas instances can be incorrectly stripped of their component link by a bug in orphan cleanup that ignores `canvasPath`. If a canvas containing instances opens before the master's canvas has been loaded into the cache, those instances may get detached. Workaround: open the master's canvas first to populate the cache.
 
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
 |--------|----------|
 | Create Component | **Cmd+Alt+K** |
-| Create Instance | Command palette |
 | Detach Instance | **Cmd+Alt+B** |
-| Reset Component Instance Overrides | Command palette |
-| Go to Master Component | Command palette |
-| Push Overrides to Master | Command palette |
+| Create Instance | Command palette only (no default keybinding) |
+| Reset Component Instance Overrides | Command palette only (no default keybinding) |
+| Go to Master Component | Command palette only (no default keybinding) |
+| Push Overrides to Master | Command palette only (no default keybinding) |
 
-**Push Overrides to Master** — When you've made overrides on an instance that should become the new default, use this command to apply the instance's overrides back to the master component. All other instances will then sync to the updated master values. This command only works when the master is on the same canvas as the instance.
+**Push Overrides to Master**: When you've made overrides on an instance that should become the new default, use this command to apply the instance's overrides back to the master component. All other instances will then sync to the updated master values. This command only works when the master is on the same canvas as the instance.
 
 ## What's Not Supported
 
@@ -223,9 +228,12 @@ Brilliant components are a master/instance system with property overrides, slots
 | Symptom | Likely Cause | Fix |
 |---------|--------------|-----|
 | Instance not updating when master changes | Property was overridden on the instance | Reset overrides, then re-apply only needed changes |
-| Cannot create component | No element selected, or element is a child inside a component instance | Select an element outside any component instance. Non-parents are auto-wrapped in a frame. Detach the instance first if needed |
-| Detached parent still looks like a component | Visual only — labels may not refresh immediately | The parent is a regular parent; verify `componentData` is gone |
+| `blendMode` change on master not reaching instances | `blendMode` is unsynced by design | Set blend mode on each instance individually, or detach if you need divergent blend behavior managed manually |
+| Cannot create component | No element selected, or element is a non-instance descendant of a component instance | Select elements outside any component instance, or select the instance root itself (it CAN be wrapped). Non-parents are auto-wrapped. |
+| Cross-canvas instance lost its component link after canvas reload | Orphan cleanup bug strips component data when master's canvas is not cached | Open the master's canvas first, then the instance canvas |
+| Push Overrides / Go to Master grayed out | Master is on a different canvas than the instance | Switch to the master's canvas before invoking the command |
 | Instance child not syncing | Child is marked as a slot | Slots are owned by the instance; edit directly |
+| Cannot drop element into component instance | Reparent guard rejects the drop | Drop into a `slot`-marked subtree, or detach the instance first |
 
 ## Creating Components via Blueprint
 
@@ -285,7 +293,7 @@ al(v,g($spacing.4),pad($spacing.6)) s(320,hug) f[(#FFFFFF)] rd($radius.md) comp 
   fr s(fill,hug) slot "Content"
 ```
 
-Slot children are skipped during sync — instances fully own their slot content. This allows each instance to have completely different content in the slot area while keeping the rest of the component in sync with the master.
+Slot children are skipped during sync: instances fully own their slot content. This allows each instance to have completely different content in the slot area while keeping the rest of the component in sync with the master.
 
 > **See also:** [knowledge/FRAMES.md](./FRAMES.md) for parent types, auto layout, and nesting
 > **See also:** [knowledge/EDITING.md](./EDITING.md) for selection and navigation within component hierarchies

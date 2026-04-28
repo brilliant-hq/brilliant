@@ -13,16 +13,16 @@ Brilliant supports design tokens through `.styles` files. Tokens let you define 
 
 Design tokens are named values that represent design decisions. Instead of hardcoding `#6264A7`, you use `brand.50`. Benefits:
 
-- **Consistency** — One source of truth for your design system
-- **Maintainability** — Change the token, update everywhere
-- **Semantic naming** — `brand.50` is more meaningful than a hex code
-- **Scale generation** — Define one brand color, get a full 5–90 scale
+- **Consistency**: One source of truth for your design system
+- **Maintainability**: Change the token, update everywhere
+- **Semantic naming**: `brand.50` is more meaningful than a hex code
+- **Scale generation**: Define one brand color, get a full 5–90 scale
 
 ## Using Tokens in the Color Picker
 
-1. Open the color picker (click any color swatch or press **Ctrl+C**)
+1. Open the color picker (click any color swatch in the right toolbar)
 2. Scroll to the **Design Tokens** section
-3. Tokens are grouped by category (brand, neutral, success, accent, etc.)
+3. Tokens are grouped by seed name (brand, neutral, success, error, warning, info, plus any custom seeds)
 4. Click a token swatch to apply it
 
 Token-bound color swatches show a subtle blue-purple border to indicate they're linked to a token.
@@ -34,15 +34,17 @@ Several inspector fields in the right toolbar accept token bindings via dropdown
 | Property | Where | Tokens accepted |
 |----------|-------|-----------------|
 | Fill / stroke color | Color picker (any swatch) | Color tokens |
-| Fill / stroke opacity | Color picker, opacity field | Opacity tokens |
+| Fill / stroke opacity | Color picker opacity field | Opacity tokens |
 | Corner radius (per corner) | Frame / rectangle section | Radius tokens |
-| Element opacity | Top of inspector | Opacity tokens |
-| Font size, weight, line height | Typography section | Corresponding `font.*` tokens |
+| Element opacity | Layer section (top of inspector) | Opacity tokens |
+| Font size, weight, line height, family | Typography section | Corresponding `font.*` tokens |
 | Auto layout gap and padding (uniform or per-side) | Auto layout section | Spacing tokens |
 
 When a property is bound to a token, the field shows the token name. Manually editing the value clears the binding for that property. Composite tokens (typography and shadow) are applied via the **Apply Typography Token** and **Apply Shadow Token** commands and clear individual bindings on the same property group.
 
-**Note:** Stroke width currently has no inspector UI for token binding. Stroke width tokens still exist in the design system, but bindings have to be created via blueprint (e.g., `st[(#000,w($stroke.width.md))]`) or programmatically.
+**No inspector UI for stroke width and shadow tokens:**
+- Stroke width tokens cannot be bound from the inspector. Use blueprint syntax (`st[(#000,w($stroke.width.md))]`) or programmatic invocation. Bound stroke widths also do NOT re-resolve on mode change.
+- Shadow tokens are applied through the **Apply Shadow Token** command (palette) or the AI/MCP path, not the effects panel.
 
 ## Using Tokens in Blueprints
 
@@ -68,18 +70,20 @@ Token references resolve at creation time using the active design system. If a t
 
 | Type | Key Pattern | Examples | Description |
 |------|-------------|----------|-------------|
-| **Color** | `{name}.{step}` | `brand.50`, `neutral.30`, `accent.10` | Full color scales from any color seed |
-| **Spacing** | `spacing.{n}` | `spacing.none`, `spacing.1`, `spacing.4`, `spacing.8` | Base × multiplier spacing values (none = 0) |
-| **Radius** | `radius.{step}` | `radius.sm`, `radius.md`, `radius.lg` | Corner radius presets |
-| **Font Size** | `font.size.{step}` | `font.size.sm`, `font.size.lg`, `font.size.2xl` | Typography scale |
-| **Font Family** | `font.family` | `font.family` | Defined font family |
-| **Font Weight** | `font.weight.{step}` | `font.weight.bold`, `font.weight.semibold` | Weight scale from thin (100) to black (900) |
-| **Line Height** | `font.lineHeight.{step}` | `font.lineHeight.tight`, `font.lineHeight.normal` | Line height multipliers |
-| **Opacity** | `opacity.{step}` | `opacity.0`, `opacity.50`, `opacity.100` | Opacity values (0.0–1.0), full 0–100 scale |
-| **Typography** | `typography.{name}` | `typography.h1`, `typography.body.md` | Composite: font size + weight + line height + family |
-| **Stroke Width** | `stroke.width.{step}` | `stroke.width.sm`, `stroke.width.lg` | Stroke thickness presets |
-| **Shadow** | `shadow.{step}` | `shadow.sm`, `shadow.md`, `shadow.lg` | Composite: one or more shadow layers |
+| **Color** | `{name}.{step}` | `brand.50`, `neutral.30`, `accent.10` | Generated 5–90 scales (10 steps) from any color seed |
+| **Spacing** | `spacing.{n}` | `spacing.none`, `spacing.1` … `spacing.32` | `none` = 0, integers 1–32 = `base × n` (continuous scale, no `sm`/`md`/`lg` keys) |
+| **Radius** | `radius.{step}` | `radius.none`, `radius.sm`, `radius.md`, `radius.lg`, `radius.xl`, `radius.full` | Multipliers of base radius; `full` = 9999 |
+| **Font Size** | `font.size.{step}` | `font.size.xs` … `font.size.2xl` | 6 steps (xs, sm, md, lg, xl, 2xl): multipliers of `font.size` base |
+| **Font Family** | `font.family` | `font.family` | Single token (no scale): the seed family name |
+| **Font Weight** | `font.weight.{step}` | `font.weight.bold`, `font.weight.semibold` | 9 steps from `thin` (100) to `black` (900) |
+| **Line Height** | `font.lineHeight.{step}` | `font.lineHeight.tight`, `font.lineHeight.normal` | 6 steps: `none` (1.0), `tight` (1.25), `snug` (1.375), `normal` (1.5), `relaxed` (1.625), `loose` (2.0) |
+| **Opacity** | `opacity.{step}` | `opacity.0`, `opacity.50`, `opacity.100` | 12 fixed steps: 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 |
+| **Typography** | `typography.{name}` | `typography.h1`, `typography.body.md` | Composite: font family + size + weight + line height + letter spacing |
+| **Stroke Width** | `stroke.width.{step}` | `stroke.width.sm`, `stroke.width.lg` | 6 steps: `none`, `hairline`, `sm`, `md`, `lg`, `xl` (multipliers of `stroke.width` base) |
+| **Shadow** | `shadow.{step}` | `shadow.sm`, `shadow.md`, `shadow.lg`, `shadow.xl` | Composite: one or more shadow layers (x, y, blur, spread, color) |
 | **Boolean** | (custom) | `feature.flag: true` | True/false values, useful for AI agents and feature switches in custom workflows |
+
+**Blueprint extension:** `$spacing.N` resolves dynamically for any positive integer in blueprint syntax even if the materialized scale only goes up to `spacing.32`. The token picker UI only surfaces `spacing.none` and `spacing.1` through `spacing.32` as persisted tokens.
 
 ## Color Token Scale
 
@@ -100,60 +104,72 @@ Color tokens are generated from a seed color using OKLCH color space for percept
 
 Lower numbers = lighter. Higher numbers = darker. The seed alias (e.g., `brand`) maps to the original seed color value in light mode. The `.50` step is generated from the OKLCH scale at 50% lightness, which is close but not identical to the seed.
 
-**Dark mode inversion:** In dark mode, color steps are mirrored — `.5` (lightest) uses the light mode `.90` value, `.10` uses `.80`, etc. The bare seed alias (e.g., `brand` without a step number) resolves to the `.40` step from the light scale in dark mode, not the original seed color. This ensures light backgrounds become dark and vice versa while maintaining the same semantic usage of token names.
+**Dark mode inversion:** Color steps are mirrored using the `_darkModeStepMap` table: `.5` ↔ `.90`, `.10` ↔ `.80`, `.20` ↔ `.70`, `.30` ↔ `.60`, `.40` ↔ `.50`. So in dark mode, `brand.5` uses the light-mode `brand.90` color, etc. The bare seed alias (e.g., `brand` without a step number) resolves to the `.40` step from the light scale in dark mode, not the original seed color. This ensures light backgrounds become dark and vice versa while keeping the same semantic usage of token names.
 
 **Custom color seeds:** Any name works. Add `accent: "#FF6347"` to get `accent.5` through `accent.90`.
 
 ## Spacing Token Scale
 
-Spacing tokens use a configurable base (default 4px) with multipliers:
+Spacing tokens use a configurable base (default 4) with integer multipliers from 1 to 32. The scale is **continuous**: every integer key resolves to `base × n`. There are no `sm`/`md`/`lg` step names for spacing.
 
 | Token | Default Value | Usage |
 |-------|---------------|-------|
-| `spacing.none` | 0px | No spacing |
-| `spacing.1` | 4px | Tight spacing |
-| `spacing.2` | 8px | Small gaps |
-| `spacing.3` | 12px | Default spacing |
-| `spacing.4` | 16px | Section spacing |
-| `spacing.6` | 24px | Large gaps |
-| `spacing.8` | 32px | Section breaks |
-| `spacing.12` | 48px | Major sections |
-| `spacing.16` | 64px | Hero spacing |
+| `spacing.none` | 0 | No spacing |
+| `spacing.1` | 4 | Tight inline spacing |
+| `spacing.2` | 8 | Small gaps |
+| `spacing.3` | 12 | Default spacing |
+| `spacing.4` | 16 | Section spacing |
+| `spacing.6` | 24 | Large gaps |
+| `spacing.8` | 32 | Section breaks |
+| `spacing.12` | 48 | Major sections |
+| `spacing.16` | 64 | Hero spacing |
+| `spacing.24` | 96 | Page sections |
+| `spacing.32` | 128 | Maximum materialized step |
+
+`$spacing.N` works for any positive integer in blueprint syntax even beyond 32: the scale just stops materializing tokens at that ceiling.
 
 ## Radius Token Scale
 
-| Token | Default Value | Usage |
-|-------|---------------|-------|
-| `radius.none` | 0px | Sharp corners |
-| `radius.sm` | 4px | Subtle rounding |
-| `radius.md` | 8px | Default (cards, buttons) |
-| `radius.lg` | 16px | Prominent rounding |
-| `radius.xl` | 24px | Large containers |
-| `radius.full` | 9999px | Fully rounded (pills, circles) |
+Default base = 4. Multipliers: `none` (0), `sm` (1×), `md` (2×), `lg` (4×), `xl` (6×). `full` is a fixed value (9999), not a multiplier.
+
+| Token | Multiplier | Default Value | Usage |
+|-------|-----------|--------------|-------|
+| `radius.none` | 0 | 0 | Sharp corners |
+| `radius.sm` | 1 | 4 | Subtle rounding |
+| `radius.md` | 2 | 8 | Default (cards, buttons) |
+| `radius.lg` | 4 | 16 | Prominent rounding |
+| `radius.xl` | 6 | 24 | Large containers |
+| `radius.full` | (fixed) | 9999 | Fully rounded (pills, circles) |
 
 ## Stroke Width Token Scale
 
-| Token | Default Value | Usage |
-|-------|---------------|-------|
-| `stroke.width.none` | 0px | No stroke |
-| `stroke.width.hairline` | 0.5px | Hairline stroke |
-| `stroke.width.sm` | 1px | Thin stroke |
-| `stroke.width.md` | 2px | Default stroke |
-| `stroke.width.lg` | 4px | Thick stroke |
-| `stroke.width.xl` | 8px | Heavy stroke |
+Default base = 1. Multipliers (except `none` which is fixed 0): `hairline` (0.5×), `sm` (1×), `md` (2×), `lg` (4×), `xl` (8×).
 
-**Known limitation:** Stroke widths bound to a token do not currently update when you switch design modes. The stroke width keeps the value it had when the binding was created. Color, spacing, radius, font size, line height, and opacity tokens DO re-resolve on mode switch.
+| Token | Multiplier | Default Value |
+|-------|-----------|--------------|
+| `stroke.width.none` | (fixed) | 0 |
+| `stroke.width.hairline` | 0.5 | 0.5 |
+| `stroke.width.sm` | 1 | 1 |
+| `stroke.width.md` | 2 | 2 |
+| `stroke.width.lg` | 4 | 4 |
+| `stroke.width.xl` | 8 | 8 |
+
+**Known limitations:**
+- The right toolbar has no token-binding dropdown for stroke width. Bindings can only be authored via blueprint syntax (`st[(#000,w($stroke.width.md))]`) or programmatically.
+- Stroke widths bound to a token do not re-resolve at runtime. The stroke keeps the value captured when the binding was created. Color, spacing, radius, font size, line height, and opacity tokens DO re-resolve on mode switch.
 
 ## Font Size Token Scale
 
-| Token | Default Value | Usage |
-|-------|---------------|-------|
-| `font.size.xs` | 12px | Fine print, captions |
-| `font.size.sm` | 14px | Secondary text |
-| `font.size.md` | 16px | Body text |
-| `font.size.lg` | 20px | Subheadings |
-| `font.size.xl` | 24px | Headings |
-| `font.size.2xl` | 32px | Display text |
+Default base = 16. Multipliers: `xs` (0.75×), `sm` (0.875×), `md` (1×), `lg` (1.25×), `xl` (1.5×), `2xl` (2×).
+
+| Token | Multiplier | Default Value | Usage |
+|-------|-----------|--------------|-------|
+| `font.size.xs` | 0.75 | 12 | Fine print, captions |
+| `font.size.sm` | 0.875 | 14 | Secondary text |
+| `font.size.md` | 1.0 | 16 | Body text |
+| `font.size.lg` | 1.25 | 20 | Subheadings |
+| `font.size.xl` | 1.5 | 24 | Headings |
+| `font.size.2xl` | 2.0 | 32 | Display text |
 
 ## Font Weight Token Scale
 
@@ -182,24 +198,24 @@ Spacing tokens use a configurable base (default 4px) with multipliers:
 
 ## Default Design System
 
-Brilliant ships with built-in defaults that apply when no `.styles` file exists:
+Brilliant ships with built-in defaults (`defaultDesignSystemSeeds` in `lib/models/design_system.dart`) that apply when no `.styles` file exists or when seeds are not specified:
 
 | Seed | Value | Description |
 |------|-------|-------------|
-| `brand` | "#6264A7" | Primary brand color (indigo) |
-| `neutral` | "#64748B" | Tinted gray (cool slate) — generates near-white to near-black scale |
-| `success` | "#22C55E" | Success/positive actions (green) |
-| `error` | "#EF4444" | Error/destructive actions (red) |
-| `warning` | "#F59E0B" | Warning/caution (amber) |
-| `info` | "#3B82F6" | Informational (blue) |
-| `spacing` | 4 | 4px base |
-| `radius` | 4 | 4px base |
-| `font.family` | Inter | Default font |
-| `font.size` | 16 | 16px base |
-| `font.weight` | 400 | Regular weight |
-| `font.lineHeight` | 1.5 | Normal line height |
-| `stroke.width` | 1 | 1px base |
-| `opacity` | 1 | Default opacity |
+| `brand` | `#6264A7` | Primary brand color (indigo) |
+| `neutral` | `#64748B` | Cool slate gray; generates near-white to near-black scale |
+| `success` | `#22C55E` | Success/positive actions (green) |
+| `error` | `#EF4444` | Error/destructive actions (red) |
+| `warning` | `#F59E0B` | Warning/caution (amber) |
+| `info` | `#3B82F6` | Informational (blue) |
+| `spacing` | `4` | Base spacing unit |
+| `radius` | `4` | Base corner radius |
+| `font.family` | `Inter` | Default font |
+| `font.size` | `16` | Base font size |
+| `font.weight` | `400` | Regular weight |
+| `font.lineHeight` | `1.5` | Normal line height |
+| `stroke.width` | `1` | Base stroke width |
+| `opacity` | `1` | Base opacity (the seed; the materialized scale is 0.0–1.0) |
 
 All 6 color seeds generate full 5–90 scales out of the box. Override any seed in your `.styles` file to customize.
 
@@ -246,7 +262,7 @@ Brilliant provides `light` and `dark` modes by default. You can declare addition
 $modes: [tint, dim]
 ```
 
-**Mode-specific color seeds** use list syntax — the first value is the base (light mode) seed, and subsequent entries are mode-keyed overrides:
+**Mode-specific color seeds** use list syntax: the first value is the base (light mode) seed, and subsequent entries are mode-keyed overrides:
 
 ```yaml
 # Base seed + mode variants in one declaration
@@ -271,7 +287,7 @@ You can also add mode seeds via the **Add Mode Seed** command without editing th
 Running generation creates a `.styles.gen` file with all resolved tokens, annotated by source:
 
 ```yaml
-# GENERATED — DO NOT EDIT
+# GENERATED: DO NOT EDIT
 # Regenerate: $ brilliant generate
 
 # Brand colors
@@ -302,7 +318,7 @@ cta.color: "{accent.50}"  # ref
 
 Reference tokens use `{tokenName}` syntax (e.g., `"{brand.70}"`) to indicate they resolve to another token's value. Bare references (without braces) are also supported for backward compatibility.
 
-The `.styles.gen` file is automatically added to `.gitignore` — it is a derived artifact and should not be committed.
+The `.styles.gen` file is automatically added to `.gitignore`: it is a derived artifact and should not be committed.
 
 ## Opacity Token Scale
 
@@ -325,11 +341,13 @@ The `.styles.gen` file is automatically added to `.gitignore` — it is a derive
 
 Design systems cascade like `.editorconfig`:
 
-1. **Root `.styles`** applies to entire repository
-2. **Subfolder `.styles`** overrides parent values for that folder
-3. **Built-in defaults** apply when no file exists
+1. **Built-in defaults** are always available as a base layer (`defaultDesignSystemSeeds` + `defaultDesignSystemTokens`)
+2. **Root `.styles`** applies to the entire repository
+3. **Subfolder `.styles`** overrides parent values for that folder
 
-This lets you have different color schemes per project folder while sharing common tokens.
+For each canvas, Brilliant walks from the canvas's directory up to the repo root, collecting `.styles` files root-first. Each file is generated independently into a `DesignSystem`, then merged with later (deeper) layers overriding earlier ones. Cross-layer token references (e.g., a subfolder token referencing a root token) resolve at runtime after merge with a max reference depth of 10.
+
+If no root `.styles` file exists, an empty one is auto-created on app launch (`ensureRootDesignSystem()`). The `.styles.gen` artifact is always regenerated on launch and added to `.gitignore`.
 
 ## Designing with Tokens
 
@@ -440,51 +458,63 @@ These commands are programmatic only (not visible in the command palette). They 
 
 | Command | Description |
 |---------|-------------|
-| **Switch Design Mode** | Switch between light, dark, and custom modes |
+| **Switch Design Mode** | Dropdown command. Hover a mode to preview it on the canvas; click to commit. Cancel preview by closing the dropdown. |
 | **Regenerate Design System** | Rebuild all `.styles.gen` files from source |
 | **Reset Design System** | Reset to built-in defaults (removes all custom seeds and tokens) |
-| **Open Design System File** | Open the nearest `.styles` file in the code editor |
+| **Open Design System File** | Open the nearest `.styles` file in the code editor (YAML syntax highlighting) |
 
 ### Composite Token Commands
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| **Apply Typography Token** | Apply a typography composite to selected text elements | Apply `typography.h1` to set font size, weight, line height at once |
+| **Apply Typography Token** | Apply a typography composite to selected text elements | Apply `typography.h1` to set font size, weight, line height, family at once |
 | **Apply Shadow Token** | Apply a shadow composite to selected elements | Apply `shadow.md` to add drop shadow effects |
 
-Typography tokens set font size, weight, family, line height, and optionally letter spacing in one operation. Manually changing any individual property (e.g., font size) clears the typography token link.
+**Typography token application:**
+- Sets `fontSize`, `fontWeight`, `fontFamily`, `lineHeight`, `letterSpacing` according to the resolved composite (any field unset on the token leaves the existing value alone, except `lineHeight` which is cleared if the token does not specify it).
+- Stores the token key in `textData.typographyTokenRef`.
+- Clears all individual font token refs (`fontSizeTokenRef`, `fontWeightTokenRef`, `lineHeightTokenRef`, `fontFamilyTokenRef`) so the composite is the single source of truth.
+- Changing the font family via the font selector clears `typographyTokenRef`. Other manual edits in the inspector may not auto-clear it; check the inspector for the active token chip.
 
-Shadow tokens replace existing drop shadows with the token's shadow layers. Manually adding or modifying effects clears the shadow token link.
+**Shadow token application:**
+- Replaces only the element's existing **drop shadow** effects with the token's shadow layers. Inner shadows, glows, and blur effects are preserved.
+- Stores the token key in `element.shadowTokenRef`.
 
-All mutation commands (set/remove/add/apply) support undo/redo — press **Cmd+Z** to revert any change.
+All mutation commands (set/remove/add/apply) support undo/redo: press **Cmd+Z** to revert any change.
 
 ## Built-in Typography Tokens
 
-These typography composites are available by default (no `.styles` file needed):
+These typography composites are available by default (defined as `builtin` source in `defaultDesignSystemTokens`). The fontFamily field is unset (null) for all tokens except `typography.code`, so they inherit the active `font.family` seed when applied.
 
-| Token | Weight | Size | Line Height | Font |
-|-------|--------|------|-------------|------|
-| `typography.h1` | Bold (700) | 36px | 1.2 | Default |
-| `typography.h2` | Bold (700) | 30px | 1.25 | Default |
-| `typography.h3` | SemiBold (600) | 24px | 1.3 | Default |
-| `typography.h4` | SemiBold (600) | 20px | 1.35 | Default |
-| `typography.h5` | SemiBold (600) | 18px | 1.4 | Default |
-| `typography.h6` | SemiBold (600) | 16px | 1.4 | Default |
-| `typography.body.sm` | Regular (400) | 14px | 1.5 | Default |
-| `typography.body.md` | Regular (400) | 16px | 1.5 | Default |
-| `typography.body.lg` | Regular (400) | 18px | 1.5 | Default |
-| `typography.caption` | Regular (400) | 12px | 1.4 | Default |
-| `typography.label` | Medium (500) | 14px | 1.4 | Default |
-| `typography.code` | Regular (400) | 14px | 1.5 | Monospace |
+| Token | Weight | Size | Line Height | Font Family |
+|-------|--------|------|-------------|-------------|
+| `typography.h1` | Bold (700) | 36 | 1.2 | inherits |
+| `typography.h2` | Bold (700) | 30 | 1.25 | inherits |
+| `typography.h3` | SemiBold (600) | 24 | 1.3 | inherits |
+| `typography.h4` | SemiBold (600) | 20 | 1.35 | inherits |
+| `typography.h5` | SemiBold (600) | 18 | 1.4 | inherits |
+| `typography.h6` | SemiBold (600) | 16 | 1.4 | inherits |
+| `typography.body.sm` | Regular (400) | 14 | 1.5 | inherits |
+| `typography.body.md` | Regular (400) | 16 | 1.5 | inherits |
+| `typography.body.lg` | Regular (400) | 18 | 1.5 | inherits |
+| `typography.caption` | Regular (400) | 12 | 1.4 | inherits |
+| `typography.label` | Medium (500) | 14 | 1.4 | inherits |
+| `typography.code` | Regular (400) | 14 | 1.5 | `monospace` |
+
+None of the built-in typography tokens set `letterSpacing`. Custom typography tokens defined in `.styles` files can include `letterSpacing`.
 
 ## Built-in Shadow Tokens
 
-| Token | Description |
-|-------|-------------|
-| `shadow.sm` | Subtle shadow (y:1, blur:2) |
-| `shadow.md` | Medium shadow (two layers: y:2+y:4) |
-| `shadow.lg` | Large shadow (two layers: y:4+y:10) |
-| `shadow.xl` | Extra large shadow (two layers: y:10+y:20) |
+Shadows are composite tokens; each is a list of `ShadowLayer` (x, y, blur, spread, color).
+
+| Token | Layers |
+|-------|--------|
+| `shadow.sm` | 1 layer: y:1, blur:2, color:rgba(0,0,0,0.05) |
+| `shadow.md` | 2 layers: (y:2, blur:4, spread:-1, rgba(0,0,0,0.06)) + (y:4, blur:6, spread:-1, rgba(0,0,0,0.1)) |
+| `shadow.lg` | 2 layers: (y:4, blur:6, spread:-2, rgba(0,0,0,0.05)) + (y:10, blur:15, spread:-3, rgba(0,0,0,0.1)) |
+| `shadow.xl` | 2 layers: (y:10, blur:10, spread:-5, rgba(0,0,0,0.04)) + (y:20, blur:25, spread:-5, rgba(0,0,0,0.1)) |
+
+**Application semantics (`Apply Shadow Token`):** Replaces only existing **drop shadow** effects on the element. Other effects (inner shadow, glows, blur) are preserved. The token reference is stored in `element.shadowTokenRef` for tracking. Manually adding or removing a drop shadow effect does NOT auto-clear `shadowTokenRef`.
 
 ## Built-in Semantic Color Aliases
 
@@ -502,8 +532,10 @@ These aliases are themed: in dark mode they automatically resolve to the inverte
 
 The following features are NOT currently in Brilliant's design system:
 
-- **Token export to CSS variables, Tailwind config, or design tokens JSON.** Tokens stay inside the `.styles` / `.styles.gen` pair; there is no built-in exporter
-- **Token search UI / favorites / recents.** The color picker shows all tokens grouped by category; other token dropdowns are flat lists
-- **Mode-aware preview thumbnails.** Mode preview happens by hovering the **Switch Design Mode** dropdown (the canvas updates live), not by per-token side-by-side swatches
-- **Numeric tokens with units.** Numbers are stored as plain doubles in points; there is no unit system (px, rem, em, %)
-- **Keyboard shortcut to switch modes.** Use the **Switch Design Mode** command in the command palette
+- **Token export to CSS variables, Tailwind config, or design tokens JSON.** Tokens stay inside the `.styles` / `.styles.gen` pair; there is no built-in exporter.
+- **Token search UI / favorites / recents.** The color picker shows all tokens grouped by category; other token dropdowns are flat lists.
+- **Numeric tokens with units.** Numbers are stored as plain doubles (no px/rem/em/% unit system).
+- **Keyboard shortcut to switch modes.** No design system command has a default keybinding. Use the **Switch Design Mode** command in the command palette.
+- **Stroke width inspector binding.** No dropdown UI; bindings can only be authored via blueprint or programmatically.
+- **Stroke width re-resolution at runtime.** Bound stroke widths do not update on mode change.
+- **Letter spacing as a built-in scale.** There is no `letterSpacing.*` token type. Letter spacing can be set inside a custom `typography.*` composite.

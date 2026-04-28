@@ -22,22 +22,26 @@ description: "Canvas management, folders, import/export, file operations, and au
 
 | Action | Shortcut |
 |--------|----------|
-| Next file (canvas, image, text) | Alt+→ |
-| Previous file (canvas, image, text) | Alt+← |
-| Previously active canvas | Ctrl+Alt+← |
+| Next file (canvas, image, text) | Alt+Right |
+| Previous file (canvas, image, text) | Alt+Left |
+| Previously active canvas | Ctrl+Alt+Left |
 | Focus active canvas in explorer | Cmd+Shift+K |
 | Search and select canvas | Cmd+P |
 | Global search (canvases, images, text files) | Cmd+K |
+| Search layers in active canvas | Cmd+L |
+| Search chats | Cmd+Shift+I |
+| Open command palette | Cmd+Shift+P |
 
-**Undo behavior:** Each canvas has its own independent undo history. Switching canvases is **not** undoable — Cmd+Z on the new canvas undoes that canvas's last action, not the switch. When the file explorer is focused, Cmd+Z undoes canvas/folder operations (rename, create, delete, move, reorder) separately from canvas operations.
+Undo is per-canvas. Each canvas has its own independent undo history. Switching canvases is not undoable: Cmd+Z on the new canvas undoes that canvas's last action. When the file explorer is focused, Cmd+Z routes to a separate explorer undo stack covering rename, create, delete, move, and reorder of canvases and folders.
 
-**Per-canvas state that persists:**
-- Element data (saved to the `.design` file)
-- Zoom and pan position
-- Background color and blackboard/whiteboard mode
-- Ruler guides
-- Selection (within a session, not across app restarts)
-- Undo history (within a session, not across app restarts)
+Per-canvas state that persists across canvas switches (saved into the `.design` file or `SharedPreferences`):
+- Element data, hierarchy, fills/strokes/effects, components, design system bindings (in the `.design` file)
+- Per-canvas background settings, ruler guides
+- Zoom and pan position (per `ZoomManager._canvasZoomStates`)
+
+Per-canvas state that persists only within a session:
+- Selection
+- Undo history
 
 ### MCP Canvas Tools
 
@@ -56,7 +60,7 @@ Claude Code can manage canvases programmatically:
 | `duplicate_canvas` | Copy a canvas with all elements and images |
 | `delete_canvas` | Delete a canvas (undoable) |
 | `delete_folder` | Delete a folder and ALL contents (undoable) |
-| `import_figma` | Import a Figma file by URL — supports full file, specific pages, or selection (opens browser sign-in if needed) |
+| `import_figma` | Import a Figma file by URL: supports full file, specific pages, or a selection subtree (opens browser sign-in when needed) |
 | `list_figma_pages` | List pages in a Figma file (lightweight metadata fetch, no canvasId needed) |
 
 **Batch structure creation:** Use `create_structure` to scaffold entire projects:
@@ -70,7 +74,7 @@ create_structure path="" children=[
 ]
 ```
 
-**Using canvasId:** `init()` returns `canvasId` in the session context — this path IS the canvasId. Use it in ALL element operations:
+**Using canvasId:** `init()` returns `canvasId` in the session context. The path IS the canvasId. Use it in ALL element operations:
 
 ```
 # Canvas path from context: "Projects/Dashboard"
@@ -82,7 +86,7 @@ execute_commands canvasId="Projects/Dashboard" commands=[{commandId: "set_width"
 
 **Per-canvas undo:** Each canvas maintains its own undo history. Cross-canvas operations register undo on the target canvas.
 
-**All operations work cross-canvas** — every element tool (create, modify, delete, group, align, move, distribute, reorder, reparent, auto layout, duplicate, export) accepts `canvasId`. No `switch_canvas` needed for any element operation.
+**All operations work cross-canvas:** every element tool (create, modify, delete, group, align, move, distribute, reorder, reparent, auto layout, duplicate, export) accepts `canvasId`. No `switch_canvas` is required for element operations.
 
 **See also:** The Delegation section in CLAUDE.md covers multi-canvas workflows and `create_structure`.
 
@@ -91,18 +95,18 @@ execute_commands canvasId="Projects/Dashboard" commands=[{commandId: "set_width"
 | Action | Shortcut |
 |--------|----------|
 | Create folder | Cmd+Shift+N |
-| Expand/collapse all folders | Cmd+Shift+C |
+| Toggle expand/collapse all folders | Cmd+Shift+C |
 
-Folder operations (via right-click in file explorer):
+Folder context menu (right-click in file explorer):
 - Rename, Delete, Duplicate
 - Cut, Copy, Paste
-- New Canvas, New Folder (within the folder)
-- Expand / Collapse, Expand All / Collapse All
+- New Canvas, New Folder (inside this folder)
+- Expand, Collapse, Expand All, Collapse All
 - Reveal in Finder, Copy Relative Path, Copy Absolute Path
-- Move canvases between folders (drag and drop, including multi-select)
+- Move canvases between folders (drag and drop, multi-select supported)
 - Nest folders inside other folders
 
-**Per-folder color tags:** Append a color suffix to a folder or canvas name to color its icon and breadcrumb. Supported suffixes: `.red`, `.green`, `.yellow`, `.orange`, `.purple`, `.pink`, `.gray` (and `.blue` is the default if no suffix). For example, naming a folder `Components.purple` shows it with a purple icon. The suffix is hidden from the displayed name and is preserved during rename.
+Per-folder color tags: appending a color suffix to a folder or canvas name colors its icon and breadcrumb. Supported suffixes: `.red`, `.green`, `.yellow`, `.orange`, `.purple`, `.pink`, `.gray`. Without a suffix the default is blue. For example, naming a folder `Components.purple` displays a purple icon. The suffix is hidden from the displayed name and is preserved through renames.
 
 ### File Explorer
 
@@ -146,30 +150,30 @@ The file explorer lives in the **left toolbar**. Open or focus it with **Cmd+Shi
 - Multi-select then drag to move several items at once (single undo entry covers the batch)
 - Drag image files from Finder onto the explorer to import them as assets
 
-**Toggle Hidden Files** — Show/hide dotfiles and dotfolders (e.g., `.git`, `.env`) via the command palette ("Toggle Hidden Files"). Hidden by default. State resets on app restart.
+**Toggle Hidden Files:** show/hide dotfiles and dotfolders (e.g. `.git`, `.env`) via the command palette ("Toggle Hidden Files"). Hidden by default. State resets on app restart.
 
-**Git integration** — In a Git repository, files matching `.gitignore` are dimmed in the explorer and can be excluded from search.
+**Git integration:** in a Git repository, files matching `.gitignore` are dimmed in the explorer and can be excluded from search.
 
 ### Top Toolbar (Workspace + Save Status)
 
-The top toolbar at the center of the window shows the current location as breadcrumbs:
+Centered in the window, the top toolbar shows the active file's location as breadcrumbs:
 
 ```
 Workspace / Folder / Subfolder / CanvasName
 ```
 
-- **Click** a breadcrumb segment to navigate (folder segments are not clickable for navigation, but the canvas segment can be double-tapped to rename)
-- **Hover** the breadcrumb to reveal a "Copy Path" button (copies the absolute path of the active `.design` file or asset to the clipboard)
-- **Save status indicator** — when there are unsaved changes, the canvas name in the breadcrumb is dimmed (60% opacity); once auto-save completes it returns to full opacity. This is the only save indicator; there is no separate "save chip" or progress spinner.
-- The **window drag area** is the breadcrumb itself: click and drag to move the window (when not maximized/fullscreen)
+- The canvas-name segment supports double-click to rename inline
+- Hovering the breadcrumb reveals a "Copy Path" button that copies the absolute path of the active `.design` file (or asset/text file) to the clipboard
+- Save status indicator: while a canvas has unsaved changes (or a save is in flight), its name in the breadcrumb renders at 0.6 opacity; once auto-save completes it returns to 0.9 opacity. There is no separate save chip or progress spinner.
+- The breadcrumb itself is the window-drag area: click and drag to move the window when not maximized or fullscreen
 
 ### Asset Management
 
 Image files live in `Assets/` folders next to canvases. Each folder level can have its own `Assets/` directory.
 
 **Asset operations** (right-click in file explorer):
-- **Rename** — automatically updates all references to the asset across every `.design` file in the workspace
-- **Delete** — checks for references first; warns if the image is used by any canvas, then moves it to `.brilliant/trash/` (recoverable via undo)
+- Rename: automatically updates all references to the asset across every `.design` file in the workspace
+- Delete: checks for references first; warns if the image is used by any canvas, then moves it to `.brilliant/trash/` (recoverable via undo)
 - **Reveal in Finder**
 - **Copy Filename**
 
@@ -217,11 +221,11 @@ Brilliant can import designs directly from Figma files via the Figma API, with s
 
 **Manual (UI):** The right toolbar Figma Import section lets you:
 1. Paste a Figma URL
-2. If the URL contains a node selection (`?node-id=...`), a "Selection only" checkbox appears (checked by default) — import just that subtree
-3. Click the config button (gear icon) to fetch and display available pages — select which pages to import
+2. If the URL contains a node selection (`?node-id=...`), a "Selection only" checkbox appears (checked by default): imports only that subtree
+3. Click the config button (gear icon) to fetch and display available pages, then select which pages to import
 4. Selecting a page unchecks "Selection only"; re-checking "Selection only" clears page selections
 
-**Programmatic (agent):** Use `execute_commands` — no `canvasId` needed:
+**Programmatic (agent):** use `execute_commands`. No `canvasId` is needed:
 
 ```json
 {
@@ -257,7 +261,7 @@ Returns `{ "pages": [{ "id": "0:1", "name": "Page 1" }, ...] }`. Use the returne
 
 **Multi-page files** create a folder named after the Figma file, with one canvas per Figma page. Single-page files import onto the current canvas (if empty) or create a new top-level canvas.
 
-**Authentication:** If the user hasn't signed in to Figma yet, the command automatically opens a browser for Figma OAuth sign-in. Let the user know a sign-in page will open. If they cancel or close the browser, the command returns an error — just try again.
+**Authentication:** if the user has not signed in to Figma, the command automatically opens a browser for Figma OAuth sign-in. The agent should mention that a sign-in page is opening. If the user cancels or closes the browser, the command returns an error; retry the command.
 
 ### Importing SVG Files
 
@@ -275,52 +279,59 @@ SVG files import as native editable vector elements:
 
 ### Exporting Elements
 
-Export selected elements to various formats. Select elements first, then export.
+Export selected elements (or whole canvases) via the command palette, the right-toolbar Export section, or the `mcp__brilliant__export` MCP tool.
 
-**How to export:**
-1. Select the elements you want to export
-2. Use the command palette (Cmd+Shift+P) and search for "Export to..."
-3. Or use the Export section in the right toolbar inspector
+How to export:
+1. Select target elements (or focus a canvas / folder)
+2. Cmd+E for PNG, or open the command palette (Cmd+Shift+P) and search "Export to..."
+3. Or expand the Export section in the right toolbar inspector to configure format, resolution, fit mode, and background
 
 | Format | Shortcut | Notes |
 |--------|----------|-------|
-| PNG | Cmd+E | Lossless with transparency support |
-| JPEG | Command palette | Lossy compression (90% quality default) |
-| WebP | Command palette | Modern format, smaller file sizes |
-| SVG | Command palette | Vector format for paths, shapes, text |
-| PDF | Command palette | Document format, preserves vectors |
+| PNG | Cmd+E | Lossless, alpha supported |
+| JPEG | Command palette | Lossy, no alpha; default quality 90 |
+| WebP | Command palette | Lossy default (q=90). Pass `webpLossless: true` (MCP) for clean rounded corners on UI mockups |
+| SVG | Command palette | Vector: paths, shapes, text |
+| PDF | Command palette | Vector document format |
+| MP4 / MOV | Command palette | Animated export with selectable codec (H.264, HEVC, ProRes 4444) and quality |
+| Replay | Command palette | Animated reveal of the selection element-by-element; output container is MP4 or MOV |
 
-**Export options (in right toolbar):**
+Right-toolbar export options:
 
 | Option | Description |
 |--------|-------------|
-| Format | PNG, JPEG, WebP, SVG, PDF, MP4, MOV |
-| Resolution | Original (1x), Original (2x), Original (3x), Original (4x), 720p, 1080p, 1440p, 4K, 8K, Instagram Post, Instagram Story, iPhone 16 Pro, MacBook Pro 14", Custom |
+| Format | PNG, JPEG, WebP, SVG, PDF, MP4, MOV, Replay |
+| Resolution | Original, 720p, 1080p, 1440p, 4K, 8K, Instagram Post, Instagram Story, iPhone 16 Pro, MacBook Pro 14", Custom |
+| Fit mode | Fit, Fill, Stretch, Repeat |
 | Background | Transparent or Canvas (when format supports alpha) |
+| Constrain proportions | Lock aspect ratio when entering custom dimensions |
+| Video options | Duration, FPS, codec, quality (video/replay formats only) |
+| Replay options | Per-element pace (ms/element), intro text, output container (MP4/MOV) |
 
-**Tips:**
-- PNG supports transparency; JPEG does not (transparent areas filled with canvas background color)
-- Use 2x scale for retina/high-DPI displays
-- SVG/PDF preserve vector paths and are infinitely scalable
-- Multiple export configs can be added to export at different scales simultaneously
+Multiple export configs can be added to a single element to export at multiple scales or formats in one action.
+
+Notes:
+- PNG and WebP support alpha; JPEG fills transparent areas with the canvas background color
+- HEVC and ProRes 4444 video codecs support alpha; H.264 does not
+- SVG and PDF preserve vector paths and stay sharp at any scale
 
 ### Importing from Sketch
 
-Brilliant can import `.sketch` files:
+`.sketch` files import as native canvases.
 
 | Method | How |
 |--------|-----|
-| Command palette | Search "Import Sketch File" |
+| Command palette | "Import Sketch File" (`import_sketch`) |
 
 ### Exporting to Sketch
 
-Export canvases or folders as `.sketch` files for use in Sketch app:
+Export the focused canvas or folder as a `.sketch` file:
 
-| Action | How to Access |
-|--------|---------------|
-| Export canvas or folder | Command palette: "Save as Sketch File" (exports the focused canvas or folder) |
+| Action | How |
+|--------|-----|
+| Save as Sketch | Command palette: "Save as Sketch File" (`save_as_sketch`) |
 
-Exports elements, fills, strokes, gradients, text, and images.
+Exports elements, fills, strokes, gradients, text, and images. Components and effects may simplify to flattened equivalents.
 
 ### Design Files
 
@@ -338,8 +349,8 @@ Brilliant uses `.design` files for saving and sharing.
 
 ### File Organization
 
-- **Single canvas** — Save As (Cmd+Shift+S) exports the `.design` YAML file + an `Assets/` folder with referenced images
-- **Folder with canvases** — Save As (Cmd+Shift+S) when a folder is focused exports the entire folder hierarchy (all `.design` files, subfolders, and referenced images) to a chosen directory
+- Single canvas: Save As (Cmd+Shift+S) exports the `.design` YAML file plus an `Assets/` folder with referenced images
+- Folder with canvases: Save As (Cmd+Shift+S) when a folder is focused exports the entire folder hierarchy (all `.design` files, subfolders, and referenced images) to a chosen directory
 
 ### Reveal in Finder
 
@@ -373,7 +384,7 @@ Brilliant auto-saves continuously. There is no Cmd+S; you do not need to save ma
 
 **Save As (Cmd+Shift+S):**
 
-Cmd+Shift+S exports the focused canvas or folder as a portable `.design` package — the YAML file plus a sibling `Assets/` folder containing all referenced images. Image paths in the YAML are rewritten to relative `Assets/filename` references. This is for sharing or archiving; it doesn't replace auto-save, which is always running in the background.
+Cmd+Shift+S exports the focused canvas or folder as a portable `.design` package: the YAML file plus a sibling `Assets/` folder containing all referenced images. Image paths in the YAML are rewritten to relative `Assets/filename` references. This is for sharing or archiving and does not replace auto-save, which always runs in the background.
 
 ---
 
@@ -412,7 +423,7 @@ my-workspace/
 
 ### .design Files
 
-Each canvas is stored as a `.design` file — a YAML-based format containing:
+Each canvas is stored as a `.design` file: a YAML-based format containing:
 - All element properties and hierarchy
 - Canvas metadata (zoom, pan position)
 - Embedded image references (pointing to Assets/ directories)
@@ -431,8 +442,8 @@ When you import an image (Cmd+Shift+O), it's saved to the appropriate Assets dir
 ### .brilliant/ Folder
 
 The `.brilliant/` directory at the workspace root contains:
-- **settings.json** — Per-workspace configuration
-- **trash/** — Recovery directory for deleted canvases, folders, and assets (supports undo)
+- `settings.json`: per-workspace configuration
+- `trash/`: recovery directory for deleted canvases, folders, and assets (supports undo)
 
 ### Deletion and Recovery
 
@@ -456,8 +467,8 @@ Brilliant tracks recently opened workspaces (up to 20). On startup, it reopens t
 ### Recent Canvases & Files
 
 Within a workspace, Brilliant keeps two recency lists:
-- **Recent canvases** — surfaces in `Cmd+P` canvas search (recent canvases score higher)
-- **Recent files** — a unified list across canvases, images, and text files; surfaces in `Cmd+K` global search and drives the **Alt+→ / Alt+←** navigation order. **Ctrl+Alt+←** jumps back to the previously active canvas (canvases only).
+- Recent canvases: surfaces in `Cmd+P` canvas search (recent canvases score higher)
+- Recent files: unified list across canvases, images, and text files; surfaces in `Cmd+K` global search and drives `Alt+Right` / `Alt+Left` navigation order. `Ctrl+Alt+Left` jumps back to the previously active canvas (canvases only).
 
 Both lists persist across app restarts (stored in `SharedPreferences`).
 
@@ -469,11 +480,11 @@ Clicking a text file in the file explorer opens it in Brilliant's built-in **cod
 
 **Features:**
 - **Syntax highlighting** with VS Code Dark+/Light+ themes (auto-matches Brilliant's brightness)
-- **Vim mode** — Full vim keybinding support via @replit/codemirror-vim. Loads your config from `~/.config/nvim/init.vim`, `~/.config/nvim/init.lua`, or `~/.vimrc` automatically (custom key mappings, settings like relativenumber, expandtab, tabstop, etc.)
-- **Search & Replace** — Cmd+F opens the search panel
-- **Diff viewing** — Side-by-side merge view for comparing changes
-- **File navigation** — Alt+Right/Left to switch between files; Ctrl+Alt+Left for previously active file
-- **Vim mode indicator** — Shows current vim mode (Normal/Insert/Visual) in the top toolbar when active
+- Vim mode: full vim keybinding support via `@replit/codemirror-vim`. Auto-loads config from `~/.config/nvim/init.vim`, `~/.config/nvim/init.lua`, or `~/.vimrc` (custom key mappings; settings like `relativenumber`, `expandtab`, `tabstop`)
+- Search and Replace: Cmd+F opens the search panel
+- Diff viewing: side-by-side merge view for comparing changes
+- File navigation: Alt+Right/Left switches between files; Ctrl+Alt+Left jumps to the previously active file
+- Vim mode indicator: shows the current vim mode (Normal/Insert/Visual) in the top toolbar when active
 
 The code editor is particularly useful for editing `.styles` files (design system tokens) directly as YAML.
 
@@ -485,14 +496,14 @@ Brilliant watches for changes to `.styles` files (design system tokens) in your 
 
 ## Collaboration & Sharing
 
-Brilliant is a single-user desktop application — there is no real-time multiplayer editing, share links, or cloud sync.
+Brilliant is a single-user desktop application. There is no real-time multiplayer editing, share links, or cloud sync.
 
 ### Sharing with Others
 
 | Goal | How |
 |------|-----|
 | **Share for viewing** | Export as PNG/SVG/PDF (see [EXPORT.md](./EXPORT.md)) and send the file |
-| **Share editable designs** | Share the `.design` file — the recipient needs Brilliant to open it |
+| **Share editable designs** | Share the `.design` file. The recipient needs Brilliant to open it |
 | **Share a full workspace** | Share the workspace folder (all `.design` files, Assets, `.styles`) |
 | **Developer handoff** | Right-click → Copy As → CSS/SVG/PNG, or use Alt+hover for measurements |
 
@@ -500,20 +511,20 @@ Brilliant is a single-user desktop application — there is no real-time multipl
 
 `.design` files are YAML-based and written deterministically, producing clean diffs. Recommended Git workflow:
 
-1. **Open a folder as workspace** (Cmd+O) — this is your Git repository
-2. Each canvas is a separate `.design` file — changes are per-file
+1. Open a folder as workspace (Cmd+O); this is the Git repository root
+2. Each canvas is a separate `.design` file (changes are per-file)
 3. Images in `Assets/` directories are referenced by canvases
-4. **Right-click → Reveal in Finder** to locate any canvas or folder on disk
-5. Commit, branch, and merge like any code project
+4. Right-click then "Reveal in Finder" locates any canvas or folder on disk
+5. Commit, branch, and merge as with any code project
 
-The `.brilliant/` folder at the workspace root contains settings and trash — include it in version control for consistency.
+The `.brilliant/` folder at the workspace root contains settings and trash. Include it in version control for consistency.
 
 ### No Version History Panel
 
-Undo is per-canvas and within-session only — undo history does not persist when you close the app. For persistent version history, use Git or your OS backup solution (e.g., Time Machine on macOS).
+Undo is per-canvas and within-session only: undo history does not persist across app launches. For persistent version history, use Git or an OS backup solution (Time Machine on macOS).
 
 ## Related
 
-- [EXPORT.md](./EXPORT.md) — Detailed export and import documentation
-- [CROP.md](./CROP.md) — Image crop mode
-- [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) — Design tokens and .styles files
+- [EXPORT.md](./EXPORT.md): export and import details
+- [CROP.md](./CROP.md): image crop mode
+- [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md): design tokens and `.styles` files

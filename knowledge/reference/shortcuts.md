@@ -31,8 +31,8 @@ Once comfortable, add alignment (Alt+Shift+L/R/T/B), z-order (]/[), boolean ops 
 
 ## Limitations
 
-- **No chord (multi-key) shortcuts** — Each shortcut is a single key combination (one key + optional modifiers). You cannot bind sequences like `Ctrl+K, Ctrl+C`. Use **Combos** (Cmd+Shift+M) to chain multiple actions behind a single shortcut.
-- **Modifier-only behaviors are not remappable** — Hold-modifiers like Space (temporary hand tool), Alt+hover (measurements), Alt+drag (duplicate while moving), Shift+drag (constrain proportions or angle), and Ctrl+drag (scale mode during resize) are built-in and cannot be reassigned in the Shortcuts panel. Note: the **K** key toggles persistent scale mode as an alternative to holding Ctrl during resize.
+- **No chord (multi-key) shortcuts**: Each shortcut is a single key combination (one key + optional modifiers). You cannot bind sequences like `Ctrl+K, Ctrl+C`. Use **Combos** (Cmd+Shift+M) to chain multiple actions behind a single shortcut.
+- **Modifier-only behaviors are not remappable**: Hold-modifiers like Space (temporary hand tool), Alt+hover (measurements), Alt+drag (duplicate while moving), Shift+drag (constrain proportions or angle), and Ctrl+drag (scale mode during resize) are built-in and cannot be reassigned in the Shortcuts panel. Note: the **K** key toggles persistent scale mode as an alternative to holding Ctrl during resize.
 
 ## Coming From Figma?
 
@@ -51,7 +51,7 @@ Most Figma shortcuts work unchanged. Key differences:
 | AI input | N/A | **/** | Natural language commands |
 | Combos | N/A | **Cmd+Shift+M** | Macro system |
 
-All shortcuts are fully remappable — you can match any tool's layout via **Shift+?** or the `set_keybinding` batch command.
+All shortcuts are fully remappable: you can match any tool's layout via **Shift+?** or the `set_keybinding` batch command.
 
 ## Platform Key Convention
 
@@ -108,12 +108,13 @@ All shortcuts are fully remappable — you can match any tool's layout via **Shi
 | Action | Shortcut |
 |--------|----------|
 | Select all | Cmd+A (in vector edit mode: selects all nodes and handles) |
-| Select previous sibling | Tab |
-| Select next sibling | Shift+Tab |
+| Select previous sibling | Tab (id `select_previous_element`) |
+| Select next sibling | Shift+Tab (id `select_next_element`) |
 | Enter frame / edit element / enter vector edit mode | Enter |
 | Exit / cancel (context-aware: clears selection, exits vector mode, exits crop, etc.) | Escape |
 | Select parent frame | Shift+Enter |
 | Rename selected layer | Cmd+R |
+| Delete selected | Backspace |
 
 ### Escape Behavior (Context-Aware)
 
@@ -134,8 +135,9 @@ A single Escape press picks one of these targets, in priority order:
 
 | Action | Shortcut |
 |--------|----------|
-| Nudge 1px | Arrow keys |
-| Nudge 10px | Shift+Arrow keys |
+| Nudge selection 1px (up/down/left/right) | Arrow keys (ids `move_elements_up`, `_down`, `_left`, `_right`) |
+| Nudge selection 10px | Shift+Arrow keys (ids `move_elements_*_fast`) |
+| Enter move mode | (no default, id `enter_move_mode`) |
 
 ### Measurement Overlay
 
@@ -158,7 +160,7 @@ A single Escape press picks one of these targets, in priority order:
 | Ctrl | Scale mode: proportional resize + scales font sizes, strokes, corner radii, and descendant elements |
 | Cmd | Preserve crop position (image stays in place) |
 
-**Scale mode toggle (K):** Pressing K enables persistent scale mode — all resizes behave as if Ctrl is held until K is pressed again or you switch tools. See [tools.md](./tools.md#scale-mode-k).
+**Scale mode toggle (K):** Pressing K enables persistent scale mode: all resizes behave as if Ctrl is held until K is pressed again or you switch tools. See [tools.md](./tools.md#scale-mode-k).
 
 ### Rotation Modifiers
 
@@ -192,7 +194,7 @@ In vector edit mode, Cmd+C / Cmd+V copy and paste the selected nodes (and their 
 | Undo | Cmd+Z |
 | Redo | Cmd+Shift+Z |
 
-Undo history is per-canvas — each canvas has its own undo stack. When the file explorer is focused, undo/redo applies to canvas and folder operations instead.
+Undo history is per-canvas: each canvas has its own undo stack. When the file explorer is focused, undo/redo applies to canvas and folder operations instead.
 
 ## Alignment
 
@@ -218,6 +220,9 @@ Undo history is per-canvas — each canvas has its own undo stack. When the file
 | Send to back | [ |
 | Bring forward | Cmd+] |
 | Send backward | Cmd+[ |
+| Reorder fill in stack | (no default, id `reorder_fill`) |
+| Reorder stroke in stack | (no default, id `reorder_stroke`) |
+| Remove selection color (from selection-colors editor) | (no default, id `remove_selection_color`) |
 
 ## Grouping & Frames
 
@@ -246,11 +251,23 @@ Boolean ops require 2+ elements selected. If a single boolean or mask group is a
 
 | Action | Shortcut |
 |--------|----------|
-| Create Component | Cmd+Alt+K |
-| Detach Instance | Cmd+Alt+B |
-| Go to Master Component | (no default — set in Shift+?) |
-| Reset Instance Overrides | (no default — set in Shift+?) |
-| Push Overrides to Master | (no default — set in Shift+?) |
+| Create Component | Cmd+Alt+K (id `create_component`) |
+| Create Instance | (no default, id `create_instance`) |
+| Detach Instance | Cmd+Alt+B (id `detach_component`) |
+| Go to Master Component | (no default, id `go_to_master_component`) |
+| Reset Instance Overrides | (no default, id `reset_component_instance_overrides`) |
+| Push Overrides to Master | (no default, id `push_overrides_to_master`) |
+
+## Frame & Container
+
+| Action | Shortcut |
+|--------|----------|
+| Toggle clip content (frame) | (no default, id `toggle_clip_content`) |
+| Toggle constrain proportions (selected element) | (no default, id `toggle_constrain_proportions`) |
+| Toggle absolute position (auto layout child) | (no default, id `toggle_absolute_position`) |
+| Toggle auto layout wrap | (no default, id `toggle_auto_layout_wrap`) |
+| Set frame type (Frame / Group / Auto Layout / Mask / Boolean) | (no default, id `set_frame_type`; dropdown command in inspector) |
+| Skew elements | (no default, id `skew_elements`) |
 
 ## Vector Edit Mode
 
@@ -270,7 +287,7 @@ These shortcuts apply only while a vector path is open for editing.
 | Duplicate selected nodes | Alt/Option+drag |
 | Detach a handle (set node to Disconnected) | Alt/Option+drag handle |
 | Snap rotation of multi-node selection | Shift+drag rotation handle |
-| Set Point Type to Straight / Mirrored / Asymmetric / Disconnected | (no defaults — set in Shift+?, or click the Point Type row in the right toolbar) |
+| Set Point Type Straight / Mirrored / Asymmetric / Disconnected | (no defaults, ids `set_point_type_straight`, `set_point_type_mirrored`, `set_point_type_asymmetric`, `set_point_type_disconnected`; or click the Point Type row in the right toolbar) |
 
 See [vectors.md](./vectors.md) for full pen / pencil / vector editing reference.
 
@@ -284,6 +301,15 @@ See [vectors.md](./vectors.md) for full pen / pencil / vector editing reference.
 | Align text left | Cmd+Alt+L |
 | Align text center | Cmd+Alt+T |
 | Align text right | Cmd+Alt+R |
+| Toggle text direction (LTR / RTL) | (no default, id `toggle_text_direction`) |
+| Auto-size text (Auto / Auto Width / Auto Height / Fixed) | (no defaults, ids `auto_size_text`, `auto_width_text`, `auto_height_text`, `fixed_size_text`; also `set_text_sizing_mode` dropdown) |
+| Increase / decrease text size | (no defaults, ids `increase_text_size`, `decrease_text_size`) |
+| Increase / decrease line height | (no defaults, ids `increase_line_height`, `decrease_line_height`) |
+| Reset line height | (no default, id `reset_line_height`) |
+| Set font weight | (no default, id `set_font_weight`; dropdown in Typography section) |
+| Apply font family | (no default, id `apply_font_family`; via font selector Cmd+Shift+F) |
+| Outline text (text -> vector path) | Cmd+Ctrl+O |
+| Flatten text (collapse styled runs) | (no default, id `flatten_text`) |
 
 ## Quick Colors
 
@@ -316,6 +342,21 @@ See [vectors.md](./vectors.md) for full pen / pencil / vector editing reference.
 | Add stroke | Shift+S |
 | Remove stroke | Alt+S |
 | Swap fill and stroke | Shift+X |
+| Cycle stroke position (inside / center / outside) | (no default, id `cycle_stroke_position`) |
+| Set stroke position (specific) | (no defaults, ids `set_stroke_position_inside`, `set_stroke_position_center`, `set_stroke_position_outside`) |
+| Set stroke cap round / square | (no defaults, ids `set_stroke_cap_round`, `set_stroke_cap_square`) |
+| Increase / decrease stroke width | (no defaults, ids `increase_stroke_width`, `decrease_stroke_width`) |
+| Add image-filter / shader fill (inner shadow, inner glow, background blur, color adjust, noise/grain, halftone, pixelate, duotone, posterize, dither) | (no defaults, ids `add_inner_shadow_fill`, `add_inner_glow_fill`, `add_background_blur_fill`, `add_color_adjust_fill`, `add_noise_grain_fill`, `add_halftone_fill`, `add_pixelate_fill`, `add_duotone_fill`, `add_posterize_fill`, `add_dither_fill`) |
+| Toggle global shader animation | (no default, id `toggle_global_shader_animation`) |
+
+## Effects
+
+| Action | Shortcut |
+|--------|----------|
+| Add drop shadow | (no default, id `add_drop_shadow`) |
+| Add layer (element) blur | (no default, id `add_layer_blur`) |
+| Add outer glow | (no default, id `add_outer_glow`) |
+| Remove effect | (no default, id `remove_effect`) |
 
 ## Size Levels (Stroke / Tool Size)
 
@@ -368,11 +409,12 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Zoom in (2x) | Cmd+= |
 | Zoom out (0.5x) | Cmd+- |
 | Zoom 100%–900% | 1 through 9 (Move/Hand tool only) |
-| Toggle zoom | 0 (Move/Hand tool only — toggles between current zoom and last zoom state) |
+| Toggle zoom | 0 (Move/Hand tool only, toggles between current zoom and last zoom state) |
 | Center on selection | Cmd+Ctrl+C |
 | Zoom to selection | Cmd+Ctrl+F |
 | Fit all content | Cmd+Ctrl+A |
-| Disable zoom out | Cmd+Ctrl+D |
+| Disable zoom out (clamp) | Cmd+Ctrl+D |
+| Reset zoom to 100% | (no default, command id `reset_zoom`) |
 | Cmd+scroll zoom | Cmd + scroll/trackpad |
 
 ## Grids & Snapping
@@ -381,71 +423,89 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 |--------|----------|
 | Toggle layout grids | Shift+G |
 | Toggle pixel grid | Cmd+' |
-| Toggle snap to pixel grid | Shift+Cmd+' |
+| Toggle snap to pixel grid | Cmd+Shift+' |
 | Toggle rulers | Shift+U |
-| Toggle snap guides (alignment, spacing, equidistant) | (no default — search "Toggle Snap Guides" in command palette) |
-| Toggle vector snapping | (no default — search "Toggle Vector Snapping" in command palette) |
-| Toggle vector snap to geometry / self / others / grids / path curves | (no default — search "Toggle Vector Snap…" in command palette) |
+| Clear all ruler guides | (no default, command id `clear_all_ruler_guides`) |
+| Toggle snap guides (alignment, spacing, equidistant) | (no default, command id `toggle_snap_guides`) |
+| Toggle dimension labels | (no default, command id `toggle_dimension_labels`) |
+| Toggle vector snapping | (no default, command id `toggle_vector_snapping_enabled`) |
+| Toggle vector snap to geometry / self / others / grids / path curves | (no default, ids `toggle_vector_snap_to_geometry`, `_self`, `_others`, `_grids`, `_path_curves`) |
+| Toggle handle angle (vector edit) | (no default, command id `toggle_handle_angle`) |
+| Add layout grid to selected frame | (no default, command id `add_layout_grid`) |
 
 ## Window & Background
 
 | Action | Shortcut |
 |--------|----------|
-| Toggle overlay mode | Ctrl+F (global hotkey, works when unfocused — switches between studio and overlay) |
-| Toggle passthrough | Ctrl+A (overlay mode only — makes window click-through) |
-| Show/hide UI | Cmd+\\ (works in both modes; in overlay mode, creates a clean transparent drawing surface) |
-| Expand/collapse sections | Cmd+/ |
+| Toggle overlay mode | Ctrl+F (global hotkey, works when Brilliant is unfocused; switches between studio and overlay) |
+| Toggle passthrough (overlay only) | Ctrl+A (global hotkey while in overlay; makes the window click-through to apps below) |
+| Show/hide UI | Cmd+\\ (toggles toolbars in both window modes; in overlay creates a clean transparent drawing surface) |
+| Expand/collapse all right-toolbar sections | Cmd+/ (id `toggle_sections`) |
 | Toggle blackboard | Cmd+Shift+B |
 | Toggle whiteboard | Cmd+Shift+W |
-| Toggle background | Cmd+Shift+D |
-| Toggle desktop icons | Ctrl+I |
+| Toggle canvas background | Cmd+Shift+D (id `toggle_background`) |
+| Toggle desktop icons (overlay) | Ctrl+I |
 | Presentation mode | Alt+P |
-| Clear all elements | C |
+| Clear all elements on canvas | C (bare, on canvas) |
+| Toggle render profiler | Cmd+Shift+Alt+P (id `toggle_render_profiler`) |
+| Toggle search profiler | (no default, id `toggle_search_profiler`) |
+| Toggle indicator (overlay status dot) | (no default, id `toggle_indicator`) |
+| Quit application | (no default, id `quit_app`; macOS provides Cmd+Q) |
+| Hide application / Hide others | (no defaults, ids `hide_app`, `hide_others`; macOS provides Cmd+H, Cmd+Alt+H) |
 
 ## Canvas Management
 
 | Action | Shortcut |
 |--------|----------|
-| New canvas | Cmd+N |
+| New canvas | Cmd+N (creates a new canvas; when AI chat is open instead routes to `new_chat`) |
 | Duplicate canvas | Cmd+Ctrl+N |
 | New folder | Cmd+Shift+N |
 | Rename canvas | Alt+Enter |
 | Delete canvas | Cmd+Shift+Delete |
-| Next file | Alt+→ |
-| Previous file | Alt+← |
-| Previously active file | Ctrl+Alt+← |
-| Focus canvas in explorer | Cmd+Shift+K |
-| Expand/collapse all folders | Cmd+Shift+C |
+| Switch to next canvas | Alt+→ |
+| Switch to previous canvas | Alt+← |
+| Switch to previously active canvas | Ctrl+Alt+← |
+| Focus active canvas in explorer | Cmd+Shift+K |
+| Toggle expand/collapse all folders | Cmd+Shift+C |
+| Toggle hidden files | (no default) |
 
 ## File Operations
 
 | Action | Shortcut |
 |--------|----------|
-| Open folder | Cmd+O |
-| Import (images, SVGs, design files) | Cmd+Shift+O |
+| Open design folder (workspace) | Cmd+O (id `open_design_folder`) |
+| Import (images, SVGs, Figma URL, Sketch files, .design folders) | Cmd+Shift+O (id `import`) |
 | Save as | Cmd+Shift+S |
-| Export to PNG | Cmd+E |
+| Export selection to PNG | Cmd+E (id `export_to_png`) |
+| Export selection to JPEG / WebP / SVG / PDF / Replay (mp4/mov) | (no defaults, ids `export_to_jpeg`, `export_to_webp`, `export_to_svg`, `export_to_pdf`, `export_to_replay`) |
+| Copy as PNG / WebP / SVG / CSS / YAML / Blueprint | (no defaults, ids `copy_as_png`, `copy_as_webp`, `copy_as_svg`, `copy_as_css`, `copy_as_yaml`, `copy_as_blueprint`) |
+| Insert image / Import image | (no defaults, ids `insert_image`, `import_image`) |
+| Clean up unused assets | (no default, id `clean_up_unused_assets`) |
+| Load Getting Started canvas | (no default, id `load_getting_started`) |
 
 ## UI Panels
 
 | Action | Shortcut |
 |--------|----------|
-| Command palette | Cmd+Shift+P |
-| Global search | Cmd+K |
-| Canvas search | Cmd+P |
+| Command palette (commands only) | Cmd+Shift+P |
+| Global search (all categories) | Cmd+K |
+| Canvas search (files filter) | Cmd+P |
 | Layer search | Cmd+L |
 | Chat search | Cmd+Shift+I |
+| Font selector | Cmd+Shift+F |
+| Color selector / picker | Ctrl+C |
 | Settings | Cmd+, |
 | Shortcuts reference | Shift+? |
-| Font selector | Cmd+Shift+F |
 | Combos | Cmd+Shift+M |
-| Left toolbar | Cmd+Shift+← |
-| Right toolbar | Cmd+Shift+→ |
-| Bottom toolbar | Cmd+Shift+↓ |
-| File explorer | Cmd+Shift+E |
-| Layers explorer | Cmd+Shift+R |
-| Focus AI chat | / |
+| Toggle left toolbar | Cmd+Shift+← |
+| Toggle right toolbar | Cmd+Shift+→ |
+| Toggle bottom toolbar | Cmd+Shift+↓ |
+| Focus file (canvas) explorer | Cmd+Shift+E (id `focus_canvas_explorer`) |
+| Focus layers explorer | Cmd+Shift+R (id `focus_layers_explorer`) |
+| Toggle layers section in left toolbar | (no default, id `toggle_layers`) |
+| Focus AI chat input in bottom toolbar | / (slash) |
 | Check for updates | Cmd+Shift+U |
+| Toggle Vim mode (code editor) | (no default, id `toggle_vim_mode`) |
 
 ## Chat Sessions
 
@@ -458,8 +518,14 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Close AI chat | Cmd+W (when chat is focused) |
 | Toggle chat explorer | Cmd+Shift+A (when AI chat is open) |
 | New chat | Cmd+N (when AI chat is open) |
+| AI chat layout: full screen / bottom half / right half / left half | (no defaults, ids `ai_chat_full_screen`, `ai_chat_bottom_half`, `ai_chat_right_half`, `ai_chat_left_half`) |
+| Toggle AI chat panel | (no default, command id `toggle_ai_chat`) |
+| Toggle suggested prompts | (no default, command id `toggle_suggested_prompts`) |
+| Toggle AI input collapse | (no default, command id `toggle_ai_input_collapse`) |
+| Clear AI input | (no default, command id `clear_ai_input`) |
+| Delete all archived chats | (no default, command id `delete_all_archived_chats`) |
 
-These shortcuts focus (and expand if minimized) the AI chat session assigned to that number. Cmd+N and Cmd+Shift+A are conditional: they only act on the chat when the AI chat surface is open or focused; otherwise Cmd+N creates a new canvas.
+These shortcuts focus (and expand if minimized) the AI chat session assigned to that number. Cmd+N and Cmd+Shift+A are conditional: they only act on the chat when the AI chat surface is open or focused. When the AI chat surface is not open, Cmd+N creates a new canvas. Cmd+W close-chat is gated behind chat focus and falls through otherwise (no global window-close binding).
 
 ## Combo Presets
 
@@ -470,12 +536,30 @@ These shortcuts focus (and expand if minimized) the AI chat session assigned to 
 | Green highlighter | Ctrl+Shift+G |
 | Blue highlighter | Ctrl+Shift+B |
 
+## Design System
+
+| Action | Shortcut |
+|--------|----------|
+| Switch design mode (e.g. light / dark) | (no default, id `switch_design_mode`) |
+| Apply dark / light theme | Ctrl+D / Ctrl+L (also bound to "Gradient (dark/light)"; same keybinding fills both roles via WhenClause disambiguation) |
+| Apply typography token / shadow token | (no defaults, ids `apply_typography_token`, `apply_shadow_token`) |
+| Set / remove design token | (no defaults, ids `set_token_value`, `remove_token`, `set_mode_token`) |
+| Add / remove color seed; add / remove mode seed | (no defaults, ids `set_color_seed`, `remove_color_seed`, `add_mode_seed`, `remove_mode_seed`) |
+| Set spacing / radius / font size / font weight / line height base | (no defaults, ids `set_spacing_base`, `set_radius_base`, `set_font_size_base`, `set_font_weight_base`, `set_line_height_base`) |
+| Regenerate / reset / open design system file | (no defaults, ids `regenerate_design_system`, `reset_design_system`, `open_design_system_file`) |
+
+## Provider / API Keys
+
+| Action | Shortcut |
+|--------|----------|
+| Set Anthropic / OpenAI / Google / OpenRouter API key | (no defaults, ids `set_anthropic_api_key`, `set_openai_api_key`, `set_google_api_key`, `set_openrouter_api_key`; also `set_brilliant_api_key`, `toggle_brilliant_ai`) |
+
 ## Programmatic Keybinding Customization
 
 Keybindings can be queried and batch-updated via commands:
 
-- **`list_keybindings`** — returns all commands with current/default keybinding, `isCustom` flag, and command groups. Optional `group` param to filter by command group, optional `search` param for case-insensitive regex matching against id/name/description (e.g. `"align|distribute"`).
-- **`set_keybinding`** — batch set keybindings. Params: `{ "bindings": [{ "commandId": "...", "key": "L", "modifiers": ["shift"] }] }`. Omit key/modifiers to clear. Returns conflicts if any.
+- **`list_keybindings`**: returns all commands with current/default keybinding, `isCustom` flag, and command groups. Optional `group` param to filter by command group, optional `search` param for case-insensitive regex matching against id/name/description (e.g. `"align|distribute"`).
+- **`set_keybinding`**: batch set keybindings. Params: `{ "bindings": [{ "commandId": "...", "key": "L", "modifiers": ["shift"] }] }`. Omit key/modifiers to clear. Returns conflicts if any.
 
 Modifier names: `command` (Cmd/Ctrl), `shift`, `alt` (Option), `control`, `fn`. Changes persist to `~/.config/brilliant/keybindings.json`.
 
@@ -492,7 +576,7 @@ Commands are organized in groups (Drawing Tools, Selection & Editing, Canvas Man
 ### Reassigning a Shortcut
 
 1. **Hover** over any command row to reveal action buttons on the right
-2. Click the **record** button (circle icon) — the keybinding area shows "Recording..."
+2. Click the **record** button (circle icon): the keybinding area shows "Recording..."
 3. **Press** your desired key combination (modifiers + key)
 4. The new shortcut is saved immediately
 5. Press **Escape** to cancel recording without changes
@@ -500,8 +584,8 @@ Commands are organized in groups (Drawing Tools, Selection & Editing, Canvas Man
 ### Removing or Resetting a Shortcut
 
 While hovering a command row:
-- **Trash** button — removes the shortcut entirely (command becomes palette-only)
-- **Reset** button (appears only if modified) — restores the default shortcut
+- **Trash** button: removes the shortcut entirely (command becomes palette-only)
+- **Reset** button (appears only if modified): restores the default shortcut
 
 ### Conflict Detection
 
@@ -536,4 +620,4 @@ Available context presets in the picker:
 
 ### Executing Commands from the Shortcuts View
 
-Click any command name in the shortcuts view to execute it immediately — useful for testing commands or triggering commands that don't have shortcuts assigned.
+Click any command name in the shortcuts view to execute it immediately: useful for testing commands or triggering commands that don't have shortcuts assigned.

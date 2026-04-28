@@ -1,6 +1,6 @@
 ---
 name: "knowledge-image-filters"
-description: "GPU image filter fills — noise/grain, halftone, pixelate, duotone, posterize, dither — with full parameter reference."
+description: "GPU image filter fills: noise/grain, halftone, pixelate, duotone, posterize, dither: with full parameter reference."
 ---
 
 > **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
@@ -11,7 +11,7 @@ GPU-powered post-processing filters applied as fill or stroke types. Each filter
 
 **Adding a filter:** Click "+" in the Fills or Strokes section, then use the type dropdown to select a filter from the **Filters** category.
 
-**Z-order processing:** A filter captures everything below it in the fill/stroke list, applies the GPU shader, and renders the result. Fills above the filter render on top of the processed output. Multiple filters can be stacked — each processes everything below it.
+**Z-order processing:** A filter captures everything below it in the fill/stroke list, applies the GPU shader, and renders the result. Fills above the filter render on top of the processed output. Multiple filters can be stacked: each processes everything below it.
 
 **Presets:** Every filter type has a preset dropdown in the expanded fill view. Selecting a preset applies a curated combination of parameter values (and colors where applicable). You can further customize after applying a preset. A reset button next to the dropdown restores the filter's defaults.
 

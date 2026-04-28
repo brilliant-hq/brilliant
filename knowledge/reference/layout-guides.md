@@ -1,144 +1,156 @@
 ---
 name: "knowledge-layout-guides"
-description: "Column, row, and grid layout guides for precise alignment and spacing in frames."
+description: "Column, row, and grid layout guides for alignment and snap targets in frames."
 ---
 
 # Layout Guides
 
-> **Parent skill:** [reference/layout-guides.md](./layout-guides.md)
-
-Layout guides (also called layout grids) are visual overlay lines on frames that help with alignment, spacing, and content organization. They also serve as **snap targets** for elements moved or resized inside the frame.
+Layout guides (a.k.a. layout grids, stored in `ParentData.layoutGrids`) are visual overlays on frames that double as **snap targets** for elements moved or resized inside the frame.
 
 ## Types
 
 | Type | Description | Use Case |
 |------|-------------|----------|
-| **Grid** | Uniform pixel grid (like graph paper) | Precise pixel-level alignment |
-| **Columns** | Vertical sections with gutters | Multi-column layouts (sidebar + content) |
-| **Rows** | Horizontal sections with gutters | Multi-row layouts (header + body + footer) |
+| **Grid** | Uniform pixel grid (graph paper) | Pixel-level alignment. Default size 10 |
+| **Columns** | Vertical sections with optional gutter | Multi-column layouts |
+| **Rows** | Horizontal sections with optional gutter | Multi-row layouts |
 
-A frame can have multiple layout guides of any combination of types.
+A frame can hold any number of guides in any combination of types.
 
 ## Adding Layout Guides
 
 1. Select a frame
 2. Right toolbar → **Layout Guides** section
-3. Click the **+** button to add a guide (default type: Grid)
-4. Change the type using the dropdown in the guide row header (Grid, Columns, or Rows)
-5. Click the **expand button** (slider icon) in the header row to expand additional properties (alignment, size, count, gutter, margin, offset, eye toggle)
+3. Click the **+** (Add Layout Grid) button → adds a guide of type **Grid**
+4. To switch type, change the **Type dropdown** in the new guide's header row to Grid / Columns / Rows
+5. Click the **slider icon** (expand button) on the right of the header to expand property fields
 
-**Keyboard shortcut:** **Shift+G** toggles the *global* layout-guide visibility (see Visibility below). There is no default keyboard shortcut for adding a guide; use the **+** button or run "Add Layout Grid" from the command palette.
+There is **no separate type-picker** at add time. The default type is always Grid; switch via the row's Type dropdown afterwards. There is no default keyboard shortcut for adding a guide. The visibility toggle keybinding is **Shift+G** (global).
 
 ## Header Row Controls
 
-Every guide has a compact header row with these controls (left to right):
+Every guide displays a compact header row. Layout (left → right):
 
 | Control | Description |
 |---------|-------------|
-| **Drag handle** | Visible when 2+ guides exist; drag to reorder |
-| **Type dropdown** | Choose Grid / Columns / Rows |
-| **Color swatch** | Tap the prefix icon on the type dropdown to open the color picker |
-| **Opacity %** | Color opacity in 0–100% (next to the expand button) |
-| **Expand button** (slider icon) | Show/hide property fields and the eye toggle |
-| **Remove button** (minus) | Delete the guide |
+| **Type dropdown** | Grid / Columns / Rows. Has a color swatch as its prefix icon |
+| **Color swatch** | Tap the prefix icon on the Type dropdown to open the color picker |
+| **Opacity field (`%`)** | Color opacity, 0–100. Supports tokens |
+| **Expand button** (slider icon) | Show/hide the guide's property fields and eye toggle |
+| **Remove button** (`-`) | Delete the guide |
+
+There is **no separate drag handle** in the header. Drag-to-reorder uses `ReorderableListView` and is initiated by long-pressing or click-and-holding the row body when 2+ guides exist (the entire row is the drag handle via `ReorderableDragStartListener`).
 
 ## Per-Guide Properties (Expanded)
 
-When expanded, the property fields and the **eye toggle** become visible. Field layout depends on the guide type.
+Field layout depends on the guide type. The **eye toggle** lives in the expanded fields, NOT the header row.
 
 ### Grid Type
 
 | Field | Description |
 |-------|-------------|
-| **Size** | Distance between grid lines in pixels (default: 10) |
-| **Eye toggle** | Hide/show this individual guide |
+| Size | Cell size in pixels. Default **10** |
+| Eye toggle | Hide/show this guide individually |
 
-**Example:** A 10px grid creates lines at 0, 10, 20, 30... pixels.
+A 10px grid draws lines at 10, 20, 30, ... (skipping the frame edges).
 
 ### Columns / Rows
 
+Three rows of fields:
+
 | Row | Fields |
 |-----|--------|
-| 1 | Alignment dropdown + Eye toggle |
-| 2 | Count + Gutter |
-| 3 | Conditional (depends on alignment): Margin (Stretch), Section Size only (Center), or Section Size + Offset (Left/Right/Top/Bottom) |
+| 1 | Alignment dropdown · Eye toggle |
+| 2 | Count · Gutter |
+| 3 | Conditional: Margin (Stretch only), Section Size (Center), or Section Size + Offset (Left/Right/Top/Bottom) |
 
-**Alignment Modes:**
+#### Alignment Modes
 
-| Mode | Columns Behavior | Rows Behavior |
-|------|------------------|---------------|
-| **Stretch** (default) | Divide frame width evenly with margins and gutters | Divide frame height evenly |
-| **Left** / **Top** | Fixed-size sections from left/top edge | — |
-| **Right** / **Bottom** | Fixed-size sections from right/bottom edge | — |
-| **Center** | Fixed-size sections centered in frame | — |
+| Mode | Columns | Rows |
+|------|---------|------|
+| **Stretch** (default) | Divide frame width with margin + gutters | Divide frame height with margin + gutters |
+| **Left** | Fixed-size columns from left edge |  |
+| **Right** | Fixed-size columns from right edge |  |
+| **Center** | Fixed-size columns centered horizontally | Fixed-size rows centered vertically |
+| **Top** |  | Fixed-size rows from top |
+| **Bottom** |  | Fixed-size rows from bottom |
 
-**Properties:**
+#### Properties
 
-| Property | Applies To | Description |
-|----------|-----------|-------------|
-| **Count** | All modes | Number of columns/rows (default: 5, min 1) |
-| **Gutter** | All modes | Gap between sections in pixels (default: 20) |
-| **Margin** | Stretch only | Space from frame edges (default: 0) |
-| **Section Size** | Left / Right / Top / Bottom / Center | Width/height of each fixed section (default: 100) |
-| **Offset** | Left / Right / Top / Bottom | Starting offset from edge (default: 0). Not shown for Center |
+| Property | Applies To | Description | Default |
+|----------|------------|-------------|---------|
+| Count | All modes | Number of sections, min 1 | **5** |
+| Gutter | All modes | Pixels between sections | **20** |
+| Margin | Stretch only | Inset from frame edges | **0** |
+| Section Size | Left, Right, Top, Bottom, Center | Fixed section width/height | **100** |
+| Offset | Left, Right, Top, Bottom (NOT Center) | Starting offset from edge | **0** |
 
 ### Gutter = 0 Behavior
 
-When gutter is set to **0**, columns and rows render as **crisp thin divider lines** instead of filled sections. This is useful for alignment references without visual clutter, and matches Figma's behavior.
+When Gutter is set to **0**, columns/rows render as **crisp thin divider lines** instead of filled sections. Useful as alignment references without visual clutter; matches Figma.
 
-- Lines are drawn at constant screen-pixel width regardless of zoom
-- Anti-aliasing is disabled for pixel-perfect crispness
+- Lines drawn at `1.0 / zoomScale` (constant screen-pixel width regardless of zoom)
+- Anti-aliasing disabled for pixel-perfect crispness
 - Both edges of every section are drawn (left and right for columns, top and bottom for rows)
 
 ## Reordering Guides
 
-When a frame has 2+ guides:
+When 2+ guides exist:
 
-1. Select the frame
-2. In Right toolbar → Layout Guides section
-3. Drag the grip handle on the left of a guide
-4. Drop to reorder
+1. Drag a guide row in the Layout Guides section
+2. Drop it at a new position
 
-The topmost guide in the list renders on top of the others.
+The UI displays guides in **reverse array order** (last array element at the top). Reorder is undo/redo friendly via `_registerPerParentUndo`.
+
+Topmost in the displayed list = drawn last = appears on top visually.
 
 ## Visibility (Two Levels)
 
-Layout guide visibility has two independent levels:
+Layout guide visibility has two independent toggles. Both must be on for a guide to render and to act as a snap target.
 
 | Level | Control | Scope |
 |-------|---------|-------|
-| **Global** | **Shift+G** | Hides/shows ALL layout guides on ALL frames at once |
-| **Per-guide** | Eye icon (in the expanded section) | Hides/shows an individual guide |
-
-A guide is only visible (and only acts as a snap target) when **both** levels are on.
+| **Global** | **Shift+G** (`toggle_layout_grids`) | Hides/shows ALL layout guides on ALL frames |
+| **Per-guide** | Eye toggle in the expanded fields | Hides/shows one guide |
 
 ## Snapping to Guides
 
-Elements inside a frame snap to that frame's visible layout guides:
+Elements inside a frame snap to that frame's visible guides:
 
-- **Column/Row edges** — Left and right boundaries of each column, top and bottom of each row
-- **Grid lines** — Both horizontal and vertical grid lines (snapping works per axis)
+- **Columns:** left and right edges of each column
+- **Rows:** top and bottom edges of each row
+- **Grid:** both horizontal and vertical lines (snaps per-axis)
 
-Snapping requires both visibility levels to be on (Shift+G global toggle AND the per-guide eye icon). Turning off either disables snapping for that guide.
-
-Snapping works even with rotated frames, guide positions are transformed to world coordinates for accurate snapping.
+Snapping works on **rotated frames**: guide positions are transformed via the frame's local basis to world coordinates.
 
 ## Color and Opacity
 
-- **Color**: Click the color swatch (prefix on the type dropdown) to open the standard color picker. Default color is a semi-transparent red
-- **Opacity**: Edit directly in the % field in the header row (range 0–100%)
-- **Tokens**: Opacity supports design system token references
+- **Color** is RGBA. Default `0x1AFF0000` (semi-transparent red)
+- **Opacity** is a 0–100% field; supports design system tokens via `opacityTokenRef`
+- Click the color swatch (prefix icon on the Type dropdown) to open the standard color picker (uses `ChangeColorContext.layoutGrid`)
 
 ## Tips
 
-- **Use gutter = 0** for crisp alignment lines instead of filled sections
-- **Multiple guides** — Combine grids with columns for different purposes (e.g., 8px grid + 12-column layout)
-- **Per-frame guides** — Each frame has its own independent guides
-- **Nested frames** — Child frames can have different guides than parents
-- **Color coding** — Use different colors to distinguish guide purposes
-- **Cross-canvas** — Guides are stored per-frame and follow the frame across canvases when moved
+- **Gutter = 0** for crisp dividers instead of filled bars
+- **Multiple guides per frame** (e.g., 8px Grid + 12-column Columns) compose freely
+- **Per-frame**: each frame has its own guide list (`ParentData.layoutGrids`)
+- **Nested frames** can have different guides than parents
+- Guides are stored on the frame element and follow the frame across canvases when moved
+
+## Quick Reference
+
+| Task | How |
+|------|-----|
+| Add a guide | Layout Guides + button → Grid (default) |
+| Change type | Row's Type dropdown → Grid / Columns / Rows |
+| Toggle global visibility | Shift+G |
+| Toggle one guide | Eye icon in the expanded section |
+| Edit color | Tap color swatch (Type dropdown prefix) |
+| Edit opacity | `%` field in the header row |
+| Reorder | Drag the row (when 2+ exist) |
+| Remove | `-` button on the right of the header |
 
 ## Related
 
-- [frames.md](./frames.md) — Parent types and auto layout
-- [shortcuts.md](./shortcuts.md) — Keyboard shortcuts
+- [frames.md](./frames.md): Parent types and auto layout
+- [shortcuts.md](./shortcuts.md): Keyboard shortcuts

@@ -7,9 +7,9 @@ description: "AI features in Brilliant: multi-provider chat, Claude Code integra
 
 > **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
 
-Brilliant has a single integrated AI system: a **multi-provider chat panel** that drives Claude Code (or another model) to design directly on the canvas. The bottom toolbar input is the entry point: type a prompt, press Enter, and a chat session is created. Brilliant is **bring-your-own-key (BYOK) only**: every chat call uses the user's own API key (Anthropic, OpenAI, Google, OpenRouter) or a local Claude CLI install. There is no hosted Brilliant inference at the moment.
+Brilliant has a single integrated AI system: a **multi-provider chat panel** that drives Claude Code (or another model) to design directly on the canvas. The bottom toolbar input is the entry point: type a prompt, press Enter, and a chat session is created.
 
-> **Note:** an older "natural language command parser" (the `NaturalLanguageCommandLegacy` class, served by a local Qwen endpoint) is still in the source tree but is not wired into the live UI. The active path always routes to Claude Code via a chat session. Phrases like "width 300" or "rotate 45" are sent to the chat model as natural language, not parsed by a deterministic command bar.
+Brilliant chat is **bring-your-own-key (BYOK) only**. Every chat call uses the user's own API key (Anthropic, OpenAI, Google, OpenRouter) or a local Claude CLI install. There is a Brilliant AI proxy in the source tree (`GlobalConfig.brilliantAiProxyBaseUrl`, `_brilliantAiEnabled` flag in `AIChatManager`) but `_loadBrilliantAi()` hard-disables it for this release: `_brilliantAiEnabled = false`. Treat it as not present. Do not pitch hosted inference, do not pitch "we cover your API costs", do not direct the user toward `brilliantAi`-flagged models. The user pays their own provider directly.
 
 ---
 
@@ -67,19 +67,23 @@ The chat panel is a floating panel that opens above the bottom toolbar. It conta
 
 ### Providers
 
+Five providers, defined statically in `lib/providers/provider_registry.dart` (no remote model sync).
+
 | Provider | Backend | Models |
 |----------|---------|--------|
-| **Claude CLI** | Local `claude` binary subprocess | Models discovered from the installed Claude CLI (allowlisted: Opus 4.7, Opus 4.6, Sonnet 4.6, Sonnet 4.5, Haiku 4.5) |
-| **Anthropic HTTP** | Direct Anthropic API | Opus 4.7, Opus 4.6, Sonnet 4.6, Sonnet 4.5, Haiku 4.5 |
-| **OpenAI HTTP** | Direct OpenAI API | GPT-5.5, GPT-5.5 Pro, GPT-5.4, GPT-5.4 Pro, GPT-5.3 Codex |
-| **Google HTTP** | Direct Gemini API | Gemini 3.1 Pro, Gemini 3 Pro, Gemini 3 Flash |
-| **OpenRouter HTTP** | OpenRouter gateway | Curated set spanning Anthropic, OpenAI, Google, DeepSeek V3.2, Moonshot Kimi K2.5 |
+| **Claude CLI** | Local `claude` binary subprocess | Discovered from the CLI at launch, intersected with an allowlist (`_cliModelSpec`): `claude-opus-4-7` ("Best"), `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-sonnet-4-5`, `claude-haiku-4-5`. Opus or any `[1m]`-tagged ID gets 1M context; others 200K |
+| **Anthropic HTTP** | `api.anthropic.com/v1/messages` | `claude-opus-4-7` ("Best"), `claude-opus-4-6` ("Excellent"), `claude-sonnet-4-6` ("Excellent"), `claude-sonnet-4-5-20250929` ("Excellent"), `claude-haiku-4-5-20251001` ("Good + Fast"). All 200K context |
+| **OpenAI HTTP** | `api.openai.com` Chat Completions or Responses API | `gpt-5.5` ("Excellent", Chat Completions), `gpt-5.5-pro` ("Excellent", Responses API), `gpt-5.4` ("Excellent + Fast", Chat Completions), `gpt-5.4-pro` ("Excellent", Responses API), `gpt-5.3-codex` ("Excellent", Responses API). Pro and Codex models route through `OpenAIResponsesProvider` (`/v1/responses`); the rest use `/v1/chat/completions`. Codex has 400K context, others 1.05M |
+| **Google HTTP** | `generativelanguage.googleapis.com/v1beta` | `gemini-3.1-pro-preview` ("Excellent"), `gemini-3-pro-preview` ("Good"), `gemini-3-flash-preview` ("Good + Fast"). All ~1.05M context |
+| **OpenRouter HTTP** | `openrouter.ai/api/v1/chat/completions` | Curated 13-model set: `anthropic/claude-opus-4.7` ("Best"), `anthropic/claude-opus-4.6`, `anthropic/claude-sonnet-4.6`, `anthropic/claude-sonnet-4.5`, `anthropic/claude-haiku-4.5`, `openai/gpt-5.5` ("Excellent"), `openai/gpt-5.4`, `openai/gpt-5.4-pro`, `openai/gpt-5.3-codex`, `google/gemini-3.1-pro-preview`, `google/gemini-3-pro-preview`, `google/gemini-3-flash-preview`, `deepseek/deepseek-v3.2` (text-only, no vision, 163K), `moonshotai/kimi-k2.5` (262K). OpenRouter currently does NOT carry `openai/gpt-5.5-pro` |
 
-> Model lists are static in the build and may change between releases. The model selector only shows models whose provider has valid credentials.
+**Default model per provider** (`ProviderRegistry.defaultModels`): Anthropic `claude-sonnet-4-6`; OpenAI `gpt-5.5`; Google `gemini-3.1-pro-preview`; OpenRouter `anthropic/claude-sonnet-4.6`. CLI has no default (populated at runtime).
+
+The model selector only shows models whose provider currently has valid credentials. Subtitles ("Best", "Excellent", "Good + Fast", etc.) are the exact strings hardcoded on each `ModelInfo`.
 
 ### BYOK: Setting Up API Keys
 
-Brilliant chat is BYOK only. Keys are stored locally in the macOS Keychain (service `com.brilliant.credentials`) and are never sent to Brilliant servers.
+Keys are stored locally in the macOS Keychain (service `com.brilliant.credentials`, items `apikey.{provider}` for keys and `oauth.{provider}` for OAuth tokens) and are sent only to the provider's own API endpoints. The Brilliant AI proxy is disabled in this build, so no chat traffic ever flows through Brilliant servers.
 
 1. Open the chat panel (click the connection indicator in the bottom toolbar, or run **Toggle AI Chat**)
 2. If no providers are connected, an onboarding view appears with buttons for each provider. Otherwise, hover the **connection indicator** in the bottom toolbar to see a popup of all providers (green dot = connected, dim = not connected)
@@ -122,28 +126,30 @@ The input bar at the bottom of the chat panel contains, left to right: attach bu
 
 ### Thinking / Reasoning Levels
 
-Some models support configurable reasoning depth:
+Configured per-model in `ProviderRegistry`:
 
-| Level | Notes |
-|-------|-------|
-| Off | No extended thinking. Claude only |
-| Low | Minimal reasoning |
-| Medium | Moderate reasoning |
-| High | Maximum reasoning |
-| Xhigh | Extra-high reasoning. GPT-5.3 Codex only |
+| Model family | Levels (`thinkingLevels`) |
+|--------------|---------------------------|
+| Claude (CLI, Anthropic HTTP, OpenRouter Anthropic) | `off`, `low`, `medium`, `high` |
+| OpenAI GPT-5.5 / 5.5 Pro / 5.4 / 5.4 Pro | `low`, `medium`, `high` (no off) |
+| OpenAI GPT-5.3 Codex | `low`, `medium`, `high`, `xhigh` |
+| Google Gemini 3.x | `low`, `medium`, `high` (no off) |
+| DeepSeek V3.2, Kimi K2.5 | none (empty `thinkingLevels`, no thinking selector shown) |
 
-Claude models support all four base levels including Off. Gemini and OpenAI reasoning models always reason and do not offer Off. GPT-5.3 Codex adds Xhigh.
+Only Claude can be turned off. Gemini and OpenAI reasoning models always reason at the chosen level. `xhigh` is exclusive to GPT-5.3 Codex.
 
 ---
 
 ## Context and Attachments (Explicit Consent)
 
-Brilliant **never auto-attaches** screenshots, file contents, app version, or other ambient context to chat messages. Every piece of context is opt-in per message; the default is none.
+Outbound chat traffic is **explicit-consent only**. Brilliant does not auto-attach screenshots of the rest of the screen, system info, app version, recent files, telemetry, or other ambient context. Each item is opt-in per message; the default is none.
 
 The two layers of context that can flow with a message:
 
-1. **Canvas context (initial message only):** when the first user message of a session is sent, Brilliant builds an MCP context payload containing the canvas snapshot in blueprint form and a canvas overview screenshot (PNG). This is necessary for the model to "see" the work-in-progress. Subsequent messages send a lighter follow-up context with only changed state. To send a prompt without canvas context, start a chat in an empty workspace or remove all elements first.
-2. **Per-message attachments (opt-in):** elements, images, files. Nothing is attached unless the user explicitly attaches it.
+1. **Canvas context (initial message only):** when the first user message of a session is sent, Brilliant builds an MCP context payload containing a Blueprint snapshot of the canvas and a canvas overview PNG screenshot. This is needed for the model to "see" the work-in-progress. Subsequent messages send a lighter follow-up context with only changed state. To send a prompt without canvas context, start a chat in an empty workspace or remove all elements first
+2. **Per-message attachments (opt-in):** elements (`@mention`), images (paste/drag/paperclip), files. Nothing attaches unless the user explicitly attaches it. Each attachment shows as a chip with an X to remove before sending
+
+When suggesting outbound workflows (sending logs, sharing repro steps, filing feedback, etc.), the AI should: never auto-attach screenshots/version/file contents; ask per-item; default to "none".
 
 ### Adding Attachments
 
@@ -163,7 +169,7 @@ Once a chat is running, Claude Code (or the chosen HTTP model) can call tools to
 
 ### Built-in tools
 
-Available to every HTTP provider:
+Available to every HTTP provider via `ToolExecutor` (`lib/providers/tool_executor.dart`):
 
 | Tool | Purpose |
 |------|---------|
@@ -171,35 +177,46 @@ Available to every HTTP provider:
 | `read` | Read a file with offset/limit |
 | `write` | Write a file (creates parents) |
 | `edit` | Replace `old_string` with `new_string` (uniqueness-checked unless `replace_all`) |
-| `glob` | File-name glob via `fd` (fallback `find`), respects .gitignore |
+| `glob` | File-name glob via `fd` (falls back to `find`), respects `.gitignore` |
 | `grep` | Content search via `rg` |
-| `web_fetch` | HTTP GET with HTML to markdown conversion, 15-min cache, summarized via a lightweight model when configured |
-| `AskUserQuestion` | Pause the run and ask the user a multiple-choice or free-text question (rendered as numbered options in the chat) |
-| `web_search` | Provider-native web search where available (Anthropic, Google when no other tools are present, OpenAI Responses) |
+| `web_fetch` | HTTP GET, HTML to markdown, 15-min cache. Optionally summarized via a lightweight model (Haiku 4.5 for Anthropic, GPT-4.1 nano for OpenAI, Gemini 2.5 Flash Lite for Google, Haiku via OpenRouter; no summarization for Claude CLI) |
+| `AskUserQuestion` | Listed in `builtInToolDefinitions` but intercepted by the orchestrator: pauses the run and presents the user a multi-choice or free-text prompt rendered as numbered options. Resumes when the user picks an option |
 
-The Claude CLI provider has its own tool implementations and ignores the list above.
+**Provider-native web search** (added when `enableWebSearch: true`):
+
+- Anthropic: `web_search_20250305` tool (`max_uses: 5`)
+- OpenAI Responses API: `web_search_preview` tool
+- Google Gemini: `google_search` tool, but ONLY when there are zero function-calling tools (Gemini API rejects the combination, so when canvas tools are present Google web search is silently skipped)
+- OpenAI Chat Completions and OpenRouter: not supported (ignored)
+
+Main sessions ship with `enableWebSearch: true`; sub-agents ship without it. The Claude CLI provider has its own internal tool implementations and ignores the list above.
 
 ### MCP Brilliant tools (canvas)
 
-These let the model design directly on the canvas:
+Two surfaces expose canvas tools:
+
+1. **External MCP server** (when Claude Code or another MCP client connects to Brilliant): the full `mcp__brilliant__*` set, registered in `lib/managers/mcp_tools/`. Includes `init` (CLI-only bootstrap; required first call), `create_html`, `create_modify_elements`, `lookup`, `get_selection`, `get_knowledge`, `execute_commands`, `export`, `generate_image`.
+2. **In-app HTTP providers** (`NativeTools.getToolDefinitions()` in `lib/providers/native_tools.dart`): the integrated Anthropic / OpenAI / Google / OpenRouter sessions get `get_knowledge`, `get_selection`, `export`, `execute_commands`, `lookup`, plus `generate_image` when a `CredentialStore` is wired. Sub-agent capable sessions also get `plan_agents` and `spawn_agent`. External MCP servers can be loaded lazily via `load_mcp_server`. **`create_html` is NOT in `getToolDefinitions()` for HTTP providers**; in-app HTTP sessions emit elements via streaming `<objects canvasId="...">` blocks (see "Streaming Element Creation" below). The `create_html` handler is still in `handleCanvasTool()` for backward compatibility, and `create_html` is exposed to external MCP clients.
 
 | Tool | Purpose |
 |------|---------|
-| `init` | Bootstrap session context (canvas IDs, design system, repo info) |
-| `get_knowledge` | Load `.claude-prod/knowledge/*.md` files (blueprint reference, design heuristics, etc.) |
-| `get_selection` | Read the user's current selection as blueprint |
-| `lookup` | Find or read elements. `scope` (canvas paths, element IDs, `#refs`) constrains where to look; filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) narrow within scope. `format` is `"summary"` (default, compact metadata) or `"blueprint"` (full trees with optional `depth`). |
-| `create_html` | Convert HTML + inline CSS to elements (default for new designs) |
-| `create_modify_elements` | Create or modify elements via Brilliant's blueprint DSL |
-| `execute_commands` | Dispatch any Brilliant canvas command (align, resize, group, set fill, etc.) — see "AI-Invocable Commands" below |
-| `export` | Render elements to PNG / JPEG / WebP / SVG / PDF (returns base64 image so the model can self-review) |
-| `generate_image` | Generate or edit an image with Google's "Nano Banana" image model and apply it as a fill |
+| `init` | (External MCP only.) Bootstrap session context: returns `canvasId`, `repoRoot`, `canvasFile`, element counts, MCP mode header, shared CLAUDE.md reference. CLI clients must call this first |
+| `get_knowledge` | Load `.claude-prod/knowledge/*.md` files by key (e.g. `blueprint/core`, `design/colors`, `effects/glass`). Required before using the Blueprint DSL |
+| `get_selection` | Returns the IDs and full blueprint of the elements selected on the given `canvasId` |
+| `lookup` | Find or read elements. `scope` (canvas paths, 16-hex element IDs, `#refs`) constrains where to look; filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) narrow within scope. `format` is `"summary"` (default) or `"blueprint"` with optional `depth`. `limit` defaults to 50 |
+| `create_html` | (External MCP only.) Convert HTML + inline CSS into auto layout frames, text, and shapes. No `get_knowledge` required. In-app HTTP sessions reach the same path via streamed `<objects>` tags |
+| `create_modify_elements` | (External MCP only.) Create or modify elements via the Blueprint DSL. Requires `get_knowledge(["blueprint/core", ...])` first |
+| `execute_commands` | Dispatch one or more Brilliant commands by ID against a single `canvasId`. Each entry is `{commandId, elementIds?, params?}`. Runs sequentially, stops on first error. See "AI-Invocable Commands" below |
+| `export` | Render elements to PNG/JPEG/WebP/SVG/PDF. Required: `canvasId`, `ids`. Optional: `format` (default `png`), `scale` (default 2.0, raster only, mutually exclusive with `width`/`height`), `width`, `height`, `fitMode` (`fit`/`fill`/`stretch`), `jpegQuality` (default 90), `webpQuality` (default 90), `webpLossless` (default false), `background` (`clear` default, or `window`), `outputPath` (writes to file instead of returning bytes inline). For UI mockups in WebP, set `webpLossless: true`; the lossy default leaves visible gray banding on rounded corners and gradients |
+| `generate_image` | Generate an image and apply it as a fill on `targetElementId`. Single or batch (`targets` array). Optional `referenceElementIds` (up to 14 references, used for "edit this image" workflows). `imageSize`: `"512px"`, `"1K"` (default), `"2K"`, `"4K"`. Requires Google API key or Google OAuth |
+| `plan_agents` / `spawn_agent` | (HTTP providers with sub-agent support.) Announce a plan, then launch sub-agents. Each sub-agent runs in its own `ChatOrchestrator` with the parent's API key; 5-minute timeout |
+| `load_mcp_server` | (HTTP providers when configured.) Load tools from a registered external MCP server by name on the next turn |
 
-The Brilliant MCP server is auto-loaded by the user's local Claude Code instance when the workspace is opened from Brilliant (no manual setup). External MCP servers can also be configured; their tools are loaded lazily via the `load_mcp_server` tool when needed.
+The Brilliant MCP server is auto-loaded by the user's local Claude Code instance when the workspace is opened from Brilliant (no manual setup). When a stale `canvasId` is passed (e.g., the canvas was renamed mid-session), `handleCanvasTool()` resolves it via `elementManager.resolveCanvasId()` before dispatch.
 
 ### AI-Invocable Commands
 
-`execute_commands` lets the AI dispatch any command that implements the `AIInvocableCommand` interface. This includes selection ops (align, distribute, flip), property setters (corner radius, opacity, blend mode), tool changes, frame and component operations, and more — over 100 commands in total. The AI provides element IDs and parameters; the command runs through the same code path as a keyboard or button press, with full undo support.
+`execute_commands` lets the AI dispatch any command that implements the `AIInvocableCommand` interface. This includes selection ops (align, distribute, flip), property setters (corner radius, opacity, blend mode), tool changes, frame and component operations, and more: over 100 commands in total. The AI provides element IDs and parameters; the command runs through the same code path as a keyboard or button press, with full undo support.
 
 ### Sub-Agents
 
@@ -234,7 +251,7 @@ The `imageSize` parameter accepts:
 
 ### Reference Images
 
-Pass element IDs in `referenceElementIds` to use existing canvas elements as visual references for style or structure. Up to 14 references (10 objects + 4 characters) are supported. This is how you "edit" a generated image: pass the original as a reference and prompt the change.
+Pass element IDs in `referenceElementIds` to use existing canvas elements as visual references for style or structure. Up to 14 references per call. This is how you "edit" a generated image: pass the original as a reference and prompt the change.
 
 ### Parallel Generation
 
@@ -295,7 +312,7 @@ Type these in the chat input:
 | Focus chat session 10 | Cmd+0 |
 | Focus next chat session | Cmd+Shift+] |
 | Focus previous chat session | Cmd+Shift+[ |
-| Close / archive focused chat session | Cmd+W (when AI input is focused) |
+| Close focused chat session | Cmd+W (when AI input is focused) |
 | Toggle chat explorer | Cmd+Shift+A |
 | New chat | Cmd+N (when AI input is focused) |
 | Chat search | Cmd+Shift+I |
@@ -320,4 +337,4 @@ These shortcuts focus the chat session assigned to that number, opening the chat
 
 ## Streaming Element Creation
 
-When the AI emits `<objects canvasId="...">` blocks (or calls `create_modify_elements`), elements are created on the canvas line by line as they stream. The chat shows a small preview chip per object batch with element count, a scale indicator, and warnings or errors from the blueprint compiler if any lines failed validation.
+In-app HTTP providers (Anthropic / OpenAI / Google / OpenRouter) do not have `create_html` or `create_modify_elements` tools. They emit elements via streamed `<objects canvasId="...">` blocks in the assistant message: each object line is parsed and applied to the canvas as it streams. The chat shows a per-batch preview chip with element count, a scale indicator, and any blueprint compiler warnings or errors. External MCP clients (Claude Code, etc.) reach the same pipeline through the `create_html` and `create_modify_elements` MCP tools.

@@ -13,171 +13,190 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 
 | Action | Shortcut |
 |--------|----------|
-| Zoom in (2x) | Cmd+= |
-| Zoom out (0.5x) | Cmd+- |
-| Zoom 100%–900% | 1 through 9 (Move/Hand tool only; press the same number again to snap back to 100%). A 1000% command exists in the command palette but has no default shortcut. |
-| Toggle zoom | 0 (Move/Hand tool only) — toggles between 100% and the previous zoom state |
-| Cmd+scroll / Cmd+trackpad pan | Zoom around cursor |
+| Zoom in (2x, viewport-centered) | Cmd+= |
+| Zoom out (0.5x, viewport-centered) | Cmd+- |
+| Zoom 100%, 200%, ..., 900% | 1, 2, 3, 4, 5, 6, 7, 8, 9 (Move or Hand tool only; pressing the same digit twice toggles back to the previous zoom). A 1000% command (`set_zoom_level_1000`) exists in the registry but has no default shortcut. |
+| Toggle zoom | 0 (Move or Hand tool only) toggles between 100% and the previous zoom state. With no previous state it jumps to 200%. |
+| Cmd+scroll, Cmd+trackpad drag | Zoom around cursor |
 | Trackpad pinch | Zoom around focal point |
 
-### Zoom Behavior (Figma-Compatible)
+### Zoom Behavior
 
-- **Multiplicative steps:** Cmd+= and Cmd+- zoom by 2x (100% → 200% → 400% → 800%)
-- **Max zoom:** 25600% (256x), useful for pixel-perfect work
-- **Min zoom:** 2% (0.02x), unless "Disable Zoom Out" (Cmd+Ctrl+D) is active, which clamps to 100%
-- **Keyboard zoom (Cmd+= / Cmd+-):** centers on the viewport
-- **Cmd+scroll, Cmd+trackpad pan, trackpad pinch:** zoom around the cursor
-- **Smooth animation:** zoom transitions use a time-normalized exponential decay so retargeting mid-flight stays smooth
-- **Per-canvas zoom state:** each canvas remembers its own zoom and pan; switching canvases restores them. The first time you visit a canvas with content, Brilliant zoom-fits to its bounds automatically.
+- **Multiplicative steps:** Cmd+= and Cmd+- zoom by 2x and 0.5x (100% to 200% to 400% to 800%)
+- **Max zoom:** 25600% (256x)
+- **Min zoom:** 2% (0.02x), unless "Disable Zoom Out" (Cmd+Ctrl+D) is active, which clamps to 100% and constrains pan to canvas bounds
+- **Keyboard zoom (Cmd+= and Cmd+-):** centers on the viewport
+- **Cmd+scroll, Cmd+trackpad drag, trackpad pinch:** zoom around the cursor
+- **Smooth animation:** zoom transitions use exponential-decay smoothing so retargeting mid-flight stays smooth (`_smoothSpeed = 60`)
+- **Per-canvas zoom state:** each canvas remembers its own zoom and pan; switching canvases restores them. The first time a canvas with content is opened, the viewport zoom-fits to its bounds automatically.
 
 ### Zoom to Content
 
 | Action | Shortcut | Description |
 |--------|----------|-------------|
 | Fit all content | Cmd+Ctrl+A | Zoom and pan to show all elements on the canvas |
-| Zoom to selection | Cmd+Ctrl+F | Zoom and pan to fit the current selection |
+| Zoom to selection | Cmd+Ctrl+F | Zoom and pan to fit the current selection. Falls back to fit-all when nothing is selected. |
 | Center on selection | Cmd+Ctrl+C | Pan to center the selection without changing zoom |
-| Reset zoom | (no default) | Snap back to 100% / zero pan; user-bindable in the Shortcuts panel |
-| Toggle zoom | 0 (Move/Hand tool only) | Toggle between 100% and the previous zoom state. If no previous state exists it jumps to 200%. |
+| Reset zoom | (no default; `reset_zoom`) | Snap back to 100% and zero pan; user-bindable |
+| Toggle zoom | 0 (Move or Hand tool only) | Toggle between 100% and the previous zoom state. With no previous state it jumps to 200%. |
 
 ### Scroll and Trackpad
 
-- **Scroll wheel** — Pans the canvas (vertical scroll = vertical pan)
-- **Cmd+scroll wheel** — Zooms around cursor position
-- **Trackpad two-finger drag** — Pans the canvas
-- **Trackpad pinch** — Zooms around focal point
-- **Cmd+trackpad drag** — Zooms around cursor position
+- Scroll wheel: pans the canvas (vertical scroll = vertical pan)
+- Cmd+scroll wheel: zooms around cursor position
+- Trackpad two-finger drag: pans the canvas
+- Trackpad pinch: zooms around focal point
+- Cmd+trackpad drag: zooms around cursor position
 
 ### Zoom Percentage
 
-Displayed in the right toolbar header. Drag the value to adjust interactively. The displayed percentage is per-canvas and updates as you switch canvases.
+Displayed in the right toolbar header. The percentage is a draggable value (drag horizontally to adjust interactively). It is per-canvas and updates on canvas switch.
 
 ### Disable Zoom Out
 
-**Cmd+Ctrl+D** — Prevents zooming below 100%. Useful for overlay mode.
+**Cmd+Ctrl+D** toggles a clamp that prevents zooming below 100% and constrains pan to canvas bounds. Useful for overlay mode and presentations.
 
 ## Pan
 
 ### Infinite Canvas Panning
 
-Pan works at **any zoom level**, including 100% with zero offset. This enables infinite canvas exploration like Figma.
+Pan works at any zoom level, including 100% with zero offset. The only constraint is when "Disable Zoom Out" is active: pan is clamped to canvas bounds.
 
 ### Hand Tool (H)
 
-Press **H**, click and drag to pan, press **V** to return to Move.
+H activates the Hand tool; click and drag pans. Press V to return to Move.
 
 ### Temporary Pan (Space)
 
-Hold **Space** while in any tool to temporarily pan. Release to return to previous tool.
+Holding Space in any tool temporarily switches to Hand-tool pan behavior. Release returns to the previous tool.
 
 ### Two-Finger Trackpad
 
-Two-finger drag on trackpad pans the canvas. Hold **Cmd** while dragging to zoom instead.
+Two-finger drag on trackpad pans. Cmd+two-finger drag zooms around the cursor.
 
 ### Scroll-Wheel Pan
 
-Mouse scroll wheel pans the canvas. Holding **Cmd** while scrolling zooms instead. Pan gestures (scroll, trackpad, hand-tool drag) include momentum, so a quick flick continues to glide and decelerate after you let go.
+Mouse scroll wheel pans (vertical scroll = vertical pan). Cmd+scroll zooms around the cursor instead. Pan gestures (scroll wheel, trackpad pan, hand-tool drag) include momentum: a quick flick decelerates after release. Decay factor 0.94 per frame; minimum flick speed 3.0; momentum stops on pointer down or `PointerScrollInertiaCancelEvent`.
 
 ## Selection and Hit Testing
 
-How Brilliant decides what you clicked on, and how it shows the result.
+How clicks resolve to elements, and how the result is shown.
 
-### What counts as "clicking on" an element
+### Hit test rules per element type
 
 | Element kind | Hit test |
 |--------------|----------|
-| Filled shape (rectangle, circle, vector region) | Anywhere inside the visible fill |
-| Outlined shape with no fill | Within ~4 screen pixels of the stroke |
-| Vector path (line/curve) | Within ~4 screen pixels of the path |
+| Filled shape (rectangle, circle, vector region) | Inside the rendered fill path (respects corner radii, arcs, rings) |
+| Outlined shape with no fill | Within 4 screen pixels of the stroke |
+| Vector path (line, curve) | Within 4 screen pixels of the path; closed paths additionally hit on filled regions |
 | Text | Inside the text bounding box |
-| Top-level frame (no parent) | Only the **frame label** above its top-left corner is clickable; clicking the frame body passes through to the children inside |
+| Top-level frame (root parent) | The frame label above the top-left corner selects the frame; clicking the frame body passes through to children. Frames are always hit-testable on their fill area even without an explicit fill. |
 | Nested frame (inside another frame) | Anywhere on the frame's fill or stroke |
 | Boolean / mask parent | Uses the resulting visible shape, not the rectangular bounding box |
+| Circle arc / ring | Hit test follows the arc fill path or ring band, not the full ellipse |
 
-The 4-pixel tolerance is **screen-relative**: it scales with zoom so the click target always feels the same size regardless of zoom level.
+Tolerance is `4.0 / zoomScale`: 4 screen pixels at any zoom level. Stacking order is topmost-first (last-rendered wins) and matches DFS pre-order via `CanvasElements.all`.
 
 ### Selection rectangles
 
-Brilliant's selection model is **per-parent**: if you select two elements in Frame A and three in Frame B, you see **two separate selection rectangles**, one per parent. Each rectangle has its own resize and rotate handles, and align/distribute commands operate within each parent's coordinate space independently.
+Selection is per-parent. With 2 elements selected in Frame A and 3 in Frame B, two selection rectangles render, one per parent. Each has its own resize and rotate handles, and align/distribute/resize commands operate within each parent's coordinate space independently.
+
+Selection handles auto-hide when they would be visually too large relative to the selection bounds (`maxHandleToSelectionRatio = 0.30`); multi-parent selections always show handles, and two-point paths (lines) always show handles.
 
 ### Marquee (drag-to-select)
 
 Drag on empty canvas to draw a selection rectangle. Rules:
-- **Nested elements** are selected as soon as the marquee touches them
-- **Top-level frames** must be **fully contained** by the marquee to be selected (otherwise the frame's children are selected instead)
-- Hold **Cmd** during marquee to ignore frames and select children directly
+- Nested elements are selected as soon as the marquee touches them (intersection test)
+- Top-level frames are selected only when fully contained by the marquee; otherwise the marquee selects the frame's children that intersect it
+- Holding Cmd during marquee ignores frame containment and selects children directly
+
+### Selection navigation (keyboard)
+
+| Key | Action |
+|-----|--------|
+| Tab | Select previous sibling (within the current parent's children) |
+| Shift+Tab | Select next sibling |
+| Shift+Enter | Select parent of the current selection (Enter dives into a parent) |
+| Cmd+A | Select all (within the focused parent context) |
+| Escape | Clear selection (when no other Escape target consumes the event first) |
+
+### Nudge (arrow keys)
+
+| Key | Action |
+|-----|--------|
+| Arrow | Move selection 1 px |
+| Shift+Arrow | Move selection 10 px |
+
+Both nudge variants register undo and respect per-parent constraints.
 
 ### Cursor states
-
-The cursor reflects the active tool and what's under it:
 
 | Cursor | When |
 |--------|------|
 | Arrow | Default (Move tool) |
-| Crosshair | Drawing tools (Rectangle, Circle, Line, Pen, Frame, Text) |
+| Crosshair | Drawing tools (Rectangle, Circle, Line, Arrow, Pen, Pencil, Frame, Text, Snip) |
 | Open hand | Hand tool (H) idle |
-| Closed hand | Hand tool dragging, or window-drag in the top toolbar |
+| Closed hand | Hand tool dragging, or window-drag in the top toolbar breadcrumb |
 | Resize arrows | Hovering a selection handle (axis-aware) |
 | Rotate | Hovering a corner just outside the selection bounds |
 | Eyedropper | Color pick mode (Ctrl+Shift+C) |
 | I-beam | Hovering a text element while in Move tool |
 
-### Highlights you'll see while working
+### Highlights rendered during work
 
-- **Hover highlight** — thin outline on the element under the cursor
-- **Selection rectangle(s)** — one per parent with selected children, plus resize/rotate handles
-- **Snap guides** — solid alignment lines and dashed spacing/distribution/size labels (see below)
-- **Measurement overlays** — Alt+hover shows pixel distances (see Measurement Overlays)
-- **Frame labels** — the frame name above top-level frames; click to select the frame
-- **Layout grids** — when enabled per-frame in the right toolbar
+- Hover highlight: thin outline on the element under the cursor
+- Selection rectangles: one per parent with selected children, plus resize/rotate handles
+- Snap guides: solid alignment lines and dashed spacing/distribution/size labels
+- Measurement overlays: Alt+hover shows pixel distances and frame padding
+- Frame labels: above top-level frames; click selects the frame
+- Layout grids: per-frame in the right toolbar Layout Guides section
 
 ## Rendering Performance
 
-Brilliant renders the canvas in two modes and switches between them automatically. You don't need to do anything; the behavior is described here so you know what to expect.
+Two render modes managed by `RenderModeController`, switched automatically.
 
-| Mode | When | What it looks like |
-|------|------|---------------------|
-| **Widget mode** | Default for canvases with up to a few hundred visible elements | Each element is its own crisp Flutter widget; everything is fully interactive |
-| **Tile mode** | Engages automatically when frames start to drop (sustained jank) or when there are roughly 512+ visible elements | Brilliant draws all elements into cached GPU tile images; selected/dragged elements still render as live widgets on top |
+| Mode | When | What it does |
+|------|------|---------------|
+| Widget mode | Default; below the tile thresholds | Each element renders as its own Flutter widget with `RepaintBoundary` |
+| Tile mode | Jank-triggered (6 of 8 frames > 15ms or 2 consecutive > 40ms; minimum 256 visible elements) or proactive (>= 512 visible elements) | Elements are drawn into cached GPU tile images by `CanvasRenderView`; promoted elements (selected, dragged) render as live widgets on top |
 
-Tile mode is invisible to the user except for being smoother. As you zoom out, hide layers, or delete elements, Brilliant returns to widget mode automatically once the visible count drops back below the threshold.
+Tile mode exits to widget mode after 3 consecutive frames with fewer than 512 visible elements. Mode switches enforce a 3-second cooldown to prevent oscillation. The user does not need to opt in or out.
 
-If you ever want raw FPS info, **Cmd+Shift+Alt+P** toggles the render profiler overlay.
+Cmd+Shift+Alt+P toggles the render profiler overlay (frame timings, jank counters, mode transitions).
 
 ## Snap Guides
 
-Snap guides help position elements precisely with visual alignment cues.
-
 ### How Snapping Works
 
-When moving, resizing, or creating elements, Brilliant shows:
-- **Solid lines** — Alignment snaps (edges/centers aligned)
-- **Dashed lines with labels** — Spacing, distribution, and sizing snaps
+While moving, resizing, or creating elements, snap guides render as:
+- Solid lines: alignment snaps (edge or center aligned to a reference)
+- Dashed lines with labels: spacing, equidistant distribution, and size-match snaps
 
-Guide color adapts to theme: light gray on dark backgrounds, dark gray on light backgrounds.
+Guide color adapts to theme (light gray on dark, dark gray on light). The snap engine is per-axis: X and Y snap independently and the closest valid target wins per axis. Once a winning position is determined, all guide types active at that exact position render together.
 
 ### Snap Types
 
-**Alignment Snap** — Snaps edges and centers to other elements' edges and centers.
+| Type | Behavior |
+|------|----------|
+| Alignment | Snaps edges and centers to siblings' edges and centers |
+| Spacing | Maintains an equal gap relative to a neighbor |
+| Equidistant | Equal gaps between 3+ siblings in a row or column |
+| Size matching | When resizing, snaps to match width or height of nearby siblings |
+| Layout grid | Snaps to columns, rows, or grid lines on the parent frame |
+| Ruler guides | Snaps to dragged-out ruler guides |
+| Angle | Shift while drawing lines/arrows snaps to 45 degree increments; pen handle drag snaps to 15 degree |
 
-**Spacing Snap** — Snaps to maintain equal spacing relative to neighbors.
+### Per-Parent Snapping
 
-**Equidistant Snap** — Equal distances between 3+ elements in a row/column.
-
-**Size Matching Snap** — When resizing, snaps to match dimensions of nearby elements.
-
-**Angle Snap** — Hold **Shift** when drawing lines to snap to 45-degree increments.
+Snapping operates within the primary parent's coordinate space. Elements snap to siblings, never across frame boundaries. Frames themselves are valid snap targets when they are siblings.
 
 ### Toggling Snaps
 
 | Action | How |
 |--------|-----|
-| Toggle snap guides | Toggle snap guides command (command palette) |
-| Toggle dimension labels | Toggle dimension labels command (command palette) |
-
-### Per-Parent Snapping
-
-Elements snap to siblings within the same parent, not elements in other frames.
+| Toggle snap guides | Command palette: "Toggle Snap Guides" (no default shortcut) |
+| Toggle dimension labels | Command palette: "Toggle Dimension Labels" (no default shortcut) |
+| Toggle snap to pixel grid | Cmd+Shift+' |
 
 ## Measurement Overlays
 
@@ -220,61 +239,54 @@ Measurement guides appear as **dashed lines with pixel labels**. When elements a
 
 | Mode | Description | Shortcut |
 |------|-------------|----------|
-| Solid (studio default) | Opaque background in studio mode | — |
-| Transparent | Default in overlay mode | — |
+| Solid (studio default) | Opaque background in studio mode | (set by canvas) |
+| Transparent | Default in overlay mode | (set by canvas) |
 | Blackboard | Dark opaque surface | Cmd+Shift+B |
 | Whiteboard | Light opaque surface | Cmd+Shift+W |
-| Toggle | Switch between transparent and last opaque | Cmd+Shift+D |
+| Toggle | Toggle between transparent and last opaque | Cmd+Shift+D |
 
 ### Window Modes
 
-Brilliant has two window modes:
-
 | Mode | Description |
 |------|-------------|
-| **Studio** (default) | Regular desktop window with title bar, shadow, resizable. Visible in Dock. Launches on startup. |
-| **Overlay** | Fullscreen transparent layer above other apps. Borderless, always-on-top, hidden from Dock. |
+| Studio (default) | Regular desktop window: title bar, shadow, resizable, visible in Dock. Launches on startup. |
+| Overlay | Fullscreen transparent layer above other apps: borderless, always-on-top, hidden from Dock. |
 
-**Switching modes:** Press `Ctrl+F` (global hotkey — works even when Brilliant is unfocused) to toggle between studio and overlay. Studio window state (position, size, fullscreen) is saved before entering overlay and restored on exit.
+Ctrl+F is a global hotkey that toggles between studio and overlay mode. It fires even when Brilliant is unfocused, minimized, or invisible. Studio window state (position, size, fullscreen, maximized) is saved on entering overlay and restored on exit.
 
-| Action | Shortcut | Description |
-|--------|----------|-------------|
-| Toggle overlay mode | Ctrl+F | Global hotkey — switch between studio and overlay mode |
-| Passthrough | Ctrl+A | Overlay only — window becomes click-through; elements visible as reference |
-| Presentation | Alt+P | Clean view, UI panels hidden |
+| Action | Shortcut | Notes |
+|--------|----------|-------|
+| Toggle overlay mode | Ctrl+F | Global hotkey |
+| Toggle passthrough | Ctrl+A | Overlay only: pointer events pass through to apps below |
+| Toggle presentation mode | Alt+P | Hides UI panels for a clean view |
+| Toggle UI (panels) | Cmd+\ | Hide/show all toolbars |
+| Toggle inspector sections | Cmd+/ | Collapse/expand all right-toolbar sections |
+| Toggle left toolbar | Cmd+Shift+Left | |
+| Toggle right toolbar | Cmd+Shift+Right | |
+| Toggle bottom toolbar | Cmd+Shift+Down | |
+| Toggle desktop icons | Ctrl+I | Hide macOS desktop icons (overlay use case) |
+| Clear all elements | C | Removes all elements from the active canvas (undoable) |
 
-**Overlay-only experience:** In overlay mode, hide the UI with `Cmd+\` to get a clean, transparent drawing surface over your desktop — ideal for annotation, live demos, or tracing over other apps. To replicate the old overlay-only workflow (no studio window visible), minimize the Studio window and use `Ctrl+F` exclusively — the minimized window stays out of your way.
+Passthrough mode is overlay-only. In overlay mode, Cmd+\ produces a clean transparent drawing surface for annotation or tracing.
 
-**Stuck in overlay mode?** If you cannot see the Brilliant window, press `Ctrl+F` — this is a **global hotkey** that works even when the app is in the background or invisible. It will switch back to Studio mode and restore the window to its previous position and size.
-
-**Note:** Passthrough mode only works in overlay mode.
-
-**Coming from legacy Brilliant?** The global hotkey changed from `Ctrl+Shift+W` to `Ctrl+F`. See the migration guide in [SKILL.md](./SKILL.md#coming-from-legacy-brilliant-bananoate).
-
-### Other Display Options
-
-| Action | Shortcut |
-|--------|----------|
-| Show/hide UI | Cmd+\\ |
-| Toggle desktop icons | Ctrl+I |
-| Clear all elements | C |
+If the window cannot be seen, press Ctrl+F: as a global hotkey it forces a return to studio mode and restores the saved window geometry.
 
 ## Rulers
 
-Toggle rulers with **Shift+U** to display rulers along the canvas edges.
+Shift+U toggles rulers along the canvas edges.
 
 ### Ruler Guides
 
-Drag from the ruler bar to create persistent horizontal or vertical guide lines on the canvas. Ruler guides:
+Drag from the ruler bar onto the canvas to create persistent horizontal or vertical guide lines. Ruler guides:
 
-- **Snap targets** — Elements snap to ruler guides during move and resize
-- **Selectable** — Click a guide to select it
-- **Deletable** — Select a guide and press Delete, or use "Clear All Ruler Guides" from the command palette
-- **Per-canvas** — Each canvas has its own set of ruler guides
+- Are snap targets during move, resize, and create
+- Are selectable: click a guide to select it
+- Are deletable: select and press Delete, or use "Clear All Ruler Guides" via the command palette
+- Are per-canvas: each canvas has its own set
 
 ## Dimension Labels
 
-When enabled, dimension labels show width/height during creation and resize operations.
+When enabled, dimension labels show width/height during creation, resize, and during snap interactions. Toggled via "Toggle Dimension Labels" in the command palette.
 
 ## Pixel Grid
 
@@ -284,11 +296,11 @@ A 1-pixel grid overlay for pixel-perfect work at high zoom levels.
 
 - **Appears at 400%+ zoom** (4x and above)
 - **Fades in smoothly** between 400% and 500% zoom
-- **Theme-aware** — light gray on dark theme, dark gray on light theme
+- Theme-aware: light gray on dark theme, dark gray on light theme
 
 ### Toggle
 
-**Cmd + '** (apostrophe) — Show/hide pixel grid
+Cmd+' toggles the pixel grid overlay.
 
 The pixel grid state persists across app restarts.
 
@@ -311,28 +323,28 @@ Layout grids are visual guides that help you align content within frames. They a
 | **Columns** | Vertical columns with count, gutter, and margin controls |
 | **Rows** | Horizontal rows with count, gutter, and margin controls |
 
-### How to Add and Configure
+### Adding and Configuring
 
 1. Select a frame
-2. In the right toolbar, find the **Layout Guides** section
-3. Click the **+** button to add a grid (default type: Grid)
-4. Change the type using the dropdown in the grid row header (Grid, Columns, or Rows)
-5. Click the settings icon on a grid row to expand configuration options
+2. Right toolbar: find the "Layout Guides" section
+3. Click the + button to add a grid (default type: Grid)
+4. Change the type via the dropdown in the grid row header (Grid, Columns, Rows)
+5. Click the settings icon on a row to expand configuration options
 
-**Shortcuts:** Shift+G toggles all grids visibility. Add a layout grid via the command palette ("Add Layout Grid").
+Shift+G toggles all layout-grid visibility. The command palette exposes "Add Layout Grid", "Add Columns", "Add Rows", and "Add Grid".
 
 ### Grid Options
 
 **Uniform Grid:**
-- **Size** — Cell size in pixels (e.g., 8px for an 8-point grid)
+- Size: cell size in pixels (e.g. 8px for an 8-point grid)
 
-**Columns / Rows:**
-- **Alignment** — Stretch (fill frame), Left/Right/Top/Bottom (anchored), or Center
-- **Count** — Number of columns or rows
-- **Gutter** — Space between columns or rows
-- **Margin** — Space from frame edge (Stretch mode)
-- **Width/Height** — Section size (fixed alignment modes)
-- **Offset** — Distance from anchor edge (fixed alignment modes)
+Columns / Rows:
+- Alignment: Stretch (fill frame), Left/Right/Top/Bottom (anchored), or Center
+- Count: number of columns or rows
+- Gutter: space between columns or rows
+- Margin: space from frame edge (Stretch mode)
+- Width/Height: section size (fixed alignment modes)
+- Offset: distance from anchor edge (fixed alignment modes)
 
 ### Per-Grid Visibility
 
@@ -361,22 +373,22 @@ When enabled (default), moving, resizing, or creating elements automatically sna
 
 ### Toggle
 
-**Shift + Cmd + '** (apostrophe) — Toggle snap to pixel grid on/off
+Shift+Cmd+' toggles snap-to-pixel-grid on/off.
 
-This is separate from the pixel grid overlay (which is just visual). You can have:
-- Overlay ON + Snap OFF — See the grid but allow sub-pixel positioning
-- Overlay OFF + Snap ON — Snap to pixels without seeing the grid
-- Both ON — Full pixel-perfect workflow
+The snap setting is independent of the pixel grid overlay (visual only). Possible combinations:
+- Overlay on, snap off: see the grid, allow sub-pixel positioning
+- Overlay off, snap on: snap to pixels without rendering the grid
+- Both on: full pixel-perfect workflow
 
 The snap setting persists across app restarts.
 
-### When Snap is Useful
+### When pixel snap is useful
 
-- **UI design** — Ensures crisp edges on retina and standard displays
-- **Icon design** — Prevents blurry edges from sub-pixel positioning
-- **Export** — Avoids anti-aliasing artifacts at element boundaries
+- UI design: keeps edges crisp on standard and retina displays
+- Icon design: prevents sub-pixel blur
+- Export: avoids anti-aliasing artifacts at element boundaries
 
-### When to Disable
+### When to disable pixel snap
 
-- **Precise alignment** — When you need exact fractional positioning
-- **Artistic work** — When pixel-perfect doesn't matter
+- Precise alignment requiring fractional positioning
+- Artistic work where pixel-perfect is not a goal

@@ -13,22 +13,24 @@ Brilliant supports exporting designs to multiple formats and copying to clipboar
 
 | Format | Extension | Type | Notes |
 |--------|-----------|------|-------|
-| **PNG** | .png | Raster | Transparency supported |
-| **JPEG** | .jpg | Raster | No transparency (transparent areas filled with canvas background color). Quality fixed at 90 in the UI; configurable via MCP `export` tool |
-| **WebP** | .webp | Raster | Transparency supported. Native libwebp encoding on macOS (real WebP bytes); other platforms currently fall back to PNG bytes. Lossy (q=90) by default; see WebP Quality below |
-| **SVG** | .svg | Vector | Effects via SVG filters; shader fills, inner shadow, inner glow, background blur, color adjust, and image filter fills are rasterized as embedded PNG images |
-| **PDF** | .pdf | Vector | Embedded fonts (Google Fonts cache + system fonts, Helvetica fallback); elements with effects are rasterized for fidelity |
-| **MP4** | .mp4 | Video | H.264 or HEVC codec. Native hardware-accelerated encoding (macOS). Includes a silent audio track for broad compatibility (e.g., WhatsApp) |
-| **MOV** | .mov | Video | HEVC (with alpha) or ProRes 4444. Supports transparent background (macOS) |
-| **Replay** | .mp4 | Video | Animated reveal of the selection: elements appear one after another with a shimmer. Always written as MP4 on disk; the chosen container (MP4/MOV) and codec control the encoding |
+| **PNG** | .png | Raster | Transparency supported. Default for `Cmd+E` |
+| **JPEG** | .jpg | Raster | No transparency. When `background: clear` is requested with JPEG, it auto-substitutes to `window` (canvas color). `jpegQuality` defaults to 90; valid range 0-100 |
+| **WebP** | .webp | Raster | Transparency supported. Native libwebp encoding on macOS via FFI (`native/libwebp/macos/libwebp.dylib` + `libsharpyuv`). Windows and Linux currently emit PNG bytes with a `.webp` extension and a warning log. Lossy q=90 by default; pass `webpLossless: true` for UI mockups (see "WebP Quality" below) |
+| **SVG** | .svg | Vector | Native filters for `dropShadow`, `outerGlow`, `layerBlur`. Pre-rasterized to embedded base64 PNG `<image>`: shader fills, inner shadow, inner glow, background blur, color adjust, image filter fills (and shader/colorAdjust strokes when not pre-rasterized are silently dropped). Angular (sweep) gradients are approximated as linear gradients |
+| **PDF** | .pdf | Vector | Embedded fonts via Google Fonts cache + system fonts, Helvetica fallback. Any element with at least one enabled effect is rasterized whole. Outside strokes fall back to centered. `colorAdjust` fills are silently dropped (no detection path). Vector rendering for native shapes |
+| **MP4** | .mp4 | Video | H.264 or HEVC. macOS only (VideoToolbox/AVAssetWriter). Includes a silent AAC audio track for broad compatibility (WhatsApp etc.). No alpha channel |
+| **MOV** | .mov | Video | HEVC (with alpha) or ProRes 4444. macOS only. Supports transparent background |
+| **Replay** | .mp4 (always) | Video | Animated reveal: elements fade in sequentially with a shimmer pass. Routed through `SessionVideoRecorder.recordElements` (different code path from MP4/MOV exports). The chosen `replayContainer` (MP4/MOV) and `replayCodec` control encoding. Total duration auto-derived from `replayMsPerElement × element count` |
 
 ### WebP Quality
 
-WebP exports are lossy by default at quality 90. **For UI mockups (cards, buttons, panels with rounded corners) lossy WebP at q=90 leaves visible gray artifacts on rounded edges and gradients.** Use lossless WebP for UI mockups instead.
+WebP defaults to lossy at quality 90. **For UI mockups (cards, buttons, panels with rounded corners and gradients) lossy WebP at q=90 leaves visible gray artifacts on rounded edges and color ramps.** Use lossless WebP for UI mockups, or pick PNG.
 
-The right-toolbar Export panel does not currently expose a lossless toggle, so to get lossless WebP either:
-- Use the MCP `export` tool with `format: "webp"` and `webpLossless: true`
-- Or export as PNG (also lossless, broader compatibility)
+The right-toolbar Export panel does not expose a lossless toggle in this build. To get lossless WebP:
+- Call the MCP `export` tool with `format: "webp"` and `webpLossless: true` (recommended for UI mockups)
+- Or export as PNG (lossless and broadly compatible)
+
+The `Copy as WebP` clipboard command produces lossy WebP under the `org.webmproject.webp` UTI on macOS only; most apps prefer PNG when both are available, so use `Copy as PNG` for general-purpose pasting.
 
 ## Export to File
 
@@ -61,16 +63,18 @@ Configure export settings in the **Export panel** in the right toolbar (appears 
 | Option | Values | Default |
 |--------|--------|---------|
 | **Format** | PNG, JPEG, WebP, SVG, PDF, MP4, MOV, Replay | PNG |
-| **Resolution** | Original (1x), Original (2x), Original (3x), Original (4x), 720p, 1080p, 1440p, 4K, 8K, Instagram Post (1080×1080), Instagram Story (1080×1920), iPhone 16 Pro (1206×2622), MacBook Pro 14" (3024×1964), Custom | Original (1x) |
-| **Width/Height** | Target pixel dimensions (MCP `export` tool: `width`, `height` params). Provide one to scale proportionally, or both for exact size. Mutually exclusive with scale. | — |
-| **Fit mode** | Fit, Fill, Stretch, Repeat (only used when both target dimensions are set) | Fit |
-| **Background** | Transparent, Canvas (when format supports alpha) | Transparent |
+| **Resolution** | `Original (1x)`, `Original (2x)`, `Original (3x)`, `Original (4x)`, `720p` (1280x720), `1080p` (1920x1080), `1440p` (2560x1440), `4K` (3840x2160), `8K` (7680x4320), `Instagram Post` (1080x1080), `Instagram Story` (1080x1920), `iPhone 16 Pro` (1206x2622), `MacBook Pro 14"` (3024x1964), `Custom` | `Original (1x)` |
+| **Width / Height** | Target pixel dimensions when format is raster or video. Mutually exclusive with `scale`. Provide one to scale proportionally, or both with a `fitMode` for exact size | none |
+| **Fit mode** | `Fit` (letterbox), `Fill` (crop), `Stretch` (non-uniform), `Repeat` (1:1 tiled). Only consulted when both target dimensions are set | `Fit` |
+| **Background** | `Transparent`, `Canvas` (canvas background color, used as fallback when format does not support alpha) | `Transparent` |
 
 **Notes:**
-- Exports use transparent background by default. JPEG does not support transparency, so when "Transparent" background is selected with JPEG it automatically falls back to the canvas background color
-- JPEG quality is fixed at 90 in the UI. For other values (0–100), use the MCP `export` tool's `jpegQuality` parameter
-- For raster formats, the Resolution dropdown controls output dimensions; for vector formats (SVG, PDF), resolution is not applicable
-- **Batch export:** Click the **+ button** in the Export panel header ("Add export config") to add additional export rows. Each row has its own format, resolution, fit mode, and background. The **Export** button writes all configured rows from a single click. Useful for shipping the same selection at PNG @1x, PNG @2x, and SVG together
+
+- JPEG and MP4 have no alpha channel: when `Transparent` is requested the runtime auto-substitutes `Canvas`. Lossless WebP and PNG keep alpha. MOV preserves alpha only with HEVC-with-alpha or ProRes 4444
+- The right-toolbar UI ships JPEG at quality 90 and does NOT expose a quality slider. For 0-100 control, call the MCP `export` tool with `jpegQuality`
+- The right-toolbar UI ships WebP as lossy q=90 with no UI toggle. For lossless, call the MCP `export` tool with `webpLossless: true`. Strongly preferred for UI mockups
+- For SVG and PDF, the Resolution dropdown is hidden (vector output is resolution-independent)
+- **Batch export:** the `+` button in the Export panel header (`Add export config`) appends an additional export row. Each row has independent format, resolution, fit mode, and background. The `Export` button runs every configured row from a single click. Use for shipping (PNG @1x, PNG @2x, SVG) together
 
 ### Context Menu
 
@@ -80,16 +84,45 @@ Right-click selected elements to access:
 
 ---
 
+## MCP `export` Tool (programmatic export)
+
+Schema (from `lib/providers/native_tools.dart`):
+
+| Param | Type | Default | Notes |
+|-------|------|---------|-------|
+| `canvasId` | string | required | Target canvas |
+| `ids` | string[] | required | Element IDs (or session refs) to export. Selecting a frame includes all descendants |
+| `format` | enum | `png` | `png`, `jpeg`, `webp`, `svg`, `pdf` (no `mp4`/`mov`/`replay` via MCP) |
+| `scale` | number | `2.0` | Raster only. Mutually exclusive with `width`/`height`. Ignored for SVG/PDF |
+| `width` | int | none | Target pixel width. With only `width`, `height` is computed proportionally |
+| `height` | int | none | Target pixel height. With only `height`, `width` is computed proportionally |
+| `fitMode` | enum | `fit` | `fit`, `fill`, `stretch`. Only consulted when both `width` and `height` are set |
+| `jpegQuality` | int | `90` | 0-100, JPEG only |
+| `webpQuality` | int | `90` | 0-100, WebP lossy only (ignored when `webpLossless: true`) |
+| `webpLossless` | bool | `false` | **Set true for UI mockups** to avoid q=90 banding on rounded corners |
+| `background` | enum | `clear` | `clear`, `window`. Ignored for SVG/PDF. JPEG auto-falls back to `window` |
+| `outputPath` | string | none | When set, writes to disk and returns a confirmation rather than inline bytes |
+
+Return shape:
+- Raster (png/jpeg/webp): inline image content part
+- SVG: raw SVG markup as text
+- PDF: base64-encoded data as text
+- With `outputPath`: short text confirmation
+
+The tool resolves `#refs` and stale canvas IDs (from in-flight sessions started before a rename) automatically. Default `scale: 2.0` matches typical Retina output, not 1.0.
+
+---
+
 ## Copy to Clipboard
 
-Copy design elements to clipboard in various formats — useful for pasting into code editors, documentation, other design tools, or chat.
+Copy design elements to clipboard in various formats: useful for pasting into code editors, documentation, other design tools, or chat.
 
 ### Commands
 
 | Command | Description |
 |---------|-------------|
 | Copy as PNG | Copy as PNG image (at screen resolution) |
-| Copy as WebP | Copy as WebP image (macOS only; narrow app compatibility — use PNG for broad paste support) |
+| Copy as WebP | Copy as WebP image (macOS only; narrow app compatibility: use PNG for broad paste support) |
 | Copy as SVG | Copy as SVG markup text |
 | Copy as CSS | Copy as CSS properties (position, size, colors, borders, gradients, rotation) |
 | Copy as YAML | Copy as YAML serialization (full element data) |
@@ -104,7 +137,7 @@ Right-click selected elements to access:
 
 - **PNG**: Image data copied to system clipboard. Default scale matches device pixel ratio for WYSIWYG (what you see on screen matches what you paste). @2x and @4x options multiply the scale for higher-resolution output.
 - **SVG**: Plain SVG markup text. Paste into code editors or SVG-capable tools.
-- **CSS**: CSS class with `width`, `height`, `position`, `left`, `top`, `border-radius`, `background-color`, `border`, `transform` (rotation), gradients, and text properties (`font-size`, `font-family`, `font-weight`, `font-style`, `text-decoration`, `line-height`, `color`). Note: `border-radius` is only exported for frames — corner radii on rectangle elements are not included.
+- **CSS**: CSS class with `width`, `height`, `position`, `left`, `top`, `border-radius`, `background-color`, `border`, `transform` (rotation), gradients, and text properties (`font-size`, `font-family`, `font-weight`, `font-style`, `text-decoration`, `line-height`, `color`). Note: `border-radius` is only exported for frames: corner radii on rectangle elements are not included.
 - **YAML**: Full element properties including hierarchy. Useful for debugging or programmatic access.
 - **Blueprint**: Brilliant's internal element blueprint format. Can be pasted back into Brilliant or shared with AI tools.
 
@@ -125,12 +158,14 @@ Video export renders animated shader fills frame-by-frame into a hardware-accele
 
 ### Video Options
 
-| Option | Values | Default |
-|--------|--------|---------|
-| **Duration** | 0.5–60 seconds (drag to adjust; presets via dropdown) | 10s |
+UI defaults (right-toolbar Export panel) differ from the underlying `VideoExportOptions` defaults: the panel ships with `duration = 10s`, `fps = 60`, `quality = Medium`, while `VideoExportOptions` itself defaults to `duration: 3.0, fps: 30, quality: medium`. The UI values win for human-driven video export.
+
+| Option | Values | UI Default |
+|--------|--------|------------|
+| **Duration** | 0.5-60s (draggable; preset dropdown) | 10s |
 | **FPS** | 15, 24, 30, 60 | 60 |
 | **Quality** | Low (smaller file), Medium (balanced), High (best quality) | Medium |
-| **Resolution** | Same presets as image export (Original 1x/2x/3x/4x, named resolutions, Custom) | Original (1x) |
+| **Resolution** | Same presets as image export | `Original (1x)` |
 
 ### Codecs
 
@@ -166,7 +201,7 @@ Replay export is a one-click animated reveal of the current selection: each elem
 | **Codec** | H.264, HEVC, ProRes 4444 (filtered by container) | H.264 |
 | **Quality** | Low, Medium, High | High |
 | **Pacing (ms per element)** | 10, 25, 50, 75, 100, 150, 200, 250, 300, 400 (presets) or any custom value | 150ms |
-| **Intro text** | Optional short text card shown before the reveal | — |
+| **Intro text** | Optional short text card shown before the reveal |  |
 | **Resolution** | Same presets as image/video export | Original (1x) |
 | **Background** | Transparent (MOV + HEVC/ProRes only) or Canvas | Transparent |
 
@@ -212,7 +247,7 @@ PDF export produces vector output with:
 
 | Format | Import | Export | Notes |
 |--------|--------|--------|-------|
-| **.ai** (Illustrator) | No | No | Use SVG as a bridge format — export from Illustrator as SVG, then import into Brilliant |
+| **.ai** (Illustrator) | No | No | Use SVG as a bridge format: export from Illustrator as SVG, then import into Brilliant |
 | **.sketch** (Sketch) | **Yes** | **Yes** | Import via "Import Sketch File" (command palette), with page selection UI in the right toolbar. Export via "Save as Sketch File" (command palette) |
 | **.fig** (Figma) | Via Figma URL (API) | No | "Import from Figma" (command palette) opens the import section in the right toolbar, where you paste a Figma URL (OAuth). Does not import `.fig` files directly |
 | **.psd** (Photoshop) | No | No | Export layers as PNG from Photoshop, then import as images |
@@ -226,7 +261,7 @@ PDF export produces vector output with:
 | **Import file** | **Cmd+Shift+O** or command palette "Import" (supports images, SVG, and .design files) |
 | **Paste from clipboard** | **Cmd+V** with an image on the clipboard |
 | **Drag and drop** | Drag image files onto the canvas |
-| **Import from Figma** | Command palette "Import from Figma" — opens the import section in the right toolbar, where you paste a Figma URL (OAuth-authenticated API import) |
+| **Import from Figma** | Command palette "Import from Figma": opens the import section in the right toolbar, where you paste a Figma URL (OAuth-authenticated API import) |
 
 Supported image formats: **PNG, JPEG, GIF, BMP, WebP**. On macOS, also **TIFF, HEIC, HEIF, AVIF** (via native conversion).
 
@@ -272,34 +307,34 @@ Both paths require an open workspace (repository mode).
 ### Paste
 
 **Cmd+V** detects clipboard content and handles these types (checked in order):
-- **Brilliant elements** — Pastes with full hierarchy and properties (same or cross-canvas). Uses internal clipboard if unchanged since last copy.
-- **Image data** — Creates a rectangle with image fill
-- **SVG markup** — Detected automatically; imported as native Brilliant elements
-- **Figma JSON** — Detected automatically (from Brilliant Figma plugin); converted to native elements
-- **Design YAML** — Brilliant's YAML serialization format; reconstructs elements
-- **Blueprint format** — Brilliant's blueprint format; reconstructs elements
-- **HTML** — Detected automatically; converted to native elements via the HTML-to-element pipeline
-- **Plain text** — Creates a text element (fallback)
+- **Brilliant elements**: Pastes with full hierarchy and properties (same or cross-canvas). Uses internal clipboard if unchanged since last copy.
+- **Image data**: Creates a rectangle with image fill
+- **SVG markup**: Detected automatically; imported as native Brilliant elements
+- **Figma JSON**: Detected automatically (from Brilliant Figma plugin); converted to native elements
+- **Design YAML**: Brilliant's YAML serialization format; reconstructs elements
+- **Blueprint format**: Brilliant's blueprint format; reconstructs elements
+- **HTML**: Detected automatically; converted to native elements via the HTML-to-element pipeline
+- **Plain text**: Creates a text element (fallback)
 
 ---
 
 ## Tips
 
-- **Cmd+E** is the fastest way to export — runs PNG export with a save dialog
-- **Copy as PNG** is great for quick sharing — it copies at screen resolution so what you see is what you paste
-- **Use @2x or @4x** from the context menu when you need higher-resolution clipboard exports
-- **Copy as SVG** is useful for pasting vector art into web projects or other design tools
-- **Copy as CSS** generates production-ready CSS properties from your design
-- **Selecting a frame** automatically includes all its children in the export
-- **For UI mockups, prefer PNG over WebP** (or use lossless WebP via the MCP `export` tool). Default lossy WebP at q=90 leaves visible gray artifacts on rounded corners and gradients
-- **Use the + button in the Export panel** to ship multiple resolutions and formats from a single Export click (e.g., PNG @1x, PNG @2x, and SVG)
-- **Right-click then Export As then Replay** for a quick animated reveal of the selection (good for showing off layered designs in chat or social posts)
-- **SVG import** works well for icons and simple illustrations; complex SVGs may need cleanup
+- `Cmd+E` runs PNG export with a save dialog (the only export keybinding)
+- `Copy as PNG` copies at device pixel ratio for WYSIWYG paste
+- Right-click then `Copy As` then `PNG @2x`/`@4x` for higher-resolution clipboard exports
+- `Copy as SVG` is useful for pasting vector art into web projects or other design tools
+- `Copy as CSS` produces position+size+colors+rotation+text props. Borders only emit for the first solid stroke; gradients only emit `linear-gradient`; corner radius only emits for frames (not rectangles)
+- Selecting a frame includes all its descendants in the export
+- **UI mockups in WebP: always pass `webpLossless: true` via the MCP `export` tool.** The right-toolbar UI exports lossy q=90 WebP, which leaves visible gray banding on rounded corners and gradients. Either use lossless WebP via the MCP path, or pick PNG
+- The `+` button in the Export panel batches multiple rows (PNG @1x, PNG @2x, SVG) into one click
+- Right-click then `Export As` then `Replay` runs at 2x scale by default, which reads cleanly on retina
+- SVG import handles icons and simple illustrations well; complex SVGs may need cleanup
 
 ---
 
 ## Related
 
-- [CANVASES.md](./CANVASES.md) — Canvas management and file operations
-- [STYLING.md](./STYLING.md) — Fills, strokes, and visual properties
-- [CROP.md](./CROP.md) — Image crop mode
+- [CANVASES.md](./CANVASES.md): Canvas management and file operations
+- [STYLING.md](./STYLING.md): Fills, strokes, and visual properties
+- [CROP.md](./CROP.md): Image crop mode

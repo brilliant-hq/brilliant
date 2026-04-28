@@ -1,6 +1,6 @@
 ---
 name: "knowledge-shaders"
-description: "Shader fills and strokes — animated procedural effects for elements in Brilliant."
+description: "Shader fills and strokes: animated procedural effects for elements in Brilliant."
 ---
 
 > **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
@@ -28,19 +28,33 @@ Shaders are animated, GPU-rendered procedural effects that can be applied to any
 
 ## Shader Types
 
-### Animated
+Each shader is a `PaintStyleType` value. The internal name and the UI label can differ: `holographic` is the internal name for the "Iridescent" shader.
 
-- **Metaballs** — Organic blob merging (up to 5 colors)
-- **Liquid Metal** — Metallic reflections with chromatic aberration, shape-aware rendering (Element, Metaballs, None), bump-modulated stripes (up to 2 colors)
-- **Iridescent** — Iridescent metallic effect with folded noise and element-aware shape rendering (up to 3 colors)
-- **Liquid Stainless Steel** — Flowing chrome-like metallic surface with multi-source lighting, specular highlights, and environment reflections (up to 2 colors)
-- **Dithering** — Animated procedural patterns rendered as retro two-tone dithered output (2 colors). Choose from 7 pattern shapes (Simplex, Warp, Dots, Wave, Ripple, Swirl, Sphere) and 4 dither algorithms (Random, 2x2, 4x4, 8x8). Adjustable grid size and animation speed
+### Animated (`category: 'Animated'`)
 
-### Interactive
+| UI Label | `PaintStyleType` | Max Colors | Default Color Count |
+|----------|------------------|------------|---------------------|
+| Metaballs | `metaballs` | 5 | 5 |
+| Liquid Metal | `liquidMetal` | 2 | 2 |
+| Iridescent | `holographic` | 3 | 3 |
+| Liquid Stainless Steel | `liquidStainlessSteel` | 2 | 2 |
+| Dithering | `dithering` | 2 | 2 |
 
-Interactive shaders react to your mouse cursor in real-time while you hover over elements in idle mode (Move/Hand tool, no selection).
+- **Metaballs** -- Organic blob merging.
+- **Liquid Metal** -- Metallic reflections with chromatic aberration, shape-aware rendering (Element, Metaballs, None), bump-modulated stripes.
+- **Iridescent** -- Iridescent metallic effect with folded noise and element-aware shape rendering.
+- **Liquid Stainless Steel** -- Flowing chrome-like surface with multi-source lighting, specular highlights, environment reflections.
+- **Dithering** -- Procedural pattern rendered as retro two-tone dithered output. 7 pattern shapes (Simplex, Warp, Dots, Wave, Ripple, Swirl, Sphere) and 4 dither algorithms (Random, 2x2, 4x4, 8x8).
 
-- **Reactive Grid** — A dynamic grid that distorts around your cursor, with proximity-based color blending and click effects (up to 5 colors). Parameters: Density, Distortion, Radius, Speed. The grid reacts when hovering near the element and smoothly returns to its ambient animation when you move away
+### Interactive (`category: 'Interactive'`)
+
+Interactive shaders react to the cursor in real time while idle hovering (Move/Hand tool, no selection, not editing). They keep animating regardless.
+
+| UI Label | `PaintStyleType` | Max Colors | Default Color Count |
+|----------|------------------|------------|---------------------|
+| Reactive Grid | `reactiveGrid` | 5 | 3 |
+
+- **Reactive Grid** -- Grid that distorts around the cursor with proximity-based color blending and click ripples. Params: Density, Distortion, Radius, Speed.
 
 ## Shader Parameters
 
@@ -56,87 +70,87 @@ Each shader type has its own set of adjustable parameters. Parameters shared acr
 
 ### Per-Shader Parameters
 
-#### Metaballs
+#### Metaballs (`metaballs`)
 
-| Parameter | Range | Default | Description |
-|-----------|-------|---------|-------------|
-| **Count** | 1–30 | 10 | Number of metaballs |
-| **Size** | 0.05–1.0 | 0.3 | Size of each metaball |
-| **Speed** | 0–3 | 1.0 | Animation speed |
+| Parameter | Param Key | Range | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| **Count** | `count` | 1-30 | 10 | Number of metaballs |
+| **Size** | `size` | 0.05-1.0 | 0.3 | Size of each metaball |
+| **Speed** | `speed` | 0-3 | 1.0 | Animation speed |
 
-Colors: up to 5. Default: black, #FF3377, #FF9900, #FFDD00, #0080FF.
+Colors: maxColors 5, defaultColors `[#000000, #FF3377, #FF9900, #FFDD00, #0080FF]`. Note: this `size` is different from the `metaballSize` param on Liquid Metal/Iridescent/Liquid Stainless Steel (0.1-3.0 there).
 
-#### Liquid Metal
+#### Liquid Metal (`liquidMetal`)
 
-| Parameter | Range | Default | Description |
-|-----------|-------|---------|-------------|
-| **Shape** | Element / Metaballs / None | Element | Shape source |
-| **Softness** | 0–1 | 0.1 | Edge softness |
-| **Repetition** | 1–10 | 2 | Wave repetition count |
-| **Shift Red** | -1 to 1 | 0.3 | Red channel chromatic aberration |
-| **Shift Blue** | -1 to 1 | 0.3 | Blue channel chromatic aberration |
-| **Distortion** | 0–1 | 0.07 | Surface distortion |
-| **Contour** | 0–3 | 0.4 | Contour/edge definition |
-| **Angle** | 0–360° | 70° | Light angle |
-| **Speed** | 0–3 | 1.0 | Animation speed |
-| **Ball Count** | 2–30 | 5 | Ball count (when Shape = Metaballs) |
-| **Ball Size** | 0.1–3 | 1.0 | Ball size (when Shape = Metaballs) |
+| Parameter | Param Key | Range | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| **Shape** | `shape` | Element (0) / Metaballs (1) / None (2) | Element | Shape source |
+| **Softness** | `softness` | 0-1 | 0.1 | Edge softness |
+| **Repetition** | `repetition` | 1-10 | 2 | Wave repetition count |
+| **Shift Red** | `shiftRed` | -1 to 1 | 0.3 | Red channel chromatic aberration |
+| **Shift Blue** | `shiftBlue` | -1 to 1 | 0.3 | Blue channel chromatic aberration |
+| **Distortion** | `distortion` | 0-1 | 0.07 | Surface distortion |
+| **Contour** | `contour` | 0-3 | 0.4 | Contour/edge definition |
+| **Angle** | `angle` | 0-360° | 70° | Light angle |
+| **Speed** | `speed` | 0-3 | 1.0 | Animation speed |
+| **Ball Count** | `metaballCount` | 2-30 | 5 | Only used when `shape = 1` (Metaballs) |
+| **Ball Size** | `metaballSize` | 0.1-3 | 1.0 | Only used when `shape = 1` (Metaballs) |
 
-Colors: up to 2.
+Colors: maxColors 2, defaultColors `[#AAAAAC, #FFFFFF]`.
 
-#### Iridescent
+#### Iridescent (`holographic`)
 
-| Parameter | Range | Default | Description |
-|-----------|-------|---------|-------------|
-| **Shape** | Element / Metaballs / None | Element | Shape source |
-| **Intensity** | 0–1 | 0.7 | Iridescence brightness |
-| **Folds** | 0–1 | 0.7 | Fold/ripple spread |
-| **Angle** | 0–360° | 10° | Hue rotation angle |
-| **Complexity** | 0–1 | 0.75 | Pattern complexity |
-| **Metallic** | 0–1 | 0.9 | Metallic finish amount |
-| **Speed** | 0–3 | 0.2 | Animation speed |
-| **Ball Count** | 2–30 | 5 | Ball count (when Shape = Metaballs) |
-| **Ball Size** | 0.1–3 | 1.0 | Ball size (when Shape = Metaballs) |
+| Parameter | Param Key | Range | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| **Shape** | `shape` | Element / Metaballs / None | Element | Shape source |
+| **Intensity** | `intensity` | 0-1 | 0.7 | Iridescence brightness |
+| **Folds** | `spread` | 0-1 | 0.7 | Fold/ripple spread (key is `spread`, label is "Folds") |
+| **Angle** | `angle` | 0-360° | 10° | Hue rotation angle |
+| **Complexity** | `noise` | 0-1 | 0.75 | Pattern complexity (key is `noise`) |
+| **Metallic** | `metallic` | 0-1 | 0.9 | Metallic finish amount |
+| **Speed** | `speed` | 0-3 | 0.2 | Animation speed |
+| **Ball Count** | `metaballCount` | 2-30 | 5 | Only used when `shape = 1` |
+| **Ball Size** | `metaballSize` | 0.1-3 | 1.0 | Only used when `shape = 1` |
 
-Colors: up to 3.
+Colors: maxColors 3, defaultColors `[#1B0A3C, #0D9488, #7C3AED]`. The internal `PaintStyleType` is `holographic`, the displayName is "Iridescent". Param keys `spread` and `noise` are intentional internal names that the UI labels as "Folds" and "Complexity".
 
-#### Liquid Stainless Steel
+#### Liquid Stainless Steel (`liquidStainlessSteel`)
 
-| Parameter | Range | Default | Description |
-|-----------|-------|---------|-------------|
-| **Shape** | Element / Metaballs / None | Element | Shape source |
-| **Flow** | 0–1 | 0.5 | Flow direction/strength |
-| **Roughness** | 0–1 | 0.3 | Surface roughness |
-| **Distortion** | 0–1 | 1.0 | Surface distortion |
-| **Depth** | 0–1 | 1.0 | 3D depth effect |
-| **Angle** | 0–360° | 45° | Light angle |
-| **Speed** | 0–3 | 2.0 | Animation speed |
-| **Ball Count** | 2–30 | 5 | Ball count (when Shape = Metaballs) |
-| **Ball Size** | 0.1–3 | 1.0 | Ball size (when Shape = Metaballs) |
+| Parameter | Param Key | Range | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| **Shape** | `shape` | Element / Metaballs / None | Element | Shape source |
+| **Flow** | `flow` | 0-1 | 0.5 | Flow direction/strength |
+| **Roughness** | `roughness` | 0-1 | 0.3 | Surface roughness |
+| **Distortion** | `distortion` | 0-1 | 1.0 | Surface distortion |
+| **Depth** | `depth` | 0-1 | 1.0 | 3D depth effect |
+| **Angle** | `angle` | 0-360° | 45° | Light angle |
+| **Speed** | `speed` | 0-3 | 2.0 | Animation speed |
+| **Ball Count** | `metaballCount` | 2-30 | 5 | Only when `shape = 1` |
+| **Ball Size** | `metaballSize` | 0.1-3 | 1.0 | Only when `shape = 1` |
 
-Colors: up to 2.
+Colors: maxColors 2, defaultColors `[#B0B0B4, #FFFFFF]`.
 
-#### Dithering
+#### Dithering (`dithering`)
 
-| Parameter | Range | Default | Description |
-|-----------|-------|---------|-------------|
-| **Shape** | Simplex / Warp / Dots / Wave / Ripple / Swirl / Sphere | Simplex | Noise pattern type |
-| **Dither** | Random / 2x2 / 4x4 / 8x8 | 4x4 | Dither matrix algorithm |
-| **Size** | 1–20 | 4 | Dither pixel grid size |
-| **Speed** | 0–3 | 1.0 | Animation speed |
+| Parameter | Param Key | Range | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| **Shape** | `shape` | Simplex (0) / Warp (1) / Dots (2) / Wave (3) / Ripple (4) / Swirl (5) / Sphere (6) | Simplex | Noise pattern type |
+| **Dither** | `ditherType` | Random (0) / 2x2 (1) / 4x4 (2) / 8x8 (3) | 4x4 | Dither matrix algorithm |
+| **Size** | `size` | 1-20 | 4 | Dither pixel grid size |
+| **Speed** | `speed` | 0-3 | 1.0 | Animation speed |
 
-Colors: 2.
+Colors: maxColors 2, defaultColors `[#000000, #00B3FF]`. No named presets.
 
-#### Reactive Grid
+#### Reactive Grid (`reactiveGrid`, Interactive)
 
-| Parameter | Range | Default | Description |
-|-----------|-------|---------|-------------|
-| **Density** | 2–20 | 8 | Grid cell density |
-| **Distortion** | 0–1 | 0.5 | Mouse-driven distortion amount |
-| **Radius** | 0.05–1 | 0.3 | Mouse interaction radius |
-| **Speed** | 0–3 | 1.0 | Animation speed |
+| Parameter | Param Key | Range | Default | Description |
+|-----------|-----------|-------|---------|-------------|
+| **Density** | `density` | 2-20 | 8 | Grid cell density |
+| **Distortion** | `distortion` | 0-1 | 0.5 | Mouse-driven distortion amount |
+| **Radius** | `radius` | 0.05-1 | 0.3 | Mouse interaction radius |
+| **Speed** | `speed` | 0-3 | 1.0 | Animation speed |
 
-Colors: up to 5.
+Colors: maxColors 5, default 3 colors `[#1A1A33, #3366CC, #E64D80]`.
 
 ## Presets
 
@@ -162,9 +176,9 @@ Every shader fill has a Transform section (in the expanded view) with 4 controls
 | **Offset Y** | -1.0–1.0 | 0.0 | Pan the pattern vertically |
 | **Rotation** | 0–360° | 0° | Rotate the pattern within the element |
 
-These controls transform the pattern independently of the element's own position, size, and rotation. The element boundary stays the same — only the procedural texture inside it changes.
+These controls transform the pattern independently of the element's own position, size, and rotation. The element boundary stays the same: only the procedural texture inside it changes.
 
-**Cmd+Resize compensation:** When resizing an element while holding Command (macOS) or Ctrl (Windows), shader UV transforms are automatically compensated so the pattern stays fixed in world space — the element boundary reveals more or less of the pattern instead of stretching it. This matches the behavior of image crop compensation during resize.
+**Cmd+Resize compensation:** When resizing an element while holding Command (macOS) or Ctrl (Windows), shader UV transforms are automatically compensated so the pattern stays fixed in world space: the element boundary reveals more or less of the pattern instead of stretching it. This matches the behavior of image crop compensation during resize.
 
 **Aspect ratio lock:** Shader fills also store an internal aspect ratio reference. During normal resize, the pattern distorts with the element. During Cmd+resize, the pattern keeps its original aspect ratio, so the boundary just reveals more or less of the same fixed pattern.
 
@@ -179,9 +193,9 @@ Liquid Metal, Iridescent, and Liquid Stainless Steel have a **Shape** dropdown w
 | **None** | No shape masking |
 
 Shaders with the Shape dropdown:
-- **Liquid Metal** — Metallic contours follow the element boundary
-- **Iridescent** — Iridescent contours follow the element boundary
-- **Liquid Stainless Steel** — Chrome contours follow the element boundary
+- **Liquid Metal**: Metallic contours follow the element boundary
+- **Iridescent**: Iridescent contours follow the element boundary
+- **Liquid Stainless Steel**: Chrome contours follow the element boundary
 
 ## Animation
 
@@ -204,17 +218,19 @@ Shader fills can be stacked with other fill types (solid, gradient, image, inner
 
 ## Unified Type Dropdown
 
-Every fill (and stroke) has a single type dropdown organized by category:
+Every fill and stroke uses one type dropdown grouped by category. Internal type names in `lib/models/element.dart` PaintStyleType enum:
 
-| Category | Types |
+| Category | Types (UI label / `PaintStyleType`) |
 |----------|-------|
-| **Colors** | Solid, Linear, Radial, Angular |
-| **Static** | Image, Inner Shadow, Inner Glow, Background Blur |
-| **Animated** | Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering |
-| **Interactive** | Reactive Grid |
-| **Filters** | Color Adjust, Noise/Grain, Halftone, Pixelate, Duotone, Posterize, Dither |
+| **Colors** | Solid (`solid`), Linear (`linearGradient`), Radial (`radialGradient`), Angular (`angularGradient`) |
+| **Static** | Image (`image`), Inner Shadow (`innerShadow`), Inner Glow (`innerGlow`), Background Blur (`backgroundBlur`) |
+| **Animated** | Metaballs (`metaballs`), Liquid Metal (`liquidMetal`), Iridescent (`holographic`), Liquid Stainless Steel (`liquidStainlessSteel`), Dithering (`dithering`) |
+| **Interactive** | Reactive Grid (`reactiveGrid`) |
+| **Filters** | Color Adjust (`colorAdjust`), Noise/Grain (`noiseGrain`), Halftone (`halftone`), Pixelate (`pixelate`), Duotone (`duotone`), Posterize (`posterize`), Dither (`dither`) |
 
-You can switch any fill between types freely. Image filter types (Filters category) apply GPU post-processing to all fills below them in the z-order.
+You can switch any fill between types freely. The Filters category applies GPU post-processing to all fills below it in the z-order; the underlying paint switches type but the fill row stays in place.
+
+Text ranges (per-character runs) are restricted to `solid` only: only the Solid option appears in the dropdown when editing a text range.
 
 ## Interactive Shader Behavior
 
@@ -229,4 +245,4 @@ Interactive shaders (like Reactive Grid) have special behavior:
 
 - **PNG/JPEG/WebP:** Shader renders at full quality (current animation frame). Interactive effects are captured at their current state
 - **PDF:** Shader renders at full quality (current animation frame) via rasterization, same as PNG/JPEG/WebP
-- **SVG:** Shader renders at full quality via pre-rasterization — the element is rendered as an embedded PNG image within the SVG. Animation is captured at the current frame. SVG cannot express fragment shaders natively, so rasterization preserves visual fidelity
+- **SVG:** Shader renders at full quality via pre-rasterization: the element is rendered as an embedded PNG image within the SVG. Animation is captured at the current frame. SVG cannot express fragment shaders natively, so rasterization preserves visual fidelity
