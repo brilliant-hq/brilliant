@@ -26,12 +26,12 @@ description: "Selection, movement, resize, rotation, alignment, distribution, z-
 
 | Action | Result |
 |--------|--------|
-| Shift+Click | Toggle element in/out of selection |
-| Cmd+A | Select all top-level elements |
+| Shift+Click | Toggle element in/out of selection (extends or removes) |
+| Cmd+A | Select all top-level elements (in vector edit mode: select all nodes and handles) |
 
 ### Drag-Select (Marquee)
 
-Click and drag on empty space to create a selection rectangle. Top-level frames must be fully contained; other elements need only intersect. Hold **Shift** to add to the existing selection.
+Click and drag on empty space to create a selection rectangle. Top-level frames with children must be fully contained; nested frames, empty top-level frames, and non-frame elements only need to intersect (or for filled rectangles/parents, the rectangle must overlap the fill). Hold **Shift** to add to the existing selection. Hold **Cmd** to select through fills (deep-select: ignores element fills when computing hits).
 
 ### Navigating the Hierarchy
 
@@ -167,7 +167,7 @@ Levels use a clock-position metaphor. Each level sets an absolute rotation in 30
 | Rotate clockwise | Cmd+Ctrl+Shift+= | +15° (relative) |
 | Rotate counter-clockwise | Cmd+Ctrl+- | -15° (relative) |
 
-Programmatic rotation via `execute_commands`: `set_rotation` (absolute), `set_rotation_multiply` (multiply current by factor), `add_to_rotation` / `subtract_from_rotation` (relative).
+Programmatic rotation via `execute_commands` uses one command (`set_rotation`) with operations: `absolute`, `add` / `subtract` (relative offset), `multiply` (factor), `increase` / `decrease` (fuzzy).
 
 ## Flipping
 
@@ -295,7 +295,7 @@ To bake a boolean parent into a single uneditable vector, use **Flatten** (Cmd+E
 | Action | Shortcut | What |
 |--------|----------|------|
 | Group | Cmd+G | Wraps selection in a group (hug sizing on both axes). Groups are structural only: not a reparent target, children cannot be dragged out. If the selection spans multiple parents, one group is created per parent. |
-| Frame Selection | Cmd+F | Wraps selection in a frame container (regular frame, fixed sized to the selection bounds, valid reparent target) |
+| Frame Selection | Cmd+F | Wraps selection in a frame container (`ParentType.frame`, hug-sized initially, valid reparent target). Sizing can be switched from hug to fixed/fill afterward. |
 | Ungroup | Cmd+Shift+G | Removes the wrapping group/frame, moves children up to the parent |
 | Add Auto Layout | Shift+A | Wraps the selection in an auto-layout frame, inferring direction and spacing from existing positions |
 

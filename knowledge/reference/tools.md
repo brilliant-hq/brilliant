@@ -56,13 +56,18 @@ Bottom toolbar layout (left to right): Move/Scale/Hand dropdown, Shape dropdown 
 
 The default tool. Used for selecting, transforming, and direct-manipulation editing.
 
-- Click to select; Shift+click extends selection; Cmd+click toggles individual elements
+- Click to select; Shift+click toggles an element in/out of selection
 - Drag to move selected elements
 - Alt+drag duplicates the selection and drags the copies; releasing Alt mid-drag cancels duplication and the original takes the dragged position
-- Alt+hover (no drag) shows measurement overlays: gap distances between selection and the hovered element, or 4-side padding when the hover target is a parent frame of the selection (or the selection is a frame containing the hover target)
+- Alt+hover (no drag) shows measurement overlays:
+  - Selection vs peer element: gap distances on whichever axis has a gap; edge-to-edge offsets when bounding boxes overlap on both axes
+  - Selection contains the hovered element (selection is a frame ancestor): 4-side padding from the hovered child to the frame edges
+  - Hovered element is the parent frame of the selection: 4-side padding from selection to the frame edges
+  All measurement geometry is computed in world-space AABBs (matching Figma, even for rotated elements)
 - 8 selection handles per parent (4 corners, 4 edges); drag to resize
 - Rotation handles appear just outside the corner handles when hovered
-- Drag on empty canvas to draw a marquee. Top-level frames require full containment; other elements require intersection. Cmd during marquee ignores frame containment
+- Drag on empty canvas to draw a marquee. Top-level frames with children require full containment; other elements (and empty / nested frames) only need intersection. Holding Cmd during marquee selects through fills (deep-select)
+- Cmd while drag-reparenting drops into the parent of the deepest matching frame (skip one level)
 - Double-click a vector element to enter vector edit mode; double-click text to edit; double-click a boolean parent to enter boolean edit mode; double-click a mask parent to enter mask edit mode; Alt+double-click an element with a gradient fill shows gradient handles
 - Frames pass double-clicks through to their children (Figma behavior). Childless frames with an image fill are an exception and consume double-click for crop entry
 - Shift+Enter selects the parent of the current selection
@@ -105,14 +110,14 @@ Straight lines between two points. Shift snaps to 45 degree increments.
 
 ## Arrow Tool (Shift+L)
 
-A line with an end-cap arrowhead. Shift snaps to 45 degree increments. Start and end caps are independently configurable in the right toolbar: None, Round, Square, Arrow.
+A line with an end-cap arrowhead. Shift snaps to 45 degree increments. Start and end caps are independently configurable in the right toolbar (`StrokeCap2`): none, round, square, arrow.
 
 ## Rectangle Tool (R, Shift+R)
 
 - R: filled rectangle
 - Shift+R: stroke-only rectangle
 - Shift while dragging: perfect square
-- Corner radii are configurable per-corner in the right toolbar; Cmd+Alt+`=`/`-` increment/decrement, Cmd+Alt+0..9 set radius levels
+- Corner radii are configurable per-corner in the right toolbar. Cmd+Alt+0..9 set radius levels; Cmd+Alt+Shift+= increases, Cmd+Alt+- decreases.
 - Drag handles inside the corners to set radius interactively
 
 ## Circle Tool (O, Shift+O)
@@ -171,7 +176,7 @@ Text styling lives in the right toolbar: family, weight, size, line height, lett
 
 ## Snip Tool (S)
 
-Captures a screen region as an image element. Drag to define the capture rectangle; Shift constrains to a square. The Brilliant overlay is hidden during the capture so the snip rectangle is not part of the screenshot. The captured image is stored in the per-canvas image cache and embedded as a `PaintStyle.image` fill on a new rectangle element. After capture, the tool auto-reverts to Move.
+Captures a screen region as an image element. Drag to define the capture rectangle; Shift constrains to a square. The native macOS screen capture API is invoked with the snip preview rectangle hidden, so the screenshot does not include the marquee outline. The captured image is stored in the per-canvas image cache and embedded as a `PaintStyle.image` fill on a new rectangle element (no stroke). After capture, the tool auto-reverts to Move and the new element is selected. Snip has no dedicated bottom-toolbar button; invoke it with S or via the command palette.
 
 ## Creation Style
 

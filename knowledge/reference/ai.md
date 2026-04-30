@@ -9,7 +9,7 @@ description: "AI features in Brilliant: multi-provider chat, Claude Code integra
 
 Brilliant has a single integrated AI system: a **multi-provider chat panel** that drives Claude Code (or another model) to design directly on the canvas. The bottom toolbar input is the entry point: type a prompt, press Enter, and a chat session is created.
 
-Brilliant chat is **bring-your-own-key (BYOK) only**. Every chat call uses the user's own API key (Anthropic, OpenAI, Google, OpenRouter) or a local Claude CLI install. There is a Brilliant AI proxy in the source tree (`GlobalConfig.brilliantAiProxyBaseUrl`, `_brilliantAiEnabled` flag in `AIChatManager`) but `_loadBrilliantAi()` hard-disables it for this release: `_brilliantAiEnabled = false`. Treat it as not present. Do not pitch hosted inference, do not pitch "we cover your API costs", do not direct the user toward `brilliantAi`-flagged models. The user pays their own provider directly.
+Brilliant chat is **bring-your-own-key (BYOK) only**. Every chat call uses the user's own API key (Anthropic, OpenAI, Google, OpenRouter) or a local Claude CLI install. The user pays their own provider directly.
 
 ---
 
@@ -71,11 +71,11 @@ Five providers, defined statically in `lib/providers/provider_registry.dart` (no
 
 | Provider | Backend | Models |
 |----------|---------|--------|
-| **Claude CLI** | Local `claude` binary subprocess | Discovered from the CLI at launch, intersected with an allowlist (`_cliModelSpec`): `claude-opus-4-7` ("Best"), `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-sonnet-4-5`, `claude-haiku-4-5`. Opus or any `[1m]`-tagged ID gets 1M context; others 200K |
+| **Claude CLI** | Local `claude` binary subprocess | Discovered from the CLI at launch, intersected with an allowlist (`_cliModelSpec`): `claude-opus-4-7` ("Best"), `claude-opus-4-6` ("Excellent"), `claude-sonnet-4-6` ("Excellent"), `claude-sonnet-4-5` ("Excellent"), `claude-haiku-4-5` ("Good + Fast"). Opus (or any `[1m]`-tagged ID) gets 1M context; others 200K |
 | **Anthropic HTTP** | `api.anthropic.com/v1/messages` | `claude-opus-4-7` ("Best"), `claude-opus-4-6` ("Excellent"), `claude-sonnet-4-6` ("Excellent"), `claude-sonnet-4-5-20250929` ("Excellent"), `claude-haiku-4-5-20251001` ("Good + Fast"). All 200K context |
 | **OpenAI HTTP** | `api.openai.com` Chat Completions or Responses API | `gpt-5.5` ("Excellent", Chat Completions), `gpt-5.5-pro` ("Excellent", Responses API), `gpt-5.4` ("Excellent + Fast", Chat Completions), `gpt-5.4-pro` ("Excellent", Responses API), `gpt-5.3-codex` ("Excellent", Responses API). Pro and Codex models route through `OpenAIResponsesProvider` (`/v1/responses`); the rest use `/v1/chat/completions`. Codex has 400K context, others 1.05M |
 | **Google HTTP** | `generativelanguage.googleapis.com/v1beta` | `gemini-3.1-pro-preview` ("Excellent"), `gemini-3-pro-preview` ("Good"), `gemini-3-flash-preview` ("Good + Fast"). All ~1.05M context |
-| **OpenRouter HTTP** | `openrouter.ai/api/v1/chat/completions` | Curated 13-model set: `anthropic/claude-opus-4.7` ("Best"), `anthropic/claude-opus-4.6`, `anthropic/claude-sonnet-4.6`, `anthropic/claude-sonnet-4.5`, `anthropic/claude-haiku-4.5`, `openai/gpt-5.5` ("Excellent"), `openai/gpt-5.4`, `openai/gpt-5.4-pro`, `openai/gpt-5.3-codex`, `google/gemini-3.1-pro-preview`, `google/gemini-3-pro-preview`, `google/gemini-3-flash-preview`, `deepseek/deepseek-v3.2` (text-only, no vision, 163K), `moonshotai/kimi-k2.5` (262K). OpenRouter currently does NOT carry `openai/gpt-5.5-pro` |
+| **OpenRouter HTTP** | `openrouter.ai/api/v1/chat/completions` | Curated 13-model set: `anthropic/claude-opus-4.7` ("Best"), `anthropic/claude-opus-4.6` ("Excellent"), `anthropic/claude-sonnet-4.6` ("Excellent"), `anthropic/claude-sonnet-4.5` ("Excellent"), `anthropic/claude-haiku-4.5` ("Good + Fast"), `openai/gpt-5.5` ("Excellent"), `openai/gpt-5.4` ("Excellent + Fast"), `openai/gpt-5.4-pro` ("Excellent"), `openai/gpt-5.3-codex` ("Excellent"), `google/gemini-3.1-pro-preview` ("Excellent"), `google/gemini-3-pro-preview` ("Good"), `google/gemini-3-flash-preview` ("Good + Fast"), `deepseek/deepseek-v3.2` (text-only, no vision, 163K, "Good"), `moonshotai/kimi-k2.5` (262K, "Good"). OpenRouter does NOT carry `openai/gpt-5.5-pro` |
 
 **Default model per provider** (`ProviderRegistry.defaultModels`): Anthropic `claude-sonnet-4-6`; OpenAI `gpt-5.5`; Google `gemini-3.1-pro-preview`; OpenRouter `anthropic/claude-sonnet-4.6`. CLI has no default (populated at runtime).
 
@@ -83,7 +83,7 @@ The model selector only shows models whose provider currently has valid credenti
 
 ### BYOK: Setting Up API Keys
 
-Keys are stored locally in the macOS Keychain (service `com.brilliant.credentials`, items `apikey.{provider}` for keys and `oauth.{provider}` for OAuth tokens) and are sent only to the provider's own API endpoints. The Brilliant AI proxy is disabled in this build, so no chat traffic ever flows through Brilliant servers.
+Keys are stored locally in the macOS Keychain (service `com.brilliant.credentials`, items `apikey.{provider}` for keys and `oauth.{provider}` for OAuth tokens) and are sent only to the provider's own API endpoints. No chat traffic flows through Brilliant servers.
 
 1. Open the chat panel (click the connection indicator in the bottom toolbar, or run **Toggle AI Chat**)
 2. If no providers are connected, an onboarding view appears with buttons for each provider. Otherwise, hover the **connection indicator** in the bottom toolbar to see a popup of all providers (green dot = connected, dim = not connected)
@@ -91,7 +91,7 @@ Keys are stored locally in the macOS Keychain (service `com.brilliant.credential
 4. Paste the key and press **Enter**. Brilliant validates the key against the provider's `models` endpoint and stores it on success
 5. To remove a key: hover the connection indicator and click a connected provider row
 
-**Environment variable fallback** (read at startup if Keychain is empty): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`.
+**Environment variable fallback** (read on-demand when the Keychain has no key for that provider): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`.
 
 **Google OAuth:** the Google provider also accepts OAuth tokens (localhost redirect flow) instead of an API key.
 
@@ -179,8 +179,8 @@ Available to every HTTP provider via `ToolExecutor` (`lib/providers/tool_executo
 | `edit` | Replace `old_string` with `new_string` (uniqueness-checked unless `replace_all`) |
 | `glob` | File-name glob via `fd` (falls back to `find`), respects `.gitignore` |
 | `grep` | Content search via `rg` |
-| `web_fetch` | HTTP GET, HTML to markdown, 15-min cache. Optionally summarized via a lightweight model (Haiku 4.5 for Anthropic, GPT-4.1 nano for OpenAI, Gemini 2.5 Flash Lite for Google, Haiku via OpenRouter; no summarization for Claude CLI) |
-| `AskUserQuestion` | Listed in `builtInToolDefinitions` but intercepted by the orchestrator: pauses the run and presents the user a multi-choice or free-text prompt rendered as numbered options. Resumes when the user picks an option |
+| `web_fetch` | HTTP GET, HTML to markdown, 15-min cache. Optionally summarized via a lightweight model (`claude-haiku-4-5-20251001` for Anthropic, `gpt-4.1-nano` for OpenAI, `gemini-2.5-flash-lite` for Google, `anthropic/claude-haiku-4.5` for OpenRouter; no summarization for Claude CLI) |
+| `AskUserQuestion` | Listed in `builtInToolDefinitions` but intercepted by the orchestrator: pauses the run and presents the user 1-4 questions, each with 2-4 predefined options (and an optional `multiSelect` flag). Free-text input is not part of the schema; resumes when the user picks |
 
 **Provider-native web search** (added when `enableWebSearch: true`):
 
@@ -196,7 +196,7 @@ Main sessions ship with `enableWebSearch: true`; sub-agents ship without it. The
 Two surfaces expose canvas tools:
 
 1. **External MCP server** (when Claude Code or another MCP client connects to Brilliant): the full `mcp__brilliant__*` set, registered in `lib/managers/mcp_tools/`. Includes `init` (CLI-only bootstrap; required first call), `create_html`, `create_modify_elements`, `lookup`, `get_selection`, `get_knowledge`, `execute_commands`, `export`, `generate_image`.
-2. **In-app HTTP providers** (`NativeTools.getToolDefinitions()` in `lib/providers/native_tools.dart`): the integrated Anthropic / OpenAI / Google / OpenRouter sessions get `get_knowledge`, `get_selection`, `export`, `execute_commands`, `lookup`, plus `generate_image` when a `CredentialStore` is wired. Sub-agent capable sessions also get `plan_agents` and `spawn_agent`. External MCP servers can be loaded lazily via `load_mcp_server`. **`create_html` is NOT in `getToolDefinitions()` for HTTP providers**; in-app HTTP sessions emit elements via streaming `<objects canvasId="...">` blocks (see "Streaming Element Creation" below). The `create_html` handler is still in `handleCanvasTool()` for backward compatibility, and `create_html` is exposed to external MCP clients.
+2. **In-app HTTP providers** (`NativeTools.getToolDefinitions()` in `lib/providers/native_tools.dart`): the integrated Anthropic / OpenAI / Google / OpenRouter sessions always get `get_knowledge`, `get_selection`, `export`, `execute_commands`, `lookup`. They additionally get: `generate_image` when a `CredentialStore` is wired; `plan_agents` and `spawn_agent` when `spawnHttpAgent` is wired (sub-agent capable sessions); `load_mcp_server` when `loadMcpServer` is wired. **`create_html` is NOT in `getToolDefinitions()` for HTTP providers**; in-app HTTP sessions emit elements via streaming `<objects canvasId="...">` blocks (see "Streaming Element Creation" below). The `create_html` handler is still in `handleCanvasTool()` for backward compatibility, and `create_html` is exposed to external MCP clients.
 
 | Tool | Purpose |
 |------|---------|
@@ -326,8 +326,8 @@ These shortcuts focus the chat session assigned to that number, opening the chat
 
 - **Open / close:** click the connection indicator in the bottom toolbar, or run **Toggle AI Chat**
 - **Rename:** double-click the topic name in the chat header, or use `/rename`
-- **Resize width:** drag the panel edges (300 to 1200 px)
-- **Resize height:** drag the top edge (min 200 px)
+- **Resize width:** drag panel edges or the divider between sessions (clamped 160-640 px per session, default 400 px; minimized tab is 150 px)
+- **Resize height:** drag the top edge of the panel
 - **Queue follow-up:** sending a message while the model is processing queues it; it sends automatically when the current response finishes
 - **Edit and resend:** click the edit icon on a user message to revise and resend
 - **Copy chat:** the header has a copy button that exports the full conversation as markdown with YAML frontmatter (model, date, project, canvas, tokens, turns)

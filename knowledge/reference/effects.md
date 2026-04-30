@@ -105,7 +105,7 @@ All params are named and optional with defaults matching the effect defaults abo
 | Blend Mode | Any of 16 designBlendModes | `srcOver` (Normal) |
 | Show Behind Transparent Areas | bool | false |
 
-**Show Behind Transparent Areas:** When enabled, the shadow shows through transparent fills. When disabled (default), the element shape is knocked out from the shadow. Toggle is only exposed in the UI for drop shadow.
+**Show Behind Transparent Areas:** When enabled, the shadow shows through transparent fills. When disabled (default), the element shape is knocked out from the shadow. The toggle is only exposed in the UI for drop shadow (the `showBehindTransparentAreas` field exists on outer glow data too but its UI toggle is hidden).
 
 ### Outer Glow (`Effect`, EffectType.outerGlow)
 

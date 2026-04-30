@@ -3,9 +3,11 @@ name: "knowledge-layout-guides"
 description: "Column, row, and grid layout guides for alignment and snap targets in frames."
 ---
 
+> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
+
 # Layout Guides
 
-Layout guides (a.k.a. layout grids, stored in `ParentData.layoutGrids`) are visual overlays on frames that double as **snap targets** for elements moved or resized inside the frame.
+Layout guides (a.k.a. layout grids, stored in `ParentData.layoutGrids`) are visual overlays on frames that double as **snap targets** for elements moved or resized inside the frame. Only frames (not other element types) carry layout guides.
 
 ## Types
 
@@ -29,17 +31,15 @@ There is **no separate type-picker** at add time. The default type is always Gri
 
 ## Header Row Controls
 
-Every guide displays a compact header row. Layout (left → right):
+Every guide displays a compact header row. Layout (left to right):
 
 | Control | Description |
 |---------|-------------|
-| **Type dropdown** | Grid / Columns / Rows. Has a color swatch as its prefix icon |
-| **Color swatch** | Tap the prefix icon on the Type dropdown to open the color picker |
-| **Opacity field (`%`)** | Color opacity, 0–100. Supports tokens |
-| **Expand button** (slider icon) | Show/hide the guide's property fields and eye toggle |
-| **Remove button** (`-`) | Delete the guide |
-
-There is **no separate drag handle** in the header. Drag-to-reorder uses `ReorderableListView` and is initiated by long-pressing or click-and-holding the row body when 2+ guides exist (the entire row is the drag handle via `ReorderableDragStartListener`).
+| **Drag handle** | Visible only when 2+ guides exist. Drag to reorder. |
+| **Type dropdown** | Grid / Columns / Rows. The dropdown's prefix is a color swatch (tap to open the color picker). |
+| **Opacity field (%)** | Color opacity, 0 to 100. Supports tokens. |
+| **Expand button** (slider icon) | Show/hide the guide's property fields and eye toggle. |
+| **Remove button** (-) | Delete the guide. |
 
 ## Per-Guide Properties (Expanded)
 

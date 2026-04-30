@@ -92,6 +92,35 @@ for(vars[$key,$icon,$label], in([
 #nav_text_home t("Dashboard",Inter,13,sb) f[(#0F172A)]
 ```
 
+## Iterate over an existing component
+
+When you already have a component master and want N instances of it
+(each with per-iteration overrides), make the body an `inst(...)` rather
+than redefining the master inline. Use `flat` to skip the misleading
+"wrap in a frame" warning — the agent is already sharing via the
+existing master, no fresh comp+inst is needed:
+
+```
+# Master defined elsewhere:
+al(h,x(s),y(c),g(12),pad(8,12)) s(220,40) f[(#1E293B)] rd(8) comp #nav_button
+  svg(icon:circle) s(18,18) f[(#64748B)] #nav_icon
+  t("Label",Inter,13,m) f[(#64748B)] #nav_text
+
+# Iterate, body is an inst() with override children:
+for(vars[$icon,$label], in([
+  (squares-four, Dashboard),
+  (chart-line,   Revenue),
+  (shopping-bag, Orders),
+]), flat)
+  inst(#nav_button) "Nav $label" #nav
+    override(#nav_text) t("$label")
+```
+
+You pick the per-iteration ref (`#nav` here, suffixed to `#nav_Dashboard`,
+`#nav_Revenue`, `#nav_Orders`). The `flat` flag is required: it tells the
+expander not to attempt comp+inst minting from the body. Each iteration
+emits a real `inst(#nav_button)`, fully linked to the master.
+
 ## `flat` opt-out — independent copies
 
 For genuinely independent copies (no comp+inst link, edits don't propagate):
@@ -102,7 +131,8 @@ for(range(8), flat)
 
 `for(...)` auto-falls-back to flat with a warning when the body root isn't
 a frame OR has multiple top-level elements per iteration. Wrap in `al(...)`
-or `fr` to enable comp+inst sharing.
+or `fr` to enable comp+inst sharing — or use the `inst()` body shape above
+to iterate over an existing master.
 
 ## Manual `comp` + `inst()` — the escape hatch
 

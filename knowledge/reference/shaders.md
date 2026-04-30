@@ -40,11 +40,11 @@ Each shader is a `PaintStyleType` value. The internal name and the UI label can 
 | Liquid Stainless Steel | `liquidStainlessSteel` | 2 | 2 |
 | Dithering | `dithering` | 2 | 2 |
 
-- **Metaballs** -- Organic blob merging.
-- **Liquid Metal** -- Metallic reflections with chromatic aberration, shape-aware rendering (Element, Metaballs, None), bump-modulated stripes.
-- **Iridescent** -- Iridescent metallic effect with folded noise and element-aware shape rendering.
-- **Liquid Stainless Steel** -- Flowing chrome-like surface with multi-source lighting, specular highlights, environment reflections.
-- **Dithering** -- Procedural pattern rendered as retro two-tone dithered output. 7 pattern shapes (Simplex, Warp, Dots, Wave, Ripple, Swirl, Sphere) and 4 dither algorithms (Random, 2x2, 4x4, 8x8).
+- **Metaballs**: Organic blob merging.
+- **Liquid Metal**: Metallic reflections with chromatic aberration, shape-aware rendering (Element, Metaballs, None), bump-modulated stripes.
+- **Iridescent**: Iridescent metallic effect with folded noise and element-aware shape rendering.
+- **Liquid Stainless Steel**: Flowing chrome-like surface with multi-source lighting, specular highlights, environment reflections.
+- **Dithering**: Procedural pattern rendered as retro two-tone dithered output. 7 pattern shapes (Simplex, Warp, Dots, Wave, Ripple, Swirl, Sphere) and 4 dither algorithms (Random, 2x2, 4x4, 8x8).
 
 ### Interactive (`category: 'Interactive'`)
 
@@ -54,7 +54,7 @@ Interactive shaders react to the cursor in real time while idle hovering (Move/H
 |----------|------------------|------------|---------------------|
 | Reactive Grid | `reactiveGrid` | 5 | 3 |
 
-- **Reactive Grid** -- Grid that distorts around the cursor with proximity-based color blending and click ripples. Params: Density, Distortion, Radius, Speed.
+- **Reactive Grid**: Grid that distorts around the cursor with proximity-based color blending and click ripples. Params: Density, Distortion, Radius, Speed.
 
 ## Shader Parameters
 

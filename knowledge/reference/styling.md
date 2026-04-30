@@ -26,17 +26,19 @@ description: "Colors, fills, strokes, opacity, and corner radius in Brilliant."
 
 ### Color Picker
 
-Open by clicking any color swatch in the right toolbar. There is no global keybinding to open the picker. The picker opens on the swatch you click, focused on that fill/stroke/effect/text-range.
+Open by clicking any color swatch in the right toolbar. There is no global keybinding to open the picker. The picker opens on the swatch you click, focused on that fill / stroke / effect / text-range / layout-grid.
 
 Components (top to bottom):
-1. **Color rectangle** (280x280) for solid/gradient/shader modes. X = saturation, Y = brightness. Drag the crosshair. In image mode this slot is replaced by the Image Manager (preview + drop/select/paste).
+1. **Color rectangle** (280x280) for solid / gradient / shader modes. X = saturation, Y = brightness. Drag the crosshair. In image mode this slot is replaced by the Image Manager (preview + select / drop / paste, accepts image files or URLs).
 2. **Eyedropper button + Hue slider** (width 280). Eyedropper toggle on the left, horizontal 360-degree hue strip on the right.
 3. **Opacity slider** (width 280). Alpha 0%-100% for the focused color.
-4. **Gradient bar** (width 280). Only in gradient mode. Click empty space to add a stop, click an existing stop to focus it, drag to reposition, Delete/Backspace removes the focused stop (minimum 2 stops).
-5. **Format inputs** row. Format dropdown (Hex/RGB/HSB/CSS) + value fields + opacity field + copy button.
+4. **Gradient bar** (width 280). Only in gradient mode. Click empty space to add a stop, click an existing stop to focus it, drag to reposition, Delete / Backspace removes the focused stop (minimum 2 stops).
+5. **Format inputs** row. Format dropdown (Hex / RGB / HSB / CSS) + value fields + opacity field + copy button.
 6. **Design Tokens / Canvas Colors / Recent Colors** sections (always visible regardless of fill type).
 
 In shader mode, the rectangle/hue/opacity controls edit one shader-color slot at a time. To pick which slot, click the individual color swatches in the right toolbar's expanded shader fill row before opening the picker.
+
+The picker has no separate Solid / Gradient / Image / Shader tabs. Fill type is selected from the type dropdown on the fill row in the right toolbar (not in the picker). The picker reflows its top section based on the current fill type.
 
 ### Color Formats
 
@@ -59,7 +61,7 @@ red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gra
 
 ### Eyedropper (Ctrl+Shift+C)
 
-Command id: `toggle_color_pick_mode`. Sample a color from anywhere on screen. A magnified 20x20 pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
+Command id: `toggle_color_pick_mode`. Shortcut is **Ctrl+Shift+C on all platforms** (uses the Control key, not the Command key, even on macOS). Sample a color from anywhere on screen. A magnified pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
 
 ### Color Picker Sections
 
@@ -67,9 +69,9 @@ The color picker includes additional sections below the main controls:
 
 - **Design Tokens**: Color tokens from the active design system (`.styles` file). Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color. Tokens stay bound through theme/mode switches.
 - **Canvas Colors**: Unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
-- **Recent Colors**: Up to 24 recently used colors across sessions. Hover a swatch to see its value in the active format.
+- **Recent Colors**: Recently used colors across sessions. Hover a swatch to see its value in the active format.
 
-In contexts that only support solid colors (canvas background, layout grid color, effect color, callback hex editing, text-range color), gradients and shader fills are filtered out of all three sections.
+In contexts that only support solid colors (canvas background, layout grid color, effect color, text-range color, AI-input callback editing), gradients and shader fills are filtered out of all three sections.
 
 ### Token Bindings
 
@@ -96,33 +98,33 @@ Click the fill color swatch in the right toolbar to open the color picker. Use C
 ### Gradient Fills
 
 1. Press **Ctrl+D** (dark gradient) or **Ctrl+L** (light gradient) for quick gradients
-2. Or change the fill type to Linear/Radial/Angular via the type dropdown on the fill row in the right toolbar
+2. Or change the fill type to Linear / Radial / Angular via the type dropdown on the fill row in the right toolbar
 3. Click color stops to edit, add stops by clicking the gradient bar in the color picker, drag to reposition
 
-**Linear**, **radial** (elliptical), and **angular** (sweep/conic) gradients are supported. Diamond, conic-with-multi-axis, and mesh gradients are not available. Select the gradient type from the fill type dropdown in the right toolbar.
+Three gradient types are supported: **Linear**, **Radial** (elliptical), and **Angular** (sweep / conic). Diamond, mesh, and multi-axis conic gradients are NOT available. Select the gradient type from the fill type dropdown in the right toolbar's "Colors" group.
 
-Gradient handles are only visible on the canvas while the color picker is open for that element's fill or stroke. They disappear when the picker closes.
+Gradient handles render on the canvas while the color picker is open for that element's fill or stroke.
 
 **Linear gradients** are defined by start/end points: edit on canvas by dragging the gradient handles (start handle, end handle), or click the gradient line to add a color stop.
 
 **Radial gradients** are defined by center, radius, and width handles: drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to make the gradient elliptical.
 
-**Angular gradients** (sweep/conic) rotate color stops around a center point: drag the center to reposition, drag the angle handle to rotate the gradient start direction. The angular sweep covers a full 360° with wrap-around interpolation across the seam.
+**Angular gradients** (sweep/conic) rotate color stops around a center point: drag the center to reposition, drag the angle handle to rotate the gradient start direction. The angular sweep covers a full 360 degrees with wrap-around interpolation across the seam.
 
-Add/remove/reposition color stops directly on the gradient bar in the color picker, or by clicking the canvas gradient line. Hovering a stop shows the position percentage and color hex; dragging shows just the percentage.
+Add / remove / reposition color stops directly on the gradient bar in the color picker, or by clicking the canvas gradient line. Hovering a stop shows the position percentage and color hex, dragging shows just the percentage.
 
 ### Image Fills
 
-Import an image via Cmd+Shift+O (Import), drag-and-drop from Finder, or paste from clipboard. The image becomes a rectangle with an image fill.
+Import an image via Cmd+Shift+O (Import), drag-and-drop from the OS file manager, or paste from clipboard. The image becomes a rectangle with an image fill.
 
 **Image Manager:** Click an image fill's color swatch in the right toolbar to open the color picker in image mode. The color picker replaces its color controls with an image preview and replacement UI. From there you can:
 - **Select** a new image file from disk
-- **Drop** an image file from Finder onto the image area
-- **Paste** an image with Cmd+V (works with screenshots, browser copies, and Finder-copied files)
+- **Drop** an image file from the OS file manager onto the image area
+- **Paste** an image or image URL with Cmd+V (works with screenshots, browser copies, Finder-copied files, and pasted URLs)
 
 The design tokens, canvas colors, and recent colors sections remain visible below the image area. A replace button is also available in the expanded image fill config row.
 
-**Supported formats:** PNG, JPG, GIF, BMP, WebP on all platforms. TIFF, HEIC, and AVIF are additionally supported on macOS (converted to PNG via native decoding). On Windows/Linux these formats are excluded from file pickers and drop targets.
+**Supported formats:** PNG, JPG / JPEG, GIF, BMP, WebP on all platforms. TIFF / TIF, HEIC / HEIF, and AVIF are additionally supported on macOS (converted to PNG via native NSImage decoding). On Windows / Linux those macOS-only formats are excluded from file pickers and drop targets.
 
 **Image Scale Modes:**
 
@@ -137,7 +139,12 @@ Change the scale mode in the right toolbar under the image fill section.
 
 ### Shader Fills
 
-Animated, GPU-rendered procedural patterns. 6 shader types: Metaballs, Liquid Metal, Iridescent (`PaintStyleType.holographic`), Liquid Stainless Steel, Dithering, Reactive Grid. Reactive Grid lives in the Interactive group, the rest in Animated. See [shaders.md](./shaders.md) for full parameter reference.
+Animated, GPU-rendered procedural patterns. 6 shader types total:
+
+- **Animated group** (5): Metaballs, Liquid Metal, Iridescent (internal name `PaintStyleType.holographic`), Liquid Stainless Steel, Dithering
+- **Interactive group** (1): Reactive Grid (cursor-reactive)
+
+See [shaders.md](./shaders.md) for full parameter reference.
 
 ### Image Filter Fills
 
@@ -184,7 +191,7 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 
 ### Stroke Properties
 
-**Position:**
+**Position** (`StrokePosition` enum, default Center):
 
 | Position | Description |
 |----------|-------------|
@@ -192,13 +199,18 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 | Center | Centered on the element edge (default) |
 | Outside | Drawn outside the element edge |
 
-**Thickness:** Adjust via right toolbar, size level shortcuts (0–9), Shift+= to increase, or - to decrease.
+**Thickness:** Adjust via right toolbar, size level shortcuts 0-9 (`set_size_level_0` ... `set_size_level_9`, plain digit keys), Shift+= to increase, `-` to decrease.
 
-**Caps (Lines/Arrows/Arcs):** None, Round, Square, Arrow. Caps are per-endpoint (per-node on vector paths, per-arc-endpoint on circles). Only leaf nodes (path endpoints with degree 1) render caps. For circles, caps appear when sweep < 100% (any arc, including ring sectors).
+**Dash pattern:** The `Stroke` data model has no dash pattern fields. Dashed strokes are not first-class on element strokes; the only dashed rendering in Brilliant is for UI overlays (selection, snap guides). SVG / Sketch import preserves dashPattern in serialization but it is not editable in the inspector.
+
+**Caps** are NOT a property of `Stroke`. They live on the geometry:
+- **Vector paths:** per-node `cap` field on leaf nodes (degree 1 endpoints). Values from `StrokeCap2` enum: `none` (butt), `round` (default), `square`, `arrow`.
+- **Circles:** `startCap` and `endCap` on `CircleData`. Cap controls appear in the stroke section of the inspector only when the circle's arc sweep is less than 100% (any arc, including ring sectors).
+- **Rectangles** and other closed shapes have no caps.
 
 ### Stroke Style Types
 
-Strokes support the same `PaintStyleType` set as fills (one unified dropdown is reused). Same dropdown groups: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (5 shaders), **Interactive** (Reactive Grid), **Filters** (Color Adjust + 6 image filters). Inner Shadow/Inner Glow as strokes render the inner-shadow/glow primitive over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
+Strokes support the same `PaintStyleType` set as fills (one unified dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). Inner Shadow / Inner Glow as strokes render the inner-shadow/glow primitive over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
 
 Switch the stroke type using the type dropdown on any stroke row in the right toolbar.
 

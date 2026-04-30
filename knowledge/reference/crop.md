@@ -54,9 +54,9 @@ When entering crop mode:
 
 ## Crop Interactions
 
-Crop mode interactions require the **Move tool (V)**. With the pen or other tools active, crop handles and pan do not respond.
+Crop mode interactions require the **Move tool (V)** to be active. With the pen tool or other tools selected, crop handles and pan do not respond.
 
-Crop mode provides two layers of handles: **container handles** (visible blue L-brackets and edge mid-lines) and **image handles** (invisible hit zones).
+Crop mode provides two layers of handles: **container handles** (visible blue L-brackets at the corners + edge mid-line marks) and **image handles** (invisible hit zones overlaid on the image area).
 
 ### Pan Image
 

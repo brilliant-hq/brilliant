@@ -3,6 +3,8 @@ name: "knowledge-frames"
 description: "Parent types (Frame, Group, Auto Layout, Mask, Boolean), nesting, sizing, drag reorder, parent properties, and component-style conversion."
 ---
 
+> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
+
 # Parents (Containers)
 
 In Brilliant, every container element is a **parent** (`ElementType.parent`). Parents come in 8 sub-types stored in `ParentData.type`: **Frame**, **Group**, **Auto Layout**, **Mask**, and four **Boolean** variants (Union, Subtract, Intersect, Exclude). Group, Mask, and all Boolean types share three constraints: always w:hug h:hug, NOT reparent targets, children cannot be dragged out during drag.

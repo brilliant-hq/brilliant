@@ -21,3 +21,5 @@ After sub-agents finish, **own the result**: inspect the canvas (`lookup` with `
 **CRITICAL**: Your first action, **right now** must be `get_knowledge` based on the user's prompt.
 
 As the chat progresses, load more relevant knowledge if you're missing any context.
+
+**HTTP override:** the "max 6 keys per call" rule in the all-agents docs is sized for the hosted CLI's tool-output-to-file affordance, which doesn't apply here. On HTTP, batch up to **15 keys per call** and aim to do all your knowledge loading in **one or two calls** before you start designing. Each `get_knowledge` round-trip is a full request — fewer, larger calls is materially faster and the response sizes are well within context.

@@ -4,7 +4,7 @@ Before any design task using Brilliant's DSL, load relevant knowledge.
 
 Over-load, never under-load (files are 5-50 lines). Max 6 keys per call — split across 2-4 calls. Many chats require 20-25 knowledge files.
 
-NEVER start designing via Brilliant's DSL before loading knowledge.
+NEVER start designing via Brilliant's DSL before loading *a minimum of 8 knowledge keys*.
 
 Load **all rows that apply** — most designs match 3-5 rows:
 

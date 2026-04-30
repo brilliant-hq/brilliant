@@ -24,6 +24,8 @@ Components let you create reusable design elements. A **master component** defin
 2. Press **Cmd+Alt+K** (or use the **Create Component** command via command palette, or right-click and choose **Component → Create Component**)
 3. The selection becomes a master component
 
+There is no dedicated component button in the right toolbar inspector and no separate components page or panel in the left toolbar. Components are created from selection on the regular canvas; masters and instances are normal frames distinguished by their diamond icon, purple label, and component data.
+
 **What happens:**
 - The frame gains a `ComponentData` marker (no `elementRef` means it is the master)
 - All descendant elements get `ChildComponentData` linking them back to the master's children
@@ -210,6 +212,9 @@ How it works:
 
 Brilliant components are a master/instance system with property overrides, slots, and cross-canvas references. The following Figma-style concepts are NOT currently in Brilliant:
 
+- **Swap Instance.** There is no swap-instance UI or command. To switch an instance to a different master, detach and recreate, or edit the blueprint to change `inst(#ref)`.
+- **Components panel / page.** There is no left-toolbar Components panel and no separate "Components" canvas type. Masters live as regular frames on a canvas; you can keep them on a dedicated canvas by convention and reference them across canvases.
+- **Per-property override badges in the inspector.** There is no inspector chip or label that flags which individual property is overridden. Overrides are tracked internally and used by sync, but the only visible component chrome is the purple frame label and the diamond icon (filled = master, outline = instance).
 - **Component variants / props** (no boolean props, enum variants, or variant matrices). Instead, create separate master components or rely on overrides
 - **Component descriptions or metadata** (no description field, no documentation popovers)
 - **Component publishing / library export** (no separate library file format; masters live on canvases inside your project)

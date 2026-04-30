@@ -7,38 +7,48 @@ description: "Text editing, inline editing, text sizing modes, typography, fonts
 
 # Text
 
+## Creating Text
+
+| Action | How |
+|--------|-----|
+| Activate Text tool | Press **T**, or pick "Text" from the bottom toolbar |
+| Place a text element | With Text tool active, click on the canvas; the cursor lands and starts editing |
+| Drag-create | The Text tool currently behaves like click-to-create only. Drag does not produce a fixed-width box; resize manually after creation if you want a fixed width. |
+
+A new text element starts with empty content, the current font family, and the current font size (default 24 px). Both axes start in `hug` mode, so the box grows with content until you resize it manually or change the sizing mode.
+
 ## Text Editing
 
 ### Entering Edit Mode
 
 | Action | How |
 |--------|-----|
-| Create new text | Press **T**, click on canvas, start typing |
 | Edit existing text | Double-click the text element, or select it and press **Enter** |
+| With Text tool | Click on an existing text element to edit it directly |
 
 ### While Editing
 
 - Type to insert text at the cursor position
-- Standard text editing shortcuts work (Cmd+A, Cmd+C, Cmd+X, Cmd+V, etc.)
+- Standard text editing shortcuts work (Cmd+A, Cmd+C, Cmd+X, Cmd+V, Cmd+Z, Cmd+Shift+Z, etc.)
 - The text element updates live as you type
 
 ### Exiting Edit Mode
 
-Press **Enter**, press **Escape**, or click outside the text element. Use **Shift+Enter** to insert a new line instead of exiting.
+Press **Enter** to finish editing, **Escape** to cancel, or click outside the text element. Use **Shift+Enter** to insert a new line instead of exiting.
 
 ## Text Sizing Modes
 
 ### Auto Size (Hug)
 
-The text box automatically resizes in both width and height to fit content. Text grows horizontally without wrapping. Set via AI command "auto size text" or right toolbar.
+The text box automatically resizes in both width and height to fit content. Text grows horizontally without wrapping. Set via "Auto Size" in the right toolbar sizing dropdown or the AI command "auto size text".
 
 ### Auto Height
 
-Width is fixed, height grows to fit. Text wraps at the fixed width. Useful for specific column widths. Set via "auto height text" or right toolbar.
+Width is fixed, height grows to fit. Text wraps at the fixed width. Useful for specific column widths. Set via "Auto Height" in the right toolbar dropdown or "auto height text".
 
 ### Auto Width
 
-Height is fixed, width grows to fit content. Text expands horizontally without wrapping. Set via "auto width text" or right toolbar.
+Height is fixed, width grows to fit content. Text expands horizontally without wrapping. Set via "Auto Width" in the right toolbar dropdown or "auto width text".
 
 ### Fixed Size
 
@@ -116,7 +126,7 @@ Custom font upload is not supported in-app. To use a font that is not in the bun
 
 | Action | How |
 |--------|-----|
-| Set exact size | Type in font size field |
+| Set exact size | Type in the font size field |
 | Drag to adjust | Drag horizontally on the font size field |
 | AI command | "text size 24" or "bigger text" |
 
@@ -136,7 +146,7 @@ Custom font upload is not supported in-app. To use a font that is not in the bun
 | w800 | Extra Bold |
 | w900 | Black |
 
-Font weight can also be set via the weight dropdown in the right toolbar Typography section, which shows only weights available for the current font.
+Font weight can also be set via the weight dropdown in the right toolbar Typography section, which shows only the weights available for the current font.
 
 ### Bold, Italic, Underline
 
@@ -146,6 +156,10 @@ Font weight can also be set via the weight dropdown in the right toolbar Typogra
 | Italic | Cmd+I |
 | Underline | Cmd+U |
 
+These work both on whole text elements (no edit mode required) and on the active selection inside an open text editor (per-range overrides).
+
+There is no strikethrough decoration in Brilliant; the only supported decoration is underline.
+
 ### Text Alignment
 
 | Alignment | Shortcut |
@@ -154,7 +168,9 @@ Font weight can also be set via the weight dropdown in the right toolbar Typogra
 | Align Center | Cmd+Alt+T |
 | Align Right | Cmd+Alt+R |
 
-Also settable via the right toolbar Typography section or AI commands ("align text left/center/right").
+Also settable via the right toolbar Typography section or AI commands ("align text left/center/right"). Alignment is whole-element only; per-range alignment is not supported.
+
+There is no Justify alignment and no vertical alignment (text always anchors to the top edge).
 
 ### Text Direction
 
@@ -162,11 +178,11 @@ Text direction controls whether text flows left-to-right (LTR, the default) or r
 
 ### Line Height
 
-Line height is a **multiplier** of font size (e.g., 1.5 = 1.5x font size). Set via the right toolbar field. Type a value, drag to adjust, or use "auto line height" for font defaults. Common values: 1.0 (tight), 1.2 (headings), 1.5 (body text), 2.0 (double-spaced).
+Line height is a **multiplier** of font size (e.g., 1.5 = 1.5x font size). Set via the right toolbar field. Type a value, drag to adjust, or use "auto line height" for font defaults. Common values: 1.0 (tight), 1.2 (headings), 1.5 (body text), 2.0 (double-spaced). Allowed range is 0 to 5.0. Line height is whole-element only (no per-range override).
 
 ### Letter Spacing
 
-Letter spacing controls the horizontal space between characters. Set via the right toolbar field next to line height. Type a value or drag to adjust. A value of 0 means default spacing (no override). Positive values increase spacing, negative values tighten it.
+Letter spacing controls the horizontal space between characters. Set via the right toolbar field next to line height. Type a value or drag to adjust. A value of 0 means default spacing (no override). Positive values increase spacing, negative values tighten it. Allowed range is -100 to 500.
 
 ## AI Typography Commands
 
@@ -198,7 +214,7 @@ You can apply different styles to portions of text within a single text element:
 | Text color | `color` |
 | Letter spacing | `letterSpacing` |
 
-Properties NOT supported per-range: line height (whole-element only), text alignment, text direction, decorations beyond underline (no strikethrough), and design token bindings (token refs are base-level only).
+Properties NOT supported per-range: line height (whole-element only), text alignment, text direction, decorations beyond underline (no strikethrough at all), and design token bindings (token refs are base-level only).
 
 Per-range color is restricted to solid colors (no gradients, shaders, or image fills on a sub-string).
 
@@ -244,25 +260,26 @@ Manually changing the font family clears `typographyTokenRef`. Other inspector e
 | Home | Jump to line start |
 | End | Jump to line end |
 
-## Outline Text (Convert to Vectors)
+## Outline Text and Flatten Text (macOS only)
 
-Select a text element and use **Cmd+Ctrl+O** (or search "Outline Text" in the command palette) to convert the text into a group of per-character vector outlines. Each character becomes its own editable vector element inside a group. This is a one-way conversion: the text can no longer be edited as text. Useful for custom letter modifications, boolean operations with other shapes, or when you need the text as pure geometry.
+Both convert a text element to vector geometry. Both are one-way conversions: the result is no longer editable as text.
 
-**Platform:** macOS only. On other platforms the command is registered but tagged `invisibleToUser` and the execute body returns immediately.
+| Command | Default Shortcut | Result |
+|---------|-----------------|--------|
+| Outline Text | **Cmd+Ctrl+O** | A group of per-character vector outlines (each character is its own editable vector) |
+| Flatten Text | **Cmd+Alt+O** | A single compound vector element (all characters merged into one path) |
 
-## Flatten Text (Convert to Single Vector)
+Use Outline Text when you want to edit individual characters (custom letter modifications, per-character coloring, character-level boolean ops). Use Flatten Text when you want a single shape for masking, boolean operations against other shapes, or export as one path.
 
-Select a text element and use **Cmd+Alt+O** (or search "Flatten Text" in the command palette) to convert the text into a single compound vector element. Unlike Outline Text (which creates one vector per character), Flatten Text merges all characters into one vector path. This is a one-way conversion.
-
-**Platform:** macOS only. On other platforms the command is hidden and the execute body returns immediately.
+**Platform:** macOS only. On Windows and Linux, both commands are registered but tagged `invisibleToUser` and the execute body returns immediately.
 
 ## Tips
 
-- **Enter** finishes editing and exits edit mode; use **Shift+Enter** to insert a new line
-- Escape exits text editing mode
+- **Enter** finishes editing and exits edit mode; use **Shift+Enter** to insert a new line.
+- **Escape** cancels editing and exits edit mode.
 - Text color is set via fills (not strokes). Text supports all fill types (solid, gradient, image, shader, image filter, color adjust). See [styling.md](./styling.md#text-fills).
-- Text elements also support strokes (rendered as outlined text), with inside/center/outside positioning
-- Text reflows from its top edge: when font size or family changes, the top stays anchored and the box grows downward
+- Text elements also support strokes (rendered as outlined text), with inside/center/outside positioning.
+- Text reflows from its top edge: when font size or family changes, the top stays anchored and the box grows downward.
 - Multi-line text uses real newlines (`\n`). There is no separate paragraph spacing field; tune spacing via line height or insert blank lines.
 
 ## Not Supported
@@ -280,3 +297,5 @@ These typography features are not available in Brilliant today, so don't promise
 - Strikethrough decoration (only underline is supported).
 - Custom font upload. Install as a system font instead.
 - Text-frame "auto-shrink to fit" mode (no automatic font-size scaling to fit a fixed box).
+- Text case transforms (uppercase / lowercase / title case) are not exposed in the UI; bake the desired case into the literal text.
+- Vector edit mode on text. Use **Outline Text** or **Flatten Text** first to convert to vectors.

@@ -100,7 +100,7 @@ All shortcuts are fully remappable: you can match any tool's layout via **Shift+
 |----------|--------|
 | Click | Place a sharp corner node (no handles) |
 | Click and drag | Place a smooth node with mirrored handles |
-| Alt/Option + drag | Place an asymmetric node (only one handle moves) |
+| Alt/Option + drag | Place a disconnected node (only the outgoing handle is set; incoming side stays zero) |
 | Shift + drag | Snap handles to 15-degree increments |
 
 ## Selection & Navigation
@@ -413,7 +413,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Center on selection | Cmd+Ctrl+C |
 | Zoom to selection | Cmd+Ctrl+F |
 | Fit all content | Cmd+Ctrl+A |
-| Disable zoom out (clamp) | Cmd+Ctrl+D |
+| Disable zoom out below 100% (toggle) | Cmd+Ctrl+D |
 | Reset zoom to 100% | (no default, command id `reset_zoom`) |
 | Cmd+scroll zoom | Cmd + scroll/trackpad |
 
@@ -449,7 +449,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Clear all elements on canvas | C (bare, on canvas) |
 | Toggle render profiler | Cmd+Shift+Alt+P (id `toggle_render_profiler`) |
 | Toggle search profiler | (no default, id `toggle_search_profiler`) |
-| Toggle indicator (overlay status dot) | (no default, id `toggle_indicator`) |
+| Toggle top-left indicator | (no default, id `toggle_indicator`) |
 | Quit application | (no default, id `quit_app`; macOS provides Cmd+Q) |
 | Hide application / Hide others | (no defaults, ids `hide_app`, `hide_others`; macOS provides Cmd+H, Cmd+Alt+H) |
 
@@ -541,7 +541,7 @@ These shortcuts focus (and expand if minimized) the AI chat session assigned to 
 | Action | Shortcut |
 |--------|----------|
 | Switch design mode (e.g. light / dark) | (no default, id `switch_design_mode`) |
-| Apply dark / light theme | Ctrl+D / Ctrl+L (also bound to "Gradient (dark/light)"; same keybinding fills both roles via WhenClause disambiguation) |
+| Apply dark theme / Apply light theme | (no defaults, ids `apply_dark_theme`, `apply_light_theme`. Note: Ctrl+D and Ctrl+L are bound to the "Gradient (dark)" / "Gradient (light)" color commands, NOT to these theme commands) |
 | Apply typography token / shadow token | (no defaults, ids `apply_typography_token`, `apply_shadow_token`) |
 | Set / remove design token | (no defaults, ids `set_token_value`, `remove_token`, `set_mode_token`) |
 | Add / remove color seed; add / remove mode seed | (no defaults, ids `set_color_seed`, `remove_color_seed`, `add_mode_seed`, `remove_mode_seed`) |

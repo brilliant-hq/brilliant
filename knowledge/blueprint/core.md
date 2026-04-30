@@ -23,7 +23,7 @@ al(v,g($spacing.4),pad($spacing.6)) p(100,100) s(360,hug) f[(#FFF)] st[($neutral
     t("Save",$font,14,sb) f[(#FFF)] #btn_label
 ```
 
-Types (these are the ONLY valid types — no aliases like `rect`, `el`, `div`, `sq`, `sp`, `img`, `section`): `r` rect · `c` circle · `t("text",Font,size)` · `line(N)` geometric line of length N (use `rot()` for angle, `cap(_, ar)` for arrowhead) · `connect(#A,#B)` topological connector between two existing elements (see below) · `fr` frame · `gr` group · `al()` auto-layout · `svg(icon:name)` Phosphor icon · `v()` vector path (charts only, NOT icons) · `delete(id)` remove element.
+Types (these are the ONLY valid types — no aliases like `rect`, `el`, `div`, `sq`, `sp`, `img`, `section`): `r` rect · `c` circle · `t("text",Font,size)` · `line(N)` geometric line of length N (use `rot()` for angle, `cap(, ar)` for arrowhead) · `connect(#A,#B)` topological connector between two existing elements (see below) · `fr` frame · `gr` group · `al()` auto-layout · `svg(icon:name)` Phosphor icon · `v()` vector path (charts only, NOT icons) · `delete(id)` remove element.
 
 Connectors: `connect(#A, #B)` — auto-routes a line between two existing refs. Resolved at end of block (refs must be defined somewhere in the same `create_modify_elements` call, even after the connect line). Use this for dependency arrows, flowcharts, sequence diagrams — NEVER hand-roll arrows with `v()` paths between elements.
 
@@ -62,6 +62,8 @@ RIGHT: al(v,g(12),pad(16))
 Alignment: `x()` aligns along the X axis (horizontal), `y()` aligns along the Y axis (vertical). Values: `s` start · `c` center · `e` end · `sb` spaceBetween. The axes are physical and never flip with layout direction. Inside `al(h)`, `x()` is the main axis; inside `al(v)`, `y()` is the main axis. `sb` is only valid on the main axis (`x(sb)` with `al(h)`, `y(sb)` with `al(v)`). Bottom-center in a column = `y(e),x(c)`. Right-center in a row = `x(e),y(c)`.
 
 Relative deltas (modify only): `p+(dx,dy)` offset position · `s+(dw,dh)` offset size · `rd+(n)` offset corner radius · `rot+(n)` offset rotation · `o+(n)` offset opacity.
+
+Skip positionals to preserve current value: positionals in `t()`, `s()`, `p()` can be left empty to keep the existing value. `s(200,)` changes width only, leaving height untouched. `p(,300)` changes y only. `t(,,,lh(1.5))` changes line-height only. Truncate trailing positionals: `s(200)` is `s(200,)`. Do NOT use `_` — empty is the only skip form. **In `t()`, whitespace is literal content** — `t( ,Inter)` sets text to a single space; only zero characters skips. Tokens `pad()`, `flip()`, `skew()`, and the per-corner form of `rd(TL,TR,BR,BL)` are all-or-nothing — provide every value or omit the token. `o()`, `rot()`, and `rd()` with no inner just skip the token.
 
 IDs: Omit for new elements (auto-generated). Existing 16-char hex ID as first token = modify. `#ref` trailing = assign, leading = modify by ref. `override(#ref)` for child overrides inside `clone()`/`inst()`. `"quoted"` trailing = name (label only — names CANNOT be used to modify elements). **Assign `#ref` to ALL text, icons, and content elements** — without a ref you cannot modify them later, forcing delete+recreate. Refs are free; missing refs are expensive.
 

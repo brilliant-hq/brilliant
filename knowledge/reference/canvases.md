@@ -132,13 +132,15 @@ The file explorer lives in the **left toolbar**. Open or focus it with **Cmd+Shi
 | Space, O | Open / switch to the focused item (canvas, image, or text file) |
 | Enter | Start inline rename on the focused item |
 | Escape | Clear navigation focus or cancel a rename / cut-paste |
-| G | Jump to the bottom of the list (Shift+G also works) |
 | Cmd+A | Select all visible items in the explorer |
 | Tab | Move focus from the file explorer to the layers explorer |
+| gg | Jump to the top of the list (press G twice within 500ms; vim-style) |
+| Shift+G | Jump to the bottom of the list |
 | Cmd+Backspace, Cmd+Delete | Delete the selected canvas/folder/asset |
 | Cmd+N | New canvas inside the focused folder |
 | Cmd+Shift+N | New folder inside the focused folder |
 | Cmd+C / Cmd+X / Cmd+V | Copy / cut / paste canvases or folders |
+| Ctrl+N / Ctrl+P | Move navigation focus down / up (vim/emacs style) |
 
 **Renaming:**
 - **Double-click** the item name to rename inline
@@ -188,9 +190,11 @@ Clicking a non-canvas file in the file explorer (or navigating to it with Alt+Ar
 
 | File type | Preview |
 |-----------|---------|
-| Image (PNG, JPG, JPEG, GIF, BMP, WebP, SVG; on macOS also TIFF, HEIC, HEIF, AVIF) | Full-size image preview, centered |
-| Text/code (JS, TS, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Go, Swift, SQL, Shell, XML, TOML/INI, plain text, `.styles`) | Built-in code editor (CodeMirror 6) with syntax highlighting and optional vim mode |
+| Image (PNG, JPG, JPEG, GIF, BMP, WebP; on macOS also TIFF/TIF, HEIC, HEIF, AVIF) | Full-size image preview, centered |
+| Text/code (JS, TS, JSX, TSX, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Go, Swift, SQL, Shell/Bash/Zsh, XML, TOML, INI, plain text, `.styles`, **`.svg`**) | Built-in code editor (CodeMirror 6) with syntax highlighting and optional vim mode |
 | Unknown file types | Sniffed: text content shows in the code editor, binary shows an unsupported placeholder |
+
+**Note:** `.svg` opens in the code editor (as XML text), not as an image preview. To use an SVG as a design element, import it via Cmd+Shift+O or paste it on the canvas - both convert SVG into native editable vector elements.
 
 The file explorer highlights the active preview row the same way it highlights active canvases. To return to a canvas, click it in the explorer or use Alt+Arrow to navigate. Text files larger than 5 MB are loaded as read-only.
 

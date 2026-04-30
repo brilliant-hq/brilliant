@@ -15,8 +15,8 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 |--------|----------|
 | Zoom in (2x, viewport-centered) | Cmd+= |
 | Zoom out (0.5x, viewport-centered) | Cmd+- |
-| Zoom 100%, 200%, ..., 900% | 1, 2, 3, 4, 5, 6, 7, 8, 9 (Move or Hand tool only; pressing the same digit twice toggles back to the previous zoom). A 1000% command (`set_zoom_level_1000`) exists in the registry but has no default shortcut. |
-| Toggle zoom | 0 (Move or Hand tool only) toggles between 100% and the previous zoom state. With no previous state it jumps to 200%. |
+| Zoom 100%, 200%, ..., 900% | 1, 2, 3, 4, 5, 6, 7, 8, 9 (Move or Hand tool only). Pressing the same digit twice resets to 100%. |
+| Toggle zoom | 0 (Move or Hand tool only) toggles between 100% and the previously-zoomed state. With no previous state it jumps to 200%. |
 | Cmd+scroll, Cmd+trackpad drag | Zoom around cursor |
 | Trackpad pinch | Zoom around focal point |
 
@@ -27,7 +27,7 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 - **Min zoom:** 2% (0.02x), unless "Disable Zoom Out" (Cmd+Ctrl+D) is active, which clamps to 100% and constrains pan to canvas bounds
 - **Keyboard zoom (Cmd+= and Cmd+-):** centers on the viewport
 - **Cmd+scroll, Cmd+trackpad drag, trackpad pinch:** zoom around the cursor
-- **Smooth animation:** zoom transitions use exponential-decay smoothing so retargeting mid-flight stays smooth (`_smoothSpeed = 60`)
+- **Smooth animation:** zoom transitions use exponential-decay smoothing so retargeting mid-flight stays smooth
 - **Per-canvas zoom state:** each canvas remembers its own zoom and pan; switching canvases restores them. The first time a canvas with content is opened, the viewport zoom-fits to its bounds automatically.
 
 ### Zoom to Content
@@ -38,7 +38,7 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 | Zoom to selection | Cmd+Ctrl+F | Zoom and pan to fit the current selection. Falls back to fit-all when nothing is selected. |
 | Center on selection | Cmd+Ctrl+C | Pan to center the selection without changing zoom |
 | Reset zoom | (no default; `reset_zoom`) | Snap back to 100% and zero pan; user-bindable |
-| Toggle zoom | 0 (Move or Hand tool only) | Toggle between 100% and the previous zoom state. With no previous state it jumps to 200%. |
+| Toggle zoom | 0 (Move or Hand tool only) | Toggle between 100% and the previously-zoomed state. With no previous state it jumps to 200%. |
 
 ### Scroll and Trackpad
 
@@ -252,7 +252,7 @@ Measurement guides appear as **dashed lines with pixel labels**. When elements a
 | Studio (default) | Regular desktop window: title bar, shadow, resizable, visible in Dock. Launches on startup. |
 | Overlay | Fullscreen transparent layer above other apps: borderless, always-on-top, hidden from Dock. |
 
-Ctrl+F is a global hotkey that toggles between studio and overlay mode. It fires even when Brilliant is unfocused, minimized, or invisible. Studio window state (position, size, fullscreen, maximized) is saved on entering overlay and restored on exit.
+Overlay mode is **opt-in**. Until the user enables it (Settings: "Overlay Mode"), the global hotkey is not registered. Once enabled, **Ctrl+F** toggles between studio and overlay mode. The hotkey fires even when Brilliant is unfocused, minimized, or invisible. Studio window state (position, size, fullscreen, maximized) is saved on entering overlay and restored on exit.
 
 | Action | Shortcut | Notes |
 |--------|----------|-------|

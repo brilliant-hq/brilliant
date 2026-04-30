@@ -26,11 +26,12 @@ al(v,g($spacing.4),pad($spacing.6)) p(100,100) s(hug,hug) f[(#FFFFFF)] st[($neut
 
 ### One Block → Feedback → Next Block
 
-**Your response is cut off immediately after `</objects>`.** Any text you write after the closing tag is lost. Put commentary *before* the tag or in your next message.
+After each `<objects>` block the runtime injects feedback. Your response handling depends on whether the block was successful:
 
-After each `<objects>` block you will automatically receive feedback:
-- **Successful block** → screenshot of your changes + a self-review checklist (spacing, typography, contrast, alignment, clipping). Fix issues with another `<objects>` block, or if the design looks good, respond to the user with a brief overview using inline element references. Composition notes flag specific problems: duplicate sibling names, collapsed zero-size elements, invisible text (no fill or transparent on matching background).
-- **Error** → the failing source line, a fix suggestion, and a count of how many lines were applied before the error. Continue from the failed line in your next `<objects>` block.
+- **Successful block** → your response is interrupted immediately after `</objects>` (text or tool calls written *after* the close tag are dropped), then a screenshot + self-review checklist (spacing, typography, contrast, alignment, clipping) is injected. Composition notes flag specific problems: duplicate sibling names, collapsed zero-size elements, invisible text. Fix any issues with another `<objects>` block, or — if the design looks good — respond to the user with a brief overview using inline element references.
+- **Error** → no interrupt; your response continues normally. The runtime then surfaces the failing source line, a fix suggestion, and a count of how many lines were applied before the error. Continue from the failed line in your next `<objects>` block.
+
+**Critical: never open a second `<objects>` tag without closing the first.** Each open tag must be matched by `</objects>` before the next open. Nested or repeated openings inside an active block are detected and abort the block with a fatal error.
 
 Output **one `<objects>` block at a time**, then review the feedback before continuing. Do NOT output multiple blocks in sequence — you won't see the result between them.
 

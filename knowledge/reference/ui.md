@@ -30,13 +30,15 @@ Brilliant runs in two window modes, switched on a single window:
 
 | Action | Shortcut |
 |--------|----------|
-| Toggle overlay mode (global) | Ctrl+F |
+| Toggle overlay mode (global, opt-in) | Ctrl+F |
 | Toggle passthrough (overlay only) | Ctrl+A |
 | Toggle desktop icons (overlay only) | Ctrl+I |
 
+**Overlay mode is opt-in.** The Ctrl+F global hotkey is only registered when "Overlay mode" is turned on in Settings (Cmd+,). With the setting off, Ctrl+F does nothing — toggle the setting to use overlay mode. The toggle is persisted via `SharedPreferences` (`OverlayModeEnabled`).
+
 In passthrough mode (overlay only), mouse clicks pass through Brilliant to the apps below. Studio window state (position, size, fullscreen, maximized) is saved before entering overlay and restored on exit. The bottom toolbar uses an `_overlayBottomEdgeInset` of 80 px while in overlay mode (vs the standard `toolbarVerticalInset` in studio).
 
-The overlay-mode toggle and passthrough-mode toggle are registered as global hotkeys via `KeybindingsManager`, so they work even when Brilliant is not the focused application. Reassigning these keybindings re-registers the global hotkey.
+The overlay-mode toggle is registered as a global hotkey via `KeybindingsManager` only when the opt-in is on, so it works even when Brilliant is not the focused application. Reassigning the keybinding re-registers the global hotkey. Passthrough and desktop-icon toggles are regular in-app shortcuts (overlay window must be active).
 
 ## Left Toolbar
 
@@ -111,7 +113,7 @@ The render order in code (`right_toolbar_view.dart` `_buildContentView`) is: Can
 
 **Layout Grid Section**: Layout grid editor for frames. Three grid types: Grid (uniform cells), Columns, Rows. Per-grid: visibility toggle, color swatch, expand toggle for properties (count, gutter, margin, alignment, span), and remove button.
 
-**Export Section**: Multi-config export panel. Each config row: format dropdown (PNG, JPEG, WebP, SVG, PDF, plus a Replay row for video: the replay container is a separate dropdown that selects MP4 or MOV), resolution preset (Original, 2x, 3x, 4x, 1080p, 4K, Custom), expand for advanced (width/height with constrain proportions, background, video duration / FPS / codec / quality for replay), and remove. Add multiple configs with `+` to export several formats in one click.
+**Export Section**: Multi-config export panel. Each config row: format dropdown (PNG, JPEG, WebP, SVG, PDF, MP4, MOV, Replay; the Replay row also shows a separate `replayContainer` dropdown that picks MP4 or MOV), resolution preset (Original 1x/2x/3x/4x, 720p, 1080p, 1440p, 4K, 8K, Instagram Post, Instagram Story, iPhone 16 Pro, MacBook Pro 14", Custom; vector formats hide the resolution row), expand for advanced (width/height with constrain proportions, fit mode = Fit/Fill/Stretch/Repeat, background, plus video duration / FPS / codec / quality and replay-specific pacing/intro for video and replay rows), and remove. Add multiple configs with `+` to export several formats in one click. The right-toolbar UI does NOT expose JPEG-quality, WebP-quality, or WebP-lossless toggles: those are only reachable via the MCP `export` tool.
 
 **Figma Import Section**: Figma file URL import. Visible only when nothing is selected and the Move tool is active (same condition as Canvas Section).
 
@@ -189,13 +191,13 @@ Inline after the tool buttons (separated by a divider). Width is 320 px. Press *
 
 A collapse/expand chevron toggles the input. When collapsed, only the connection indicator and the expand chevron remain. When the AI chat panel is open with an active session, the bottom toolbar shows the connection indicator instead of the full input (the chat input lives in the panel above).
 
-The connection indicator opens a hover-menu listing providers (Claude Code, Anthropic, OpenAI, Google, OpenRouter, Brilliant) with green dot for "credentialed" or dim "+" for "set API key". Clicking a row inline-prompts for the API key in the AI input field; Esc cancels.
+The connection indicator opens a hover-menu listing five providers in this order: Claude Code, Anthropic, OpenAI, Google, OpenRouter. Each row shows a green dot when credentialed and a dim icon when not. Clicking an unconnected row inline-prompts for the API key in the AI input field; clicking a connected row removes that key. Esc cancels.
 
 While agents are running, one small `AgentActivityIndicator` bar per processing session appears at the right end of the toolbar. The submit button switches to a stop button while the user's request is processing; if the AI returns a "command not recognized" response a brief `?` indicator is shown instead. See `ai.md` for the full AI feature reference.
 
 ## Command Palette
 
-A single floating, draggable, search-driven palette with multiple content modes (`CommandPaletteContent`): `globalSearch`, `commands`, `canvasSelection`, `fontFamily`, `layerSearch`, `colorSelector`, `settings`, `updates`, `keyboardShortcuts`, `combos`. Modes that share `globalSearchList` (the searchable list view) all use the same search field with a left-side filter dropdown.
+A single floating, draggable, search-driven palette with multiple content modes (`CommandPaletteContent`): `globalSearch`, `commands`, `canvasSelection`, `fontFamily`, `layerSearch`, `colorSelector`, `settings`, `updates`, `keyboardShortcuts`, `combos`. Modes that share `globalSearchList` (the searchable list view) all use the same search field with a left-side filter dropdown. The legacy mode-per-shortcut entries (`commands`, `canvasSelection`, `fontFamily`, `layerSearch`) auto-redirect into `globalSearch` with the appropriate `GlobalSearchFilter` applied; chat search is a `chats` filter on the same global search palette (no dedicated mode).
 
 | Mode | Shortcut |
 |------|----------|
@@ -215,7 +217,7 @@ Note: **/** focuses the AI input in the bottom toolbar (then opens the chat pane
 
 All search modes support: type to search, Up/Down to navigate, Enter to execute, Escape to close, draggable title bar.
 
-**Unified Global Search** (Cmd+K): Shows commands + files + layers + fonts + chats in one list, each section capped by the layout. The filter dropdown switches to a single category. The category-specific shortcuts (Cmd+Shift+P, Cmd+P, Cmd+L, Cmd+Shift+F, Cmd+Shift+I) open the same palette pre-filtered. In "all" mode, layers only run when the query is 2+ characters (otherwise the first 5 elements show as a stub) and fonts are skipped (too many entries).
+**Unified Global Search** (Cmd+K): Shows commands + files + layers + fonts + chats in one list, each section capped by the layout. The filter dropdown switches to a single category (filter values: `all`, `commands`, `files`, `layers`, `fonts`, `chats`). The category-specific shortcuts (Cmd+Shift+P, Cmd+P, Cmd+L, Cmd+Shift+F, Cmd+Shift+I) open the same palette pre-filtered. In "all" mode, layers only run when the query is 2+ characters (otherwise the first 5 elements show as a stub) and fonts are skipped (too many entries).
 
 ### Keyboard Shortcuts View (Shift+?)
 
@@ -269,7 +271,7 @@ When the code editor is focused, undo/redo is captured by CodeMirror, not by Bri
 
 ## AI Chat Panel
 
-The chat panel surfaces AI design sessions above the bottom toolbar. Multi-provider: Claude Code (local CLI), Anthropic, OpenAI, Google, OpenRouter, and (disabled by default) Brilliant proxy all run through the same UI. BYOK only: no hosted credits. See `ai.md` for providers, models, slash commands, attachments, and tool execution.
+The chat panel surfaces AI design sessions above the bottom toolbar. Multi-provider: Claude Code (local CLI), Anthropic HTTP, OpenAI HTTP (Chat Completions + Responses API), Google Gemini, and OpenRouter all run through the same UI. BYOK only: every chat call uses the user's own API key (or local Claude CLI). See `ai.md` for providers, models, slash commands, attachments, and tool execution.
 
 ### Session Tabs
 
@@ -293,8 +295,8 @@ Tabs sit inline in the bottom toolbar after the tool buttons (sessions occupy th
 
 ### Resize
 
-- **Width:** drag between sessions or at panel edges (clamped 160–640 px per session; chat panel honors a 440 px floor during the Claude Code setup onboarding).
-- **Height:** drag the top edge of the panel (min 200 px, fills available screen space).
+- **Width per session:** clamped 160–640 px (default 400 px, minimized 150 px). The chat panel honors a per-session minimum width returned by `AIChatManager.minAiChatWidth` (e.g., the Claude Code setup onboarding raises this floor temporarily).
+- **Height:** drag the top edge of the panel.
 
 ---
 

@@ -15,17 +15,19 @@ Press **P** to activate the Pen tool. Also accessible via:
 - **Bottom toolbar:** Click the Drawing Tools dropdown and select "Pen"
 - **Command Palette:** Press **Cmd+Shift+P**, search for "Pen"
 
-The Pen tool is persistent: after finishing a path, the tool stays active so you can immediately start another. Press **Escape** to exit pen tool back to Move.
+The Pen tool stays active after a path is finished so you can immediately start another. Press **Escape** to exit pen tool back to Move.
 
 ### Vector Edit Mode (Edit Existing Paths)
 
 To edit an existing vector element's nodes:
 1. Select the vector element
-2. **Double-click** it, or press **Enter**, to enter vector edit mode
+2. Press **Enter** (or double-click the element) to enter vector edit mode
 3. Edit nodes, handles, and edges (see sections below)
 4. Press **Escape** to exit. First press clears any node/handle selection, second press exits vector edit mode.
 
-Vector edit mode auto-converts shapes (rectangles with corner radii, circles, lines) into editable Bezier vectors on entry, and reverts to the original shape type on exit if the geometry is unchanged. Paths that drop below 2 nodes are deleted entirely (full undo restores).
+Vector edit mode auto-converts shapes (rectangles with corner radii, circles/ellipses, lines) into editable Bezier vectors on entry and reverts to the original shape type on exit if the geometry is unchanged. Paths that drop below 2 nodes are deleted entirely (full undo restores).
+
+Pencil-tool elements are already vectors and need no conversion. Text cannot enter vector edit mode directly: use **Outline Text** (Cmd+Ctrl+O) or **Flatten Text** (Cmd+Alt+O) first to convert it to vector geometry.
 
 ---
 
@@ -36,15 +38,15 @@ The pen tool creates vector paths by placing nodes one at a time with optional b
 ### Basic Usage
 
 1. Activate the pen tool (see "How to Access" above).
-2. **Click** to place a node (straight edge to previous).
-3. **Click and drag** to place a node with Bezier handles (smooth curve).
-4. Continue clicking to add more nodes.
-5. **Click the first node** to close the path into a shape.
-6. Press **Escape** to exit. First press clears node selection, second press exits vector edit mode and switches to the Move tool.
+2. **Click** to place a corner node (straight edges to/from the previous node).
+3. **Click and drag** to place a node with mirrored Bezier handles (smooth curve).
+4. Continue clicking/dragging to add more nodes.
+5. **Click the first node** of the open path to close it into a shape.
+6. Press **Escape** to exit. First press clears any node selection, second press exits vector edit mode and switches to the Move tool.
 
 ### Creating Straight Lines
 
-Click without dragging at each point. Default point type is **Straight** (no handles).
+Click without dragging at each point. The new node's point type is **Straight** (no handles).
 
 ### Creating Curves
 
@@ -58,18 +60,23 @@ Click and drag to pull out Bezier handles:
 - Click (no drag) for sharp corners
 - Click and drag for smooth curves
 - Alternate freely between the two
-- **Alt/Option + drag** while placing a node creates only the outgoing handle (no incoming handle); the node's point type is set to **Disconnected**
+- **Alt/Option + drag** while placing a node creates only the outgoing handle (the incoming handle stays at the node); the node's point type is set to **Disconnected**
+
+### Constraints While Drawing
+
+- Hold **Shift** while clicking the next point to constrain the new edge angle to 15-degree increments from the previous node.
+- Hold **Shift** while dragging out handles to snap the handle angle to 15-degree increments.
+- Snap guides also fire if vector snapping is enabled (see "Snap Guides in Vector Mode" below).
 
 ### Closing a Path
 
-Click on the first node to create a closed shape.
+Click on the first node of the path to create a closed shape.
 
 ### Tips
 
-- Hold **Shift** while dragging handles to snap the handle angle to 15-degree increments.
 - Closed paths can have fills and strokes; open paths render strokes only.
-- After creation, refine in vector edit mode (select path, press **Enter**).
-- Pen tool stays active after a path is finished. Click again to start another.
+- After creation, refine in vector edit mode (select the path, press **Enter**).
+- Pen tool stays active after a path is finished. Click again to start another path.
 
 ## Pencil Tool
 
@@ -77,7 +84,7 @@ Press **Shift+P** to activate the Pencil tool. Also accessible via:
 - **Bottom toolbar:** Drawing Tools dropdown → "Pencil"
 - **Command Palette:** Cmd+Shift+P, search "Pencil"
 
-The Pencil tool creates freehand vector paths by drawing with the mouse. The stroke is smoothed into cubic Bezier curves with mirrored handles. The result is a standard vector element that can be edited in vector edit mode.
+The Pencil tool creates freehand vector paths by drawing with the mouse. Sample points are added adaptively (sampling distance scales with cursor velocity and stroke thickness, so faster strokes record fewer, more spread-out points). On release, the captured points are converted into a cubic Bezier path with mirrored handles via Catmull-Rom-like smoothing (`tension = 0.5`). The result is a standard vector element that can be edited in vector edit mode.
 
 ### Basic Usage
 
@@ -85,7 +92,7 @@ The Pencil tool creates freehand vector paths by drawing with the mouse. The str
 2. Click and drag on the canvas to draw a freehand path
 3. Release to finish the stroke
 
-The pencil tool produces open paths with strokes (no fill). It auto-finalizes once you have at least 2 points; very short strokes are discarded. Refine the path in vector edit mode after drawing.
+The pencil tool produces **open paths with strokes** (no fill); it never auto-closes. Strokes need at least 2 sample points to be kept; shorter taps are discarded. Hold **Shift** during the drag to constrain segments to the nearest 45-degree direction. Refine the path in vector edit mode after drawing.
 
 ## Node Editing
 
@@ -98,26 +105,26 @@ Enter vector edit mode by selecting a vector element and pressing **Enter** (or 
 | Select a node | Click on it |
 | Add to selection | Shift+Click |
 | Toggle selection | Shift+Click selected node |
-| Select multiple | Drag rectangle over nodes |
+| Select multiple | Drag a rectangle over nodes |
 | Select all nodes in path | Cmd+A while in vector edit mode |
 
-When clicking a region or stroke (not a node), the **vector node selection is cleared** and the part is selected for fill/stroke editing instead. Shift+click on a region adds it to the part selection.
+When clicking on a region or stroke (not a node), the **vector node selection is cleared** and the part is selected for fill/stroke editing instead. Shift+click on a region adds it to the part selection.
 
 ### Moving Nodes
 
 Select nodes and drag. Snap guides work (see "Snap Guides in Vector Mode" below).
 
-- Hold **Shift** while dragging a node to snap the displacement angle from its starting position to 15-degree increments (relative to the primary node's drag-start position).
-- Hold **Alt/Option** at the start of a drag to **duplicate** the selected nodes. The drag operates on the copies and originals stay put.
+- Hold **Shift** while dragging a node to snap the displacement angle from its drag-start position to 15-degree increments (relative to the primary node's drag-start position).
+- Hold **Alt/Option** at the start of a drag to **duplicate** the selected nodes. The drag operates on the copies; originals stay put. Only edges where both endpoints are in the selection are duplicated alongside the nodes.
 - With 2+ nodes selected, dragging anywhere inside the selection bounding box moves all selected nodes together.
 - With 2+ nodes selected, a sub-selection bounding box with resize and rotation handles appears around them (see "Node Sub-Selection Transform" below).
 
 ### Moving Disconnected Regions
 
-Vectors with multiple separate connected components (e.g., a Venn diagram with 3 circles, or a multi-part icon) support dragging each component independently:
+Vectors with multiple separate connected components (for example a Venn diagram with three circles, or a multi-part icon) support dragging each component independently:
 
 - **Click** on a disconnected region (fill area or stroke) to select all its nodes at once.
-- **Drag** a disconnected region to move it: click-and-drag works in one gesture.
+- **Drag** a disconnected region to move it. Click-and-drag works in one gesture.
 - **Shift+Click** another region to add its nodes to the selection, then drag to move multiple regions together.
 
 ### Adding Nodes on an Edge
@@ -155,7 +162,7 @@ Drag a handle endpoint. The behavior of the **opposite** handle depends on the n
 
 If a normal drag breaks symmetry on a Mirrored node, the point type auto-transitions to **Disconnected** at drag end.
 
-Hold **Shift** during a handle drag to combine the existing snap behavior with extra geometric snaps (collinear, perpendicular, 15-degree increments, etc.). See "Snap Guides in Vector Mode" below.
+Hold **Shift** during a handle drag to combine the existing snap behavior with extra geometric snaps (collinear, perpendicular, 15-degree increments, and so on). See "Snap Guides in Vector Mode" below.
 
 #### Detaching Handles
 
@@ -219,7 +226,7 @@ In vector edit mode:
 
 ### Select All in Vector Mode
 
-**Cmd+A** in vector edit mode selects all nodes in the current path (rather than selecting all elements on the canvas).
+**Cmd+A** in vector edit mode selects all nodes and handles in the current path (rather than selecting all elements on the canvas).
 
 ### Companion Display
 
@@ -274,7 +281,7 @@ If a handle is dragged within ~5 px (screen) of the node, it retracts to zero (c
 
 Six toggles control vector-edit snapping. None have default keybindings; reach them via the command palette or assign keys via **Shift+?**:
 
-- **Vector snapping enabled** (master gate, default ON): disables all vector snaps.
+- **Vector snapping enabled** (master gate, default ON): disables all vector snaps when off.
 - **Snap to self** (default ON): snap to nodes and handles on the editing vector.
 - **Snap to others** (default ON): snap to sibling vector elements.
 - **Snap to geometry** (default ON): snap to non-vector sibling element corners and centers.
@@ -285,13 +292,36 @@ Pixel-grid snapping is a separate toggle (**Shift+Cmd+'**) shared with element e
 
 ---
 
-## Boolean Operations and Flatten
+## Boolean Operations
 
-Boolean operations (Union, Subtract, Intersect, Exclude) wrap 2+ selected shapes into a boolean parent whose children remain editable. Double-click a boolean parent to edit its children; **Escape** exits boolean edit mode.
+Boolean operations wrap 2+ selected shapes into a boolean parent whose children remain editable. Double-click a boolean parent to drill into it; **Escape** exits boolean edit mode. If the selection is already a single boolean parent, running the same kind of command swaps its operation (for example, toggle a Union into a Subtract without re-creating the wrapper).
 
-**Flatten** (Cmd+Enter) bakes any selection into a single vector element. Use it to commit a boolean result, convert a primitive (rect/circle/line) into editable vector geometry, or merge a frame's children into one path.
+| Command | Default Shortcut | Result |
+|---------|-----------------|--------|
+| Boolean Union | Alt+Shift+U | Combine all shapes' filled areas |
+| Boolean Subtract | Alt+Shift+S | Subtract front shapes from the back shape |
+| Boolean Intersect | Alt+Shift+I | Keep only the overlapping area |
+| Boolean Exclude | Alt+Shift+E | Keep only the non-overlapping areas (XOR) |
 
-See `editing.md` for shortcuts, full input/output behavior of Flatten, and the related Outline Text and Mask operations.
+## Flatten
+
+**Flatten** (`Cmd+Enter`) bakes any selection into a single vector element:
+
+- Single primitive (rect/circle/line) -> converts to vector
+- Boolean union -> concatenates children losslessly (per-child colors preserved)
+- Boolean subtract / intersect / exclude -> bakes the result via path sampling
+- Group/frame -> concatenates children losslessly
+- Multiple selected elements -> concatenates all into one path
+- Single vector -> no-op
+
+Use Flatten when you need to commit a boolean result, convert a primitive into editable vector geometry, or merge a frame's children into one path.
+
+## Outline Text and Flatten Text (macOS only)
+
+- **Outline Text** (`Cmd+Ctrl+O`) converts a selected text element into a **group of per-character vector outlines** — each glyph becomes its own editable vector inside a group.
+- **Flatten Text** (`Cmd+Alt+O`) converts a selected text element into a **single compound vector element** (all glyphs merged into one path).
+
+Both are one-way conversions: the result is no longer editable as text. Both are macOS-only; on other platforms the commands exist but execute no-op.
 
 ---
 
@@ -345,7 +375,7 @@ al(v,g($spacing.none),pad(2,$spacing.none,$spacing.none,$spacing.none)) s(fill,2
   v() s(fill,fill) f[(linear(180,stop(#F97316,0,o(0.15)),stop(#F97316,1,o(0.0))))] st[(#F97316,w(1.5),cap(n,n),pos(o))] path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z) "Line"
 ```
 
-The `L60,24 L0,24 Z` closes the path along the bottom edge. With `s(fill,fill)` on the vector, the path scales into whatever bounds the frame provides — closing edges always land exactly at the clip boundary. The `pad(2,0,0,0)` adds 2px top padding (≥ stroke width) so the curve stroke isn't clipped, while 0 padding on the other sides keeps closing-edge strokes cropped. The gradient (`180` = top-to-bottom) creates the modern area chart look; `f[(solid(#F97316,o(0.12)))]` also works.
+The `L60,24 L0,24 Z` closes the path along the bottom edge. With `s(fill,fill)` on the vector, the path scales into whatever bounds the frame provides — closing edges always land exactly at the clip boundary. The `pad(2,0,0,0)` adds 2px top padding (>= stroke width) so the curve stroke isn't clipped, while 0 padding on the other sides keeps closing-edge strokes cropped. The gradient (`180` = top-to-bottom) creates the modern area chart look; `f[(solid(#F97316,o(0.12)))]` also works.
 
 **Crucial invariant — the clip frame's interior (size minus padding) must equal the vector's bounds.** Two safe configurations:
 
@@ -403,7 +433,7 @@ Vector path endpoints (leaf nodes with degree 1) can have individual stroke caps
 
 | Cap Type | Description |
 |----------|-------------|
-| **None** | Butt cap -- no extension past the endpoint |
+| **None** | Butt cap — no extension past the endpoint |
 | **Round** | Semicircle cap (default) |
 | **Square** | Extends by half stroke thickness past the endpoint |
 | **Arrow** | Arrow head pointing outward along the path tangent |

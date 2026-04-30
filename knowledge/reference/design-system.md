@@ -37,14 +37,18 @@ Several inspector fields in the right toolbar accept token bindings via dropdown
 | Fill / stroke opacity | Color picker opacity field | Opacity tokens |
 | Corner radius (per corner) | Frame / rectangle section | Radius tokens |
 | Element opacity | Layer section (top of inspector) | Opacity tokens |
-| Font size, weight, line height, family | Typography section | Corresponding `font.*` tokens |
+| Font size, weight, line height | Typography section | Corresponding `font.*` tokens |
 | Auto layout gap and padding (uniform or per-side) | Auto layout section | Spacing tokens |
 
 When a property is bound to a token, the field shows the token name. Manually editing the value clears the binding for that property. Composite tokens (typography and shadow) are applied via the **Apply Typography Token** and **Apply Shadow Token** commands and clear individual bindings on the same property group.
 
-**No inspector UI for stroke width and shadow tokens:**
-- Stroke width tokens cannot be bound from the inspector. Use blueprint syntax (`st[(#000,w($stroke.width.md))]`) or programmatic invocation. Bound stroke widths also do NOT re-resolve on mode change.
-- Shadow tokens are applied through the **Apply Shadow Token** command (palette) or the AI/MCP path, not the effects panel.
+**No inspector UI for these token types:**
+- **Stroke width tokens** cannot be bound from the inspector. Use blueprint syntax (`st[(#000,w($stroke.width.md))]`) or programmatic invocation. Bound stroke widths also do NOT re-resolve on mode change (known runtime gap).
+- **Font family tokens** (the single `font.family` token) cannot be bound from the typography font picker. The font selector sets `fontFamily` directly. Use a typography composite via **Apply Typography Token** (which can carry a `fontFamily`) or blueprint syntax to bind to `font.family`.
+- **Shadow tokens** are applied through the **Apply Shadow Token** command (palette) or the AI/MCP path, not from the effects panel. The effects panel only edits raw shadow values.
+- **Typography composite tokens** are applied through the **Apply Typography Token** command (palette) or AI/MCP path. There is no in-inspector "pick a typography token" dropdown.
+
+**No general token-creation UI.** Tokens, seeds, modes, and mode seeds are created and edited by editing the `.styles` file in the code editor (open via the **Open Design System File** command) or by AI/MCP commands. There is no variables panel, no in-app token editor, and no UI button to add a new color seed or custom token.
 
 ## Using Tokens in Blueprints
 
@@ -458,9 +462,9 @@ These commands are programmatic only (not visible in the command palette). They 
 
 | Command | Description |
 |---------|-------------|
-| **Switch Design Mode** | Dropdown command. Hover a mode to preview it on the canvas; click to commit. Cancel preview by closing the dropdown. |
+| **Switch Design Mode** | Dropdown command in the command palette. Hover a mode to preview it on the canvas; click to commit. Closing the dropdown cancels the preview and restores the previous mode. Available modes are `light`, `dark`, plus any custom modes declared in `.styles`. There is no default keybinding. |
 | **Regenerate Design System** | Rebuild all `.styles.gen` files from source |
-| **Reset Design System** | Reset to built-in defaults (removes all custom seeds and tokens) |
+| **Reset Design System** | Reset to built-in defaults (rewrites the `.styles` file to defaults; undoable) |
 | **Open Design System File** | Open the nearest `.styles` file in the code editor (YAML syntax highlighting) |
 
 ### Composite Token Commands
@@ -532,6 +536,7 @@ These aliases are themed: in dark mode they automatically resolve to the inverte
 
 The following features are NOT currently in Brilliant's design system:
 
+- **Variables panel / token editor UI.** Tokens, seeds, and modes are authored in the `.styles` file (open via **Open Design System File**) or via AI/MCP commands. There is no in-app form to create, rename, or delete a token from the UI.
 - **Token export to CSS variables, Tailwind config, or design tokens JSON.** Tokens stay inside the `.styles` / `.styles.gen` pair; there is no built-in exporter.
 - **Token search UI / favorites / recents.** The color picker shows all tokens grouped by category; other token dropdowns are flat lists.
 - **Numeric tokens with units.** Numbers are stored as plain doubles (no px/rem/em/% unit system).
@@ -539,3 +544,6 @@ The following features are NOT currently in Brilliant's design system:
 - **Stroke width inspector binding.** No dropdown UI; bindings can only be authored via blueprint or programmatically.
 - **Stroke width re-resolution at runtime.** Bound stroke widths do not update on mode change.
 - **Letter spacing as a built-in scale.** There is no `letterSpacing.*` token type. Letter spacing can be set inside a custom `typography.*` composite.
+- **Font family inspector binding.** The font picker sets `fontFamily` as a literal; bind via a typography composite or blueprint.
+- **In-app rename / delete buttons for tokens.** Edit the `.styles` file directly, or use the (programmatic-only) **Set Token Value** / **Remove Token** commands.
+- **Per-token override badges.** Tokens applied to element properties show as token names in the inspector, but there is no separate "is overridden" indicator beyond the token chip itself.

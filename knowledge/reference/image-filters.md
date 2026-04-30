@@ -189,9 +189,9 @@ Reduce color levels for poster-style banding.
 Colors: none.
 
 **Modes:**
-- **RGB** -- Quantize each R, G, B channel independently
-- **Luminosity** -- Quantize luminance only, preserve original hue/saturation
-- **HSL** -- Quantize hue, saturation, and lightness independently
+- **RGB**: Quantize each R, G, B channel independently
+- **Luminosity**: Quantize luminance only, preserve original hue/saturation
+- **HSL**: Quantize hue, saturation, and lightness independently
 
 ### Presets
 
@@ -264,9 +264,9 @@ Use the command palette (Cmd+Shift+P) to add filters by name:
 
 ## General Notes
 
-- **Stable across zoom** -- Filter patterns use logical coordinates, so grain/dot/cell sizes remain consistent as you zoom in and out
-- **Export** -- PNG/JPEG/WebP capture the filter at full quality. SVG and PDF pre-rasterize filters as embedded PNG images
-- **Stacking** -- Multiple filters can be stacked on one element; each processes all fills below it
-- **Strokes** -- All filters work identically on strokes (applied to the stroke's rendered area)
-- **Per-color alpha** -- For filters with color inputs, each color's alpha controls its tint strength (contribution vs original), not output transparency
-- **Blend mode** -- Every image filter has a fill-level blend mode dropdown in the expanded view, controlling how the filter output composites with content below
+- **Stable across zoom**: Filter patterns use logical coordinates, so grain/dot/cell sizes remain consistent as you zoom in and out
+- **Export**: PNG/JPEG/WebP capture the filter at full quality. SVG and PDF pre-rasterize filters as embedded PNG images
+- **Stacking**: Multiple filters can be stacked on one element; each processes all fills below it
+- **Strokes**: All filters work identically on strokes (applied to the stroke's rendered area)
+- **Per-color alpha**: For filters with color inputs, each color's alpha controls its tint strength (contribution vs original), not output transparency
+- **Blend mode**: Every image filter has a fill-level blend mode dropdown in the expanded view, controlling how the filter output composites with content below
