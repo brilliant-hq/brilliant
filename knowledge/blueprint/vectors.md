@@ -19,7 +19,7 @@ Assumes: `blueprint/core`, `blueprint/paint`
 ## Stroke-only curve
 
 ```
-v(nodes[(0,0,40,mi),(1,60,16,mi),(2,120,12,mi)]) s(120,48) st[(#14B8A6,w(1.5))]
+v(nodes[(0,0,40,mi),(1,60,16,mi),(2,120,12,mi)]) s(120,48) st[($teal.mid,w($stroke.width.soft))]
 ```
 
 ## Area fill (closed path)
@@ -27,7 +27,7 @@ v(nodes[(0,0,40,mi),(1,60,16,mi),(2,120,12,mi)]) s(120,48) st[(#14B8A6,w(1.5))]
 Close with straight bottom nodes + outside stroke + clip frame to hide closing edges:
 ```
 al(v,g($spacing.none),pad(2,$spacing.none,$spacing.none,$spacing.none)) s(hug,hug) clip "ClipFrame"
-  v(nodes[(0,0,40,mi),(1,60,16,mi),(2,120,12,mi),(3,120,48),(4,0,48)],edges[(0,0,1),(1,1,2),(2,2,3),(3,3,4),(4,4,0)],closed) s(120,48) f[(#CCFBF1)] st[(#14B8A6,w(1.5),pos(o))]
+  v(nodes[(0,0,40,mi),(1,60,16,mi),(2,120,12,mi),(3,120,48),(4,0,48)],edges[(0,0,1),(1,1,2),(2,2,3),(3,3,4),(4,4,0)],closed) s(120,48) f[($teal.faint)] st[($teal.mid,w($stroke.width.soft),pos(o))]
 ```
 
 Outside stroke `pos(o)` pushes boundary strokes beyond the bbox. Clip frame crops them. Top padding >= stroke width. ONE vector with both fill and stroke.

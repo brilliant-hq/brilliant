@@ -43,7 +43,7 @@ There is no dedicated component button in the right toolbar inspector and no sep
 
 1. Select a master component
 2. Use the **Create Instance** command (via command palette, or right-click and choose **Component → Create Instance**)
-3. A linked copy appears offset 50px down and right from the master
+3. A linked copy appears offset 50px down and right from the master (translated via the master's `vectorPath`)
 
 **What happens:**
 - A deep copy of the master's subtree is created with new element IDs
@@ -95,8 +95,9 @@ When you modify a property on an instance or its children, that property is auto
 | `opacity` | Element opacity |
 | `circleData` | Circle arc/ring properties |
 | `constrainProportions` | Aspect ratio lock |
+| `designSystem` | Element-level design system override |
 
-**Root vs child sync:** The sync engine treats instance roots differently from instance children. Instance **children** sync all 15 categories listed above plus the element `type` (structural, always copied). Instance **roots** sync a smaller subset: `name`, `textData`, `rectangleData`, `vectorPath`, and `type` are NOT synced for the root frame. Renaming a master frame does not propagate the name to instance roots, but renaming a master's child does propagate to instance children. All other categories (fills, strokes, parentData, layoutBehavior, rotation, flips, effects, opacity, circleData, constrainProportions) sync for both roots and children.
+**Root vs child sync:** The sync engine treats instance roots differently from instance children. Instance **children** sync all 16 categories listed above plus the element `type` (structural, always copied), for a total of 17 synced categories. Instance **roots** sync a smaller subset: `name`, `textData`, `rectangleData`, `vectorPath`, and `type` are NOT synced for the root frame. Renaming a master frame does not propagate the name to instance roots, but renaming a master's child does propagate to instance children. All other categories (fills, strokes, parentData, layoutBehavior, rotation, flips, effects, opacity, circleData, constrainProportions, designSystem) sync for both roots and children.
 
 **Unsynced properties:** `blendMode`, `opacityTokenRef` (element-level), `shadowTokenRef`, and `cropData` are not part of the component sync engine. Changes to these on the master do not propagate to instances. `blendMode` is also not tracked for override detection, so changing it on an instance does not register as an override. (Per-fill/per-stroke `opacityTokenRef` IS synced indirectly via the `fills` and `strokes` categories.)
 
@@ -139,7 +140,7 @@ If you need to fully diverge from the master, **detach** the instance first.
 To restore an instance to match its master:
 
 1. Select a component instance root (the command's WhenClause activates only on instance roots)
-2. Use the **Reset Component Instance Overrides** command (via command palette)
+2. Use the **Reset Component Instance Overrides** command (via command palette, or right-click and choose **Component → Reset Overrides**)
 
 **What happens:**
 - All `overriddenProperties` are cleared on the targeted elements
@@ -206,7 +207,7 @@ How it works:
 | Go to Master Component | Command palette only (no default keybinding) |
 | Push Overrides to Master | Command palette only (no default keybinding) |
 
-**Push Overrides to Master**: When you've made overrides on an instance that should become the new default, use this command to apply the instance's overrides back to the master component. All other instances will then sync to the updated master values. This command only works when the master is on the same canvas as the instance.
+**Push Overrides to Master**: When you've made overrides on an instance that should become the new default, use this command (via command palette, or right-click and choose **Component → Push Overrides to Master**) to apply the instance's overrides back to the master component. All other instances will then sync to the updated master values. This command only works when the master is on the same canvas as the instance.
 
 ## What's Not Supported
 
@@ -249,9 +250,9 @@ Components and instances can be created in blueprint syntax using the `comp`, `i
 Add the `comp` bare flag to create a component master:
 
 ```
-al(h,x(c),y(c),g($spacing.2),pad($spacing.3,$spacing.6)) s(hug,hug) f[(#F1F5F9),(f2,inner(#000,o(0.06),x(2),y(2),blur(4))),(f3,inner(#FFF,o(0.5),x(-1),y(-1),blur(2)))] rd(10) shadow(#000,o(0.04),y(1),blur(2)) shadow(#000,o(0.08),y(4),blur(12)) comp #btn "Button"
-  svg(icon:sparkle) s(16,16) f[(#374151)] "Icon" #btn_icon
-  t("Get Started",Inter,14,sb) f[(#1E293B)] "Label" #btn_label
+al(h,x(c),y(c),g($spacing.sm),pad($spacing.md,$spacing.lg)) s(hug,hug) f[($slate.faint),(f2,inner($color.shadow,o($visibility.faint),x(2),y(2),blur(4))),(f3,inner($neutral.hint,o($visibility.mid),x(-1),y(-1),blur(2)))] rd($radius.md) shadow($color.shadow,o($visibility.faint),y(1),blur(2)) shadow($color.shadow,o($visibility.faint),y(4),blur(12)) comp #btn "Button"
+  svg(icon:sparkle) s(16,16) f[($slate.bold)] "Icon" #btn_icon
+  t("Get Started",$font.family,$font.size.sm,sb) f[($slate.intense)] "Label" #btn_label
 ```
 
 **What happens:**
@@ -264,9 +265,9 @@ al(h,x(c),y(c),g($spacing.2),pad($spacing.3,$spacing.6)) s(hug,hug) f[(#F1F5F9),
 Use `inst(#ref)` to create an instance of an existing component master. Override children by `#ref`:
 
 ```
-inst(#btn) p(300,100) f[(#E0E7FF),(f2,inner(#000,o(0.06),x(2),y(2),blur(4))),(f3,inner(#FFF,o(0.5),x(-1),y(-1),blur(2)))]
-  override(#btn_icon) svg(icon:rocket) f[(#4338CA)]
-  override(#btn_label) t("Launch") f[(#312E81)]
+inst(#btn) p(300,100) f[($indigo.faint),(f2,inner($color.shadow,o($visibility.faint),x(2),y(2),blur(4))),(f3,inner($neutral.hint,o($visibility.mid),x(-1),y(-1),blur(2)))]
+  override(#btn_icon) svg(icon:rocket) f[($indigo.bold)]
+  override(#btn_label) t("Launch") f[($indigo.intense)]
 ```
 
 **What happens:**
@@ -293,12 +294,14 @@ The path is relative to the current canvas's location in the project.
 Mark a child with the `slot` bare flag to designate it as instance-owned content:
 
 ```
-al(v,g($spacing.4),pad($spacing.6)) s(320,hug) f[(#FFFFFF)] rd($radius.md) comp #card "Card"
-  t("Card Title",Inter,20,b) s(fill,hug) f[(#0F172A)] "Header"
+al(v,g($spacing.md),pad($spacing.lg)) s(320,hug) f[($color.surface)] rd($radius.md) comp #card "Card"
+  t("Card Title",$font.family,$font.size.xl,b) s(fill,hug) f[($color.text.primary)] "Header"
   fr s(fill,hug) slot "Content"
 ```
 
 Slot children are skipped during sync: instances fully own their slot content. This allows each instance to have completely different content in the slot area while keeping the rest of the component in sync with the master.
+
+Adding to a slot **appends** — it does not clear what is already there. Only the first fill of a never-touched slot replaces the master's seed content; every add after that (whether by parenting into the slot or re-opening a slot block on the instance) stacks on top. To swap a slot's contents, delete the existing slot children first, then add the new ones. (If you re-fill a slot and end up with duplicates, this is why.)
 
 > **See also:** [knowledge/FRAMES.md](./FRAMES.md) for parent types, auto layout, and nesting
 > **See also:** [knowledge/EDITING.md](./EDITING.md) for selection and navigation within component hierarchies

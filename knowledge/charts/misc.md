@@ -3,57 +3,32 @@ assumes: blueprint/layout, blueprint/paint, blueprint/text, blueprint/components
 ---
 # Data Viz: Stacked Bars & Heatmaps
 
-Assumes: `blueprint/core`, `blueprint/layout`
+## Stacked horizontal bar
 
-## Stacked Horizontal Bar
+Flex segments give proportions with no pixel math. Wrap each segment as
+an `fr` (so `comp` is valid) holding a fill `r`; the flex weight is an
+`s(fill:N,...)` frame property on the `inst()` line, the color an
+`override` on the inner `r`. The track is `rd($radius.full) clip` to
+round the ends.
 
-Flex segments — proportional, no pixel math. Encode each segment's weight,
-color, and label as one tuple:
 ```
-$neutral=#64748B
-al(h,g($spacing.none),pad($spacing.none)) s(280,12) rd($radius.full) clip "Stacked" #stacked
-  for(vars[$w,$color,$name], in([
-    (40,#6366F1,Deep),
-    (30,#818CF8,Light),
-    (20,#EC4899,REM),
-    (10,#F97316,Awake),
-  ]))
-    r s(fill:$w,fill) f[($color)] "$name" #seg
-```
-
-Parent `rd($radius.full) clip` rounds ends. `s(fill,12)` for responsive.
-
-**Legend:** Dot + label per segment — same tuple data, separate loop:
-```
-al(h,x(s),y(c),g(16),pad($spacing.none)) s(hug,hug) "Legend" #legend
-  for(vars[$color,$name], in([
-    (#6366F1,Deep Sleep),
-    (#818CF8,Light Sleep),
-    (#EC4899,REM),
-    (#F97316,Awake),
-  ]))
-    al(h,x(s),y(c),g(6),pad($spacing.none)) s(hug,hug) "Item $name" #leg
-      r s(8,8) f[($color)] rd($radius.full) #leg_dot
-      t("$name",Inter,12) f[($neutral.50)] #leg_label
+al(h,g($spacing.none),pad($spacing.none)) s(280,12) rd($radius.full) clip "Stacked"
+  fr comp s(fill:40,fill) "Deep" #seg
+    r s(fill,fill) f[($indigo.mid)] #seg_fill
+  inst(#seg) s(fill:30,fill) "Light"
+    override(#seg_fill) f[($indigo.soft)]
+  inst(#seg) s(fill:20,fill) "REM"
+    override(#seg_fill) f[($pink.mid)]
 ```
 
-## Contribution Heatmap
+A legend is the same `comp`/`inst` idea: a row of dot-plus-label pairs,
+one palette stop per segment.
 
-Column-Major Grid. Each week = vertical column of 7 cells.
+## Contribution heatmap
 
-- Cell: `s(11,11) rd(2)` with `g(3)` between
-- Day labels: V-stack with spacer frames matching stride
-- Month labels: fixed width `s(70,hug)` matching ~5 weeks
-- Legend: 5 color swatches Less→More
-
-**5-level intensity:**
-
-| Level | Color |
-|-------|-------|
-| 0 (empty) | `#EBEDF0` |
-| 1 (low) | `#9BE9A8` |
-| 2 (medium) | `#40C463` |
-| 3 (high) | `#30A14E` |
-| 4 (max) | `#216E39` |
-
-Adapt colors: blues for coding, purples for design, reds for incidents.
+A column-major grid: each week is a vertical column of 7 day cells,
+`s(11,11) rd($radius.xs)` with a small gap. Encode intensity as a 5-stop
+ramp of one palette (`$green.subtle` through `$green.strong`, or `$blue`,
+`$violet`, ...), with `$color.surface.container` for empty cells. Add
+day-of-week labels down the side and month labels along the top, plus a
+Less-to-More legend of the five swatches.

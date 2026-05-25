@@ -3,53 +3,46 @@ assumes: blueprint/effects, design/colors
 ---
 # Effect: Dark Mode
 
-Assumes: `blueprint/effects`
+Dark backgrounds are where Brilliant's effects shine: inner glows,
+colored shadows, and shaders that look garish on white turn elegant on
+dark.
 
-Dark backgrounds are where Brilliant's effects truly shine. Inner glows, colored shadows, and shaders that look garish on white become elegant on dark.
+## Tuning effects for dark
 
-## Effect Tuning Table
+- **Inner glow** is the superpower on dark, at full vibrancy
+  (`o($visibility.firm)` and up); skip it or keep it faint on light.
+- **Drop shadows** can take a brand color on dark, doubling as an ambient
+  glow; on light keep them neutral and low-opacity.
+- **Shaders** run at full vibrancy on dark, muted on light.
+- **Background blur**: more blur and a darker tint on dark.
 
-| Effect | Light bg | Dark bg |
-|---|---|---|
-| Inner shadow | Higher opacity (0.15-0.25) | Lower opacity (0.08-0.15), larger blur |
-| Inner glow | Skip or subtle (0.08-0.12) | **Superpower** — full vibrancy (0.3-0.8) |
-| Drop shadow | Black/gray, low opacity | **Colored shadows** — double as ambient glow |
-| Outer glow | Rarely useful | Great for floating/neon |
-| Background blur | Lower blur (8-12), light tint | Higher blur (12-20), darker tint |
-| Shaders | Lower opacity, muted | Full vibrancy — natural home |
+## Surfaces, not raw stops
 
-## Surface Hierarchy
-
-Use fill brightness, not shadows, for visual hierarchy:
-
-```text
-$neutral=#64748B
-```
-Base `$neutral.90` deepest · Surface 1 `$neutral.80` cards, panels · Surface 2 `$neutral.70` elevated, active · Surface 3 `$neutral.60` popovers, tooltips.
-
-## Dark Cards
+Build chrome from `$color.surface`, `$color.surface.container`,
+`$color.text.*`, and `$color.outline.*`, never raw `$neutral.X` stops.
+The catalog re-resolves every alias through `theme.dark` automatically,
+so one blueprint renders correctly in both modes. Use fill brightness,
+not shadows, for hierarchy on dark.
 
 ```
-$neutral=#64748B
-$dark_shadow=shadow(#000,o(0.30)) shadow(#000,o(0.20),y(12),blur(32))
-al(v,g($spacing.4),pad($spacing.6)) s(340,hug) f[($neutral.80)] rd($radius.md) $dark_shadow #dark_card
-  t("Dark Card",Inter,18,sb) f[($neutral.5)] "Title" #dark_title
-  t("Shadow creates depth on dark surfaces",Inter,14) s(fill,hug) f[($neutral.40)] "Body" #dark_body
+al(v,g($spacing.md),pad($spacing.lg)) s(340,hug) f[($color.surface.container)] rd($radius.md) shadow($color.shadow,o($visibility.soft),y(12),blur(32)) "Card"
+  t("Mode-aware card",$font.family,$font.size.lg,sb) f[($color.text.primary)]
+  t("Renders right in light and dark",$font.family,$font.size.sm) s(fill,hug) f[($color.text.secondary)]
 ```
 
-## Dark Glass
+## Per-element mode override
 
-Lower tint opacity — dark bg does contrast work:
-```text
-$tint=solid(#FFF,o(0.06))
-$edge=solid(#FFF,o(0.08))
-f[($tint),(f2,blur(16))] st[($edge,w(1))]
+To render one frame dark while the canvas stays light (a side-by-side
+comparison, an inverted feature card), put `ds(, theme(dark))` on the
+frame. The empty leading slot keeps the inherited brand; the mode
+applies to that frame and its descendants, and the aliases re-resolve
+dark just for that subtree.
+
+```
+fr s(400,160) ds(, theme(dark)) f[($color.surface)] rd($radius.md) "Dark Preview"
+  al(v,g($spacing.sm),pad($spacing.md)) s(fill,hug)
+    t("Dark on a light canvas",$font.family,$font.size.sm,sb) f[($color.text.primary)]
+    t("Aliases resolve through theme.dark here",$font.family,$font.size.sm) s(fill,hug) f[($color.text.secondary)]
 ```
 
-Inner glow replaces border on dark:
-```text
-$tint=solid(#FFF,o(0.06))
-$edge=solid(#FFF,o(0.06))
-f[($tint),(f2,blur(16)),(f3,glow(#FFF,o(0.08),blur(8)))]
-  st[($edge,w(1))]
-```
+Dark glass (lower tint opacity, inner glow as the edge): see `effects/glass`.

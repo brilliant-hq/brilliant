@@ -71,8 +71,8 @@ Most text in UI is labels and values that should never wrap. Only use fill for p
 **Example: bullet list row:**
 ```
 al(h,x(s),y(s),g(8),pad($spacing.none)) s(fill,hug) "Bullet Row"
-  t("•",Inter,16) f[(#F97316)]
-  t("Launch multiplayer cursors",Inter,16) s(fill,hug) f[(#334155)]
+  t("•",$font.family,$font.size.md) f[($orange.mid)]
+  t("Launch multiplayer cursors",$font.family,$font.size.md) s(fill,hug) f[($slate.bold)]
 ```
 The bullet stays hug width, the item text fills remaining space.
 
@@ -83,6 +83,8 @@ The bullet stays hug width, the item text fills remaining space.
 ## Typography
 
 All typography properties are in the right toolbar when a text element is selected.
+
+When the selection contains text elements with **different values** for a given property (font size, line height, letter spacing, font weight, font family, alignment, sizing mode), the inspector field shows the placeholder **`Mixed`** instead of a single value. Typing a value in a `Mixed` field applies that value to the whole selection.
 
 ### Font Family
 
@@ -107,7 +109,7 @@ Recently used fonts surface at the top of the list when the search field is empt
 
 ### Available Fonts
 
-Brilliant bundles a curated list of approximately **300 Google Fonts** (`curatedGoogleFonts` in `lib/managers/font_manager.dart`) plus all **system fonts** from your OS. Examples by category:
+Brilliant bundles a curated list of about **300 Google Fonts** (`curatedGoogleFonts` in `lib/managers/font_manager.dart`) plus all **system fonts** from your OS. Examples by category:
 
 | Category | Examples |
 |----------|----------|
@@ -178,11 +180,11 @@ Text direction controls whether text flows left-to-right (LTR, the default) or r
 
 ### Line Height
 
-Line height is a **multiplier** of font size (e.g., 1.5 = 1.5x font size). Set via the right toolbar field. Type a value, drag to adjust, or use "auto line height" for font defaults. Common values: 1.0 (tight), 1.2 (headings), 1.5 (body text), 2.0 (double-spaced). Allowed range is 0 to 5.0. Line height is whole-element only (no per-range override).
+Line height is a **multiplier** of font size (e.g., 1.5 = 1.5x font size). Set via the right toolbar field. Type a value, drag to adjust, or use "auto line height" for font defaults. Common values: 1.0 (tight), 1.2 (headings), 1.5 (body text), 2.0 (double-spaced). Any value `<= 0` clears the override and falls back to the font's default line height. Line height is whole-element only (no per-range override).
 
 ### Letter Spacing
 
-Letter spacing controls the horizontal space between characters. Set via the right toolbar field next to line height. Type a value or drag to adjust. A value of 0 means default spacing (no override). Positive values increase spacing, negative values tighten it. Allowed range is -100 to 500.
+Letter spacing controls the horizontal space between characters. Set via the right toolbar field next to line height. Type a value or drag to adjust. A value of 0 means default spacing (no override). Positive values increase spacing, negative values tighten it.
 
 ## AI Typography Commands
 
@@ -226,14 +228,16 @@ Text properties can be bound to design system tokens. Bindings resolve at render
 
 | Property | Token key pattern | Stored on `TextData` field |
 |----------|------------------|---------------------------|
-| Font size | `font.size.{xs..2xl}` | `fontSizeTokenRef` |
-| Font weight | `font.weight.{thin..black}` | `fontWeightTokenRef` |
-| Line height | `font.lineHeight.{none..loose}` | `lineHeightTokenRef` |
-| Font family | `font.family` | `fontFamilyTokenRef` |
+| Font size | `font.size.{step}` (e.g., `font.size.md`) plus bare seed `font.size` | `fontSizeTokenRef` |
+| Font weight | `font.weight.{step}` (e.g., `font.weight.bold`) plus bare seed `font.weight` | `fontWeightTokenRef` |
+| Line height | `font.lineHeight.{step}` (e.g., `font.lineHeight.normal`) plus bare seed `font.lineHeight` | `lineHeightTokenRef` |
+| Font family | `font.family` (seed) | `fontFamilyTokenRef` |
 | Text color | color token (via fill `tokenRef`) | on `Fill.style.tokenRef` |
 | Composite typography | `typography.{name}` | `typographyTokenRef` |
 
-A **composite typography token** bundles font family, size, weight, line height, and letter spacing into one named style. Applying a typography token via the **Apply Typography Token** command sets all five fields, stores the key in `typographyTokenRef`, and clears the four individual font token refs. Built-in composites: `typography.h1`–`h6`, `typography.body.sm`/`md`/`lg`, `typography.caption`, `typography.label`, `typography.code` (monospace family). See the design system reference for default values.
+Scale step names come from `kFontSizeMultipliers`, `kFontWeightSteps`, `kLineHeightSteps` in `lib/state/dsl/catalog.dart`. Seed-only systems (with just `font.size`, no scale seeds) generate the full scale automatically.
+
+A **composite typography token** bundles font family, size, weight, line height, and letter spacing into one named style. Applying a typography token via the **Apply Typography Token** command sets all five fields, stores the key in `typographyTokenRef`, and clears the four individual font token refs. Built-in composites (15 total, defined in `defaultDesignSystemTokens`): `typography.h1`–`h4` (heading scale, h5/h6 were dropped in V2), `typography.display.lg`/`md`/`sm` (hero/landing), `typography.body.sm`/`md`/`lg`, `typography.button`, `typography.input`, `typography.label`, `typography.caption`, `typography.code` (monospace family). See the design system reference for default values.
 
 Manually changing the font family clears `typographyTokenRef`. Other inspector edits update the underlying value but may leave the composite ref in place; the inspector chip is the authoritative indicator.
 

@@ -110,7 +110,7 @@ Straight lines between two points. Shift snaps to 45 degree increments.
 
 ## Arrow Tool (Shift+L)
 
-A line with an end-cap arrowhead. Shift snaps to 45 degree increments. Start and end caps are independently configurable in the right toolbar (`StrokeCap2`): none, round, square, arrow.
+A line with an end-cap arrowhead. Shift snaps to 45 degree increments. Start and end caps are independently configurable in the right toolbar (`StrokeCap2`): none, round, square, arrow, circle (filled dot marker).
 
 ## Rectangle Tool (R, Shift+R)
 
@@ -198,15 +198,15 @@ Combine selected vector/shape elements into a single boolean parent. Operations 
 
 ## Masks
 
-Use a vector or shape as a mask for sibling elements. The mask becomes the parent's first child and clips its siblings.
+Use a vector or shape as a mask for sibling elements. The topmost element (last in z-order, `childIds.last`) becomes the mask shape and clips the siblings below it.
 
 | Action | Shortcut | Effect |
 |--------|----------|--------|
-| Use as mask | Cmd+Ctrl+M | Wraps selection so the bottom-most element clips the others |
+| Use as mask | Cmd+Ctrl+M | Wraps selection so the topmost element (last in z-order) clips the others below |
 | Mask edit mode | Double-click mask | Edit the mask shape; Escape exits |
 
 Mask types are configurable per-mask in the right toolbar: vector (default), alpha, luminance.
 
 ## Outline Text
 
-Cmd+Ctrl+O converts selected text elements into editable vector outlines. The result is one vector element per text element; the original text is replaced.
+Cmd+Ctrl+O (macOS only) converts a selected text element into a **group** containing one vector element per glyph (each character becomes its own editable vector inside the group). To get a single compound vector instead, use **Flatten Text** (Cmd+Alt+O) or **Flatten** (Cmd+Enter).

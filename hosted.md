@@ -15,6 +15,14 @@ Brilliant is a Figma-like 2D vector design tool. Auto layout, frames, groups, hu
 
 **NEVER** use the `Agent` tool or `Read` tool to access knowledge files. **ALWAYS** call `get_knowledge` directly — it resolves dependencies and strips metadata that raw file reads miss. `get_knowledge` is its own tool — do NOT pass it through `execute_commands`.
 
+## Name this chat
+
+Emit a `<title>` tag that names the conversation in 4-10 words:
+
+`<title>Pricing page redesign</title>`
+
+Your first response must contain one. In later responses, emit a new `<title>` only if the topic drifts or the name needs adjusting. The tag is stripped from the visible chat — don't mention it.
+
 ## Sub-agents (the `Agent` tool)
 
 **Do NOT use sub-agents unless the user explicitly asks for them.** Build everything yourself — you are faster and produce better results for single designs. Sub-agents add overhead and produce output you'll need to fix anyway.

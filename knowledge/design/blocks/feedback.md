@@ -3,66 +3,41 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 ---
 # Blocks: Feedback
 
-Assumes: `blueprint/core`, `blueprint/layout`, `blueprint/paint`
+## Inline messages
 
-## Alert / Banner
-H-row `x(s),y(s) g($spacing.3) pad($spacing.3,$spacing.4) s(fill,hug) rd($radius.sm)`. Status icon(20x20) + V-stack `s(fill,hug)`: title(14,m) + message(14) + optional dismiss x icon. For showing all 4 variants together (style guide / docs), use `for(...)` with a tuple per status:
+- **Alert / banner**: h-row, a status icon plus a title/message v-stack,
+  optional dismiss `x`. Pair a `.container` fill with its text role:
+  `$color.success.container` + `$color.text.success`, and likewise
+  warning / error / info. Stamp all four as a `comp`/`inst` set.
+- **Toast**: the same row at a fixed `s(320-400,hug)` plus a shadow,
+  pinned top-right or bottom-center.
+
+## Overlays
+
+- **Modal**: a full-parent scrim `solid($color.shadow,o($visibility.mid))`
+  (a frozen dark layer), then a centered `$color.surface` v-stack with a
+  high shadow, a space-between header (title + `x`), and an `x(e)` footer.
+- **Drawer**: a `$color.surface` v-stack `s(360-480,fill)` with a high
+  shadow, pinned to one edge; space-between header.
+- **Bottom sheet**: a `$color.surface` v-stack with top-only radius and
+  an upward shadow (`y(-4)`); a small centered grab handle on top.
+- **Dropdown menu**: a `$color.surface` v-stack, `pad($spacing.xs)`, high
+  shadow + stroke; items are `rd($radius.sm)` h-rows, destructive ones in
+  `$color.text.error`.
+- **Tooltip**: a compact one-line dark chip, `$color.shadow` fill with
+  light text.
+
+## Status & states
+
+- **Progress bar**: an `al(h)` track frame, `clip`, holding `fill:N` /
+  `fill:M` segments (`fill:3` + `fill:1` = 75%).
+- **Skeleton**: rects in `$color.outline.variant` matching the real
+  content's layout and spacing.
+- **Empty state**: a centered v-stack of a large muted icon, a title, a
+  description, and an optional CTA.
+
 ```
-al(v,g($spacing.3),pad($spacing.none)) s(420,hug) "Alerts" #alerts
-  for(vars[$status,$icon,$title,$bg,$border,$iconColor,$titleColor,$bodyColor], in([
-    (Success,check-circle,"Saved successfully",#ECFDF5,#A7F3D0,#10B981,#065F46,#047857),
-    (Error,x-circle,"Something went wrong",#FEF2F2,#FECACA,#EF4444,#991B1B,#991B1B),
-    (Warning,warning,"Heads up",#FFFBEB,#FDE68A,#F59E0B,#92400E,#92400E),
-    (Info,info,"FYI",#EFF6FF,#BFDBFE,#3B82F6,#1E40AF,#1E40AF),
-  ]))
-    al(h,x(s),y(s),g($spacing.3),pad($spacing.3,$spacing.4)) s(fill,hug) f[($bg)] st[($border,w(1))] rd($radius.sm) "Alert $status" #alert
-      svg(icon:$icon) s(20,20) f[($iconColor)] #alert_icon
-      al(v,g($spacing.1),pad($spacing.none)) s(fill,hug) #alert_body
-        t("$title",Inter,14,m) f[($titleColor)] #alert_title
-        t("Details about the $status state.",Inter,14) s(fill,hug) f[($bodyColor)] #alert_msg
-```
-Single banner: drop the `for(...)`, write one alert directly.
-
-## Toast
-H-row `x(s),y(c) g($spacing.3) pad($spacing.3,$spacing.4) s(320-400,hug) rd($radius.sm)` + shadow. Icon + V-stack: title(14,m) + body(13) + trailing x close. Same colors as Alert. Position: top-right or bottom-center.
-
-## Modal / Dialog
-Scrim: rect filling parent `solid(#000,o(0.5))`. Dialog: V-stack `pad($spacing.6) s(480-560,hug)` white `rd($radius.md)` high shadow, centered. Header: spaceBetween(title(18,sb) + x). Footer: H-row `x(e),y(c) g($spacing.2)`.
-
-## Drawer
-V-stack `s(360-480,fill)` white + high shadow. Header: spaceBetween `pad($spacing.4,$spacing.6)` title + x. Content V-stack `g($spacing.4) pad(0,$spacing.6)`.
-
-## Bottom Sheet
-```
-$neutral=#64748B
-$font=Inter
-al(v,g($spacing.none),pad($spacing.none)) s(390,hug) f[(#FFF)] rd($radius.lg,$radius.lg,0,0) shadow(#000,o(0.12),y(-4),blur(16)) st[($neutral.20,w(1))] #sheet
-  al(h,x(c),y(c),g($spacing.none),pad($spacing.3,$spacing.none)) s(fill,hug)
-    r s(36,4) f[($neutral.30)] rd($radius.full) "Handle"
-  al(v,g($spacing.3),pad($spacing.4,$spacing.6)) s(fill,hug) #sheet_content
-    t("Share",$font,16,sb) f[($neutral.90)] #sheet_title
-    t("Choose how to share this file",$font,14) f[($neutral.50)] #sheet_desc
-```
-Top-only radius. Upward shadow `y(-4)`.
-
-## Dropdown Menu
-V-stack `pad($spacing.1) s(200-280,hug)` white `rd($radius.sm)` + high shadow + 1px stroke. Items: H-row `x(s),y(c) g($spacing.2) pad($spacing.2,$spacing.3) s(fill,hug) rd($radius.sm)`. Destructive: red text.
-
-## Tooltip
-`pad($spacing.2,$spacing.3) s(hug,hug)` dark fill (#1E293B) `rd($radius.sm)`. White text(12-13). Single line.
-
-## Progress Bar (Flex)
-```
-$brand=#EF4444
-$neutral=#64748B
-al(h,g($spacing.none),pad($spacing.none)) s(200,6) f[($neutral.10)] rd($radius.full) clip
-  r s(fill:3,fill) f[($brand.50)] "Fill"
+al(h,g($spacing.none),pad($spacing.none)) s(200,6) f[($color.surface.container)] rd($radius.full) clip "Progress"
+  r s(fill:3,fill) f[($color.primary)] "Fill"
   r s(fill:1,fill) "Empty"
 ```
-75% filled. `fill:4`+`fill:1` = 80%.
-
-## Skeleton
-Rects mimicking loading layout. `rd($radius.sm) f[(#E2E8F0)]`. Match spacing of real content.
-
-## Empty State
-V-stack `y(c),x(c) g($spacing.3) pad($spacing.12)`. Large icon(48-64, muted) + title(18,sb, centered) + description + optional CTA.

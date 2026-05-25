@@ -5,30 +5,33 @@ dsl: [t(, lh, ls, eb, bl]
 # Blueprint Text
 
 ```
-t("Dashboard",Inter,24,b) f[(#0F172A)]
-t("Chapter One",Playfair Display,20,italic) f[(#8B5CF6)]
-t("LAUNCH DAY",Inter,11,sb,ls(0.12)) f[(#EF4444)]
-t("Updated 5 min ago",Inter,12,m,align(r)) s(fill,hug) f[(#94A3B8)]
-t("Long description that wraps",Inter,14,lh(1.4)) s(fill,hug) f[(#64748B)]
-t("Hello\nWorld",Fira Code,16) f[(#10B981)]
-t("Outlined",Inter,28,b) f[] st[(#0F172A,w(2),pos(o))]
-t("Glow",Inter,28,b) f[(#FFF)] shadow(#8B5CF6,blur(12))
+t("Dashboard",$font.family,$font.size.xl,b) f[($color.text.primary)]
+t("Chapter One",$font.family.serif,$font.size.lg,italic) f[($violet.mid)]
+t("LAUNCH DAY",$font.family,$font.size.xs,sb,ls($font.letterSpacing.loose)) f[($color.error)]
+t("Updated 5 min ago",$font.family,$font.size.xs,m,align(r)) s(fill,hug) f[($color.text.disabled)]
+t("Long description that wraps",$font.family,$font.size.sm,lh($font.lineHeight.snug)) s(fill,hug) f[($color.text.secondary)]
+t("Hello\nWorld",Fira Code,$font.size.md) f[($emerald.mid)]
+t("Outlined",$font.family,$font.size.2xl,b) f[(solid($color.surface,o($visibility.invisible)))] st[($color.text.primary,w($stroke.width.mid),pos(o))]
+t("Glow",$font.family,$font.size.2xl,b) f[($color.on-primary)] shadow($color.secondary,blur(12))
+t("Blue Title",$font.family,$font.size.4xl,b) f[($color.text.display)]
+t("Pink Callout",$font.family,$font.size.4xl,b) f[($color.text.display.alt)]
 ```
 
 First 3 positional: `t("content",family,size)`, then any order:
-Weights: `r`(400) body/descriptions · `m`(500) labels/captions · `sb`(600) subheadings/nav/card titles · `b`(700) headings/hero/CTAs · `eb`(800) display headlines · `bl`(900) watermarks. Align: `align(l)` left · `align(c)` center · `align(r)` right · `align(j)` justify. Direction: `rtl` or `ltr` (default) — RTL auto-defaults to right alignment unless overridden. `lh(N)` line-height multiplier (e.g. `1.4`). `ls(N)` letter spacing as em multiplier of the rendered font size (`ls(0.12)` = 12% tracking, matches CSS `letter-spacing: 0.12em`). For absolute pixels, suffix with `px`: `ls(2px)`. Negative values tighten: `ls(-0.02)`. `italic`, `underline`. Escapes: `\"` quote, `\uXXXX` unicode.
+Weights: `r`(400) body/descriptions · `m`(500) labels/captions · `sb`(600) subheadings/nav/card titles · `b`(700) headings/hero/CTAs · `eb`(800) display headlines · `bl`(900) watermarks — weight keywords, or `$font.weight.{hint..intense}` tokens. Align: `align(l)` left · `align(c)` center · `align(r)` right · `align(j)` justify. Direction: `rtl` or `ltr` (default) — RTL auto-defaults to right alignment unless overridden. `lh(N)` line-height multiplier — token-bound, use `$font.lineHeight.{none,tight,snug,normal,relaxed,loose}` (e.g. `lh($font.lineHeight.snug)`). `ls(N)` letter spacing — token-bound, use `$font.letterSpacing.{none,tight,snug,normal,relaxed,loose}` (e.g. `ls($font.letterSpacing.loose)`); the scale carries both tight (negative) and loose (positive) tracking. `italic`, `underline`. Escapes: `\"` quote, `\uXXXX` unicode.
 
 ~290 bundled Google Fonts. Unavailable fonts silently fall back. Omit `s()` for short labels (hug). Use `s(fill,hug)` for any text that could exceed its parent's width.
 
 **Modify only some properties** — leave a positional empty to keep its current value:
 ```
-abc123 t(,,,lh(1.5))         # change only line-height
-abc123 t(,Helvetica,)         # change only font family
+abc123 t(,,,lh($font.lineHeight.normal))   # change only line-height
+abc123 t(,Inter,)             # change only font family
 abc123 t(,,18,b)              # change only size + weight
 abc123 t("New title")         # change only content
 ```
 Empty positional (no characters) = preserve. **Whitespace IS literal content** — `t( ,Inter)` sets text to a single space, `t(" ")` does the same. Quoted empty (`t("")`) is rejected — text content cannot be empty.
 
-⚠ Text fill defaults to white — always specify `f[(#hex)]`.
+⚠ Text fill defaults to `$color.text.primary` (mode-aware: `$neutral.intense` in light, `$neutral.hint` in dark) — readable across modes even when you forget `f[(...)]`. Still always set the fill explicitly when you want a specific color.
 ⚠ **Text overflows when hug width exceeds parent width.** Text defaults to `hug` (single line) — correct for labels, values, headings. When text content is wider than its parent's resolved width, it overflows. Use `s(fill,hug)` on descriptions, subtitles, and paragraphs so they wrap instead of overflowing.
 ⚠ **Empty text is invalid.** The app auto-removes empty text elements; the parser rejects creates without content and modifies that explicitly empty the text. To clear a text element, delete it (`delete(#ref)`).
+⚠ **`lh()` / `ls()` / `align()` only live inside `t()` props.** Writing them as siblings after the closing paren halts the line. `t("Hi",Inter,16,b,lh($font.lineHeight.tight))` ✓ — never `t(...) lh(...)`.

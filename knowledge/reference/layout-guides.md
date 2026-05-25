@@ -7,7 +7,7 @@ description: "Column, row, and grid layout guides for alignment and snap targets
 
 # Layout Guides
 
-Layout guides (a.k.a. layout grids, stored in `ParentData.layoutGrids`) are visual overlays on frames that double as **snap targets** for elements moved or resized inside the frame. Only frames (not other element types) carry layout guides.
+Layout guides (a.k.a. layout grids, stored in `ParentData.layoutGrids` as `List<LayoutGrid>`) are visual overlays on parent elements that double as **snap targets** for elements moved or resized inside the parent. Only parent elements (frames, groups, auto layout, masks, booleans) carry layout guides; the Layout Guides section in the right toolbar appears whenever any parent is selected.
 
 ## Types
 
@@ -21,13 +21,13 @@ A frame can hold any number of guides in any combination of types.
 
 ## Adding Layout Guides
 
-1. Select a frame
+1. Select a parent element
 2. Right toolbar → **Layout Guides** section
-3. Click the **+** (Add Layout Grid) button → adds a guide of type **Grid**
+3. Click the **+** (Add Layout Grid) button. The new guide is a `LayoutGridType.grid` (uniform pixel grid)
 4. To switch type, change the **Type dropdown** in the new guide's header row to Grid / Columns / Rows
 5. Click the **slider icon** (expand button) on the right of the header to expand property fields
 
-There is **no separate type-picker** at add time. The default type is always Grid; switch via the row's Type dropdown afterwards. There is no default keyboard shortcut for adding a guide. The visibility toggle keybinding is **Shift+G** (global).
+The Add command (`add_layout_grid`) always inserts a `Grid` type guide; switch to Columns or Rows via the row's Type dropdown afterwards. There is **no default keyboard shortcut** for adding a guide. The visibility toggle keybinding is **Shift+G** (global, `toggle_layout_grids`).
 
 ## Header Row Controls
 
@@ -79,8 +79,8 @@ Three rows of fields:
 
 | Property | Applies To | Description | Default |
 |----------|------------|-------------|---------|
-| Count | All modes | Number of sections, min 1 | **5** |
-| Gutter | All modes | Pixels between sections | **20** |
+| Count | All Columns/Rows modes | Number of sections, min 1 | **5** |
+| Gutter | All Columns/Rows modes | Pixels between sections | **20** |
 | Margin | Stretch only | Inset from frame edges | **0** |
 | Section Size | Left, Right, Top, Bottom, Center | Fixed section width/height | **100** |
 | Offset | Left, Right, Top, Bottom (NOT Center) | Starting offset from edge | **0** |
@@ -126,7 +126,7 @@ Snapping works on **rotated frames**: guide positions are transformed via the fr
 ## Color and Opacity
 
 - **Color** is RGBA. Default `0x1AFF0000` (semi-transparent red)
-- **Opacity** is a 0–100% field; supports design system tokens via `opacityTokenRef`
+- **Opacity** is a 0 to 100% field; supports design system tokens via `opacityTokenRef`
 - Click the color swatch (prefix icon on the Type dropdown) to open the standard color picker (uses `ChangeColorContext.layoutGrid`)
 
 ## Tips

@@ -110,12 +110,12 @@ Per-folder color tags: appending a color suffix to a folder or canvas name color
 
 ### File Explorer
 
-The file explorer lives in the **left toolbar**. Open or focus it with **Cmd+Shift+E**. It shows all canvases, folders, asset (image) files, and other text/code files in the workspace as a tree.
+The file explorer lives in the **left toolbar**. Focus it with **Cmd+Shift+E** (command id `focus_canvas_explorer`). The Layers explorer (canvas's element tree) sits below it; focus it with **Cmd+Shift+R**. Toggle the whole left toolbar visibility with **Cmd+Shift+Left Arrow**. The file explorer shows all canvases, folders, asset (image) files, and other text/code files in the workspace as a tree.
 
 **Layout (top to bottom):**
-1. Toolbar buttons: New Canvas, New Folder, Toggle Layers Explorer
+1. "Files" header with toolbar buttons (right-aligned): Toggle All Folders (expand/collapse all), New Folder (Cmd+Shift+N), New Canvas (Cmd+N), Toggle Canvas Search (Cmd+P)
 2. Workspace tree: folders (with disclosure triangle), canvases (`.design`), images, text files
-3. Empty state if the workspace has no canvases (offers to create one)
+3. Below the file explorer: the Layers explorer (focus with Cmd+Shift+R) shows the element tree of the active canvas
 
 **Selection:**
 - Click an item to select it (and switch to it if it's a canvas or previewable file)
@@ -152,7 +152,7 @@ The file explorer lives in the **left toolbar**. Open or focus it with **Cmd+Shi
 - Multi-select then drag to move several items at once (single undo entry covers the batch)
 - Drag image files from Finder onto the explorer to import them as assets
 
-**Toggle Hidden Files:** show/hide dotfiles and dotfolders (e.g. `.git`, `.env`) via the command palette ("Toggle Hidden Files"). Hidden by default. State resets on app restart.
+**Toggle Hidden Files:** show/hide dotfiles and dotfolders (e.g. `.git`, `.env`) via the command palette ("Toggle Hidden Files"). Hidden by default. State persists across app restarts.
 
 **Git integration:** in a Git repository, files matching `.gitignore` are dimmed in the explorer and can be excluded from search.
 
@@ -427,12 +427,13 @@ my-workspace/
 
 ### .design Files
 
-Each canvas is stored as a `.design` file: a YAML-based format containing:
+Each canvas is stored as a `.design` file: a YAML-based format (currently `version: 3`) containing:
+- A leading comment header in compact "blueprint" form: gives an AI a fast read of IDs, types, fills, strokes, sizing, and hierarchy without parsing the YAML body
 - All element properties and hierarchy
-- Canvas metadata (zoom, pan position)
-- Embedded image references (pointing to Assets/ directories)
+- Canvas metadata (zoom, pan position, background, ruler guides)
+- Embedded image references (pointing to `Assets/` directories)
 
-Files are written deterministically for clean version control diffs.
+Files are written deterministically (stable key order, inline coordinate arrays, hex color strings) for clean version control diffs. Older `.design` files are migrated transparently on load (short IDs, circle start angles).
 
 ### Assets
 
@@ -480,7 +481,7 @@ Both lists persist across app restarts (stored in `SharedPreferences`).
 
 Clicking a text file in the file explorer opens it in Brilliant's built-in **code editor** (powered by CodeMirror 6). The editor replaces the canvas view while a text file is active.
 
-**Supported file types:** JavaScript, TypeScript, JSX/TSX, Python, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Dart, Go, Swift, SQL, Shell/Bash, XML/SVG, TOML/INI/conf, and plain text. `.styles` and `.styles.gen` files open with YAML highlighting.
+**Supported file types:** JavaScript, TypeScript, JSX/TSX, Python, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Dart, Go, Swift, SQL, Shell/Bash, XML/SVG, TOML/INI/conf, and plain text. Design-system source files under `Styles/` (`*.styles`) open with DSL highlighting; the generated artifacts under `Styles/.gen/` (`*.gen.yaml`) open with YAML highlighting.
 
 **Features:**
 - **Syntax highlighting** with VS Code Dark+/Light+ themes (auto-matches Brilliant's brightness)
@@ -490,11 +491,11 @@ Clicking a text file in the file explorer opens it in Brilliant's built-in **cod
 - File navigation: Alt+Right/Left switches between files; Ctrl+Alt+Left jumps to the previously active file
 - Vim mode indicator: shows the current vim mode (Normal/Insert/Visual) in the top toolbar when active
 
-The code editor is particularly useful for editing `.styles` files (design system tokens) directly as YAML.
+The code editor is particularly useful for editing the design system DSL (`.styles` files under `Styles/` folders) directly. The `.gen.yaml` files under `Styles/.gen/` open with YAML highlighting; treat them as read-only since they regenerate from the DSL source.
 
 ### .styles File Watching
 
-Brilliant watches for changes to `.styles` files (design system tokens) in your workspace. If you edit a `.styles` file externally (e.g., in a code editor), Brilliant automatically regenerates the design system. This makes it easy to keep design tokens in sync with code.
+Brilliant watches for changes to `.styles` files (design system tokens) in your workspace. If you edit a `.styles` file externally (e.g., in a code editor), Brilliant automatically regenerates the sibling `.gen.yaml`. This makes it easy to keep design tokens in sync with code.
 
 ---
 

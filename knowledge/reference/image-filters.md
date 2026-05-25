@@ -264,9 +264,12 @@ Use the command palette (Cmd+Shift+P) to add filters by name:
 
 ## General Notes
 
-- **Stable across zoom**: Filter patterns use logical coordinates, so grain/dot/cell sizes remain consistent as you zoom in and out
-- **Export**: PNG/JPEG/WebP capture the filter at full quality. SVG and PDF pre-rasterize filters as embedded PNG images
-- **Stacking**: Multiple filters can be stacked on one element; each processes all fills below it
+- **No compact blueprint syntax**: Image filters (noise/grain, halftone, pixelate, duotone, posterize, dither) and Color Adjust cannot be authored in the `f[...]` blueprint compact form. Add via commands (above) or by setting fill type via the UI dropdown, then tune params via slider drags or the property inspector. After adding, parameters are stored as `ImageFilterData.params` (key/value floats) and `colors` (List<Color>).
+- **Underlying type**: All image filters are `PaintStyleType` values with `isImageFilter == true` (`noiseGrain`, `halftone`, `pixelate`, `duotone`, `posterize`, `dither`). Color Adjust is `PaintStyleType.colorAdjust` (not an image filter per `isImageFilter`, but lives in the same "Filters" UI category).
+- **Stable across zoom**: Filter patterns use logical coordinates (via a `uScale = dpr * zoomScale` shader uniform), so grain/dot/cell sizes remain consistent as you zoom in and out
+- **Export**: PNG/JPEG/WebP capture the filter at full quality. SVG and PDF pre-rasterize filters as embedded PNG images. Strokes with filter paint styles are also pre-rasterized for vector export.
+- **Stacking**: Multiple filters can be stacked on one element; each processes all fills below it (image filters are paint-style fills, so z-order is the fills-list order).
 - **Strokes**: All filters work identically on strokes (applied to the stroke's rendered area)
-- **Per-color alpha**: For filters with color inputs, each color's alpha controls its tint strength (contribution vs original), not output transparency
+- **Per-color alpha**: For filters with color inputs, each color's alpha controls its tint strength (contribution vs original), not output transparency. Halftone uses a custom alpha-packing scheme (single packed float for 6 alphas) to fit Metal's 31-uniform fragment shader limit.
 - **Blend mode**: Every image filter has a fill-level blend mode dropdown in the expanded view, controlling how the filter output composites with content below
+- **Token bindings**: Duotone and any filter with colors can bind individual color stops to design system tokens via `ImageFilterData.colorTokenRefs` / `colorOpacityTokenRefs`.

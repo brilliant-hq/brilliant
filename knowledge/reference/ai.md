@@ -1,6 +1,6 @@
 ---
 name: "knowledge-ai"
-description: "AI features in Brilliant: multi-provider chat, Claude Code integration, BYOK setup, attachments, MCP tools, image generation, and slash commands."
+description: "AI features in Brilliant: multi-provider chat, Claude Code integration, BYOK setup, attachments, MCP tools, image and vector generation, vectorization, and slash commands."
 ---
 
 # AI Features
@@ -9,7 +9,7 @@ description: "AI features in Brilliant: multi-provider chat, Claude Code integra
 
 Brilliant has a single integrated AI system: a **multi-provider chat panel** that drives Claude Code (or another model) to design directly on the canvas. The bottom toolbar input is the entry point: type a prompt, press Enter, and a chat session is created.
 
-Brilliant chat is **bring-your-own-key (BYOK) only**. Every chat call uses the user's own API key (Anthropic, OpenAI, Google, OpenRouter) or a local Claude CLI install. The user pays their own provider directly.
+Brilliant chat is **bring-your-own-key (BYOK) only**. Every chat call uses the user's own API key (Anthropic, OpenAI, Google, OpenRouter) or a local Claude CLI install. Quiver is a separate BYOK provider used only for vector generation and vectorization. The user pays their own provider directly.
 
 ---
 
@@ -21,7 +21,7 @@ Brilliant chat is **bring-your-own-key (BYOK) only**. Every chat call uses the u
 |--------|----------|
 | Focus AI input in bottom toolbar | / (slash) |
 
-The input lives at the right end of the bottom toolbar. Click the field, press **/**, or use the **Focus AI Chat** command from the command palette.
+The input lives in the bottom toolbar, to the right of the drawing tool buttons. Click the field, press **/**, or use the **Focus AI Chat** command from the command palette. A chevron toggle next to the field collapses it to just the connection indicator (**Collapse AI Input** / **Expand AI Input** command).
 
 ### How It Works
 
@@ -34,7 +34,7 @@ Pressing Enter creates a new chat session (topic auto-derived from the first 60 
 
 ### Hint Cycle
 
-The input field cycles through ~60 example prompts as placeholder text (rotating every 5 seconds, shuffled per session). Categories include showcase designs, common UI patterns, canvas-aware prompts that reference the current selection ("convert this to dark mode"), creative prompts, bulk-generation, sub-agent prompts, and prompts with `#hashtag` modifiers.
+The input field cycles through a shuffled pool of starter prompts as placeholder text (currently 17 entries in `AIInputFieldConfig.starterPrompts`: short product-design ideas like "Meditation app onboarding", "Stripe-style pricing", "Kanban board"). While a session is processing, the inline hint area rotates through keyboard tips, slash command summaries, and modifier hints (`@` to mention elements, `#` for hashtag style hints, `"this"` / `"these"` to reference the current selection).
 
 ### Submission Behavior
 
@@ -67,15 +67,15 @@ The chat panel is a floating panel that opens above the bottom toolbar. It conta
 
 ### Providers
 
-Five providers, defined statically in `lib/providers/provider_registry.dart` (no remote model sync).
+Five chat providers (`ProviderId.claudeCli`, `anthropicHttp`, `openaiHttp`, `googleHttp`, `openRouterHttp`) defined statically in `lib/providers/provider_registry.dart` (no remote model sync). Quiver is a sixth credential slot (`hasQuiverCredentials`) used for vector generation and vectorization only; it is not a chat provider.
 
 | Provider | Backend | Models |
 |----------|---------|--------|
 | **Claude CLI** | Local `claude` binary subprocess | Discovered from the CLI at launch, intersected with an allowlist (`_cliModelSpec`): `claude-opus-4-7` ("Best"), `claude-opus-4-6` ("Excellent"), `claude-sonnet-4-6` ("Excellent"), `claude-sonnet-4-5` ("Excellent"), `claude-haiku-4-5` ("Good + Fast"). Opus (or any `[1m]`-tagged ID) gets 1M context; others 200K |
 | **Anthropic HTTP** | `api.anthropic.com/v1/messages` | `claude-opus-4-7` ("Best"), `claude-opus-4-6` ("Excellent"), `claude-sonnet-4-6` ("Excellent"), `claude-sonnet-4-5-20250929` ("Excellent"), `claude-haiku-4-5-20251001` ("Good + Fast"). All 200K context |
-| **OpenAI HTTP** | `api.openai.com` Chat Completions or Responses API | `gpt-5.5` ("Excellent", Chat Completions), `gpt-5.5-pro` ("Excellent", Responses API), `gpt-5.4` ("Excellent + Fast", Chat Completions), `gpt-5.4-pro` ("Excellent", Responses API), `gpt-5.3-codex` ("Excellent", Responses API). Pro and Codex models route through `OpenAIResponsesProvider` (`/v1/responses`); the rest use `/v1/chat/completions`. Codex has 400K context, others 1.05M |
-| **Google HTTP** | `generativelanguage.googleapis.com/v1beta` | `gemini-3.1-pro-preview` ("Excellent"), `gemini-3-pro-preview` ("Good"), `gemini-3-flash-preview` ("Good + Fast"). All ~1.05M context |
-| **OpenRouter HTTP** | `openrouter.ai/api/v1/chat/completions` | Curated 13-model set: `anthropic/claude-opus-4.7` ("Best"), `anthropic/claude-opus-4.6` ("Excellent"), `anthropic/claude-sonnet-4.6` ("Excellent"), `anthropic/claude-sonnet-4.5` ("Excellent"), `anthropic/claude-haiku-4.5` ("Good + Fast"), `openai/gpt-5.5` ("Excellent"), `openai/gpt-5.4` ("Excellent + Fast"), `openai/gpt-5.4-pro` ("Excellent"), `openai/gpt-5.3-codex` ("Excellent"), `google/gemini-3.1-pro-preview` ("Excellent"), `google/gemini-3-pro-preview` ("Good"), `google/gemini-3-flash-preview` ("Good + Fast"), `deepseek/deepseek-v3.2` (text-only, no vision, 163K, "Good"), `moonshotai/kimi-k2.5` (262K, "Good"). OpenRouter does NOT carry `openai/gpt-5.5-pro` |
+| **OpenAI HTTP** | `api.openai.com` Chat Completions or Responses API | `gpt-5.5` ("Excellent", Chat Completions), `gpt-5.5-pro` ("Excellent", Responses API), `gpt-5.4` ("Excellent + Fast", Chat Completions), `gpt-5.4-pro` ("Excellent", Responses API), `gpt-5.3-codex` ("Excellent", Responses API). Models flagged `usesResponsesApi: true` (the two Pro models plus Codex) route through `OpenAIResponsesProvider` (`/v1/responses`); the rest use `/v1/chat/completions`. Codex has 400K context, others 1.05M |
+| **Google HTTP** | `generativelanguage.googleapis.com/v1beta` | `gemini-3.1-pro-preview` ("Excellent"), `gemini-3-pro-preview` ("Good"), `gemini-3-flash-preview` ("Good + Fast"). All 1M context (1,048,576 tokens) |
+| **OpenRouter HTTP** | `openrouter.ai/api/v1/chat/completions` | Curated 14-model set: `anthropic/claude-opus-4.7` ("Best"), `anthropic/claude-opus-4.6` ("Excellent"), `anthropic/claude-sonnet-4.6` ("Excellent"), `anthropic/claude-sonnet-4.5` ("Excellent"), `anthropic/claude-haiku-4.5` ("Good + Fast"), `openai/gpt-5.5` ("Excellent"), `openai/gpt-5.4` ("Excellent + Fast"), `openai/gpt-5.4-pro` ("Excellent"), `openai/gpt-5.3-codex` ("Excellent"), `google/gemini-3.1-pro-preview` ("Excellent"), `google/gemini-3-pro-preview` ("Good"), `google/gemini-3-flash-preview` ("Good + Fast"), `deepseek/deepseek-v3.2` (text-only, no vision, 163K, "Good"), `moonshotai/kimi-k2.5` (262K, "Good"). OpenRouter does NOT carry `openai/gpt-5.5-pro` |
 
 **Default model per provider** (`ProviderRegistry.defaultModels`): Anthropic `claude-sonnet-4-6`; OpenAI `gpt-5.5`; Google `gemini-3.1-pro-preview`; OpenRouter `anthropic/claude-sonnet-4.6`. CLI has no default (populated at runtime).
 
@@ -83,7 +83,7 @@ The model selector only shows models whose provider currently has valid credenti
 
 ### BYOK: Setting Up API Keys
 
-Keys are stored locally in the macOS Keychain (service `com.brilliant.credentials`, items `apikey.{provider}` for keys and `oauth.{provider}` for OAuth tokens) and are sent only to the provider's own API endpoints. No chat traffic flows through Brilliant servers.
+Keys are stored locally in the macOS Keychain (service `com.brilliant.credentials`, accounts `apikey.{provider}` and `oauth.{provider}`, written with `-A` so any signed Brilliant build can read them without re-prompting) or, on Windows, in `~/.config/brilliant/credentials.json`. Keys are sent only to the provider's own API endpoints; no chat traffic flows through Brilliant servers.
 
 1. Open the chat panel (click the connection indicator in the bottom toolbar, or run **Toggle AI Chat**)
 2. If no providers are connected, an onboarding view appears with buttons for each provider. Otherwise, hover the **connection indicator** in the bottom toolbar to see a popup of all providers (green dot = connected, dim = not connected)
@@ -91,11 +91,11 @@ Keys are stored locally in the macOS Keychain (service `com.brilliant.credential
 4. Paste the key and press **Enter**. Brilliant validates the key against the provider's `models` endpoint and stores it on success
 5. To remove a key: hover the connection indicator and click a connected provider row
 
-**Environment variable fallback** (read on-demand when the Keychain has no key for that provider): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`.
+**Environment variable fallback** (read on-demand when storage has no key for that provider): `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`. Quiver currently only honors a Keychain/credentials.json entry (the error message references `QUIVER_API_KEY` but no env fallback is wired up in the credential store).
 
 **Google OAuth:** the Google provider also accepts OAuth tokens (localhost redirect flow) instead of an API key.
 
-**Claude CLI** has no key entry: install the `claude` CLI locally and Brilliant detects it on launch.
+**Claude CLI** has no key entry: install the `claude` CLI locally and Brilliant detects it on launch. `claude-haiku-4-5` requires the CLI to expose it; older CLI builds will simply show fewer models.
 
 ### Starting a Session
 
@@ -179,7 +179,7 @@ Available to every HTTP provider via `ToolExecutor` (`lib/providers/tool_executo
 | `edit` | Replace `old_string` with `new_string` (uniqueness-checked unless `replace_all`) |
 | `glob` | File-name glob via `fd` (falls back to `find`), respects `.gitignore` |
 | `grep` | Content search via `rg` |
-| `web_fetch` | HTTP GET, HTML to markdown, 15-min cache. Optionally summarized via a lightweight model (`claude-haiku-4-5-20251001` for Anthropic, `gpt-4.1-nano` for OpenAI, `gemini-2.5-flash-lite` for Google, `anthropic/claude-haiku-4.5` for OpenRouter; no summarization for Claude CLI) |
+| `web_fetch` | HTTP GET, HTML to markdown, 15-min raw-fetch cache (re-summarized per call). Summarization model picked per provider family (`claude-haiku-4-5-20251001` for Anthropic, `gpt-4.1-nano` for OpenAI, `gemini-2.5-flash-lite` for Google, `anthropic/claude-haiku-4.5` for OpenRouter; the Claude CLI provider returns raw markdown without a separate summarization pass) |
 | `AskUserQuestion` | Listed in `builtInToolDefinitions` but intercepted by the orchestrator: pauses the run and presents the user 1-4 questions, each with 2-4 predefined options (and an optional `multiSelect` flag). Free-text input is not part of the schema; resumes when the user picks |
 
 **Provider-native web search** (added when `enableWebSearch: true`):
@@ -195,20 +195,22 @@ Main sessions ship with `enableWebSearch: true`; sub-agents ship without it. The
 
 Two surfaces expose canvas tools:
 
-1. **External MCP server** (when Claude Code or another MCP client connects to Brilliant): the full `mcp__brilliant__*` set, registered in `lib/managers/mcp_tools/`. Includes `init` (CLI-only bootstrap; required first call), `create_html`, `create_modify_elements`, `lookup`, `get_selection`, `get_knowledge`, `execute_commands`, `export`, `generate_image`.
-2. **In-app HTTP providers** (`NativeTools.getToolDefinitions()` in `lib/providers/native_tools.dart`): the integrated Anthropic / OpenAI / Google / OpenRouter sessions always get `get_knowledge`, `get_selection`, `export`, `execute_commands`, `lookup`. They additionally get: `generate_image` when a `CredentialStore` is wired; `plan_agents` and `spawn_agent` when `spawnHttpAgent` is wired (sub-agent capable sessions); `load_mcp_server` when `loadMcpServer` is wired. **`create_html` is NOT in `getToolDefinitions()` for HTTP providers**; in-app HTTP sessions emit elements via streaming `<objects canvasId="...">` blocks (see "Streaming Element Creation" below). The `create_html` handler is still in `handleCanvasTool()` for backward compatibility, and `create_html` is exposed to external MCP clients.
+1. **External MCP server** (when Claude Code or another MCP client connects to Brilliant): the full `mcp__brilliant__*` set, registered in `lib/managers/mcp_tools/`. Tools exposed: `init` (CLI-only bootstrap; required first call), `create_html`, `create_modify_elements`, `lookup`, `get_selection`, `get_knowledge`, `execute_commands`, `export`, `generate_image`, `generate_svg`, `vectorize_image`.
+2. **In-app HTTP providers** (`NativeTools.getToolDefinitions()` in `lib/providers/native_tools.dart`): the integrated Anthropic / OpenAI / Google / OpenRouter sessions always get `get_knowledge`, `get_selection`, `export`, `execute_commands`, `lookup`. They additionally get: `generate_image`, `generate_svg`, and `vectorize_image` when a `CredentialStore` is wired; `plan_agents` and `spawn_agent` when `spawnHttpAgent` is wired (sub-agent capable sessions); `load_mcp_server` when `loadMcpServer` is wired. **`create_html` and `create_modify_elements` are NOT in `getToolDefinitions()` for HTTP providers**; in-app HTTP sessions emit elements via streaming `<objects canvasId="...">` blocks (see "Streaming Element Creation" below). A `create_html` handler is still wired in `handleCanvasTool()` for backward compatibility, and both creation tools are exposed to external MCP clients.
 
 | Tool | Purpose |
 |------|---------|
 | `init` | (External MCP only.) Bootstrap session context: returns `canvasId`, `repoRoot`, `canvasFile`, element counts, MCP mode header, shared CLAUDE.md reference. CLI clients must call this first |
 | `get_knowledge` | Load `.claude-prod/knowledge/*.md` files by key (e.g. `blueprint/core`, `design/colors`, `effects/glass`). Required before using the Blueprint DSL |
 | `get_selection` | Returns the IDs and full blueprint of the elements selected on the given `canvasId` |
-| `lookup` | Find or read elements. `scope` (canvas paths, 16-hex element IDs, `#refs`) constrains where to look; filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) narrow within scope. `format` is `"summary"` (default) or `"blueprint"` with optional `depth`. `limit` defaults to 50 |
-| `create_html` | (External MCP only.) Convert HTML + inline CSS into auto layout frames, text, and shapes. No `get_knowledge` required. In-app HTTP sessions reach the same path via streamed `<objects>` tags |
-| `create_modify_elements` | (External MCP only.) Create or modify elements via the Blueprint DSL. Requires `get_knowledge(["blueprint/core", ...])` first |
+| `lookup` | Find or read elements. `scope` (canvas paths, 16-hex element IDs, `#refs`) constrains where to look; filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) narrow within scope. `type` accepts `vector`, `circle`, `rectangle`, `text`, `parent` (`line` is also accepted by the schema for compatibility but maps to vector). `format` is `"summary"` (default) or `"blueprint"` with optional `depth`. `limit` defaults to 50 |
+| `create_html` | (External MCP only as a tool definition; in-app HTTP sessions reach the same converter via streamed `<objects>` tags.) Convert HTML + inline CSS into auto layout frames, text, and shapes. No `get_knowledge` required |
+| `create_modify_elements` | (External MCP only as a tool definition; in-app HTTP sessions stream blueprint via `<objects>` instead.) Create or modify elements via the Blueprint DSL. Requires `get_knowledge(["blueprint/core", ...])` first |
 | `execute_commands` | Dispatch one or more Brilliant commands by ID against a single `canvasId`. Each entry is `{commandId, elementIds?, params?}`. Runs sequentially, stops on first error. See "AI-Invocable Commands" below |
 | `export` | Render elements to PNG/JPEG/WebP/SVG/PDF. Required: `canvasId`, `ids`. Optional: `format` (default `png`), `scale` (default 2.0, raster only, mutually exclusive with `width`/`height`), `width`, `height`, `fitMode` (`fit`/`fill`/`stretch`), `jpegQuality` (default 90), `webpQuality` (default 90), `webpLossless` (default false), `background` (`clear` default, or `window`), `outputPath` (writes to file instead of returning bytes inline). For UI mockups in WebP, set `webpLossless: true`; the lossy default leaves visible gray banding on rounded corners and gradients |
-| `generate_image` | Generate an image and apply it as a fill on `targetElementId`. Single or batch (`targets` array). Optional `referenceElementIds` (up to 14 references, used for "edit this image" workflows). `imageSize`: `"512px"`, `"1K"` (default), `"2K"`, `"4K"`. Requires Google API key or Google OAuth |
+| `generate_image` | Generate a raster image and apply it as a fill on `targetElementId`. Single or batch (`targets` array). Optional `referenceElementIds` (up to 14 references, used for "edit this image" workflows). `imageSize`: `"512px"`, `"1K"` (default), `"2K"`, `"4K"`. Use for photos, realistic scenes, complex textures. Requires Google API key or Google OAuth |
+| `generate_svg` | Generate an editable vector graphic (SVG) and place it on the canvas as native editable shapes. Single, parallel variations (`n: 1–4`), or distinct prompts in batch (`targets`). Optional `referenceElementIds` (up to 4) export to PNG and steer style. Use for icons, logos, illustrations, diagrams: anything that should stay crisp and remain editable. Requires Quiver API key |
+| `vectorize_image` | Convert a raster element on the canvas into editable vector paths. Required: `canvasId`, `sourceElementId`. Optional: `autoCrop` (default true). The original raster is left intact; the vector elements are placed on the canvas. Requires Quiver API key |
 | `plan_agents` / `spawn_agent` | (HTTP providers with sub-agent support.) Announce a plan, then launch sub-agents. Each sub-agent runs in its own `ChatOrchestrator` with the parent's API key; 5-minute timeout |
 | `load_mcp_server` | (HTTP providers when configured.) Load tools from a registered external MCP server by name on the next turn |
 
@@ -231,6 +233,20 @@ Image generation uses Google's "Nano Banana" image model (`gemini-3.1-flash-imag
 ### Requirements
 
 A Google API key or Google OAuth credentials. Image generation is only available when the Google provider is connected, regardless of which chat model is active.
+
+## AI Vector Graphics Generation
+
+Vector generation uses Quiver's Arrow model (`arrow-1.1`). Generated SVGs are placed on the canvas as native editable vector elements via `importSvgElements`, so users can immediately move, resize, recolor, and reshape them like any hand-drawn vector. Vectorization (`vectorize_image`) takes a raster element on the canvas and returns an editable SVG of the same content.
+
+### Requirements
+
+A Quiver API key. SVG generation and vectorization are only available when the Quiver provider is connected, regardless of which chat model is active. See `svg/prompts` and `svg/integration` knowledge files for prompt patterns and decision rules.
+
+### Tool Selection Rules
+
+- Photo, realistic image, complex texture → `generate_image` (Google)
+- Icon, logo, illustration, diagram, anything that should stay crisp at any zoom → `generate_svg` (Quiver)
+- User has a raster they want to edit as vectors → `vectorize_image` (Quiver)
 
 ### How It Works
 
@@ -308,14 +324,16 @@ Type these in the chat input:
 
 | Action | Shortcut |
 |--------|----------|
+| Focus AI input in bottom toolbar | / (slash) |
 | Focus chat session 1 to 9 | Cmd+1 through Cmd+9 |
 | Focus chat session 10 | Cmd+0 |
 | Focus next chat session | Cmd+Shift+] |
 | Focus previous chat session | Cmd+Shift+[ |
-| Close focused chat session | Cmd+W (when AI input is focused) |
+| Close focused chat session | Cmd+W (close_ai_chat; gated by AI input focus / chat open WhenClause) |
 | Toggle chat explorer | Cmd+Shift+A |
 | New chat | Cmd+N (when AI input is focused) |
-| Chat search | Cmd+Shift+I |
+| Chat search | Cmd+Shift+I (toggle_chat_search) |
+| Escape AI chat | Esc (EscapeAIChatCommand) |
 | Toggle AI chat panel | Toggle AI Chat command (no default keybinding; assignable in shortcuts view) |
 
 These shortcuts focus the chat session assigned to that number, opening the chat panel if it is hidden. Session number assignments show as keybinding badges in the chat panel header and chat explorer sidebar.

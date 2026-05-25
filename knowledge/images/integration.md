@@ -32,9 +32,9 @@ fr s(fill,400) f[(img(Assets/hero.png))] clip rd($radius.md) "Hero Image" #hero_
 
 Always add overlay for readability:
 ```
-fr s(fill,500) f[(img(Assets/hero.png)),(f2,solid(#09090B,o(0.55)))] clip "Hero" #hero
-  al(v,y(c),x(c),g($spacing.4),pad($spacing.16)) s(fill,fill) #hero_content
-    t("Headline",Inter,48,sb,align(c)) f[(#FFF)] #hero_title
+fr s(fill,500) f[(img(Assets/hero.png)),(f2,solid($neutral.intense,o($visibility.mid)))] clip "Hero" #hero
+  al(v,y(c),x(c),g($spacing.md),pad($spacing.3xl)) s(fill,fill) #hero_content
+    t("Headline",$font.family,$font.size.5xl,sb,align(c)) f[($neutral.hint)] #hero_title
 ```
 
 ## Parallel Generation

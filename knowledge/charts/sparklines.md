@@ -3,66 +3,36 @@ assumes: blueprint/vectors
 ---
 # Data Viz: Sparklines
 
-Assumes: `blueprint/vectors`
-
-Compact inline charts. Three node strategies:
-
-| Strategy | Nodes | Look | Use for |
-|----------|-------|------|---------|
-| All `mi` | Smooth curves | Polished, organic | Revenue, users |
-| All `st` | Angular/jagged | Raw, volatile | Latency, stock price |
-| Mixed | Smooth + sharp | Realistic | Alerts, bursts |
-
-## Stroke-Only (Volatile)
+Compact inline charts drawn as a `v()` vector path. Node type sets the
+feel: all `mi` for smooth (revenue, users), all `st` for jagged (latency,
+prices), mixed for realism. Avoid AI tells: same shape every chart,
+perfectly even X spacing, symmetric rises, clean sine waves.
 
 ```
-v(nodes[(0,0,21),(1,10,11),(2,17.68,19.32),(3,25.21,11),(4,32,18),(5,34.36,13.43),(6,43.32,22.67),(7,60,0)]) s(60,22.67) st[(#EF4444,w(1.5))]
+// Simple — stroke-only, no axis. NO clip needed (nothing to mask).
+al(v,g($spacing.none),pad($spacing.none)) s(120,48) "Spark"
+  v(nodes[(0,0,40,mi),(1,30,32,mi),(2,60,22,mi),(3,90,10,mi),(4,120,4,mi)]) s(fill,40) st[($primary.mid,w($stroke.width.soft))]
+
+// Medium — leading Y label gutter (two FLOW columns, never abs + fill).
+al(h,x(s),y(c),g($spacing.sm),pad($spacing.none)) s(200,40) "Tile"
+  t("0",$font.family,$font.size.xs,m,align(r)) s(28,hug) f[($color.text.secondary)]
+  v(nodes[(0,0,40,mi),(1,40,30,mi),(2,80,22,mi),(3,120,8,mi),(4,160,2,mi)]) s(fill,40) st[($primary.mid,w($stroke.width.soft))]
+-- abs+fill in the SAME parent silently overlap: fill expands UNDER abs.
+
+// Complex — area fill, label gutter, gridline at label baseline.
+al(h,x(s),y(c),g($spacing.sm),pad($spacing.none)) s(240,56) "TileFull"
+  al(v,x(e),y(sb),g($spacing.none),pad($spacing.none)) s(28,fill) "YAxis"
+    t("30K",$font.family,$font.size.xs,m,align(r)) f[($color.text.disabled)]
+    t("0",$font.family,$font.size.xs,m,align(r)) f[($color.text.disabled)]
+  fr s(fill,fill) "SparkCol"
+    r abs p(0,8) s(fill,1) f[($color.outline.variant)]    -- gridline at label BASELINE, not its top
+    r abs p(0,48) s(fill,1) f[($color.outline.variant)]
+    al(v,g($spacing.none),pad($spacing.lg,$spacing.none,$spacing.none,$spacing.none)) abs p(0,0) s(fill,56) clip "SparkClip"
+      v(nodes[(0,0,40,mi),(1,40,30,mi),(2,80,22,mi),(3,120,8,mi),(4,160,2,mi),(5,160,56),(6,0,56)],edges[(0,0,1),(1,1,2),(2,2,3),(3,3,4),(4,4,5),(5,5,6),(6,6,0)],closed) s(fill,fill) f[(linear(180,stop($primary.mid,0,o($visibility.soft)),stop($primary.mid,1,o($visibility.invisible))))] st[($primary.mid,w($stroke.width.soft),pos(o))]
 ```
 
-## Area Fill (Smooth Growth)
+**Three things every model gets wrong, in order of damage:**
 
-Uses Clip-Outside-Stroke. ONE closed vector with both fill and stroke, inside a clipping `al()` frame with top padding only:
-```
-$brand=#14B8A6
-al(v,g($spacing.none),pad(2,$spacing.none,$spacing.none,$spacing.none)) s(fill,26) clip "Spark" #spark
-  v(nodes[(0,0,21.6,mi),(1,12,16.8,mi),(2,28,12,mi),(3,38,15.6,mi),(4,50,7.2,mi),(5,60,0,mi),(6,60,24),(7,0,24)],edges[(0,0,1),(1,1,2),(2,2,3),(3,3,4),(4,4,5),(5,5,6),(6,6,7),(7,7,0)],closed) s(fill,fill) f[(linear(180,stop($brand.50,0,o(0.40)),stop($brand.50,1,o(0))))] st[($brand.50,w(1.5),pos(o))] #spark_area
-```
-
-### Crucial invariant: the clip frame's interior must match the vector's bounds
-
-The closing edges of the area fill (the bottom and sides of the closed path) sit AT the vector's bounding box. The clip frame crops them ONLY if its interior (frame size minus padding) is the same size as the vector. Two safe configurations:
-
-| Frame | Vector | How they stay matched |
-|---|---|---|
-| `s(fill, FIXED)` or `s(FIXED, FIXED)` | `s(fill, fill)` | Vector stretches to the frame — bounds equal frame interior. **Recommended** — single source of truth for chart size. |
-| `s(hug, hug)` | `s(W, H)` (fixed) | Frame shrinks to wrap the vector — bounds equal the vector. Use when the chart should size to its data extent, not its container. |
-
-**What breaks it:** fixed-size frame + a vector with any *different* fixed dimension on the same axis. Common failure:
-```
-al(v,pad(2,0,0,0)) s(620,198) clip "Spark"
-  v() s(fill,180) ... path:d(... L620,180 L0,180 Z)
-```
-Frame is 198 tall, vector is 180 tall → vector bottom lands at y=182 (after 2px pad), clip boundary is at y=198 → 16px of unclipped closing-edge stroke is visible at the bottom. Either drop the vector to `s(fill,fill)` (so it grows into the 196px-tall interior) or shrink the frame to `s(620, 182)` (so it hugs the vector).
-
-The top `pad(2,0,0,0)` leaves room for the outside stroke above the curve so the topmost arc isn't clipped. No padding on the other sides — those closing-edge strokes are intentionally clipped.
-
-## Realistic Path Shapes
-
-**Pick DIFFERENT archetype per sparkline:**
-
-| Metric | Archetype |
-|---|---|
-| Revenue, MRR | Gradual up + 1-2 pullbacks |
-| Latency | Flat + isolated sharp spikes |
-| Error rate | Near-zero + sudden bursts |
-| Stock price | Rapid zigzag, big amplitude |
-| Conversion | Seasonal dip, recovers |
-
-## Fake Tells to Avoid
-
-| Tell | Fix |
-|---|---|
-| Same shape everywhere | Different archetype per metric |
-| Even X spacing | 3-4px during change, 6-8px during plateaus |
-| Symmetric rises/falls | Steeper drops than rises |
-| Sine wave | Irregular periods, random amplitudes |
+1. **`clip` is only for area fills**, never stroke-only curves. Closed paths leak their closing edges past the path bbox; `clip` masks them. Open stroke paths have nothing to mask — adding `clip` invites every overshoot warning below.
+2. **Top pad must cover stroke width + bezier handle bulge.** `mi` nodes generate auto-tangents at 30% of edge length; a curve dropping from y=40 to y=2 over a single edge can bulge ~12px above the top node. `$spacing.lg` covers most cases; raise it when rises are steep.
+3. **Gridlines sit at the label's baseline**, not its top. A 12px-tall `$font.size.xs` label has its baseline ~8-9px below its `p(_, y)` top — put gridlines there so they slide under the glyph instead of through it.

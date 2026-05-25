@@ -7,16 +7,22 @@ Create and modify elements via `<objects>` tags in your text response. This stre
 Example:
 
 <objects canvasId="Projects/Dashboard" previewIds="#card">
-$brand=#3B82F6
-$neutral=#64748B
-$spacing=4
-$radius=8
-$font=Inter
-al(v,g($spacing.4),pad($spacing.6)) p(100,100) s(hug,hug) f[(#FFFFFF)] st[($neutral.20,w(1))] rd($radius.md) "Card" #card
-  t("Dashboard",$font,24,b) f[($brand.90)] "Title" #title
-  t("Welcome back",$font,14) s(fill,hug) f[($neutral.50)] "Subtitle" #subtitle
-  al(h,x(c),y(c),g($spacing.none),pad($spacing.3,$spacing.4)) s(hug,hug) f[($brand.50)] rd($radius.sm) "Button" #btn
-    t("Get Started",$font,14,sb) f[(#FFF)] "Label" #label
+ds_file("dashboard-blue")
+  brand: #3B82F6
+  neutral: #64748B
+  font.family: Inter
+
+  color.surface: #FFFFFF
+  color.outline: neutral.200
+  color.text.primary: brand.900
+  color.text.secondary: neutral.500
+  color.primary: brand.500
+
+al(v, g($spacing.4), pad($spacing.6)) ds(dashboard-blue) p(100,100) s(hug,hug) f[($color.surface)] st[($color.outline, w(1))] rd($radius.md) "Card" #card
+  t("Dashboard", $font.family, 24, b) f[($color.text.primary)] "Title" #title
+  t("Welcome back", $font.family, 14) s(fill,hug) f[($color.text.secondary)] "Subtitle" #subtitle
+  al(h, x(c), y(c), pad($spacing.3, $spacing.4)) s(hug,hug) f[($color.primary)] rd($radius.sm) "Button" #btn
+    t("Get Started", $font.family, 14, sb) f[(#FFF)] "Label" #label
 </objects>
 
 - Substitute the real `canvasId` — no placeholders.
@@ -43,6 +49,51 @@ Output **one `<objects>` block at a time**, then review the feedback before cont
 #card f[(#FF0000)]                     ← flat modify — changes card's fill
 #title t("New text",Inter,24,b)        ← flat modify — changes title's text
 ```
+
+### Checkpoints — annotate as you build, undo back later
+
+Add `// short label` comments at logical milestones. They double as readable narration *and* undo anchors. After each block, the feedback message lists your recent checkpoints; in a later block, `undo("label")` rolls the canvas back to that point. No separate tool, no special syntax — just comments.
+
+**When to add checkpoints — apply this rule, don't make a judgment call:**
+
+Add a `// label` comment whenever ANY of:
+- The block has 3+ distinct sections (header / body / footer · hero / stats / CTAs · pros / cons / verdict). One checkpoint at each section boundary.
+- The block creates ~25+ elements.
+- A single section is non-trivial to recreate — multi-fill stack, nested `repeat(...)` blocks, custom positioning.
+
+Skip checkpoints when the block is a **single section, a flat-modify pass, or fewer than ~10 elements** — at that size they're noise.
+
+The cost of skipping a needed checkpoint is high: if the last section comes out wrong, you re-type the whole block instead of `undo("section before it")` + a few new lines.
+
+```
+<objects canvasId="...">
+fr p(0,0) s(1440,900) f[(#F8FAFC)] "Hero" #hero
+  c s(560,560) f[(#DFF3EA)] "Mint sun" #mint
+  c s(360,360) f[(#F4BFA4)] "Peach glow" #peach   // background atmosphere
+  al(v,g(24)) s(525,hug) "Copy" #copy
+    t("Feel renewed",Inter,58,b) "Headline" #headline
+    t("Personalized rituals…",Inter,18) "Sub" #sub   // hero copy
+  al(h,g(16)) s(hug,hug) "CTA row" #ctas
+    al(h,pad(12,24)) f[(#17342E)] rd(8) "Primary" #primary
+    al(h,pad(12,24)) st[(#17342E,w(1))] rd(8) "Secondary" #secondary   // CTAs in place
+</objects>
+```
+
+If a follow-up block produces a worse result, revert without re-typing everything:
+
+```
+<objects canvasId="...">
+undo("hero copy")               ← rolls back the CTAs that came after
+  al(h,g(14)) s(hug,hug) "CTA row v2" #ctas_v2
+    ...different button shape...
+</objects>
+```
+
+Tips:
+- Keep labels short and meaningful (3–5 words). They're how you'll address them.
+- Inline trailing form (`... #ctas   // CTAs in place`) is the densest. Standalone (`// hero copy` on its own line) also works.
+- The most recent ~8 checkpoints are surfaced in post-block feedback so you don't have to remember them.
+- Reusing a label re-snapshots at the new position (most recent wins).
 
 ### Error Recovery
 

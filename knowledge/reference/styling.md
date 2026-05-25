@@ -33,8 +33,8 @@ Components (top to bottom):
 2. **Eyedropper button + Hue slider** (width 280). Eyedropper toggle on the left, horizontal 360-degree hue strip on the right.
 3. **Opacity slider** (width 280). Alpha 0%-100% for the focused color.
 4. **Gradient bar** (width 280). Only in gradient mode. Click empty space to add a stop, click an existing stop to focus it, drag to reposition, Delete / Backspace removes the focused stop (minimum 2 stops).
-5. **Format inputs** row. Format dropdown (Hex / RGB / HSB / CSS) + value fields + opacity field + copy button.
-6. **Design Tokens / Canvas Colors / Recent Colors** sections (always visible regardless of fill type).
+5. **Format inputs** row. Format dropdown (Hex / RGB / HSB / CSS) + value fields + copy button. The format dropdown has hover-preview (hovering a format previews the value display before clicking).
+6. **Design Tokens** section, then **Canvas Colors**, then a divider, then **Recent Colors** (always present regardless of fill type, including image mode).
 
 In shader mode, the rectangle/hue/opacity controls edit one shader-color slot at a time. To pick which slot, click the individual color swatches in the right toolbar's expanded shader fill row before opening the picker.
 
@@ -75,12 +75,14 @@ In contexts that only support solid colors (canvas background, layout grid color
 
 ### Token Bindings
 
-A `PaintStyle` has two independent token bindings:
+A solid `PaintStyle` has two independent token bindings (stored on `SolidData`):
 
 - **Color token** (e.g. `brand.50`): chosen via the design tokens section or the hex field's token dropdown. Resolves to the actual color at render time.
 - **Opacity token** (e.g. `opacity.50`): chosen via the opacity field's token dropdown when the design system has opacity tokens.
 
-You can bind both at once. Manually dragging the opacity slider clears the opacity token binding; manually editing hex/RGB/HSB clears the color token binding.
+Both can be set simultaneously. Manually dragging the opacity slider clears the opacity token binding; manually editing hex/RGB/HSB clears the color token binding.
+
+**Per-stop token bindings.** Gradient stops, shader colors, and image-filter colors carry their own parallel `colorTokenRefs` / `colorOpacityTokenRefs` lists (one slot per color). Editing a stop's hex field, picking a token from the stop's dropdown, or typing a token name in the hex field writes to that stop's slot only. Changing fill type between gradient flavors (Linear / Radial / Angular) preserves per-stop bindings; converting solid -> gradient seeds both stops with the solid's token (if any).
 
 ## Fills
 
@@ -112,6 +114,8 @@ Gradient handles render on the canvas while the color picker is open for that el
 **Angular gradients** (sweep/conic) rotate color stops around a center point: drag the center to reposition, drag the angle handle to rotate the gradient start direction. The angular sweep covers a full 360 degrees with wrap-around interpolation across the seam.
 
 Add / remove / reposition color stops directly on the gradient bar in the color picker, or by clicking the canvas gradient line. Hovering a stop shows the position percentage and color hex, dragging shows just the percentage.
+
+Each gradient stop has its own row in the right toolbar with a hex field, opacity field, and position field. The hex field accepts both hex literals and design token names (e.g. `brand.50`); typing a token name binds that token to the stop only. A purple diamond badge on the hex or opacity field indicates a token binding on that stop.
 
 ### Image Fills
 
@@ -204,13 +208,19 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 **Dash pattern:** The `Stroke` data model has no dash pattern fields. Dashed strokes are not first-class on element strokes; the only dashed rendering in Brilliant is for UI overlays (selection, snap guides). SVG / Sketch import preserves dashPattern in serialization but it is not editable in the inspector.
 
 **Caps** are NOT a property of `Stroke`. They live on the geometry:
-- **Vector paths:** per-node `cap` field on leaf nodes (degree 1 endpoints). Values from `StrokeCap2` enum: `none` (butt), `round` (default), `square`, `arrow`.
-- **Circles:** `startCap` and `endCap` on `CircleData`. Cap controls appear in the stroke section of the inspector only when the circle's arc sweep is less than 100% (any arc, including ring sectors).
+- **Vector paths:** per-node `cap` field on leaf nodes (degree 1 endpoints). Values from `StrokeCap2` enum: `none` (butt), `round` (default), `square`, `arrow`, `circle` (filled dot marker, radius approx. thickness).
+- **Circles:** `startCap` and `endCap` on `CircleData` (default `round`). Cap controls appear in the stroke section of the inspector only when the circle's arc sweep is less than 100% (any arc, including ring sectors).
 - **Rectangles** and other closed shapes have no caps.
+
+**Join:** The `Stroke` model has no `strokeJoin` / miter / bevel field. Joins are not user-configurable; the renderer uses Flutter's default join behavior.
+
+**Fields on `Stroke`:** `id`, `thickness` (TokenizedDouble, supports design tokens), `style` (PaintStyle), `position` (StrokePosition), `blendMode` (default `srcOver`). No cap, join, or dash fields.
 
 ### Stroke Style Types
 
-Strokes support the same `PaintStyleType` set as fills (one unified dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). Inner Shadow / Inner Glow as strokes render the inner-shadow/glow primitive over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
+Strokes support the same `PaintStyleType` set as fills (one unified dropdown is reused, command id `change_shader_effect_type`). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). Total 21 `PaintStyleType` values. Inner Shadow / Inner Glow as strokes render the inner-shadow/glow primitive over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
+
+Text ranges only support Solid.
 
 Switch the stroke type using the type dropdown on any stroke row in the right toolbar.
 

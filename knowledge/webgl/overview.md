@@ -71,7 +71,7 @@ brilliantFilter('filtered', 'photo', FRAG, {
 
 ## Mapping Blueprint Values to WebGL Config
 
-**Colors:** Blueprint `metaballs(#FF0000,#00FF00)` → `colors: ['#FF0000', '#00FF00']`
+**Colors:** Blueprint tokens resolve to hex at render time. `metaballs($red.mid,$emerald.mid)` → `colors: ['<resolved red.500 hex>', '<resolved emerald.500 hex>']`. The WebGL config carries the resolved hex values; the blueprint side stays token-bound.
 
 **Params:** Blueprint `size(0.3),count(15),speed(1.0)` → `params: { uSize: 0.3, uCount: 15, uSpeed: 1.0 }`
 

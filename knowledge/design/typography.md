@@ -3,31 +3,38 @@ assumes: blueprint/text
 ---
 # Design Typography
 
-For text syntax, see `blueprint/text`.
+For text syntax, see `blueprint/text`. For DS architecture, see `design-systems/core`.
 
 ## Type Scale (Body = 16px)
 
+The catalog covers the scale. Always reach for `$font.size.X` rather than typing raw pixels:
+
 ```
-12 · 14 · 16 · 18 · 20 · 24 · 30 · 36 · 48 · 60 · 72
+$font.size.xs   = 12   (overlines, captions, micro-labels)
+$font.size.sm   = 14   (secondary body, dense UI)
+$font.size.md   = 16   (body)
+$font.size.lg   = 20   (subheadings)
+$font.size.xl   = 24   (section headings)
+$font.size.2xl  = 32   (page headings)
+$font.size.3xl  = 36   (small heroes)
+$font.size.4xl  = 40   (heroes)
+$font.size.5xl  = 48   (large heroes)
+$font.size.6xl  = 64   (display)
+$font.size.7xl  = 80, 8xl = 96, 9xl = 128 (oversize watermarks / display)
 ```
 
-Overline 11-12/sb UPPERCASE · Caption 12-13/m · Secondary 13-14/r · Body 15-16/r · Subheading 18-20/sb · Section heading 24-28/b · Page heading 32-40/b · Hero 44-72/b or eb.
 Jump rule: heading = 150-200% of body.
 
-## Font Pairing
+## Font Families
 
-**Same family (safest):** Inter bold + Inter regular. DM Sans, Plus Jakarta Sans also work.
-**Sans + Serif (high contrast):** Playfair Display / bold + Inter / regular → luxury, editorial.
-**Geometric + Humanist:** Space Grotesk / bold + Inter / regular → tech, developer.
+Use the active DS's font tokens — `$font.family` (workhorse sans) and `$font.family.serif` (editorial accent, when the DS provides one). Most designs need only these: same-family pairing is safest; `$font.family.serif` as a single editorial heading + `$font.family` body is the high-contrast move.
 
-Domain fonts: Restaurant (Playfair Display, Lora, DM Serif Display) · Finance (Inter, DM Sans, Space Grotesk) · Developer Tools (Space Grotesk, JetBrains Mono) · SaaS (Plus Jakarta Sans, Outfit, Sora) · Agency (Instrument Sans, Bricolage Grotesque).
-
-**Avoid:** Inter for everything (generic), Poppins + Poppins (template feel), Roboto (placeholder).
+Specific Google Fonts override the DS — `t("...",Playfair Display,...)` works inline and auto-loads. Reach for this only when the active DS doesn't fit the mood; switching DS is usually the better move (see `design-systems/core`).
 
 ## Hierarchy
 
-Use 2-3 levers simultaneously: **Size** + **Weight** + **Color**. Pair heavy headings (bold/extrabold) with regular or light body. 3-4 text colors max: Primary `#0F172A` · Body `#334155` · Secondary `#64748B` · Subtle `#94A3B8`. Max 2 font families. Tighter tracking on large type (24px+), open tracking on small-caps or labels below 13px.
+Use 2-3 levers simultaneously: **Size** + **Weight** + **Color**. Pair heavy headings (`$font.weight.bold` or `.strong`) with `.soft` or `.faint` body. Use semantic text aliases — `$color.text.primary`, `$color.text.secondary`, `$color.text.disabled` — so the hierarchy auto-flips in dark mode. Max 2 font families. Tighter tracking on large type (24px+), open tracking on small-caps or labels below 13px.
 
 ## Anchor Principle
 
-Every screen has ONE focal element sized 2-3x body: landing hero headline 48-72px · pricing price 36-48px · dashboard primary KPI 32-48px.
+Every screen has ONE focal element sized 2-3x body — hero headline, primary metric, key callout. Don't equally weight multiple "biggest things" — one dominates, the rest support.

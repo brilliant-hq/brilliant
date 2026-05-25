@@ -3,63 +3,41 @@ assumes: images/prompts
 ---
 # Image Generation: Templates
 
-Assumes: `images/prompts`
+Adapt these per use case. Each shows a good prompt shape; swap the
+subject and keep the structure (subject, setting, light, lens, grade).
 
-## Hero / Banner
-
-Ratios: `16:9`, `21:9`. Size: `"2K"` or `"4K"`.
-
+## Hero / banner (16:9 or 21:9, "2K"-"4K")
 ```
-"An aerial view of a modern coastal city at golden hour, warm sunlight
-reflecting off glass skyscrapers, turquoise ocean, tilt-shift lens
-creating selective focus on downtown, cinematic color grading"
+"Aerial view of a modern coastal city at golden hour, glass skyscrapers,
+turquoise ocean, tilt-shift focus on downtown, cinematic color grading"
 ```
 
-## Product Shot
-
-Ratios: `1:1`, `4:3`, `3:2`. Size: `"2K"`.
-
+## Product shot (1:1 / 4:3 / 3:2, "2K")
 ```
-"A matte black wireless earbud case on raw concrete, one earbud resting
-beside it, soft directional studio lighting from upper left, gentle
-gradient shadow, warm off-white background, shallow depth of field,
-crisp detail on textured matte finish"
+"Matte black wireless earbud case on raw concrete, one earbud beside it,
+soft directional studio light, warm off-white backdrop, shallow depth"
 ```
 
-## Portrait / Avatar
-
-Ratio: `1:1`. Size: `"1K"` avatars, `"2K"` hero.
-
+## Portrait / avatar (1:1; "1K" avatar, "2K" hero)
 ```
-"Professional headshot, confident man, early 40s, short salt-and-pepper
-hair, trimmed beard, navy crew-neck sweater, warm neutral expression,
-soft gradient backdrop, Rembrandt lighting with catch light"
+"Professional headshot, confident man early 40s, salt-and-pepper hair,
+navy sweater, soft gradient backdrop, Rembrandt lighting, catch light"
 ```
 
-## Food Photography
-
-Ratios: `1:1`, `4:3`. Size: `"2K"`.
-
+## Food (1:1 / 4:3, "2K")
 ```
-"Rustic wooden board with freshly baked sourdough, one slice torn off
-revealing airy crumb, ramekin of golden butter, scattered flour on
-dark slate, warm overhead natural light, editorial food photography"
+"Rustic board with fresh sourdough, one slice torn to an airy crumb,
+ramekin of butter, flour on dark slate, warm overhead, editorial style"
 ```
 
-## Texture / Background
-
-Ratio: `1:1` or match section. Size: `"2K"`.
-
+## Texture / background (1:1 or match the section, "2K")
 ```
-"Seamless abstract flowing liquid marble, deep navy and gold veins,
-organic swirling patterns with metallic highlights, smooth gradients,
-macro photography of polished stone surface"
+"Seamless flowing liquid marble, deep navy and gold veins, swirling
+metallic highlights, macro photography of polished stone"
 ```
 
-## Illustration
-
+## Illustration (match the placement ratio)
 ```
-"Whimsical flat illustration of a small plant shop storefront, warm
-pastel palette with terracotta, sage green, cream, potted plants in
-window, hand-painted watercolor texture, children's book style"
+"Whimsical flat illustration of a plant-shop storefront, warm pastel
+terracotta, sage, and cream, potted plants, watercolor, children's-book"
 ```

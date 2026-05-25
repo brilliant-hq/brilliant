@@ -318,7 +318,7 @@ Use Flatten when you need to commit a boolean result, convert a primitive into e
 
 ## Outline Text and Flatten Text (macOS only)
 
-- **Outline Text** (`Cmd+Ctrl+O`) converts a selected text element into a **group of per-character vector outlines** — each glyph becomes its own editable vector inside a group.
+- **Outline Text** (`Cmd+Ctrl+O`) converts a selected text element into a **group of per-character vector outlines**: each glyph becomes its own editable vector inside a group.
 - **Flatten Text** (`Cmd+Alt+O`) converts a selected text element into a **single compound vector element** (all glyphs merged into one path).
 
 Both are one-way conversions: the result is no longer editable as text. Both are macOS-only; on other platforms the commands exist but execute no-op.
@@ -339,7 +339,7 @@ A vector element's bounding box is defined by `s(W,H)` in the element declaratio
 
 ```
 # A 60x24 vector positioned at (10,5) inside a group
-v() s(60,24) p(10,5) st[(#F97316,w(1.5))] path:d(M0,20 C10,16 20,12 30,8 C40,6 50,4 60,2) "Curve"
+v() s(60,24) p(10,5) st[($orange.mid,w($stroke.width.soft))] path:d(M0,20 C10,16 20,12 30,8 C40,6 50,4 60,2) "Curve"
 ```
 
 **The path fills the `s(W,H)` box.** If your path coordinates exceed the declared size, the overflow is clipped. If they're smaller, the element has dead space. Design paths to match your declared size.
@@ -361,7 +361,7 @@ v() s(60,24) p(10,5) st[(#F97316,w(1.5))] path:d(M0,20 C10,16 20,12 30,8 C40,6 5
 ### Sparkline (Stroke Only)
 
 ```
-v() s(60,24) st[(#F97316,w(1.5))] path:d(M0,22 C6,21 12,20 18,17 C22,16 26,18 30,15 C36,12 42,10 48,8 C52,7 56,5 60,4) "Spark"
+v() s(60,24) st[($orange.mid,w($stroke.width.soft))] path:d(M0,22 C6,21 12,20 18,17 C22,16 26,18 30,15 C36,12 42,10 48,8 C52,7 56,5 60,4) "Spark"
 ```
 
 **Always use `C` (cubic bezier) for smooth curves.** `L`-only paths look jagged. See `charts/sparklines` for metric-specific path shapes (revenue, latency, error rate, etc.).
@@ -372,19 +372,19 @@ To fill the area under a curve, **close the path at the bottom** and wrap in a *
 
 ```
 al(v,g($spacing.none),pad(2,$spacing.none,$spacing.none,$spacing.none)) s(fill,26) clip "Spark"
-  v() s(fill,fill) f[(linear(180,stop(#F97316,0,o(0.15)),stop(#F97316,1,o(0.0))))] st[(#F97316,w(1.5),cap(n,n),pos(o))] path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z) "Line"
+  v() s(fill,fill) f[(linear(180,stop($orange.mid,0,o($visibility.subtle)),stop($orange.mid,1,o($visibility.invisible))))] st[($orange.mid,w($stroke.width.soft),cap(n,n),pos(o))] path:d(M0,20 C5,18 10,22 15,16 C20,10 25,14 30,8 C35,12 40,4 45,8 C50,6 55,10 60,6 L60,24 L0,24 Z) "Line"
 ```
 
-The `L60,24 L0,24 Z` closes the path along the bottom edge. With `s(fill,fill)` on the vector, the path scales into whatever bounds the frame provides — closing edges always land exactly at the clip boundary. The `pad(2,0,0,0)` adds 2px top padding (>= stroke width) so the curve stroke isn't clipped, while 0 padding on the other sides keeps closing-edge strokes cropped. The gradient (`180` = top-to-bottom) creates the modern area chart look; `f[(solid(#F97316,o(0.12)))]` also works.
+The `L60,24 L0,24 Z` closes the path along the bottom edge. With `s(fill,fill)` on the vector, the path scales into whatever bounds the frame provides, so closing edges always land exactly at the clip boundary. The `pad(2,0,0,0)` adds 2px top padding (>= stroke width) so the curve stroke isn't clipped, while 0 padding on the other sides keeps closing-edge strokes cropped. The gradient (`180` = top-to-bottom) creates the modern area chart look; `f[(solid($orange.mid,o($visibility.subtle)))]` also works.
 
-**Crucial invariant — the clip frame's interior (size minus padding) must equal the vector's bounds.** Two safe configurations:
+**Crucial invariant: the clip frame's interior (size minus padding) must equal the vector's bounds.** Two safe configurations:
 
 | Frame | Vector | Notes |
 |---|---|---|
 | `s(fill, FIXED)` or `s(FIXED, FIXED)` | `s(fill, fill)` | **Recommended.** Vector stretches to the frame; chart size lives in one place. |
 | `s(hug, hug)` | `s(W, H)` (fixed) | Use when the chart should size to its data extent, not its container. |
 
-What breaks it: a fixed-size frame plus a vector with a *different* fixed dimension on the same axis. Example: frame `s(620,198)` + vector `s(fill,180)` leaves the L0,180 closing edge at frame y=182 (after the 2px top pad) while the clip boundary is at y=198 — 16px of unclipped bottom-edge stroke shows. Either drop the vector to `s(fill,fill)` or shrink the frame's height to match `vector_h + top_pad`.
+What breaks it: a fixed-size frame plus a vector with a *different* fixed dimension on the same axis. Example: frame `s(620,198)` + vector `s(fill,180)` leaves the L0,180 closing edge at frame y=182 (after the 2px top pad) while the clip boundary is at y=198, so 16px of unclipped bottom-edge stroke shows. Either drop the vector to `s(fill,fill)` or shrink the frame's height to match `vector_h + top_pad`.
 
 ### Common Mistakes
 
@@ -392,13 +392,13 @@ What breaks it: a fixed-size frame plus a vector with a *different* fixed dimens
 |-------|---------|
 | Two separate vectors in a group (one stroke, one fill) for sparkline + area | ONE closed vector with both `fill` and `stroke` in a clip frame |
 | Placing a colored `rect` behind a sparkline stroke to simulate area fill | Use a **closed vector path** with `f[(solid(#hex,opacity))]`. The rect can't follow the curve |
-| Using centered stroke on closed sparkline paths | Use `st[(#hex,w(1.5),cap(n,n),pos(o))]` (outside stroke) + clip frame to hide closing-edge strokes |
-| Fixed-size frame `s(W,H)` + fixed-size vector `s(W,H')` with `H' ≠ H − topPad` (closing edge visible at bottom) | Vector `s(fill,fill)` inside `s(fill,H)` or `s(W,H)` frame — vector's bounds always match the frame's interior |
+| Using centered stroke on closed sparkline paths | Use `st[(<color>,w($stroke.width.soft),cap(n,n),pos(o))]` (outside stroke) + clip frame to hide closing-edge strokes |
+| Fixed-size frame `s(W,H)` + fixed-size vector `s(W,H')` with `H' ≠ H − topPad` (closing edge visible at bottom) | Vector `s(fill,fill)` inside `s(fill,H)` or `s(W,H)` frame, so the vector's bounds always match the frame's interior |
 | Using `L` segments for smooth sparklines | Use `C` cubic beziers. `L` creates jagged zigzags |
 | Creating vectors without size | Always declare size: `v() s(60,24)` (the path renders within this box) |
 | Fighting vector positioning with repeated @X,Y adjustments | Design path coordinates relative to `0,0`, set size with `s(W,H)` to match path bounds, position with `p(X,Y)` |
-| Creating separate triangle `vector` elements for arrowheads | Use `cap(n,ar)` on a `line(N)`, `connect(...)`, or `vector`. The arrow cap renders automatically at the endpoint |
-| Hand-routing dependency arrows with `v()` paths between elements | Use `connect(#A, #B, route(elbow))` to auto-route from A to B at end of block (no math required) |
+| Creating separate triangle `vector` elements for arrowheads | Use `cap(n,ar)` on a `line(...)` or `vector`. The arrow cap renders automatically at the endpoint |
+| Hand-routing dependency arrows with `v()` paths between elements | Use `line(from(#A), to(#B), route(elbow))` to auto-route from A to B at end of block (no math required) |
 
 ### Vector Regions
 
@@ -406,8 +406,8 @@ Vectors with multiple closed regions (e.g. imported SVG logos) expose per-region
 
 ```
 abc123 v() s(200,200) "Logo"
-  vr(r1, M0,0 C50,-20 100,0 100,100 Z) f[(#FF6611)]
-  vr(r2, M30,30 L70,30 L70,70 L30,70 Z) f[(#00FF00)]
+  vr(r1, M0,0 C50,-20 100,0 100,100 Z) f[($orange.mid)]
+  vr(r2, M30,30 L70,30 L70,70 L30,70 Z) f[($green.mid)]
   vr(r3, M40,40 L60,40 L60,60 L40,60 Z) hole
 ```
 
@@ -419,8 +419,8 @@ abc123 v() s(200,200) "Logo"
 **Modify per-region fills** by region ID, no path data needed:
 ```
 abc123
-  vr(r1) f[(solid(#F97316,o(0.15))),(f2,blur(12)),(f3,inner(#000,o(0.2),y(2),blur(4)))]
-  vr(r2) f[(solid(#8B5CF6,o(0.1))),(f2,blur(8))]
+  vr(r1) f[(solid($orange.mid,o($visibility.subtle))),(f2,blur(12)),(f3,inner($color.shadow,o($visibility.subtle),y(2),blur(4)))]
+  vr(r2) f[(solid($violet.mid,o($visibility.faint))),(f2,blur(8))]
 ```
 
 Only listed regions are modified; others keep their current fills. Flat `f[...]` on the element line still applies uniformly to all regions.
@@ -433,16 +433,17 @@ Vector path endpoints (leaf nodes with degree 1) can have individual stroke caps
 
 | Cap Type | Description |
 |----------|-------------|
-| **None** | Butt cap — no extension past the endpoint |
+| **None** | Butt cap (no extension past the endpoint) |
 | **Round** | Semicircle cap (default) |
 | **Square** | Extends by half stroke thickness past the endpoint |
 | **Arrow** | Arrow head pointing outward along the path tangent |
+| **Circle** | Filled dot marker at the endpoint (radius approx. stroke thickness) |
 
 **For two-endpoint open paths** (lines, simple curves) **and circle arcs** (sweep < 100%): Separate start cap and end cap dropdowns appear side by side, allowing independent control of each endpoint.
 
 **For multi-endpoint vectors** (paths with 3+ leaf nodes): A unified dropdown sets all endpoints to the same cap.
 
-Arrow caps scale with stroke width automatically. Use `cap(n,ar)` in blueprint syntax for arrow endpoints (e.g., `st[(#374151,w(1.5),cap(n,ar))]`). See the Arrows section below for examples.
+Arrow caps scale with stroke width automatically. Use `cap(n,ar)` in blueprint syntax for arrow endpoints (e.g., `st[($gray.bold,w($stroke.width.soft),cap(n,ar))]`). See the Arrows section below for examples.
 
 ### When to Use Vectors vs Other Elements
 
@@ -451,42 +452,49 @@ Arrow caps scale with stroke width automatically. Use `cap(n,ar)` in blueprint s
 | Icons | `svg` (NEVER `vector`) |
 | Sparklines, trend lines | `vector` with stroke, `C` curves |
 | Area charts (filled region under curve) | `vector` with closed path + fill (one element, both stroke and fill) |
-| Arrows (straight) | `line(N)` with `cap(n,ar)` and `st[(#hex,w(width))]` |
-| Arrows connecting two existing elements | `connect(#A, #B)` with `cap(n,ar)` (auto-routes between refs) |
-| Arrows (curved, freeform) | `vector` with `st[(#hex,w(width),cap(n,ar))]` arrow cap and `C` curves |
+| Arrows (straight) | `line(len(N))` (or `line(len(N), angle(deg))`) with `cap(n,ar)` and `st[(<color>,w(width))]` |
+| Arrows between two coordinates | `line(from(x,y), to(x,y))` with `cap(n,ar)` and `st[...]` |
+| Arrows connecting two existing elements | `line(from(#A), to(#B))` with `cap(n,ar)` (auto-routes between refs) |
+| Arrows (curved, freeform) | `vector` with `st[(<color>,w(width),cap(n,ar))]` arrow cap and `C` curves |
 | Simple colored rectangles | `rect` |
 | Circles, dots | `circle` |
 | Decorative wavy dividers | `vector` with `C` curves |
-| Progress rings | Track = `circle` with stroke; progress arc = `circle` with `arc(start,sweep)`. Example: `c s(80,80) st[(#F97316,w(4),cap(r,r))] arc(90,75) ratio(1)` for 75% starting at top (90°=top, 0°=right) |
+| Progress rings | Track = `circle` with stroke; progress arc = `circle` with `arc(start,sweep)`. Example: `c s(80,80) st[($orange.mid,w($stroke.width.bold),cap(r,r))] arc(90,75) ratio(1)` for 75% starting at top (90°=top, 0°=right) |
 
 ### Arrows
 
-Use `cap(n,ar)` to add an arrowhead at the endpoint (`ar` = arrow endCap). Cap can go inline in the stroke or as a top-level token. Works on `line(N)`, `connect()`, and `vector` elements; no separate triangle elements needed.
+Use `cap(n,ar)` to add an arrowhead at the endpoint (`ar` = arrow endCap). Cap can go inline in the stroke or as a top-level token. Works on `line(...)` and `vector` elements; no separate triangle elements needed.
 
-**Straight arrow** uses `line(N)`:
+**Straight arrow** uses `line(len(N))`:
 ```
-line(200) cap(n,ar) st[(#374151,w(1.5))] "Arrow"
+line(len(200)) cap(n,ar) st[($gray.bold,w($stroke.width.soft))] "Arrow"
 ```
 
-**Diagonal arrow** uses `line(N)` with `rot()`:
+**Diagonal arrow** uses `line(len(N), angle(deg))`:
 ```
-line(200) p(40,40) rot(45) cap(n,ar) st[(#374151,w(1.5))] "Diagonal arrow"
+line(len(200), angle(45)) p(40,40) cap(n,ar) st[($gray.bold,w($stroke.width.soft))] "Diagonal arrow"
 ```
-`rot()` pivots around `p()` (the line's start), so the line extends from `p` along the rotated direction.
+`angle()` pivots around `p()` (the line's start), so the line extends from `p` along the rotated direction. `rot()` is **not** allowed on lines — direction is part of `line()`'s own arguments.
 
-**Connecting two existing elements** uses `connect()`, which auto-routes with smart defaults (elbow shape + obstacle avoidance):
+**Between two coordinates** uses endpoint form:
 ```
-connect(#card1, #card2) cap(n,ar) st[(#888,w(1.5))]                      # smart defaults
-connect(#card1, #card2, intent(dependency))                              # preset bundles route + avoid + cap + stroke
-connect(#card1, #card2, route(straight), avoid(none))                    # opt out: literal straight line
-connect(#card1, #card2, from(r, 0.25), to(l, 0.75))                      # fractional anchors along edges
-connect(#card1, #card2, from(#card1_port), to(#card2_port))              # anchor on nested elements
+line(from(0,0), to(120,60)) cap(n,ar) st[($gray.bold,w($stroke.width.soft))] "Callout"
 ```
-**Defaults** (no params): `route(elbow)` + `avoid(all)`, picking an orthogonal shape and routing around any other elements between the endpoints. **Intents** (`dependency`/`flow`/`annotation`) seed defaults; explicit tokens always win. **Routes**: `elbow` (default; single right-angle bend, auto-promoted to 2-bend when needed), `elbow2` (always 2 bends), `straight`, `bezier`. **Avoid**: `all` (default), `endpoints` (only source/target), `none`. **Anchors**: bare side (`tl t tr l c r bl b br`), `(side, fraction)` for a position along an edge, or `(#ref)` to anchor on a nested element. Omit `from`/`to` to auto-pick the closest sides. Path resolves at end of block once both refs exist.
+
+**Connecting two existing elements** uses endpoint form with refs, which auto-routes with smart defaults (elbow shape + obstacle avoidance) and auto-parents to the elements' lowest common ancestor:
+```
+line(from(#card1), to(#card2)) cap(n,ar) st[($color.outline,w($stroke.width.soft))]   # smart defaults
+line(from(#card1), to(#card2), intent(dependency))                                    # preset bundles route + avoid + cap + stroke
+line(from(#card1), to(#card2), route(straight), avoid(none))                          # opt out: literal straight line
+line(from(#card1, r, 0.25), to(#card2, l, 0.75))                                      # fractional anchors along edges
+line(from(#card1_port), to(#card2_port))                                              # anchor on nested elements
+line(from(20,30), to(#card2), intent(flow))                                           # coord origin, ref target
+```
+**Defaults** (no extra params): `route(elbow)` + `avoid(all)`, picking an orthogonal shape and routing around any other elements between the endpoints. **Intents** (`dependency`/`flow`/`annotation`) seed defaults; explicit tokens always win. **Routes**: `elbow` (default; single right-angle bend, auto-promoted to 2-bend when needed), `elbow2` (always 2 bends), `straight`, `bezier`. **Avoid**: `all` (default), `endpoints` (only source/target), `none`. **Anchors** on a ref endpoint: bare side (`tl t tr l c r bl b br`), `(#ref, side, fraction)` for a position along an edge, or `(#child_ref)` to anchor on a nested element. Omit anchor args to auto-pick the closest sides. Path resolves at end of block once all refs exist. Full reference: `blueprint/lines`.
 
 **Curved freeform arrow** uses a `vector` with bezier:
 ```
-v() s(200,100) st[(#374151,w(1.5),cap(n,ar))] path:d(M0,50 C60,50 140,0 200,0) "Arrow"
+v() s(200,100) st[($gray.bold,w($stroke.width.soft),cap(n,ar))] path:d(M0,50 C60,50 140,0 200,0) "Arrow"
 ```
 
 The arrow cap renders at the last node, oriented along the path tangent. It scales with stroke width automatically.

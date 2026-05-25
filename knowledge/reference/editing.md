@@ -16,9 +16,9 @@ description: "Selection, movement, resize, rotation, alignment, distribution, z-
 | Click on an element | Selects only that element |
 | Click on empty space | Deselects everything |
 | Click on a frame label | Selects the frame |
-| Cmd+Click during drag-reparent | Drop into the parent of the deepest hit frame instead of the deepest frame itself |
+| Cmd held during drag-reparent | Drop into the parent of the deepest hit frame instead of the deepest frame itself |
 
-**Note:** Top-level frame bodies are not clickable. Click the frame label to select a top-level frame. Nested frames are fully clickable.
+**Note:** A top-level frame **with children** has its body and strokes non-clickable (click its label to select). Empty top-level frames and all nested frames are fully clickable on the body.
 
 **Frame selection rule (Figma-style mutual exclusion):** A frame and its descendants cannot be selected at the same time. Selecting a frame deselects all descendants; selecting any element deselects all of its ancestors. Marquee selecting both a frame and its children keeps only the frame.
 
@@ -221,7 +221,7 @@ Use `execute_commands` with `skew_elements`:
 Use `skew(x,y)` property:
 
 ```
-a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[(#F59E0B)] "Hero BG"
+a1b2c3d4 r p(0,0) s(1280,400) skew(-8,0) f[($amber.mid)] "Hero BG"
 ```
 
 ### Common Values
@@ -273,7 +273,7 @@ Z-order operates within each parent frame independently. The Layers explorer sho
 
 ### Via Blueprint
 
-Use `front`, `front(N)`, `back`, `back(N)` tokens on modify lines: `#card front` (bring to front), `#card back(2)` (send backward 2 steps).
+Use `front`, `front(N)`, `back`, `back(N)` tokens on **create or modify** lines: `#card front` (bring an existing card to front), `#card back(2)` (send backward 2 steps), or `r s(200,200) f[(#10B981)] back parent(#frame)` (create a shape already sent behind its siblings — handy for a backing card or background layer). On a create line, `before()`/`after()` takes precedence over `front`/`back` if both are present.
 
 ## Boolean Operations
 
@@ -335,7 +335,7 @@ Text outlining requires CoreText, so flattening text is **macOS only**. Flatteni
 | Action | Shortcut |
 |--------|----------|
 | Outline Text | Ctrl+Cmd+O |
-| Flatten Text | (no default shortcut, available via command palette) |
+| Flatten Text | Cmd+Alt+O |
 
 Both commands are **macOS only** (require CoreText).
 
@@ -361,7 +361,7 @@ Renames the selected element's layer name.
 | Paste | Cmd+V |
 | Duplicate | Cmd+D |
 | Delete | Backspace (or Delete) |
-| Clear all | C (the C key, with no element selected) |
+| Clear all | C (the C key, when canvas has focus) |
 
 ### Copy
 
@@ -370,7 +370,7 @@ Copies the selected elements to an **internal clipboard** (in-memory) and writes
 **What gets copied:**
 - Selected elements and their full hierarchy (frames include all children and nested frames)
 - Styling (fills, strokes, corner radius, opacity, layout behavior, effects, component data)
-- A single unmodified image element (no strokes, no corner radius, full opacity) writes its raw image bytes to the system clipboard instead of re-rendering
+- When the selection is exactly one image element with no strokes, default (zero) corner radius, full opacity, and no active crop, the raw image bytes are written to the system clipboard instead of a re-rendered PNG (preserves original quality)
 
 ### Cut
 

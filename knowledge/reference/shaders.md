@@ -211,6 +211,7 @@ Shaders with the Shape dropdown:
 - Click a color swatch in the expanded fill view to edit it in the color picker
 - Add/remove colors with the +/- buttons (up to the shader's maximum)
 - Minimum 1 color per shader
+- Each shader color slot can bind to a design system color token (via `colorTokenRefs`) and an opacity token (via `colorOpacityTokenRefs`). Token bindings resolve through the active design system / mode at paint time; the literal color is the fallback if the token is missing.
 
 ## Combining with Other Fills
 

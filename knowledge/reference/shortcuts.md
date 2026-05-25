@@ -62,6 +62,15 @@ All shortcuts are fully remappable: you can match any tool's layout via **Shift+
 | Alt | Option (⌥) | Alt |
 | Shift | Shift (⇧) | Shift |
 
+### Windows-disabled defaults
+
+On Windows the following defaults are unbound (the OS or browser-style conventions reserve them). Users can reassign these in the Shortcuts panel.
+
+| Command | Reason |
+|---------|--------|
+| `toggle_overlay_mode` (default Ctrl+F on macOS) | Ctrl+F is the universal "Find" shortcut on Windows. Also unregisters the global hotkey. |
+| `toggle_pass_through` (default Ctrl+A on macOS) | Ctrl+A is the universal "Select All" shortcut on Windows. |
+
 ## Tools
 
 | Tool | Shortcut |
@@ -437,8 +446,8 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 
 | Action | Shortcut |
 |--------|----------|
-| Toggle overlay mode | Ctrl+F (global hotkey, works when Brilliant is unfocused; switches between studio and overlay) |
-| Toggle passthrough (overlay only) | Ctrl+A (global hotkey while in overlay; makes the window click-through to apps below) |
+| Toggle overlay mode | Ctrl+F on macOS (registered as an OS-level global hotkey via `hotkey_manager`, fires even when Brilliant is unfocused; switches between studio and overlay). Unbound by default on Windows. The hotkey is gated by the per-user overlay-mode feature flag (`overlayModeEnabledProvider` in `KeybindingsManager`). |
+| Toggle passthrough (overlay only) | Ctrl+A on macOS (global hotkey while in overlay; makes the window click-through to apps below). Unbound by default on Windows. |
 | Show/hide UI | Cmd+\\ (toggles toolbars in both window modes; in overlay creates a clean transparent drawing surface) |
 | Expand/collapse all right-toolbar sections | Cmd+/ (id `toggle_sections`) |
 | Toggle blackboard | Cmd+Shift+B |
@@ -540,19 +549,21 @@ These shortcuts focus (and expand if minimized) the AI chat session assigned to 
 
 | Action | Shortcut |
 |--------|----------|
-| Switch design mode (e.g. light / dark) | (no default, id `switch_design_mode`) |
+| Switch design mode (e.g. light / dark) | (no default, id `set_design_system_mode`) |
 | Apply dark theme / Apply light theme | (no defaults, ids `apply_dark_theme`, `apply_light_theme`. Note: Ctrl+D and Ctrl+L are bound to the "Gradient (dark)" / "Gradient (light)" color commands, NOT to these theme commands) |
-| Apply typography token / shadow token | (no defaults, ids `apply_typography_token`, `apply_shadow_token`) |
-| Set / remove design token | (no defaults, ids `set_token_value`, `remove_token`, `set_mode_token`) |
-| Add / remove color seed; add / remove mode seed | (no defaults, ids `set_color_seed`, `remove_color_seed`, `add_mode_seed`, `remove_mode_seed`) |
-| Set spacing / radius / font size / font weight / line height base | (no defaults, ids `set_spacing_base`, `set_radius_base`, `set_font_size_base`, `set_font_weight_base`, `set_line_height_base`) |
+| Apply typography / shadow token to selection | (no defaults, ids `apply_typography_token`, `apply_shadow_token`) |
+| Set design token on selected element property | (no default, id `set_design_token`) |
 | Regenerate / reset / open design system file | (no defaults, ids `regenerate_design_system`, `reset_design_system`, `open_design_system_file`) |
+| Create a design system viewer canvas | (no default, id `create_design_system_viewer`) |
+| Switch active design system | (no default, id `set_design_system`) |
+
+Note: seeds (color, mode) and base scales (spacing, radius, font size, font weight, line height) are authored directly in the design system YAML file (or via `open_design_system_file`), not via individual commands.
 
 ## Provider / API Keys
 
 | Action | Shortcut |
 |--------|----------|
-| Set Anthropic / OpenAI / Google / OpenRouter API key | (no defaults, ids `set_anthropic_api_key`, `set_openai_api_key`, `set_google_api_key`, `set_openrouter_api_key`; also `set_brilliant_api_key`, `toggle_brilliant_ai`) |
+| Set Anthropic / OpenAI / Google / OpenRouter / Quiver API key | (no defaults, ids `set_anthropic_api_key`, `set_openai_api_key`, `set_google_api_key`, `set_openrouter_api_key`, `set_quiver_api_key`) |
 
 ## Programmatic Keybinding Customization
 

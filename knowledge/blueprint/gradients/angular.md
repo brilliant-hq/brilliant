@@ -17,21 +17,25 @@ Colors sweep around a center point (conic/sweep). Like a color wheel or light re
 (angular(cx,cy,ax,ay,w(wx,wy),stop(#hex,pos),...))  — elliptical
 ```
 
+Token-bound stops work the same as in linear/radial:
+`angular($brand.mid,$brand.intense)`, `stop($neutral.hint,0,o($visibility.mid))`,
+`solid($brand.mid,o(0.5))`.
+
 ## Use Cases
 
 **Progress rings** — angular gradients naturally follow circular paths:
 ```
-st[(angular(#F59E0B,#EF4444),w(4),cap(r,r))] arc(90,84) ratio(1)
+st[(angular($amber.mid,$red.mid),w($stroke.width.bold),cap(r,r))] arc(90,84) ratio(1)
 ```
 
 **Metallic/holographic sheen** — close hues create brushed-metal look:
 ```
-f[(angular(stop(#C0C0C0,0),stop(#E8E8E8,0.25),stop(#A0A0A0,0.5),stop(#D0D0D0,0.75),stop(#C0C0C0,1)))]
+f[(angular(stop($neutral.soft,0),stop($neutral.faint,0.25),stop($neutral.soft,0.5),stop($neutral.subtle,0.75),stop($neutral.soft,1)))]
 ```
 
 **Badge accents** — small angular on circular elements creates gem-like refraction:
 ```
-al(h,x(c),y(c),g($spacing.none),pad($spacing.none)) s(32,32) f[(angular(#10B981,#14B8A6,#0891B2,#10B981))] rd($radius.full) "Badge" #badge
+al(h,x(c),y(c),g($spacing.none),pad($spacing.none)) s(32,32) f[(angular($emerald.mid,$teal.mid,$cyan.firm,$emerald.mid))] rd($radius.full) "Badge" #badge
 ```
 
 ## When to Reach for Angular

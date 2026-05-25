@@ -3,38 +3,40 @@ assumes: blueprint/paint
 ---
 # Design Colors
 
-For color syntax, see `blueprint/paint`.
+For color syntax, see `blueprint/paint`. For DS architecture and the
+"design system IS the design" principle, see `design-systems/core`.
 
 ## 60-30-10 Rule
 
-60% dominant (backgrounds #FFF/#F8FAFC) · 30% secondary (text/borders #334155/#E2E8F0) · 10% accent (CTAs #3B82F6/#10B981). Most common mistake: accent on 30%+ of surface. One accent CTA is confident — accent on navbar, headers, AND badges is noisy.
-
-## Building from One Accent
-
-1. Pick accent (match domain below)
-2. Generate tinted neutral — desaturate 90%, darken for text
-3. Light variant — accent at 8-12% opacity for tags/badges
-4. Dark variant — darken 15-20% for hover/pressed
+60% dominant (backgrounds `$color.surface` / `$color.surface.container`) · 30% secondary (text `$color.text.{primary,secondary}`, borders `$color.outline.variant`) · 10% accent (CTAs `$color.primary`, callouts `$color.secondary`). Most common mistake: accent on 30%+ of surface. One accent CTA is confident — accent on navbar, headers, AND badges is noisy.
 
 ## Neutrals
 
-Slate (cool blue, pairs with blue/indigo/violet) · Stone (warm yellow, pairs with amber/orange/rose) · Zinc (true neutral, pairs with anything) · avoid pure Gray (lifeless). **Body text should never be pure black (#000) or pure gray (#333/#666)** — tint it to match your neutral family.
-
-## Domain Color Psychology
-
-Restaurant: Amber `#F59E0B` / Red `#DC2626`, Stone · Finance: Emerald `#10B981`, Slate · SaaS: Blue `#3B82F6`, Slate · Dev Tools: Violet `#8B5CF6`, Zinc · Travel/Luxury: Teal `#0D9488`, Stone · Healthcare: Teal `#14B8A6`, Slate · Gaming: Violet/Lime, Zinc · Luxury/Fashion: Off-black `#1A1A2E`, Zinc.
+Slate (cool, blue-tinted) · Stone (warm, yellow-tinted) · Zinc (true neutral) · Gray is the lifeless default — skip it. **Body text should never be pure black (#000) or pure gray (#333/#666)** — tint it to match your neutral family.
 
 ## Dark Mode
 
-Light → Dark: bg #FFFFFF→#0D1117 · card #FFFFFF+border→#1F2937 · text primary #0F172A→#F9FAFB · text secondary #64748B→#9CA3AF · border #E2E8F0→#374151 · accent stays the same.
-Never #000 bg (void), never #FFF text (eye strain). Reduce accent saturation on dark. Shadows invisible — surface color does the work.
+**Switch the DS — don't hand-roll.** The fastest, most cohesive path to dark is `ds(, theme(dark))` (or `ds(name, theme(dark))` for both brand + mode) on the top-level frame, then build with semantic aliases. `$color.surface`, `$color.text.{primary,secondary}`, `$color.outline.variant`, `$color.primary`, `$color.secondary` all auto-flip via the `theme.dark` block in the active DS — the same blueprint renders both modes without per-element rewrites.
+
+Role tokens (`$neutral.hint`, `$neutral.intense`, `$primary.soft`, etc.) are also mode-aware: under `theme.dark`, low↔high flip automatically (`hint↔intense`, `faint↔strong`, `subtle↔bold`, `soft↔firm`; `mid` stays). So `$neutral.hint` is a near-white wash in light and a near-black wash in dark. For chrome (surfaces, body text, borders), prefer semantic aliases (`$color.surface`, `$color.text.primary`, `$color.outline.variant`) because they carry intent; reach for role tokens (`$primary.soft`, `$emerald.bold`) for accents that need a specific presence level. Raw numeric stops (`$neutral.500`, `$primary.700`) halt in explicit mode — reach for chrome aliases (`$color.shadow`, `$color.glow`) for mode-immune values or role names for mode-aware ones. To dark-theme a single frame inside a light app, wrap it: `ds(, theme(dark)) f[($color.surface)] ...` — the nested cascade re-resolves both semantics and role tokens for that subtree. Never #000 bg (void), never #FFF text (eye strain). Reduce accent saturation on dark. Shadows invisible — surface color does the work.
+
+## Interactive states
+
+Items that respond to a cursor — sidebar rows, menu items, list rows, selectable cards — pick from these surface tokens instead of hand-picking neutral stops. They assume the item sits on `$color.surface`; for items on a deeper container, step one boldness role darker.
+
+- `$color.surface.hover` (neutral.faint) — "cursor is here" feedback.
+- `$color.surface.pressed` (neutral.subtle) — the moment of click, slightly deeper.
+- `$color.surface.selected` (primary.subtle) + `$color.on-surface.selected` (primary.bold) — the current row in a nav/menu/list. Brand-tinted bg plus brand-tinted icon and bold label.
+- Disabled — leave the surface at rest and mute the label + icon with `$color.text.disabled`. No dedicated surface token; the muted foreground does the work.
+
+For primary/secondary buttons, hover and pressed are usually expressed through shadow + brand-fill shifts rather than surface tokens — see `design/blocks/actions`.
 
 ## Data Viz Colors
 
-**Semantic:** Green=good `#10B981`, Red=bad `#F43F5E`, Amber=warning `#F59E0B`, Blue=neutral `#3B82F6`
+**Semantic status:** `$color.success` = good, `$color.error` = bad, `$color.warning` = warning, `$color.info` = neutral. These auto-flip with mode — reach for them whenever the chart's color carries semantic meaning.
 
-**Chart series (max 6):** `#3B82F6` `#10B981` `#F59E0B` `#8B5CF6` `#F43F5E` `#06B6D4`
+**Chart series (max 6):** `$blue.mid` `$emerald.mid` `$amber.mid` `$violet.mid` `$rose.mid` `$cyan.mid` (palette stops picked for distinguishability — categorical data viz wants distinct hues, not roles).
 
 ## Contrast (WCAG AA)
 
-Normal text (<18px): 4.5:1 · Large text (18px+ bold): 3:1 · `#10B981` on white fails for small text — use `#059669`. Reduced opacity is useful for hierarchy but text must remain readable at a glance.
+Normal text (<18px): 4.5:1 · Large text (18px+ bold): 3:1 · `#10B981` (`$emerald.mid`) on white fails for small text — use `#059669` (`$emerald.firm`). Reduced opacity is useful for hierarchy but text must remain readable at a glance.

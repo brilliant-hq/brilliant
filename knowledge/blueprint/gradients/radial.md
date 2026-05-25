@@ -4,45 +4,46 @@ dsl: [radial, cx, cy, rx, ry, elliptical]
 ---
 # Gradients: Radial
 
-Assumes: `blueprint/paint`
-
-Point-source light — spotlights, glowing orbs. Creates focal gravity that linear cannot.
+A point-source light: spotlights, glowing orbs, focal gravity that a
+linear gradient cannot give.
 
 ## Syntax
 
 ```
-(radial())                              — default: centered, white→black
-(radial(#center,#edge))                 — two-color
-(radial(solid(#hex,o(0.3)),solid(#hex,o(0))))  — with opacity
-(radial(cx(25),cy(15),r(50),#hex,#hex)) — positioned (cx/cy: 0=left/top, 50=center; r: 50=edge)
-(radial(rx(80),ry(40),#hex,#hex))       — elliptical
-(radial(cx,cy,rx,ry,stop(#hex,pos),...)) — positional with stops
+radial($center,$edge)                        two-color, centered
+radial(cx(25),cy(15),r(50),$c1,$c2)           positioned (0 = left/top, 50 = center; r: 50 = edge)
+radial(rx(80),ry(40),$c1,$c2)                 elliptical
+radial(cx,cy,rx,ry,stop($c,pos),...)          positional, multi-stop
 ```
 
-## Key Patterns
+Stops take tokens for color and opacity, like any fill. Bind to the
+brand (`$primary.mid`) so the gradient follows mode and brand switches;
+a raw hex would not.
 
-**Ambient glow** — off-center, low opacity, brand-tinted. Layer 2-3 for simulated mesh:
-```
-f[(radial(-0.5,-0.5,0.5,0.5,stop(#312E81,0,o(0.25)),stop(#312E81,1,o(0))))]
-```
+## Patterns
 
-**Vignette** — transparent center, dark edges:
-```
-f[(radial(0,0,1,1,stop(#000,0,o(0)),stop(#000,0.6,o(0)),stop(#000,1,o(0.7))))]
-```
+Ambient glow: off-center, low opacity, brand-tinted; layer two or three
+for a mesh-gradient feel.
 
-**Elliptical accent** — wider-than-tall using `w()`:
 ```
-f[(radial(0,0,0,-1,w(1,0),stop(#EC4899,0,o(0.3)),stop(#EC4899,1,o(0))))]
+f[(radial(-0.5,-0.5,0.5,0.5,stop($primary.bold,0,o($visibility.soft)),stop($primary.bold,1,o($visibility.invisible))))]
 ```
 
-**Radial + linear stack** — linear sets mood, radial adds highlight:
+Vignette: transparent center, dark edges (`$color.shadow` stays dark in
+both modes).
+
 ```
-f[(linear(135,#09090B,#1E1B4B)),(f2,radial(0.3,-0.3,0,-1,stop(#6366F1,0,o(0.15)),stop(#6366F1,1,o(0))))]
+f[(radial(0,0,1,1,stop($color.shadow,0,o($visibility.invisible)),stop($color.shadow,0.6,o($visibility.invisible)),stop($color.shadow,1,o($visibility.bold))))]
+```
+
+Radial over linear: the linear sets the mood, a radial adds a highlight.
+
+```
+f[(linear(135,$zinc.intense,$indigo.intense)),(f2,radial(0.3,-0.3,0,-1,stop($indigo.mid,0,o($visibility.subtle)),stop($indigo.mid,1,o($visibility.invisible))))]
 ```
 
 ## Instincts
 
-- **Off-center by default.** Centering every radial is an amateur tell.
-- **Elliptical over circular.** Real light pools stretch. Use `w()`.
-- **Layer, don't overload.** Two at 15% > one at 30%.
+Off-center by default (centering every radial is an amateur tell).
+Prefer elliptical over circular, since real light pools stretch. Layer
+two faint radials rather than one strong one.

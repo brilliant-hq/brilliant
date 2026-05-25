@@ -34,7 +34,7 @@ Brilliant runs in two window modes, switched on a single window:
 | Toggle passthrough (overlay only) | Ctrl+A |
 | Toggle desktop icons (overlay only) | Ctrl+I |
 
-**Overlay mode is opt-in.** The Ctrl+F global hotkey is only registered when "Overlay mode" is turned on in Settings (Cmd+,). With the setting off, Ctrl+F does nothing — toggle the setting to use overlay mode. The toggle is persisted via `SharedPreferences` (`OverlayModeEnabled`).
+**Overlay mode is opt-in.** The Ctrl+F global hotkey is only registered when "Overlay mode" is turned on in Settings (Cmd+,). With the setting off, Ctrl+F does nothing: toggle the setting to use overlay mode. The toggle is persisted via `SharedPreferences` (`OverlayModeEnabled`).
 
 In passthrough mode (overlay only), mouse clicks pass through Brilliant to the apps below. Studio window state (position, size, fullscreen, maximized) is saved before entering overlay and restored on exit. The bottom toolbar uses an `_overlayBottomEdgeInset` of 80 px while in overlay mode (vs the standard `toolbarVerticalInset` in studio).
 
@@ -89,9 +89,11 @@ While dragging a selection rectangle that touches many elements, sections auto-c
 
 ### Sections (in order from top to bottom)
 
-The render order in code (`right_toolbar_view.dart` `_buildContentView`) is: Canvas, Current Stroke, Current Fill, Element, Parent, Typography, Selection Strokes, Selection Fills, Selection Colors, Effects (`SelectionEffectsSection`), Layout Grid, Export, Figma Import. Each section decides its own visibility internally; this list reflects the order in which visible sections appear.
+Render order in `_buildContentView` (`right_toolbar_view.dart`): Design System, Canvas, Current Stroke, Current Fill, Element, Parent, Typography, Selection Strokes, Selection Fills, Selection Colors, Effects (`SelectionEffectsSection`), Layout Grid, Export, Figma Import. Each section decides its own visibility internally; this list reflects the slot order, not which sections are visible at any moment.
 
 **Header** (above the section stack): Reset position, toggle-toolbar (close/expand), and toggle-sections (expand or collapse all) buttons on the left. Zoom percentage on the right: drag to adjust, click to open a preset dropdown (2, 25, 50, 75, 100, 125, 150, 200, 300, 400, 600, 800, 1000, 2000, 3000, 5000).
+
+**Design System Section**: Brand dropdown plus one row per mode axis (theme first, density second, then alphabetical). Visible whenever the active canvas is loaded; lets users switch the design system, theme, density, and any custom mode axes the design system defines. Surfaces here only; token management itself lives in the design system file. See `design-systems/core`.
 
 **Canvas Section**: Canvas background color swatch and toggle. Visible only when nothing is selected and the Move tool is active.
 
@@ -117,7 +119,7 @@ The render order in code (`right_toolbar_view.dart` `_buildContentView`) is: Can
 
 **Figma Import Section**: Figma file URL import. Visible only when nothing is selected and the Move tool is active (same condition as Canvas Section).
 
-There is no dedicated Design System section in the right toolbar. Design tokens surface in the color picker (token swatches at the bottom) and in numeric property fields that accept tokens (font size, line height, font weight, corner radius, padding). Token management is in the design system file itself; see `design-system.md`.
+Design tokens also surface in the color picker (token swatches at the bottom) and in numeric property fields that accept tokens (font size, line height, font weight, corner radius, padding). The Design System section at the top of the toolbar handles brand/mode switching only.
 
 A `SketchImportSection` widget exists in the codebase but is not mounted in `_buildContentView`. Sketch files import through the global Import command (Cmd+Shift+O) instead.
 
@@ -191,7 +193,7 @@ Inline after the tool buttons (separated by a divider). Width is 320 px. Press *
 
 A collapse/expand chevron toggles the input. When collapsed, only the connection indicator and the expand chevron remain. When the AI chat panel is open with an active session, the bottom toolbar shows the connection indicator instead of the full input (the chat input lives in the panel above).
 
-The connection indicator opens a hover-menu listing five providers in this order: Claude Code, Anthropic, OpenAI, Google, OpenRouter. Each row shows a green dot when credentialed and a dim icon when not. Clicking an unconnected row inline-prompts for the API key in the AI input field; clicking a connected row removes that key. Esc cancels.
+The connection indicator opens a hover-menu listing six providers in this order: Claude Code, Anthropic, OpenAI, Google, OpenRouter, Quiver. Anthropic / OpenAI / Google / OpenRouter are chat providers. Quiver is an SVG generation provider (text-to-SVG and raster-to-SVG vectorization). Each row shows a green dot when credentialed and a dim icon when not. Clicking an unconnected row inline-prompts for the API key in the AI input field; clicking a connected row removes that key. Esc cancels.
 
 While agents are running, one small `AgentActivityIndicator` bar per processing session appears at the right end of the toolbar. The submit button switches to a stop button while the user's request is processing; if the AI returns a "command not recognized" response a brief `?` indicator is shown instead. See `ai.md` for the full AI feature reference.
 

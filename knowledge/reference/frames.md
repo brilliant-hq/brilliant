@@ -46,16 +46,16 @@ In Brilliant, every container element is a **parent** (`ElementType.parent`). Pa
 
 ## Parent Types
 
-| Type | Sizing | Reparent Target? | Created By |
-|------|--------|------------------|-----------|
-| **Frame** | Any (hug/fill/fixed). Default: fixed | Yes | Cmd+F (wrap), F (frame tool), Type dropdown |
-| **Group** | Always w:hug h:hug | No | Cmd+G |
-| **Auto Layout** | Any. Default: hug | Yes | Shift+A |
-| **Mask** | Always w:hug h:hug | No | Ctrl+Cmd+M |
-| **Boolean Union** | Always w:hug h:hug | No | Alt+Shift+U |
-| **Boolean Subtract** | Always w:hug h:hug | No | Alt+Shift+S |
-| **Boolean Intersect** | Always w:hug h:hug | No | Alt+Shift+I |
-| **Boolean Exclude** | Always w:hug h:hug | No | Alt+Shift+E |
+| Type | `ParentType` | Sizing | Reparent Target? | Created By |
+|------|--------------|--------|------------------|-----------|
+| **Frame** | `frame` | Any (hug/fill/fixed). Default: fixed | Yes | Cmd+F (wrap), F (frame tool), Type dropdown |
+| **Group** | `group` | Always w:hug h:hug | No | Cmd+G |
+| **Auto Layout** | `autoLayout` | Any. Default: hug both axes | Yes | Shift+A |
+| **Mask** | `mask` | Always w:hug h:hug | No | Ctrl+Cmd+M |
+| **Boolean Union** | `booleanUnion` | Always w:hug h:hug | No | Alt+Shift+U |
+| **Boolean Subtract** | `booleanSubtract` | Always w:hug h:hug | No | Alt+Shift+S |
+| **Boolean Intersect** | `booleanIntersect` | Always w:hug h:hug | No | Alt+Shift+I |
+| **Boolean Exclude** | `booleanExclude` | Always w:hug h:hug | No | Alt+Shift+E |
 
 ### Shared Capabilities
 
@@ -71,9 +71,9 @@ All parent types support:
 ### Type-Specific Differences
 
 - **Frame** and **Auto Layout** support all sizing modes and accept reparenting (drag elements in/out).
-- **Group** is always w:hug h:hug. Changing sizing from hug on either axis auto-converts to **Frame**. Groups are NOT reparent targets.
-- **Mask** is always w:hug h:hug. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape.
-- **Boolean** is always w:hug h:hug. The combined path is rendered. Double-click to enter edit mode (children become editable; Subtract is z-order sensitive).
+- **Group** is always w:hug h:hug. Changing sizing from hug on either axis auto-converts to **Frame**. Groups are NOT reparent targets; children cannot be dragged out during drag.
+- **Mask** is always w:hug h:hug. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape. The data model has `MaskType.vector` / `.alpha` / `.luminance` but only Vector is active in the UI (Alpha and Luminance round-trip in the file format only).
+- **Boolean** is always w:hug h:hug. The combined path is rendered. Double-click to enter edit mode (children become editable; Subtract is z-order sensitive: front shapes subtract from the back).
 
 ## Frames
 
@@ -155,13 +155,15 @@ A mask uses one element to clip others, like a cookie cutter. The **topmost elem
 
 ### Mask Types
 
+`ParentData.maskType` is one of:
+
 | Type | Description |
 |------|-------------|
 | Vector (default, `MaskType.vector`) | Clip via the mask shape's vector outline including stroke geometry |
-| Alpha (`MaskType.alpha`) | Defined in the data model and serialized; not exposed in the UI |
-| Luminance (`MaskType.luminance`) | Defined in the data model and serialized; not exposed in the UI |
+| Alpha (`MaskType.alpha`) | Defined in the data model and serialized; no UI selector |
+| Luminance (`MaskType.luminance`) | Defined in the data model and serialized; no UI selector |
 
-The active type is always Vector. Alpha/Luminance round-trip in the file format but cannot be selected via the right toolbar.
+The active rendering type is always Vector. Alpha/Luminance round-trip through `.design` files but cannot be selected via the right toolbar.
 
 ### Mask Properties
 
@@ -199,20 +201,20 @@ Auto layout frames flow children in a row or column, with optional wrap.
 
 **Defaults applied at creation** (vs `AutoLayoutData()` constructor defaults):
 
-| Field | At creation (`addAutoLayoutToElements`) | Constructor default |
-|-------|----------------------------------------|---------------------|
-| `direction` | inferred (horizontal if spread is wider than tall; **horizontal for 0–1 elements**) | vertical |
-| `mainAxisAlignment` | start | start |
-| `crossAxisAlignment` | inferred from positions | start |
-| `itemSpacing` | inferred from average gap | 10 |
-| padding (all four) | **0** | 10 |
-| `wrap` | false | false |
+| Field | At creation (`addAutoLayoutToElements`, 2+ elements) | Single element (`< 2`) | Constructor default |
+|-------|------------------------------------------------------|------------------------|---------------------|
+| `direction` | horizontal if center spread is wider than tall, else vertical | horizontal | vertical |
+| `mainAxisAlignment` | start | start | start |
+| `crossAxisAlignment` | inferred from positions | start | start |
+| `itemSpacing` | rounded average gap between consecutive elements, floored at 0 for the inferred default (negative gap is still settable later via `$spacing.overlap.*` for overlap) | 10 | 10 |
+| padding (all four) | **0** | **0** | 10 |
+| `wrap` | false | false | false |
 
 The frame's `LayoutBehavior` is forced to `widthSizing: hug, heightSizing: hug` at creation.
 
 ### Single-Frame In-Place Conversion
 
-When **Shift+A** is pressed with a **single non-auto-layout parent** selected, that parent is converted in-place via `setParentType(autoLayout)` instead of being wrapped. Children are sorted by spatial position along the inferred main axis. Padding is computed from the existing frame bounds.
+When **Shift+A** is pressed with a **single non-auto-layout parent (Frame / Group / Mask / Boolean)** selected, that parent is converted in-place via `setParentType(autoLayout)` instead of being wrapped. Children are sorted by spatial position along the inferred main axis. Padding is computed from the existing frame bounds. Single non-parent selections (a lone rectangle / vector / etc.) are wrapped in a new auto layout frame instead.
 
 ### Right Toolbar (Parent Section)
 
@@ -371,7 +373,7 @@ Children of auto layout frames can opt out of layout flow with **absolute positi
 
 The pin button only appears when at least one selected element is inside an auto layout frame.
 
-**Blueprint:** add `abs` keyword: `c abs p(200,-8) s(20,20) f[(#EF4444)]`
+**Blueprint:** add `abs` keyword: `c abs p(200,-8) s(20,20) f[($red.mid)]`
 
 **Use cases:** badges, notification dots, floating buttons, watermarks, decorative overlays.
 

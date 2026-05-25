@@ -1,201 +1,53 @@
 ---
-assumes: blueprint/core, blueprint/variables, blueprint/layout
-dsl: [for, range, in, vars, step, flat, comp, inst, override]
+assumes: blueprint/core, blueprint/layout
+dsl: [comp, inst, override, slot]
 ---
 # Blueprint Components & Iteration
 
-For 3+ similar elements (calendar days, nav items, stat tiles, dot grids,
-color swatches — anything you'd otherwise stamp by hand), use `for(...)`.
-It expands a uniform template and generates `comp + inst()` under the hood.
-
-## Shapes
-
-### `for(range(N))` — pure count
-```
-for(range(7))
-  al(v,x(c),y(c),pad(8)) s(60,80) "Slot $n" #slot
-    t("$n",Inter,14,sb)
-```
-Implicit `$i` (0-based) and `$n` (1-based) are available in any body.
-`range(s,e)` is end-exclusive. `range(s,e,step(N))` skips by N.
-Name the index when you want both value and position: `for($step, range(3,9))`.
-
-### `for($v, in([scalars]))` — single-var values
-```
-for($abbr, in([MON,TUE,WED,THU,FRI,SAT,SUN]))
-  al(v,x(c),y(c),pad(8)) s(fill,hug) "Day $abbr" #day
-    t("$abbr",JetBrains Mono,11,sb)
-```
-`$abbr` substitutes inside any property — string literals, hex, refs, names.
-
-### `for(vars[...], in([(...),...]))` — multi-var tuples
-Tabular data with multiple values per iteration. Encode variants
-(color, signal, icon name) directly in the data:
-```
-for(vars[$abbr,$num,$dColor], in([
-  (MON,20,#475569),
-  (TUE,21,#475569),
-  (WED,22,#10B981),
-]))
-  al(v,x(c),y(c),pad(8)) s(fill,hug) "Day $abbr" #day
-    t("$abbr",Inter,11,sb) f[($dColor)] #abbr
-    t("$num",Inter,16,sb) f[(#0F172A)] #num
-```
-
-### Seed-scale composition
-For-loop substitution runs before var resolution, so `$brand.$step` works:
-```
-for($step, in([5,10,20,30,40,50,60,70,80,90]), flat)
-  r s(48,fill) f[($brand.$step)]
-```
-
-## Per-iteration refs — the addressability win
-
-Every iteration's outer frame and every ref'd inner child is addressable.
-The suffix is the first declared var (or `$i` for ranges):
-
-| Ref | Points to |
-|---|---|
-| `#day_MON` | The COMP (first iteration's frame). Modifying propagates to all instances. |
-| `#day_TUE`, `#day_WED`, ... | Each instance frame. Modifying one affects only that instance. |
-| `#abbr_MON` | Master's child. Propagates. |
-| `#abbr_TUE`, ... | Each instance's own child. |
+3+ near-identical elements (nav items, cards, tiles, table rows)?
+Declare the shape once with `comp` on the parent, then stamp copies
+with `inst(#master)` in source order. Editing the master propagates
+to every instance.
 
 ```
-# Highlight THU specifically
-#day_THU f[(#6366F1)]
-#abbr_THU f[(#FFFFFF)]
-#num_THU f[(#FFFFFF)]
+al(h,g($spacing.md),pad($spacing.md)) s(900,hug) "Board" #board
+
+  -- comp goes on the parent type. The master IS the first instance —
+  -- this row IS Backlog. Children that vary per instance need #refs.
+  -- One child can be a `slot` for heterogeneous per-instance content.
+  al(v,g($spacing.sm),pad($spacing.md)) comp s(280,fill) f[($color.surface)] rd($radius.md) "Backlog" #col
+    t("Backlog",$font.family,$font.size.md,sb) f[($color.text.primary)] #col_title
+    al(v,g($spacing.sm),pad($spacing.none)) s(fill,fill) slot "Body" #col_body
+      al(h,g($spacing.none),pad($spacing.sm)) s(fill,hug) f[($color.surface.container)] rd($radius.sm) "Audit docs"
+        t("Audit docs",$font.family,$font.size.sm) f[($color.text.primary)]
+
+  -- Trailing props on inst() modify the INSTANCE FRAME — use this to
+  -- make one stamp special (active tab, current column, selected row).
+  -- override(#child) edits a master child by ref. Each override LOCKS
+  -- that token category against future master edits: t() locks all
+  -- text props, s() locks sizing, f[]/o()/rot()/effects each lock
+  -- independently. Reset via reset_component_instance_overrides.
+  inst(#col) f[($color.primary.container)] shadow($color.shadow,o($visibility.faint),y(2),blur(8)) "In Progress"
+    override(#col_title) t("In Progress",$font.family,$font.size.md,sb) f[($color.primary)]
+
+  -- Slot fill: bare `#slot_ref` (or `override(#slot_ref)`, same) opens a
+  -- block; on a NEW instance the indented children replace the master's
+  -- seed for THIS instance only.
+  inst(#col) "Shipped"
+    override(#col_title) t("Shipped today",$font.family,$font.size.md,sb)
+    #col_body
+      al(h,g($spacing.none),pad($spacing.sm)) s(fill,hug) f[($color.primary.container)] rd($radius.sm) "v2.4 release"
+        t("v2.4 release",$font.family,$font.size.sm) f[($color.primary)]
+
+-- Add to an instance ALREADY on canvas (e.g. one more card): parent the
+-- new element into the slot by ref. clone(#card) parent(#slot) works too.
+-- ONLY a slot accepts adds — parenting onto a normal instance child drops
+-- the line with a warning (add it to the master instead).
+al(v,g($spacing.sm),pad($spacing.md)) parent(#col_body) f[($color.surface)] rd($radius.md) "New card"
+  t("Ship the thing",$font.family,$font.size.sm,sb) f[($color.text.primary)]
+
+-- Slot adds APPEND — they never clear. Re-filling a slot stacks on top of
+-- what's there (only the first fill of an untouched slot replaces the
+-- seed). To swap content, delete() the old slot children first.
+delete(#old_card)
 ```
-
-For pure ranges, the suffix is `$i`: `#slot_0, #slot_1, ..., #slot_6`.
-
-## Active-state / exception override
-
-Use the loop for the uniform list, then flat-modify the one that differs.
-**Even with one different item, the loop is still right** — don't drop
-to hand-coded N-copies.
-
-```
-for(vars[$key,$icon,$label], in([
-  (home,squares-four,Dashboard),
-  (revenue,chart-line,Revenue),
-  (orders,shopping-bag,Orders),
-]))
-  al(h,x(s),y(c),g(12),pad(8,12)) s(fill,hug) "Nav $label" #nav
-    svg(icon:$icon) s(18,18) f[(#64748B)] #nav_icon
-    t("$label",Inter,13,m) f[(#64748B)] #nav_text
-
-# Active state — three flat-modify lines, not a second loop
-#nav_home f[(#F8FAFC)]
-#nav_icon_home f[(#0F172A)]
-#nav_text_home t("Dashboard",Inter,13,sb) f[(#0F172A)]
-```
-
-## Iterate over an existing component
-
-When you already have a component master and want N instances of it
-(each with per-iteration overrides), make the body an `inst(...)` rather
-than redefining the master inline. Use `flat` to skip the misleading
-"wrap in a frame" warning — the agent is already sharing via the
-existing master, no fresh comp+inst is needed:
-
-```
-# Master defined elsewhere:
-al(h,x(s),y(c),g(12),pad(8,12)) s(220,40) f[(#1E293B)] rd(8) comp #nav_button
-  svg(icon:circle) s(18,18) f[(#64748B)] #nav_icon
-  t("Label",Inter,13,m) f[(#64748B)] #nav_text
-
-# Iterate, body is an inst() with override children:
-for(vars[$icon,$label], in([
-  (squares-four, Dashboard),
-  (chart-line,   Revenue),
-  (shopping-bag, Orders),
-]), flat)
-  inst(#nav_button) "Nav $label" #nav
-    override(#nav_text) t("$label")
-```
-
-You pick the per-iteration ref (`#nav` here, suffixed to `#nav_Dashboard`,
-`#nav_Revenue`, `#nav_Orders`). The `flat` flag is required: it tells the
-expander not to attempt comp+inst minting from the body. Each iteration
-emits a real `inst(#nav_button)`, fully linked to the master.
-
-## `flat` opt-out — independent copies
-
-For genuinely independent copies (no comp+inst link, edits don't propagate):
-```
-for(range(8), flat)
-  c s(8,8) f[(#94A3B8)]
-```
-
-`for(...)` auto-falls-back to flat with a warning when the body root isn't
-a frame OR has multiple top-level elements per iteration. Wrap in `al(...)`
-or `fr` to enable comp+inst sharing — or use the `inst()` body shape above
-to iterate over an existing master.
-
-## Manual `comp` + `inst()` — the escape hatch
-
-When iterations differ heavily in shape (e.g., pricing tiers with 3, 5, 8
-features each), drop to manual. Same machinery `for(...)` generates:
-```
-al(v,g(16),pad(24)) s(300,hug) "Card" comp #card
-  t("Title",Inter,18,b) #title
-  t("Description",Inter,14) #desc
-inst(#card) p(320,0) "Pro" #pro
-  override(#title) t("Pro Plan")
-  override(#desc) t("For growing teams")
-```
-
-Mark a child `slot` to let instances fully replace that subtree
-(`#features` below):
-```
-al(v) "Card" comp #card
-  al(v) "Features" slot #features
-    t("3 projects",Inter,14)
-inst(#card) "Custom"
-  #features
-    t("Unlimited projects",Inter,14)
-    t("Priority support",Inter,14)
-```
-
-`inst()` stays synced to master. Use `clone(id)` for an independent copy.
-
-## Limits
-
-- **No nested `for(...)`** — flatten: write outer rows out, use `for(range(N))` per row.
-- **No expressions** — `$i+1` doesn't evaluate. Use `$n` for 1-based, or bake values into tuples.
-- **Multi-line `in([...])` works** (one tuple per line), but a single tuple `(...)` cannot span lines.
-
-## Same-call modify of `svg(...)` iteration refs — split into a follow-up call
-
-`svg(...)` children import asynchronously. Per-iteration svg refs
-(`#nav_icon_home`, `#nav_icon_revenue`, ...) bind to their imported
-element ID only after the import drains, which happens AFTER the body of
-this `create_modify_elements` call has been parsed. Result: a flat-modify
-on a per-iteration svg ref **inside the same call** as the `for(...)`
-sometimes resolves before the binding lands and surfaces as `ref "#X" not found`.
-
-The runtime now retries those modifies after the SVG drain, so most cases
-just work — but if you see a `ref "#X" not found` warning whose siblings
-(`#X_inboxIcon`, `#X_revenueIcon`, ...) ARE in `successfulRefs`, the cleanest
-fix is to put the modify in a **second** `create_modify_elements` call:
-
-```
-# Call 1 — create the iteration:
-for(vars[$key,$icon,$label], in([
-  (home,squares-four,Dashboard),
-  (revenue,chart-line,Revenue),
-]))
-  al(h,...) "Nav $label" #nav
-    svg(icon:$icon) s(18,18) f[(#64748B)] #nav_icon
-    t("$label",Inter,13,m) #nav_text
-
-# Call 2 — modify per-iteration svg refs (refs are bound by now):
-#nav_icon_home f[(#0F172A)]
-#nav_icon_revenue f[(#0F172A)]
-```
-
-Non-svg per-iteration refs (`#nav_text_home`, frame refs like `#nav_home`)
-are bound synchronously and can be flat-modified in the same call as the
-`for(...)`. The split only matters for `svg(...)` children.

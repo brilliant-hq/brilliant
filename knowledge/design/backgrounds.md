@@ -3,60 +3,48 @@ assumes: blueprint/paint
 ---
 # Design Backgrounds
 
-## Section Background Alternation
+## Section alternation
 
-The #1 technique for multi-section pages. Alternate 2-3 tones. No two adjacent sections share the same background:
+The first move for a multi-section page: alternate 2-3 surface tones so
+no two adjacent sections match. Most sections are `$color.surface`; lift
+some with `$color.surface.container`; an occasional dark section
+(`$zinc.intense`, `$slate.intense`) breaks the rhythm. The page frame
+uses `g($spacing.none)`; each section owns its vertical padding.
+
+## Solid and gradient
+
+80%+ of sections are a solid or a gradient. A dark solid between light
+sections creates rhythm with no decoration; keep one tonal family (zinc
+neutral, stone warm, slate cool). Gradient angle: `180` grounds, `135`
+energizes, `0` lifts.
+
+## Decorative treatments
+
+One or two per page, matched to brand personality (most sections need
+none): a faint diagonal stripe (rotated rect, `clip`, low opacity), a dot
+grid, corner shapes, floating shapes, or glass cards over a rich
+background.
+
+A full-size uniform background is a fill on the section frame, never a
+child rect (see `blueprint/paint`). Only a layer that needs independent
+position or rotation becomes a real element: a `gr` overlay (outside
+auto layout) or an `abs` child (inside it).
 
 ```
-Navbar    f[(#FFFFFF)]
-Hero      f[(#FFFFFF)]
-Logos     f[(#FAFAFA)]       ← tinted (zinc-50)
-Features  f[(#FFFFFF)]
-Stats     f[(#F4F4F5)]       ← deeper tint (zinc-100)
-CTA       f[(#18181B)]       ← dark accent
-Footer    f[(#FAFAFA)]
+fr s(W,H) clip f[($color.surface)] "Section"
+  gr s(W,H) "BG Effects"
+    r s(W,H) f[(radial(cx(20),cy(15),$primary.soft,$color.surface))] "Glow"
+  al(v,y(c),x(c),g($spacing.lg),pad($spacing.3xl)) s(W,H) "Content"
 ```
 
-Parent frame uses `g(0)` — sections manage their own vertical padding.
+## Avoid
 
-## Solid & Gradient (80%+ of sections)
+Large low-opacity circles behind content are the #1 AI background
+cliché; the only exception is a single ambient glow in a dark or premium
+hero, never repeated across sections.
 
-**Solid:** A dark solid between white sections creates rhythm without decoration. Vary tonal family: zinc (neutral), stone (warm), slate (cool).
+## Presentation treatments
 
-**Gradient sweep:** `180` grounds, `135` energizes, `0` lifts. Same tonal family.
-
-## Decorative Treatments (1-2 per page max)
-
-Match to brand personality. Most sections don't need these.
-Diagonal stripe (bold, SaaS — rotated rect in group overlay with `clip`, -8° to -12°, 0.04-0.08 opacity) · dot grid (technical — 4x4px circles, 40-60px apart, 0.06-0.15 opacity) · corner shapes (luxury — 1-3 shapes tucked into corners, 0.03-0.06 filled) · floating shapes (dev tools, SaaS) · glassmorphism (cards over rich backgrounds).
-
-## Backgrounds Are Fills, Not Child Elements
-
-**Solid colors, gradients, shaders, and dim overlays belong in the fill stack** — never as separate child rectangles. Stack multiple fills on the frame itself:
-```text
-fr s(W,H) f[(metaballs(...)),(f2,solid(#000,o(0.4)))] clip "Section"
-  al(...) "Content"
-```
-
-## Positioned Decorative Layers (glow, texture)
-
-Decorative elements that need **independent positioning** (off-center radial glows, positioned texture rects, rotated shapes) use a group overlay — but only when a fill can't express the effect:
-
-```text
-fr s(W,H) f[(bg)] clip "Section"
-  gr p(0,0) s(W,H) "BG Effects"        ← group: free positioning, no layout flow
-    r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 1 — needs custom position
-    r p(0,0) s(W,H) f[(radial(...))]    ← decorative layer 2 — needs custom position
-  al(v,y(c),x(c),g(N),pad(...)) p(0,0) s(W,H) "Content"  ← content overlaps group
-    ...structured content...
-```
-
-**Rule of thumb:** if the "background" is full-size and uniform → fill layer. If it needs position/rotation/size independent from the frame → `abs` child inside auto layout, or group overlay outside auto layout.
-
-## DO NOT
-
-**No ambient glow circles.** Large low-opacity circles behind content is the #1 AI background cliche. Exception: single ambient touch in dark/premium hero — never repeated across sections.
-
-## Presentation Treatments
-
-Flat · tilted `rot(-3)` or `skew(-8,0)` · stacked 2-3 offset frames with rotation · browser chrome (top bar with dots + URL) · clipped preview `clip` + `rd(12)`.
+For showcasing a UI: flat, tilted (`rot(-3)`), a stack of 2-3 offset
+rotated frames, browser chrome (a top bar with dots and a URL), or a
+`clip`-ped preview with `rd($radius.lg)`.

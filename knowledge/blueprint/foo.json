@@ -1,0 +1,191 @@
+{
+  "Primitives": {
+    "color": {
+      "blue": {
+        "500": {
+          "$type": "color",
+          "$value": "#3b82f6"
+        }
+      },
+      "neutral": {
+        "0": {
+          "$type": "color",
+          "$value": "#ffffff"
+        },
+        "900": {
+          "$type": "color",
+          "$value": "#0b0b0c"
+        }
+      }
+    },
+    "font": {
+      "family": {
+        "sans": {
+          "$type": "fontFamily",
+          "$value": "Inter"
+        }
+      },
+      "size": {
+        "100": {
+          "$type": "dimension",
+          "$value": "14px"
+        },
+        "200": {
+          "$type": "dimension",
+          "$value": "16px"
+        }
+      },
+      "weight": {
+        "normal": {
+          "$type": "fontWeight",
+          "$value": 400
+        },
+        "bold": {
+          "$type": "fontWeight",
+          "$value": 700
+        }
+      }
+    },
+    "unit": {
+      "4": {
+        "$type": "dimension",
+        "$value": "4px"
+      },
+      "8": {
+        "$type": "dimension",
+        "$value": "8px"
+      },
+      "12": {
+        "$type": "dimension",
+        "$value": "12px"
+      }
+    }
+  },
+  "SemanticColors": {
+    "$modes": [
+      "Light",
+      "Dark"
+    ],
+    "content": {
+      "primary": {
+        "$type": "color",
+        "$value": {
+          "Light": "{Primitives.color.neutral.900}",
+          "Dark": "{Primitives.color.neutral.0}"
+        }
+      }
+    },
+    // primary
+    // accent
+    "surface": {
+      "default": {
+        "$type": "color",
+        "$value": {
+          "Light": "{Primitives.color.neutral.0}",
+          "Dark": "{Primitives.color.neutral.900}"
+        }
+      }
+    },
+    "border": {
+      "accent": {
+        "$type": "color",
+        "$value": {
+          "Light": "{Primitives.color.blue.500}",
+          "Dark": "{Primitives.color.blue.500}"
+        }
+      }
+    }
+  },
+  "SemanticType": {
+    "body": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{Primitives.font.family.sans}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{Primitives.font.size.100}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{Primitives.font.weight.normal}"
+      }
+    },
+    "heading": {
+      "family": {
+        "$type": "fontFamily",
+        "$value": "{Primitives.font.family.sans}"
+      },
+      "size": {
+        "$type": "dimension",
+        "$value": "{Primitives.font.size.200}"
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": "{Primitives.font.weight.bold}"
+      }
+    }
+  },
+  "SemanticLayout": {
+    "padding": {
+      "sm": {
+        "$type": "dimension",
+        "$value": "{Primitives.unit.8}"
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": "{Primitives.unit.12}"
+      }
+    },
+    "radius": {
+      "md": {
+        "$type": "dimension",
+        "$value": "{Primitives.unit.8}"
+      }
+    },
+    "gap": {
+      "sm": {
+        "$type": "dimension",
+        "$value": "{Primitives.unit.4}"
+      }
+    }
+  },
+  "Components": {
+    "BrandA": {
+      "button": {
+        "background": {
+          "$type": "color",
+          "$value": "{SemanticColors.border.accent}"
+        },
+        "label": {
+          "$type": "color",
+          "$value": "{SemanticColors.surface.default}"
+        },
+        "padding": {
+          "$type": "dimension",
+          "$value": "{SemanticLayout.padding.md}"
+        },
+        "radius": {
+          "$type": "dimension",
+          "$value": "{SemanticLayout.radius.md}"
+        }
+      }
+    },
+    "BrandB": {
+      "button": {
+        "background": {
+          "$type": "color",
+          "$value": "{SemanticColors.content.primary}"
+        }
+      }
+    },
+    "BrandC": {
+      "button": {
+        "background": {
+          "$type": "color",
+          "$value": "{SemanticColors.surface.default}"
+        }
+      }
+    }
+  }
+}

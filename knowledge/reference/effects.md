@@ -61,34 +61,53 @@ Use the command palette (Cmd+Shift+P) to add effects by name:
 | Add Background Blur | `add_background_blur_fill` | Adds background blur fill with defaults |
 | Add Color Adjust | `add_color_adjust_fill` | Adds color adjust filter fill with defaults |
 
+Additional management commands (target a specific effect via `targetEffectId` context):
+
+| Command | ID | Notes |
+|---------|-----|-------|
+| Remove Effect | `remove_effect` | Removes effect by id |
+| Toggle Effect Visibility | `toggle_effect_visibility` | Toggles `enabled` flag |
+| Reorder Effect | `reorder_effect` | Drag handle reorder (later effects render on top) |
+| Change Effect Type | `change_effect_type` | DropdownValueCommand<EffectType>, resets to type defaults |
+| Toggle Show Behind Transparent | `toggle_effect_show_behind_transparent` | Drop shadow knockout flag |
+| Set Effect Blend Mode | `set_effect_blend_mode` | DropdownValueCommand<BlendMode> |
+| Draggable Update Effect Property | `draggable_update_effect_property` | offsetX/offsetY/blur/spread/radius/opacity drag |
+| Draggable Update Effect Fill Property | `draggable_update_effect_fill_property` | innerShadow/innerGlow/backgroundBlur fields |
+| Change Shader Effect Type | `change_shader_effect_type` | DropdownValueCommand<PaintStyleType> for swapping fill type |
+
 ### Via Compact Format
 
 Inner effects are specified as fills using the compact blueprint syntax:
 
 | Type | Syntax | Example |
 |------|--------|---------|
-| Inner shadow | `f[(id,inner(#color,o(N),x(N),y(N),blur(N),sp(N)))]` | `f[(inner(#000000,o(0.5),y(2),blur(4)))]` |
-| Inner glow | `f[(id,glow(#color,o(N),blur(N),sp(N)))]` | `f[(glow(#FFFFFF,o(0.6),blur(4)))]` |
+| Inner shadow | `f[(id,inner(<color>,o(N),x(N),y(N),blur(N),sp(N),blend(mode)))]` | `f[(inner($color.shadow,o($visibility.mid),y(2),blur(4)))]` |
+| Inner glow | `f[(id,glow(<color>,o(N),blur(N),sp(N),blend(mode)))]` | `f[(glow($color.glow,o($visibility.mid),blur(4)))]` |
 | Background blur | `f[(id,blur(radius))]` | `f[(blur(12))]` |
-| Metaballs shader | `f[(id,metaballs(#colors...,params...))]` | `f[(metaballs(#FF3377,#0080FF,count(15)))]` |
 
-All `inner()` params are named and optional with defaults: color=#000000, opacity=0.5, offsetX=0, offsetY=2, blurRadius=4, spread=0, blendMode=srcOver. Only non-default params needed. Examples: `f[(inner())]` all defaults · `f[(inner(#FF0000))]` red · `f[(inner(#000,o(0.3),y(4),blur(8),sp(2)))]` with spread.
+`<color>` accepts any token reference. Bare `inner()` / `glow()` (no args) bind to `$color.shadow` / `$color.glow` automatically.
 
-All `glow()` params are named and optional with defaults: color=#FFFFFF, opacity=0.6, blurRadius=4, spread=0, blendMode=screen. Only non-default params needed. Examples: `f[(glow())]` all defaults · `f[(glow(#10B981))]` green · `f[(glow(#10B981,o(0.8),blur(12),sp(4)))]` with spread.
+`inner()` defaults: opacity=0.5, offsetY=2, blurRadius=4, blendMode=srcOver. Only non-default params needed. Examples: `f[(inner())]` defaults · `f[(inner($red.mid))]` accent · `f[(inner($color.shadow,o(0.3),y(4),blur(8),sp(2)))]` with spread.
 
-`blur(radius)` has one optional param, default 8. Pair with a low-opacity fill for frosted glass: `f[(solid(#FFF,o(0.1))),(f2,blur(12))]`.
+`glow()` defaults: opacity=0.6, blurRadius=4, blendMode=screen. Examples: `f[(glow())]` defaults · `f[(glow($emerald.mid))]` green · `f[(glow($emerald.mid,o(0.8),blur(12),sp(4)))]` with spread.
 
-`metaballs(#colors...,key(value)...)`: bare `#hex` values are colors, `key(value)` are named params. All optional. Params: `count` (1-30, default 10), `size` (0.05-1.0, default 0.3), `speed` (0-3, default 1.0). Default colors: #000000, #FF3377, #FF9900, #FFDD00, #0080FF. Examples: `f[(metaballs())]` all defaults · `f[(metaballs(#EC4899,#EF4444))]` custom colors · `f[(metaballs(count(8),speed(2)))]` custom params.
+`blur(radius)` has one optional param, default 8. Pair with a low-opacity fill for frosted glass: `f[(solid($neutral.hint,o($visibility.subtle))),(f2,blur(12))]`.
 
-Outer effects (drop shadow, outer glow, element blur) also have compact blueprint syntax as standalone tokens (not inside `f[...]`):
+Image filter fills (noise/grain, halftone, pixelate, duotone, posterize, dither) and color adjust have NO compact blueprint syntax. Add them via commands (`add_noise_grain_fill`, `add_halftone_fill`, etc.) or by setting fill type via the UI dropdown. See [image-filters.md](./image-filters.md) for parameters.
+
+Shader fills (metaballs, liquidMetal, holographic, liquidStainlessSteel, reactiveGrid, dithering) DO have compact blueprint syntax. See shader knowledge for details.
+
+Outer effects (drop shadow, outer glow, element blur) have compact blueprint syntax as standalone tokens (not inside `f[...]`):
 
 | Type | Syntax | Example |
 |------|--------|---------|
-| Drop shadow | `shadow(#color,o(opacity),x(n),y(n),blur(n),sp(n))` | `shadow(#000000,o(0.25),y(4),blur(8))` |
-| Outer glow | `outerglow(#color,o(opacity),blur(n),sp(n))` | `outerglow(#FFFFFF,o(0.6),blur(8))` |
+| Drop shadow | `shadow(<color>,o(opacity),x(n),y(n),blur(n),sp(n),blend(mode))` | `shadow($color.shadow,o(0.25),y(4),blur(8))` |
+| Outer glow | `outerglow(<color>,o(opacity),blur(n),sp(n),blend(mode))` | `outerglow($color.glow,o(0.6),blur(8))` |
 | Element blur | `eblur(radius)` | `eblur(4)` |
 
-All params are named and optional with defaults matching the effect defaults above. `shadow()`, `outerglow()`, and `eblur()` with empty parens use all defaults. Or add via commands: `add_drop_shadow`, `add_outer_glow`, `add_layer_blur`.
+Bare `shadow()` / `outerglow()` (no args) bind to `$color.shadow` / `$color.glow` from the active DS automatically.
+
+All params are named and optional with defaults matching the effect defaults above. `shadow()`, `outerglow()`, and `eblur()` with empty parens use all defaults.
 
 ## Effect Properties
 
@@ -111,8 +130,6 @@ All params are named and optional with defaults matching the effect defaults abo
 
 | Property | Range | Default |
 |----------|-------|---------|
-| X offset | -200 to 200 | 0 |
-| Y offset | -200 to 200 | 0 |
 | Blur | 0 to 200 | 8 |
 | Spread | -100 to 100 | 0 |
 | Color | Any | `#FFFFFF` |
@@ -120,7 +137,7 @@ All params are named and optional with defaults matching the effect defaults abo
 | Blend Mode | Any | `screen` |
 | Show Behind Transparent Areas | bool, data only | false |
 
-The `showBehindTransparentAreas` field is supported on the Effect class for outer glow but the UI toggle is hidden (drop shadow only). Outer glow uses 3-pass `MaskFilter.blur` rendering.
+Outer glow is symmetric: the inspector does not expose X/Y offset fields (the `offsetX`/`offsetY` fields exist on the Effect class but stay at 0). The `showBehindTransparentAreas` field is supported on the Effect class for outer glow but the UI toggle is also hidden (drop shadow only). Outer glow uses 3-pass `MaskFilter.blur` rendering.
 
 ### Element Blur (`Effect`, EffectType.layerBlur)
 
@@ -164,7 +181,9 @@ Background blur has no color, no opacity, no blend mode in the data class. The f
 
 ### Design System Token Binding
 
-Effect opacity can be bound to a design system token. When bound, the opacity resolves from the token value rather than the stored numeric value, and the token name appears in the opacity field. Manually editing the opacity clears the token binding.
+Effect opacity (`opacityTokenRef`) and effect color (`colorTokenRef`) can each be bound to design system tokens independently. When bound, the painter resolves through the active design system at render time and the stored numeric/color value is the offline fallback. Manually editing opacity via the drag command clears the opacity token binding (color follows the standard fill color-picker token-clear flow).
+
+`InnerShadowData` and `InnerGlowData` carry the same `colorTokenRef` / `opacityTokenRef` fields. `BackgroundBlurData` has no color or opacity so no token bindings. Image filter duotone color stops are token-bindable via `ImageFilterData.colorTokenRefs` / `colorOpacityTokenRefs`.
 
 ### Composite Shadow Tokens
 
@@ -200,16 +219,20 @@ The design system supports composite shadow tokens that bundle multiple drop sha
 Per-element canvas layer stack (inside `element_renderer_mixins.dart`):
 
 ```
-1. Opacity saveLayer (if element.opacity < 1.0)
-2.   Element-blur saveLayer (if any layerBlur effect enabled)
-3.     Drop shadows + outer glows (in element.effects list order)
+1. Opacity saveLayer (if element.opacity < 1.0 OR blend mode != srcOver)
+2.   Element-blur saveLayer (if any layerBlur effect enabled, uses ImageFilter.blur)
+3.     Drop shadows + outer glows (in element.effects list order, BEFORE fills)
 4.     Fills in z-order: solid, gradient, image, shaders, innerShadow, innerGlow, image filters, color adjust
 5.     Strokes (same supported PaintStyleType set as fills)
 6.   Restore element-blur layer
 7. Restore opacity layer
 ```
 
+`EffectType` has exactly 3 values: `dropShadow`, `outerGlow`, `layerBlur`. Drop shadow and outer glow are "outer effects" (`Effect.isOuterEffect`). Outer glow uses multi-pass `MaskFilter.blur` or `saveLayer + ImageFilter.blur` depending on path complexity.
+
 **Background blur** is NOT in this canvas stack. It renders at the widget level via `BackdropFilter` + `_ElementShapeClipper` in `canvas_render_view.dart`. This is why background blur is the only inner effect with no color, opacity, or blend mode.
+
+**Image filters and color adjust** are fills that capture and reprocess everything below them in the fill/stroke list via GLSL shaders. Place them at the top of the fills list to affect all fills below.
 
 **Vector regions:** Vector elements with detected enclosed regions can carry per-region fills, including `innerShadow`/`innerGlow` (rendered per region) and per-region strokes with effect paint styles.
 
@@ -235,6 +258,8 @@ Organized into 4 sections in the right toolbar (`ColorAdjustData`):
 | **Color** | Saturation, Vibrance, Temperature, Tint, Hue |
 | **Detail** | Clarity, Sharpness |
 | **Effects** | Vignette, Sepia, Inversion |
+
+`ColorAdjustData` has 17 adjustment params plus `opacity`. Sliders also expose a separate Opacity row.
 
 **Storage vs display:** Most parameters are stored as -1.0 to 1.0 floats and displayed as -100% to 100% in the inspector (`displayScale = 100`). Exceptions: Inversion and Sepia store 0.0 to 1.0 (UI 0-100%); Hue stores 0.0 to 360.0 degrees (no scaling). All defaults are 0 except `opacity` (default 1.0). When you set values in blueprints or via MCP, use the stored range, not the percentage. The data class `isDefault` getter returns true when all 17 adjustment params are 0 (regardless of opacity).
 

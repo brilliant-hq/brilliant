@@ -3,66 +3,48 @@ assumes: blueprint/layout, blueprint/paint, blueprint/text, blueprint/components
 ---
 # Data Viz: Bar Charts
 
-Assumes: `blueprint/core`, `blueprint/layout`, `blueprint/components`
+## Vertical bars
 
-## Vertical Bar Chart
+Columns sit in a fixed-height `al(h)` (the chart area) with `y(e)` so
+they share a baseline. Each column is `al(v,y(e))` sized `s(hug,fill)`:
+`fill` gives it the full height, `y(e)` drops the bar to the bottom so it
+grows upward. Bar corners are `rd($radius.sm,$radius.sm,$radius.none,$radius.none)` (rounded
+top, flat bottom). Stamp the column as a `comp`, varying bar height and
+tone per instance:
 
-Uses Bottom-Aligned Columns pattern. Each bar + label in a column:
-
-Same brand color, different values. Use seed steps for emphasis (`.50` normal, `.70` highlight). One tuple per column:
 ```
-$brand=#F97316
-$neutral=#64748B
-al(h,x(s),y(e),g(4),pad($spacing.none)) s(hug,120) "Cols" #cols
-  for(vars[$month,$h,$tone], in([
-    (Jan,40,$brand.40),
-    (Feb,72,$brand.40),
-    (Mar,56,$brand.40),
-    (Apr,96,$brand.60),
-    (May,64,$brand.40),
-  ]))
-    al(v,y(e),x(c),g(4),pad($spacing.none)) s(hug,fill) "Col $month" #col
-      r s(24,$h) f[($tone)] rd(3,3,0,0) "Bar" #col_bar
-      t("$month",Inter,10,m,align(c)) f[($neutral.40)] "Label" #col_label
-```
-After expansion, `#col_Apr` is the highlighted column, `#col_bar_Apr` its bar — modify either to push values further.
-
-### Rules
-
-| Rule | Why |
-|------|-----|
-| Columns `s(hug,fill)` NOT `hug,hug` | `fill` gives `e` room to push bars down |
-| Cols container fixed height | Sets chart area |
-| Column main axis `e` | Bars grow upward |
-| Bar radius `rd(N,N,0,0)` | Rounded top, flat bottom |
-| Use `g()` not `spaceBetween` | Uniform spacing |
-
-### Variants
-
-- **Value labels:** Text above bar, `g(2)` tight spacing
-- **Grouped:** Paired bars in `al(h,x(s),y(e),g(2))`, narrower (16px), legend with dots
-- **Mixed-width:** Wider (48px) with gradient for important, narrower for secondary
-
-## Horizontal Bar Chart
-
-Label + bar + value per row.
-
-**Static:** Fixed pixel widths. Labels `s(56,hug)` fixed. Bar width = `max_width × (value / max)`. Bar `rd(0,4,4,0)`.
-
-**Flex (responsive):** Bar in `s(fill,20)` track frame. `fill:VALUE` + `fill:(SCALE-VALUE)`:
-Categorical palette — each row a distinct color (never semantic tokens like `$success`/`$warning`). One tuple per row:
-```
-$neutral=#64748B
-al(v,g(8),pad($spacing.none)) s(hug,hug) "HBar" #hbar
-  for(vars[$label,$w,$color], in([
-    (Sales,160,#E11D48),
-    (Ops,120,#F59E0B),
-    (Dev,90,#14B8A6),
-  ]))
-    al(h,x(c),y(s),g(8),pad($spacing.none)) s(hug,hug) "Row $label" #hrow
-      t("$label",Inter,12,m,align(r)) s(50,hug) f[($neutral.50)] "Label" #hrow_label
-      al(h,g($spacing.none),pad($spacing.none)) s(200,16) f[($neutral.5)] rd(4) clip "Track" #hrow_track
-        r s($w,fill) f[($color)] rd(4) "Fill" #hrow_fill
+al(h,x(s),y(e),g($spacing.xs),pad($spacing.none)) s(hug,120) "Cols"
+  al(v,y(e),x(c),g($spacing.xs),pad($spacing.none)) comp s(hug,fill) "Jan" #col
+    r s(24,40) f[($primary.soft)] rd($radius.sm,$radius.sm,$radius.none,$radius.none) "Bar" #col_bar
+    t("Jan",$font.family,$font.size.xs,m,align(c)) f[($color.text.secondary)] #col_label
+  inst(#col) "Feb"
+    override(#col_bar) r s(24,72) f[($primary.soft)] rd($radius.sm,$radius.sm,$radius.none,$radius.none)
+    override(#col_label) t("Feb")
+  inst(#col) "Mar" #mar
+    override(#col_bar) r s(24,96) f[($primary.firm)] rd($radius.sm,$radius.sm,$radius.none,$radius.none)
+    override(#col_label) t("Mar")
 ```
 
-Same SCALE for all rows. Chart uses `s(fill,hug)`.
+Keep one brand hue across the bars and lift the highlight with a firmer
+stop (`$primary.firm`). A trailing `#ref` on an `inst()` keeps that column
+addressable. Grouped bars: pair narrower bars in a nested `al(h)` with a
+dot legend.
+
+## Horizontal bars
+
+One row is a label plus a track frame holding the fill bar; make the
+track `clip` so the fill's corners stay inside it. Responsive version:
+track `s(fill,16)`, fill width by `fill:VALUE` against the same scale on
+every row. Categorical data uses a distinct palette stop per row, never
+semantic roles.
+
+```
+al(v,g($spacing.sm),pad($spacing.none)) s(hug,hug) "HBar"
+  al(h,x(c),y(s),g($spacing.sm),pad($spacing.none)) comp s(hug,hug) "Sales" #hrow
+    t("Sales",$font.family,$font.size.xs,m,align(r)) s(50,hug) f[($color.text.secondary)] #hrow_label
+    al(h,g($spacing.none),pad($spacing.none)) s(200,16) f[($color.surface.container)] rd($radius.sm) clip "Track"
+      r s(160,fill) f[($rose.mid)] rd($radius.sm) "Fill" #hrow_fill
+  inst(#hrow) "Ops"
+    override(#hrow_label) t("Ops")
+    override(#hrow_fill) r s(120,fill) f[($amber.mid)] rd($radius.sm)
+```

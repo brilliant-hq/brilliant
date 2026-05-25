@@ -15,10 +15,12 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 |--------|----------|
 | Zoom in (2x, viewport-centered) | Cmd+= |
 | Zoom out (0.5x, viewport-centered) | Cmd+- |
-| Zoom 100%, 200%, ..., 900% | 1, 2, 3, 4, 5, 6, 7, 8, 9 (Move or Hand tool only). Pressing the same digit twice resets to 100%. |
+| Zoom 100%, 200%, ..., 900% | 1, 2, 3, 4, 5, 6, 7, 8, 9 (Move or Hand tool only, no text input, no command palette). Pressing the same digit twice resets to 100%. |
 | Toggle zoom | 0 (Move or Hand tool only) toggles between 100% and the previously-zoomed state. With no previous state it jumps to 200%. |
 | Cmd+scroll, Cmd+trackpad drag | Zoom around cursor |
 | Trackpad pinch | Zoom around focal point |
+
+Note: there is no built-in "Zoom to 100%" Cmd+0 binding. `0` alone (without Cmd) is `toggle_zoom`, and Cmd+0 is unbound by default. To jump to 100% explicitly, press `1`.
 
 ### Zoom Behavior
 
@@ -27,7 +29,7 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 - **Min zoom:** 2% (0.02x), unless "Disable Zoom Out" (Cmd+Ctrl+D) is active, which clamps to 100% and constrains pan to canvas bounds
 - **Keyboard zoom (Cmd+= and Cmd+-):** centers on the viewport
 - **Cmd+scroll, Cmd+trackpad drag, trackpad pinch:** zoom around the cursor
-- **Smooth animation:** zoom transitions use exponential-decay smoothing so retargeting mid-flight stays smooth
+- **Smooth animation:** zoom transitions use time-normalized exponential-decay smoothing (smoothSpeed = 60) so retargeting mid-flight stays smooth. Toggle via "Toggle Zoom Animation" command (no default shortcut).
 - **Per-canvas zoom state:** each canvas remembers its own zoom and pan; switching canvases restores them. The first time a canvas with content is opened, the viewport zoom-fits to its bounds automatically.
 
 ### Zoom to Content
@@ -43,10 +45,12 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 ### Scroll and Trackpad
 
 - Scroll wheel: pans the canvas (vertical scroll = vertical pan)
+- **Shift+scroll wheel:** pans horizontally (Figma/Penpot convention). Tilt-wheel x-deltas are folded in.
 - Cmd+scroll wheel: zooms around cursor position
 - Trackpad two-finger drag: pans the canvas
 - Trackpad pinch: zooms around focal point
 - Cmd+trackpad drag: zooms around cursor position
+- **Middle-mouse drag:** temporarily swaps to the Hand tool while held (same as holding Space). Cursor flips to grabbing; bottom toolbar reflects the mode. Release to return to the previous tool.
 
 ### Zoom Percentage
 
@@ -76,7 +80,26 @@ Two-finger drag on trackpad pans. Cmd+two-finger drag zooms around the cursor.
 
 ### Scroll-Wheel Pan
 
-Mouse scroll wheel pans (vertical scroll = vertical pan). Cmd+scroll zooms around the cursor instead. Pan gestures (scroll wheel, trackpad pan, hand-tool drag) include momentum: a quick flick decelerates after release. Decay factor 0.94 per frame; minimum flick speed 3.0; momentum stops on pointer down or `PointerScrollInertiaCancelEvent`.
+Mouse scroll wheel pans (vertical scroll = vertical pan). Shift+scroll pans horizontally. Cmd+scroll zooms around the cursor instead. Trackpad pan and hand-tool drag include momentum (quick flick decelerates after release; decay 0.94/frame, min flick speed 3.0; momentum stops on pointer down or `PointerScrollInertiaCancelEvent`). Mouse scroll wheel has no added momentum (the OS handles its own acceleration).
+
+### Middle-Mouse Drag
+
+Press and drag the middle mouse button to pan. This temporarily swaps to the Hand tool (same code path as holding Space), so the cursor shows "grabbing" and the bottom toolbar reflects the mode. Release to return to the previous tool.
+
+## Coordinate Spaces
+
+The canvas has four nested coordinate systems. AI tools working with positions need to know which space they are in.
+
+| Space | What it is | Where it shows up |
+|-------|-----------|-------------------|
+| **Screen** | Raw pointer pixel coordinates from the OS | Pointer events, before any transform |
+| **World** | Absolute canvas coordinates, after inverse zoom transform | Hit testing input, rendering output, marquee rects |
+| **Parent-local** | Position relative to the element's parent frame | `element.points`, `element.aabb`, the values you set via MCP `create_modify_elements` |
+| **Element-local** | Geometry inside an element's own frame | Vector path nodes, internal text layout |
+
+Stored element coordinates (`x`, `y`, `width`, `height` in blueprint, `points` / `aabb` internally) are **parent-local**. Top-level elements live under a synthetic root parent, so for top-level elements parent-local equals world.
+
+`lookup` returns blueprint coordinates that are parent-local. To position an element in world space, account for its ancestor chain. Frames have rotation, so a rotated frame's children sit in a rotated parent-local space (their world bounds are computed by rotating about the frame center).
 
 ## Selection and Hit Testing
 
@@ -151,18 +174,39 @@ Both nudge variants register undo and respect per-parent constraints.
 - Frame labels: above top-level frames; click selects the frame
 - Layout grids: per-frame in the right toolbar Layout Guides section
 
+## Blend Modes
+
+Brilliant supports blend modes at four scopes: element, fill, stroke, and effect. All default to `normal` (`srcOver`).
+
+| Scope | Property (blueprint) | What it composites |
+|-------|----------------------|--------------------|
+| Element | `blendMode` on the element | Entire element (all fills + strokes + effects) against the canvas underneath |
+| Fill | `blendMode` on a fill entry | This single fill against the canvas underneath |
+| Stroke | `blendMode` on a stroke entry | This single stroke against the canvas underneath |
+| Effect | `blendMode` on a drop shadow / outer glow / element blur. Inner shadow and inner glow each have their own `blendMode` in their data (inner glow defaults to `screen`). | Per-effect output |
+
+Element-level blend mode wraps the whole element in a single composite layer so its fills, strokes and effects composite normally with each other first, then the unit blends against the canvas. Fill/stroke/effect modes are independent and apply only to their own render pass.
+
+Supported modes (16): `normal` (srcOver), `darken`, `multiply`, `colorBurn`, `lighten`, `screen`, `colorDodge`, `overlay`, `softLight`, `hardLight`, `difference`, `exclusion`, `hue`, `saturation`, `color`, `luminosity`. Same set exports cleanly to SVG (`mix-blend-mode`) and PDF.
+
 ## Rendering Performance
 
-Two render modes managed by `RenderModeController`, switched automatically.
+Two render modes managed by `RenderModeController`, switched automatically. The user does not need to opt in or out.
 
 | Mode | When | What it does |
 |------|------|---------------|
 | Widget mode | Default; below the tile thresholds | Each element renders as its own Flutter widget with `RepaintBoundary` |
-| Tile mode | Jank-triggered (6 of 8 frames > 15ms or 2 consecutive > 40ms; minimum 256 visible elements) or proactive (>= 512 visible elements) | Elements are drawn into cached GPU tile images by `CanvasRenderView`; promoted elements (selected, dragged) render as live widgets on top |
+| Tile mode | Jank-triggered (6 of 8 recent frames > 15ms, OR 2 consecutive frames > 40ms) gated on >= 256 visible elements, OR proactively on zoom/pan start when >= 512 visible elements | All elements drawn into cached GPU-resident tile images via a single `TilePainter`; during drag, small selections (<= 100 elements) promote to per-element widgets on top, larger selections use a single snapshot image |
 
-Tile mode exits to widget mode after 3 consecutive frames with fewer than 512 visible elements. Mode switches enforce a 3-second cooldown to prevent oscillation. The user does not need to opt in or out.
+Exit back to widget mode requires visible elements below 512 for 3 consecutive checks. Mode switches enforce a 3-second cooldown to prevent oscillation.
 
-Cmd+Shift+Alt+P toggles the render profiler overlay (frame timings, jank counters, mode transitions).
+### Studio vs Overlay screen capture
+
+When the canvas is zoomed/panned in overlay mode, the OS desktop image is captured and painted as the background behind the canvas content. In studio mode this is skipped (capture would record the app's own window); the void background fills the area instead.
+
+### Profiler overlay
+
+**Cmd+Shift+Alt+P** toggles the render profiler overlay (frame timings, jank counters, mode transitions, manager notification costs). Debug builds only.
 
 ## Snap Guides
 
@@ -234,6 +278,14 @@ Measurement guides appear as **dashed lines with pixel labels**. When elements a
 | Release Alt | Measurements disappear |
 
 ## Background
+
+The canvas paints three background layers in order: void, background color, blackboard. Each layer is shown only when the layers above it would not fully cover it.
+
+### Layer stack
+
+1. **Void**: visible only when the canvas is "outside" the editable area (studio mode, preview mode, or overlay mode while zoomed/panned). The void renders a theme-aware base (light grey on light theme, very dark grey on dark theme) plus a tiled `CheckerboardPattern` at 5% opacity to signal "no canvas content here". The void is skipped when an opaque background or blackboard color would fully occlude it.
+2. **Background color**: the canvas's configured background, drawn over the void. Shown when `isBackgroundEnabled` is true and there is no blackboard color.
+3. **Blackboard color**: highest-priority opaque fill. Drawn over everything else when `blackboardColor` is set.
 
 ### Background Modes
 

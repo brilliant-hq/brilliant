@@ -15,16 +15,17 @@ Gradient CTAs = **never** (solid only — gradient CTAs are the #1 AI tell). Her
 
 ## Multi-Stop Knee
 
-Two stops feel flat. Three create depth — the middle stop shifts character:
+Two stops feel flat. Three create depth — the middle stop shifts character.
+Use design tokens so the gradient follows brand + mode switches:
 ```
-f[(linear(180,stop(#09090B,0),stop(#18181B,0.6),stop(#312E81,1)))]
+f[(linear(180,stop($zinc.intense,0),stop($zinc.intense,0.6),stop($indigo.intense,1)))]
 ```
 
 ## Gradient + Effect Stacking
 
-Gradient base + low-opacity shader for organic texture:
+Gradient base + low-opacity shader for organic texture. Stops are tokens like every other slot — see `design-systems/core` "Modes":
 ```
-f[(linear(135,#831843,#9F1239)),(f2,metaballs(#9F1239,#BE185D,opacity(0.15),speed(0.2)))]
+f[(linear(135,$pink.intense,$rose.intense)),(f2,metaballs($rose.intense,$pink.bold,opacity(0.15),speed(0.2)))]
 ```
 
 ## Rules
@@ -39,4 +40,8 @@ f[(linear(135,#831843,#9F1239)),(f2,metaballs(#9F1239,#BE185D,opacity(0.15),spee
 
 ## By Mood
 
-Subtle depth `linear(180,#F8FAFC,#E2E8F0)` · premium dark `linear(180,#0F172A,#1E293B)` · warm energy `linear(135,#F59E0B,#F43F5E)` · ocean calm `linear(90,#14B8A6,#3B82F6)` · tech depth `linear(180,#0F172A,#334155)`.
+Subtle depth `linear(180,$slate.hint,$slate.subtle)` · premium dark
+`linear(180,$slate.intense,$slate.strong)` · warm energy
+`linear(135,$amber.mid,$rose.mid)` · ocean calm
+`linear(90,$teal.mid,$blue.mid)` · tech depth
+`linear(180,$slate.intense,$slate.bold)`.
