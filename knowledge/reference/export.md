@@ -68,7 +68,7 @@ Configure export settings in the **Export panel** in the right toolbar (appears 
 | Option | Values | Default |
 |--------|--------|---------|
 | **Format** | PNG, JPEG, WebP, SVG, PDF, HTML, HTML (document), HTML (flex), React (JSX), MP4, MOV, Replay | PNG |
-| **Resolution** | `Original (1x)`, `Original (2x)`, `Original (3x)`, `Original (4x)`, `720p` (1280x720), `1080p` (1920x1080), `1440p` (2560x1440), `4K` (3840x2160), `8K` (7680x4320), `Instagram Post` (1080x1080), `Instagram Story` (1080x1920), `iPhone 16 Pro` (1206x2622), `MacBook Pro 14"` (3024x1964), `Custom`. Vector formats (SVG, PDF) hide the resolution row. | `Original (1x)` |
+| **Resolution** | `Original (1x)`, `Original (2x)`, `Original (3x)`, `Original (4x)`, `720p` (1280x720), `1080p` (1920x1080), `1440p` (2560x1440), `4K` (3840x2160), `8K` (7680x4320), `Portrait Post · IG, FB` (1080x1350), `Square Post · IG, X` (1080x1080), `Story / Reel · IG, TikTok` (1080x1920), `iPhone 16 Pro` (1206x2622), `MacBook Pro 14"` (3024x1964), `Custom`. Vector formats (SVG, PDF) hide the resolution row. | `Original (1x)` |
 | **Width / Height** | Target pixel dimensions when format is raster or video. Mutually exclusive with `scale`. Provide one to scale proportionally, or both with a `fitMode` for exact size | none |
 | **Fit mode** | `Fit` (letterbox), `Fill` (crop), `Stretch` (non-uniform), `Repeat` (1:1 tiled). Only consulted when both target dimensions are set | `Fit` |
 | **Background** | `Transparent`, `Canvas` (canvas background color, used as fallback when format does not support alpha) | `Transparent` |

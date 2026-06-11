@@ -305,7 +305,7 @@ Right-toolbar export options:
 | Option | Description |
 |--------|-------------|
 | Format | PNG, JPEG, WebP, SVG, PDF, MP4, MOV, Replay |
-| Resolution | Original, 720p, 1080p, 1440p, 4K, 8K, Instagram Post, Instagram Story, iPhone 16 Pro, MacBook Pro 14", Custom |
+| Resolution | Original, 720p, 1080p, 1440p, 4K, 8K, Portrait Post · IG, FB, Square Post · IG, X, Story / Reel · IG, TikTok, iPhone 16 Pro, MacBook Pro 14", Custom |
 | Fit mode | Fit, Fill, Stretch, Repeat |
 | Background | Transparent or Canvas (when format supports alpha) |
 | Constrain proportions | Lock aspect ratio when entering custom dimensions |

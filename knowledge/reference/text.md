@@ -264,18 +264,18 @@ Manually changing the font family clears `typographyTokenRef`. Other inspector e
 | Home | Jump to line start |
 | End | Jump to line end |
 
-## Outline Text and Flatten Text (macOS only)
+## Outline Text and Flatten Text (macOS + Windows)
 
 Both convert a text element to vector geometry. Both are one-way conversions: the result is no longer editable as text.
 
 | Command | Default Shortcut | Result |
 |---------|-----------------|--------|
-| Outline Text | **Cmd+Ctrl+O** | A group of per-character vector outlines (each character is its own editable vector) |
-| Flatten Text | **Cmd+Alt+O** | A single compound vector element (all characters merged into one path) |
+| Outline Text | **Cmd+Ctrl+O** (macOS) | A group of per-character vector outlines (each character is its own editable vector) |
+| Flatten Text | **Cmd+Alt+O** (macOS) / **Ctrl+Alt+O** (Windows) | A single compound vector element (all characters merged into one path) |
 
 Use Outline Text when you want to edit individual characters (custom letter modifications, per-character coloring, character-level boolean ops). Use Flatten Text when you want a single shape for masking, boolean operations against other shapes, or export as one path.
 
-**Platform:** macOS only. On Windows and Linux, both commands are registered but tagged `invisibleToUser` and the execute body returns immediately.
+**Platform:** macOS (CoreText) and Windows (DirectWrite). On Windows, Outline Text has no keyboard shortcut (its Cmd+Ctrl+O chord would collide with Ctrl+O) — run it from the right-click menu, command palette, or the canvas context menu. On Linux both commands stay hidden (no native glyph-outline backend).
 
 ## Tips
 
