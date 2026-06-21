@@ -3,11 +3,9 @@ name: "knowledge-frames"
 description: "Parent types (Frame, Group, Auto Layout, Mask, Boolean), nesting, sizing, drag reorder, parent properties, and component-style conversion."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # Parents (Containers)
 
-In Brilliant, every container element is a **parent** (`ElementType.parent`). Parents come in 8 sub-types stored in `ParentData.type`: **Frame**, **Group**, **Auto Layout**, **Mask**, and four **Boolean** variants (Union, Subtract, Intersect, Exclude). Group, Mask, and all Boolean types share three constraints: always w:hug h:hug, NOT reparent targets, children cannot be dragged out during drag.
+In Brilliant, every container element is a **parent**. Parents come in 8 sub-types: **Frame**, **Group**, **Auto Layout**, **Mask**, and four **Boolean** variants (Union, Subtract, Intersect, Exclude). Group, Mask, and all Boolean types share three constraints: always Hug on both axes, NOT reparent targets, children cannot be dragged out during drag.
 
 ## Coming From Other Tools
 
@@ -16,16 +14,16 @@ In Brilliant, every container element is a **parent** (`ElementType.parent`). Pa
 | Figma / Sketch | Brilliant | Notes |
 |----------------|-----------|-------|
 | **Frame** | Parent (Frame) | Free-positioning container with fixed sizing by default |
-| **Group** (Cmd+G) | Parent (Group) | Always w:hug h:hug. NOT a drop target |
+| **Group** (Cmd+G) | Parent (Group) | Always Hug on both axes. NOT a drop target |
 | **Auto Layout Frame** (Shift+A) | Parent (Auto Layout) | Flow layout, supports wrap |
 | Component | Component | Masters and instances. See [components.md](./components.md) |
 | Artboard | Canvas (separate page) or Frame (bounded area) | |
 | **Mask** (Cmd+Option+M) | Mask (**Ctrl+Cmd+M**) | macOS reserves Cmd+Option+M for "Minimize All Windows" |
 | Constraints (pin to edges) | Not available | Use auto layout with hug/fill/fixed |
-| Absolute position | `abs` keyword / pin button in Element section | Same concept |
+| Absolute position | Pin button in the Element section sizing row | Same concept |
 | Boolean ops | Boolean parents | Each op produces a re-editable parent (double-click to edit) |
 
-**Frames, Groups, Masks, and Booleans are all parent elements** distinguished by `ParentType`. Convert between any of them via the **Type dropdown** in the right toolbar's Parent section.
+**Frames, Groups, Masks, and Booleans are all parent elements** distinguished by their type. Convert between any of them via the **Type dropdown** in the right toolbar's Parent section.
 
 ### Adobe Illustrator
 
@@ -46,16 +44,16 @@ In Brilliant, every container element is a **parent** (`ElementType.parent`). Pa
 
 ## Parent Types
 
-| Type | `ParentType` | Sizing | Reparent Target? | Created By |
-|------|--------------|--------|------------------|-----------|
-| **Frame** | `frame` | Any (hug/fill/fixed). Default: fixed | Yes | Cmd+F (wrap), F (frame tool), Type dropdown |
-| **Group** | `group` | Always w:hug h:hug | No | Cmd+G |
-| **Auto Layout** | `autoLayout` | Any. Default: hug both axes | Yes | Shift+A |
-| **Mask** | `mask` | Always w:hug h:hug | No | Ctrl+Cmd+M |
-| **Boolean Union** | `booleanUnion` | Always w:hug h:hug | No | Alt+Shift+U |
-| **Boolean Subtract** | `booleanSubtract` | Always w:hug h:hug | No | Alt+Shift+S |
-| **Boolean Intersect** | `booleanIntersect` | Always w:hug h:hug | No | Alt+Shift+I |
-| **Boolean Exclude** | `booleanExclude` | Always w:hug h:hug | No | Alt+Shift+E |
+| Type | Sizing | Reparent Target? | Created By |
+|------|--------|------------------|-----------|
+| **Frame** | Any (Hug/Fill/Fixed). Default: Fixed | Yes | Cmd+F (wrap), F (frame tool), Type dropdown |
+| **Group** | Always Hug both axes | No | Cmd+G |
+| **Auto Layout** | Any. Default: Hug both axes | Yes | Shift+A |
+| **Mask** | Always Hug both axes | No | Ctrl+Cmd+M |
+| **Boolean Union** | Always Hug both axes | No | Alt+Shift+U |
+| **Boolean Subtract** | Always Hug both axes | No | Alt+Shift+S |
+| **Boolean Intersect** | Always Hug both axes | No | Alt+Shift+I |
+| **Boolean Exclude** | Always Hug both axes | No | Alt+Shift+E |
 
 ### Shared Capabilities
 
@@ -66,14 +64,14 @@ All parent types support:
 - Nesting (parents inside parents, any combination)
 - Conversion to any other parent type via the dropdown
 
-**Default `clipContent: false`** for all parent types. Toggle with the scissors button next to the Type dropdown, or the `clip` / `no-clip` keywords in blueprint format.
+**Clip content is off by default** for all parent types. Toggle it with the scissors button next to the Type dropdown in the right toolbar's Parent section.
 
 ### Type-Specific Differences
 
 - **Frame** and **Auto Layout** support all sizing modes and accept reparenting (drag elements in/out).
-- **Group** is always w:hug h:hug. Changing sizing from hug on either axis auto-converts to **Frame**. Groups are NOT reparent targets; children cannot be dragged out during drag.
-- **Mask** is always w:hug h:hug. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape. The data model has `MaskType.vector` / `.alpha` / `.luminance` but only Vector is active in the UI (Alpha and Luminance round-trip in the file format only).
-- **Boolean** is always w:hug h:hug. The combined path is rendered. Double-click to enter edit mode (children become editable; Subtract is z-order sensitive: front shapes subtract from the back).
+- **Group** is always Hug on both axes. Changing sizing from Hug on either axis auto-converts it to a **Frame**. Groups are NOT reparent targets; children cannot be dragged out during drag.
+- **Mask** is always Hug on both axes. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape. Only Vector masking is selectable in the UI (the file format can store Alpha and Luminance mask types, but there is no UI to pick them).
+- **Boolean** is always Hug on both axes. The combined path is rendered. Double-click to enter edit mode (children become editable; Subtract is z-order sensitive: front shapes subtract from the back).
 
 ## Frames
 
@@ -102,13 +100,13 @@ All parent types support:
 3. A Group parent wraps the selection (one group per source parent: per-parent grouping)
 
 **Group properties at creation:**
-- `widthSizing: hug, heightSizing: hug` (forced)
-- `clipContent: false`, no fill, no stroke
+- Hug on both axes (forced)
+- Clip content off, no fill, no stroke
 - Z-order: inserted at the backmost selected element's position
 
 ### Sizing
 
-Groups are **always w:hug h:hug** (auto-resize to fit children). **Changing sizing from hug on either axis auto-converts to Frame.**
+Groups are **always Hug on both axes** (auto-resize to fit children). **Changing sizing from Hug on either axis auto-converts the group to a Frame.**
 
 ### Ungrouping (Cmd+Shift+G)
 
@@ -129,7 +127,7 @@ If the group is a component master, its component relationship is cleaned up fir
 
 - **Fill** (Shift+F), **Stroke** (Shift+S), **Corner radius**, **Effects**
 - **Clip content** off by default
-- **Sizing**: always hug (changing → Frame)
+- **Sizing**: always Hug (changing it converts the group to a Frame)
 - **Rename**: Cmd+R, or double-click the frame label on canvas
 
 ## Masks (Ctrl+Cmd+M)
@@ -145,35 +143,33 @@ A mask uses one element to clip others, like a cookie cutter. The **topmost elem
 **At creation:**
 - The mask shape includes **stroke geometry** in the clip (a circle with a thick stroke masks a wider area than its fill alone)
 - The mask shape is invisible in normal mode
-- Frame defaults: w:hug h:hug, no fill, no stroke, `clipContent: false` (clipping is via mask shape, not bounds)
+- Mask defaults: Hug on both axes, no fill, no stroke, clip content off (clipping is done by the mask shape, not by bounds)
 
 ### Editing the Mask Shape
 
 - **Double-click** the mask to enter edit mode: the mask shape becomes visible and editable
-- Modify it (resize, change arc, edit vector nodes, etc.); changes update the clip path live via `shapeNeedsUpdateCounter` invalidation
+- Modify it (resize, change arc, edit vector nodes, etc.); the clip path updates live
 - **Escape** or click outside to exit
 
 ### Mask Types
 
-`ParentData.maskType` is one of:
-
 | Type | Description |
 |------|-------------|
-| Vector (default, `MaskType.vector`) | Clip via the mask shape's vector outline including stroke geometry |
-| Alpha (`MaskType.alpha`) | Defined in the data model and serialized; no UI selector |
-| Luminance (`MaskType.luminance`) | Defined in the data model and serialized; no UI selector |
+| Vector (default) | Clip via the mask shape's vector outline including stroke geometry |
+| Alpha | Stored in the file format only; no UI selector |
+| Luminance | Stored in the file format only; no UI selector |
 
-The active rendering type is always Vector. Alpha/Luminance round-trip through `.design` files but cannot be selected via the right toolbar.
+The active masking type is always Vector. Alpha and Luminance round-trip through saved files but cannot be selected via the right toolbar.
 
 ### Mask Properties
 
-- **Sizing**: always w:hug h:hug
+- **Sizing**: always Hug on both axes
 - **Fill, stroke, corner radius, effects**: rendered on the mask result shape (same overlay path used by booleans)
 - **Tip**: any element type can be the mask shape (rectangle, circle, vector, text). Reorder children in the layers explorer to change which is the mask shape (last/topmost = mask).
 
 ## Boolean Operations
 
-Boolean parents combine child paths. Always w:hug h:hug. Not reparent targets.
+Boolean parents combine child paths. Always Hug on both axes. Not reparent targets.
 
 | Operation | Shortcut |
 |-----------|----------|
@@ -199,22 +195,22 @@ Auto layout frames flow children in a row or column, with optional wrap.
 2. Press **Shift+A**
 3. Direction, spacing, padding, and cross-axis alignment are inferred from element positions
 
-**Defaults applied at creation** (vs `AutoLayoutData()` constructor defaults):
+**Defaults applied at creation:**
 
-| Field | At creation (`addAutoLayoutToElements`, 2+ elements) | Single element (`< 2`) | Constructor default |
-|-------|------------------------------------------------------|------------------------|---------------------|
-| `direction` | horizontal if center spread is wider than tall, else vertical | horizontal | vertical |
-| `mainAxisAlignment` | start | start | start |
-| `crossAxisAlignment` | inferred from positions | start | start |
-| `itemSpacing` | rounded average gap between consecutive elements, floored at 0 for the inferred default (negative gap is still settable later via `$spacing.overlap.*` for overlap) | 10 | 10 |
-| padding (all four) | **0** | **0** | 10 |
-| `wrap` | false | false | false |
+| Field | With 2+ elements | With a single element |
+|-------|------------------|-----------------------|
+| Direction | Horizontal if the selection spreads wider than tall, else Vertical | Horizontal |
+| Main-axis alignment | Start | Start |
+| Cross-axis alignment | Inferred from positions | Start |
+| Spacing | Rounded average gap between consecutive elements, floored at 0 (a negative gap, which overlaps children, can be typed into the spacing field later) | 10 |
+| Padding (all four sides) | 0 | 0 |
+| Wrap | Off | Off |
 
-The frame's `LayoutBehavior` is forced to `widthSizing: hug, heightSizing: hug` at creation.
+The new auto layout frame is created Hug on both axes.
 
 ### Single-Frame In-Place Conversion
 
-When **Shift+A** is pressed with a **single non-auto-layout parent (Frame / Group / Mask / Boolean)** selected, that parent is converted in-place via `setParentType(autoLayout)` instead of being wrapped. Children are sorted by spatial position along the inferred main axis. Padding is computed from the existing frame bounds. Single non-parent selections (a lone rectangle / vector / etc.) are wrapped in a new auto layout frame instead.
+When **Shift+A** is pressed with a **single non-auto-layout parent (Frame / Group / Mask / Boolean)** selected, that parent is converted to Auto Layout in place instead of being wrapped in a new frame. Children are sorted by spatial position along the inferred main axis. Padding is computed from the existing frame bounds. A single non-parent selection (a lone rectangle, vector, etc.) is wrapped in a new auto layout frame instead.
 
 ### Right Toolbar (Parent Section)
 
@@ -250,9 +246,9 @@ The 3×3 grid sets main-axis and cross-axis alignment in one click.
 | Horizontal | Main axis (start/center/end) | Cross axis (start/center/end) |
 | Vertical | Cross axis (start/center/end) | Main axis (start/center/end) |
 
-**Single-click** a dot to set alignment. **Double-click** a dot to toggle the spacing mode between Fixed and Auto (`spaceBetween`). When Auto is active, only the cross-axis dot remains adjustable (the main axis is locked to spaceBetween).
+**Single-click** a dot to set alignment. **Double-click** a dot to toggle the spacing mode between Fixed and Auto (space-between). When Auto is active, only the cross-axis dot remains adjustable (the main axis is locked to space-between).
 
-**Main-axis options:** start, center, end, **spaceBetween (Auto spacing)**. With spaceBetween + a **single child**, the child is centered (not pushed to start). With 2 children, they go to opposite edges with no middle gap.
+**Main-axis options:** start, center, end, **Auto (space-between)**. With Auto and a **single child**, the child is centered (not pushed to start). With 2 children, they go to opposite edges with no middle gap.
 
 **Cross-axis options:** start, center, end.
 
@@ -263,21 +259,21 @@ Gap between children, in pixels. Modes:
 | Mode | Behavior |
 |------|----------|
 | Fixed | The entered value is used directly |
-| Auto | Equivalent to `spaceBetween` main-axis alignment. The spacing field becomes read-only and shows the *computed* gap (stored on `AutoLayoutData.computedItemSpacing`) |
+| Auto | Equivalent to space-between main-axis alignment. The spacing field becomes read-only and shows the *computed* gap |
 
-Spacing supports design system tokens via the spacing-tokens menu.
+Spacing can be bound to a design system spacing token via the spacing-tokens menu next to the field.
 
 ### Padding
 
 Three editing modes, switched via the two buttons next to the all-padding field:
 
-| Mode | Layout | Toggle button |
-|------|--------|---------------|
-| **Uniform** (default) | Single field for all four sides | (none active) |
-| **H/V** | H (left+right) and V (top+bottom) fields | `arrow.left.arrow.right` |
-| **Individual** | L/T then R/B fields (two rows) | `square.dashed` |
+| Mode | Layout |
+|------|--------|
+| **Uniform** (default) | Single field for all four sides |
+| **H/V** | Horizontal (left+right) and Vertical (top+bottom) fields |
+| **Individual** | Left/Top then Right/Bottom fields (two rows) |
 
-The all-padding field accepts comma-separated input even in uniform mode: `"16,8"` sets H/V; `"16,8,24,8"` sets L/T/R/B. Padding supports design system tokens.
+The all-padding field accepts comma-separated input even in uniform mode: typing "16,8" sets H/V; "16,8,24,8" sets Left/Top/Right/Bottom. Padding values can be bound to design system spacing tokens.
 
 ### Wrap
 
@@ -304,40 +300,25 @@ Set via **W Sizing** and **H Sizing** dropdowns in the right toolbar's **Element
 
 #### When to Use Each Mode
 
-| Use Case | Width | Height | Notes |
-|----------|-------|--------|-------|
-| Label / value text (numbers, metrics, units, dates, nav items, section headers) | Hug | Hug | Must not wrap. Omit `s()` only if the smart default produces hug,hug; otherwise set `s(hug,hug)` explicitly. In **vertical** auto layout the smart default is `fill,hug` for text: override |
-| Prose / body / descriptions | Fill | Hug | Should wrap. `s(fill,hug)` |
-| Text in horizontal layout (expanding) | Fill (set explicitly) | Hug | |
-| Non-text in vertical layout | Fill *(auto)* |  | |
-| Non-text in horizontal layout |  | Fill *(auto)* | |
-| Button | Hug | Hug | |
-| Icon / avatar | Fixed | Fixed | |
-| Input field | Fill | Fixed (e.g., 40) | |
-| Sidebar | Fixed (e.g., 240) | Fill | |
-| Content area | Fill | Fill or Hug | |
-| Full-width section | Fill | Hug | |
-| Siblings that should match dimension | Fill | Fill | Cross-axis fill stretches to match tallest/widest sibling |
-| Proportional siblings (e.g., 3:1 split) | Fill:N | varies | `fill:3`+`fill:1` = 75%/25% |
+| Use Case | Width | Height |
+|----------|-------|--------|
+| Label / value text (numbers, metrics, units, dates, nav items, section headers) | Hug | Hug |
+| Prose / body / descriptions (should wrap) | Fill | Hug |
+| Button | Hug | Hug |
+| Icon / avatar | Fixed | Fixed |
+| Input field | Fill | Fixed |
+| Sidebar | Fixed | Fill |
+| Content area | Fill | Fill or Hug |
+| Full-width section | Fill | Hug |
+| Siblings that should match dimension | Fill | Fill (cross-axis Fill stretches to match tallest/widest sibling) |
 
-**Horizontal layout text rule:** With multiple text elements in a horizontal auto layout (label + value, bullet + item), only the expanding text gets `fill` width. Short labels/bullets stay `hug`.
+Text on Hug width does not wrap (it renders at its natural single-line width). Set width to Fill for text that should wrap. With multiple text elements in a horizontal row (label + value, bullet + item), put only the expanding text on Fill width; short labels stay Hug.
 
 #### Flex Factor
 
-Multiple Fill children divide remaining space proportionally by their **flex factor** (`LayoutBehavior.flex`, default `1.0`).
+When several Fill children share an axis, they divide the remaining space proportionally by their **flex factor** (default 1.0). A flex of 3 next to a flex of 1 yields a 75% / 25% split.
 
-```
-Frame: 400 wide, 16px padding each side → content = 368
-Children: [Fixed 80] [Fill] [Fill] [Fixed 80], 8px spacing × 3 = 24
-Remaining = 368 − 160 − 24 = 184
-Each Fill (flex 1) = 184 / 2 = 92
-```
-
-`fill:3` + `fill:1` → first gets 138, second gets 46 (75%/25%).
-
-The **Flex** field appears in the Element section's **corner-radius row** (not the Rotation row), prefixed with "F", when a Fill child on the parent's main axis is selected. Plain `fill` = flex 1.0.
-
-If fixed/hug children consume all available space, fill children get 0 width (clamped, never negative).
+The **Flex** field appears in the Element section's corner-radius row, prefixed with "F", and is shown only when a Fill child on the parent's main axis is selected. If fixed/hug siblings consume all available space, fill children collapse to 0 (clamped, never negative).
 
 #### Fill Inside Hug Frames
 
@@ -345,15 +326,15 @@ If fixed/hug children consume all available space, fill children get 0 width (cl
 
 | Scenario | Behavior |
 |----------|----------|
-| Fill on **main axis** + frame Hug | **Collapses to content size** (acts like Hug). Avoids circular dependency: frame size = sum of children, but fill wants frame size to compute |
+| Fill on **main axis** + frame Hug | Collapses to content size (acts like Hug). Avoids a circular dependency: the frame sizes to its children, but Fill wants the frame size to compute against |
 | Fill on **cross axis** + frame Hug | Works normally. Fill children are excluded from the cross-axis hug calculation; non-fill siblings determine the cross-axis size; fill children stretch to match |
 | Fill + frame Fixed | Works normally |
 
-**All-fill cross-axis edge case:** When ALL children have `fill` on the cross axis (no non-fill anchor), Brilliant measures each child's natural content size and uses the largest as the cross-axis bootstrap. Common in pricing grids and multi-column layouts.
+**All-fill cross-axis edge case:** When every child has Fill on the cross axis (no non-fill anchor), Brilliant measures each child's natural content size and uses the largest as the cross-axis size. Common in pricing grids and multi-column layouts.
 
-**Accent-bar pattern:** A thin rectangle with `w:fixed h:fill` inside a horizontal auto layout. The rect's height does not affect the parent's hug height; siblings determine it, and the bar stretches.
+**Accent-bar pattern:** A thin rectangle with Fixed width and Fill height inside a horizontal auto layout does not affect the parent's hug height; its siblings determine the height and the bar stretches to match.
 
-**Plain frames and groups (non-auto-layout):** Fill collapses to content size on **both** axes (no main/cross distinction). A fill-width text inside a hug-width plain frame will not wrap; it renders at its natural single-line width. Matches Figma.
+**Plain frames and groups (non-auto-layout):** Fill collapses to content size on **both** axes (no main/cross distinction). A Fill-width text inside a hug-width plain frame will not wrap; it renders at its natural single-line width.
 
 ### Frame Axis Sizing
 
@@ -369,11 +350,9 @@ Children of auto layout frames can opt out of layout flow with **absolute positi
 
 **Toggle:**
 - Pin button in the right toolbar's **Element** section sizing row (rightmost button), or
-- Run "Toggle Ignore Auto Layout" command (`toggle_absolute_position`)
+- Command palette → "Toggle Ignore Auto Layout"
 
 The pin button only appears when at least one selected element is inside an auto layout frame.
-
-**Blueprint:** add `abs` keyword: `c abs p(200,-8) s(20,20) f[($red.mid)]`
 
 **Use cases:** badges, notification dots, floating buttons, watermarks, decorative overlays.
 
@@ -421,32 +400,32 @@ Common conversions:
 
 | From → To | Effect |
 |-----------|--------|
-| Frame → Group | Forces w:hug h:hug, clears auto layout data |
-| Frame → Auto Layout | Infers direction, spacing, alignment, padding from current child positions; sorts children spatially along main axis |
-| Frame → Boolean | Forces hug, clears auto layout data, **clears fills/strokes** (only when source is non-boolean/non-mask), renames |
-| Frame → Mask | Forces hug, clears auto layout data, clears fills/strokes (only when source is non-boolean/non-mask), renames to "Mask" |
+| Frame → Group | Forces Hug on both axes, clears auto layout settings |
+| Frame → Auto Layout | Infers direction, spacing, alignment, padding from current child positions; sorts children spatially along the main axis |
+| Frame → Boolean | Forces Hug, clears auto layout settings, **clears fills/strokes** (only when the source is not already a Boolean or Mask), renames |
+| Frame → Mask | Forces Hug, clears auto layout settings, clears fills/strokes (only when the source is not already a Boolean or Mask), renames to "Mask" |
 | Group → Frame | Unlocks sizing |
 | Group → Auto Layout | Infers layout, unlocks sizing |
-| Auto Layout → Frame | Clears auto layout data, children keep current positions |
-| Auto Layout → Group | Clears auto layout data, forces w:hug h:hug |
+| Auto Layout → Frame | Clears auto layout settings, children keep current positions |
+| Auto Layout → Group | Clears auto layout settings, forces Hug on both axes |
 | Boolean ↔ Boolean | Preserves fills/strokes, renames |
 | Boolean ↔ Mask | Preserves fills/strokes |
 | Mask → non-mask non-boolean | Standard conversion, keeps fills/strokes |
 
-**Auto-conversion:** Changing a Group's sizing from hug on either axis automatically converts it to Frame.
+**Auto-conversion:** Changing a Group's sizing from Hug on either axis automatically converts it to a Frame.
 
-**Side effect:** Converting an auto layout parent to any non-auto-layout type **strips `isAbsolutePosition`** from all children.
+**Side effect:** Converting an auto layout parent to any non-auto-layout type **removes the absolute-position flag** from all children.
 
 ## Parent Properties (All Types)
 
 | Property | Description |
 |----------|-------------|
-| Clip content | Clip children to parent bounds. Default: **off** for all types. Toggle: scissors button next to Type dropdown. Blueprint: `clip` / `no-clip` |
+| Clip content | Clip children to parent bounds. Default: **off** for all types. Toggle: scissors button next to the Type dropdown in the Parent section |
 | Corner radius | Per-corner or uniform; supports radius tokens |
 | Fill | Color, gradient, image, or shader |
 | Stroke | Border |
 | Effects | Drop shadow, outer glow, element blur (inner shadow / inner glow / background blur are fill types in the Fills list) |
-| Sizing | Frame and Auto Layout: hug/fill/fixed per axis. Group, Mask, Boolean: locked to w:hug h:hug |
+| Sizing | Frame and Auto Layout: Hug/Fill/Fixed per axis. Group, Mask, Boolean: locked to Hug on both axes |
 | Opacity, Blend mode | Element-level (in Element section) |
 
 ## Nesting
@@ -471,7 +450,7 @@ Drag elements over a parent to auto-reparent:
 |----------|--------|
 | **Cmd+F** | Frame from selection (default fixed sizing, reparent target) |
 | **F**, drag | Frame tool: draws frame, captures elements fully inside |
-| **Cmd+G** | Group (always w:hug h:hug) |
+| **Cmd+G** | Group (always Hug on both axes) |
 | **Shift+A** | Auto Layout (or in-place convert if a single non-auto-layout parent is selected) |
 | **Ctrl+Cmd+M** | Mask |
 | **Alt+Shift+U / S / I / E** | Boolean Union / Subtract / Intersect / Exclude |
@@ -496,9 +475,9 @@ Frames support column, row, and grid overlays. See [layout-guides.md](./layout-g
 | Children overflow horizontally | Wrap not enabled, too many hug children | Enable wrap; or shrink children; or grow container |
 | Wrap toggle has no effect | Frame hugs on main axis | Set main-axis sizing to Fixed or Fill |
 | Auto spacing not pushing items to edges | Only one child | Auto centers a single child; add children or use Fixed alignment |
-| Text wrapping when it should not | Text has `fill` width | Change to `hug` |
-| Text not wrapping when it should | Text has `hug` in horizontal layout | Set `w:fill h:hug` explicitly |
-| Siblings not equal height in a row | Cross-axis (height) is `hug` | Use `fill` height; cross-axis fill stretches to match tallest sibling |
+| Text wrapping when it should not | Text has Fill width | Change W Sizing to Hug |
+| Text not wrapping when it should | Text has Hug width in a horizontal layout | Set W Sizing to Fill, H Sizing to Hug |
+| Siblings not equal height in a row | Cross-axis (height) is Hug | Set H Sizing to Fill; cross-axis Fill stretches to match the tallest sibling |
 | Nested parent not stretching | Auto layout default is hug | Set Fill on the nested parent explicitly |
 | Children inside Group/Mask/Boolean cannot be dragged out | Intentional, those types are not reparent targets | Use the layers explorer, or convert to Frame |
 | Layout looks wrong after undo | Normal | Re-apply changes if needed |

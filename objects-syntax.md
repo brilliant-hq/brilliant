@@ -59,7 +59,7 @@ Add `// short label` comments at logical milestones. They double as readable nar
 Add a `// label` comment whenever ANY of:
 - The block has 3+ distinct sections (header / body / footer · hero / stats / CTAs · pros / cons / verdict). One checkpoint at each section boundary.
 - The block creates ~25+ elements.
-- A single section is non-trivial to recreate — multi-fill stack, nested `repeat(...)` blocks, custom positioning.
+- A single section is non-trivial to recreate — multi-fill stack, nested instances, custom positioning.
 
 Skip checkpoints when the block is a **single section, a flat-modify pass, or fewer than ~10 elements** — at that size they're noise.
 

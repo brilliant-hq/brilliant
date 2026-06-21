@@ -1,27 +1,39 @@
 ---
 name: "knowledge-image-filters"
-description: "GPU image filter fills: noise/grain, halftone, pixelate, duotone, posterize, dither: with full parameter reference."
+description: "GPU image-filter fills (noise/grain, halftone, pixelate, duotone, posterize, dither): how to add and tune them in the UI, with full parameter and preset reference."
 ---
-
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
 
 # Image Filters
 
-GPU-powered post-processing filters applied as fill or stroke types. Each filter processes all fills below it in the z-order, producing effects like film grain, halftone printing, pixelation, and color reduction.
+GPU post-processing filters that live in the Fills (or Strokes) list of an element. Each filter reprocesses everything painted below it in that list, producing effects like film grain, halftone printing, pixelation, and color reduction. They work on any fills (solid, gradient, image, shader), not just photos.
 
-**Adding a filter:** Click "+" in the Fills or Strokes section, then use the type dropdown to select a filter from the **Filters** category.
+The six image filters are: **Noise / Grain**, **Halftone**, **Pixelate**, **Duotone**, **Posterize**, **Dither**.
 
-**Z-order processing:** A filter captures everything below it in the fill/stroke list, applies the GPU shader, and renders the result. Fills above the filter render on top of the processed output. Multiple filters can be stacked: each processes everything below it.
+## Adding a filter (UI)
 
-**Presets:** Every filter type has a preset dropdown in the expanded fill view. Selecting a preset applies a curated combination of parameter values (and colors where applicable). You can further customize after applying a preset. A reset button next to the dropdown restores the filter's defaults.
+1. Select an element.
+2. In the right toolbar's **Fills** section (or **Strokes** section), click the **+** button to add a fill/stroke.
+3. Click the fill's type dropdown (the leftmost control on the fill row). Scroll to the **Filters** group and pick a filter.
 
-> **Color Adjust** is also in the Filters category but covers photo-style adjustments (exposure, contrast, saturation, white balance, vignette, sepia, etc.). It is documented in [effects.md](./effects.md#color-adjust-fill).
+The new fill row now represents the filter. Click the row to expand it and reveal the filter's parameters, color swatches (for filters that use colors), preset dropdown, and blend mode.
+
+## Z-order processing
+
+A filter captures everything below it in the same fills/strokes list, applies the GPU shader, and outputs the result in that fill's slot. Fills above the filter paint on top of the processed output. To make a filter affect the whole element, place it at the top of the fills list. Multiple filters can be stacked: each processes everything below it. Reorder fills by dragging rows in the Fills section.
+
+## Presets
+
+When a filter fill is expanded, a preset dropdown appears at the top of its config. Hovering a preset previews it live; selecting one applies a curated combination of parameter values (and colors, for Duotone). You can keep tuning parameters after applying a preset. A reset control restores the filter's default parameters.
+
+## Color Adjust
+
+**Color Adjust** also appears in the Filters group of the type dropdown, but it is a photo-style adjustment layer (exposure, contrast, saturation, white balance, vignette, sepia, etc.), not a pattern filter. It is documented separately in [effects.md](./effects.md#color-adjust-fill).
 
 ---
 
 ## Noise / Grain
 
-Film-like grain overlay. The grain is internally composited using overlay blend mode within the shader. A separate fill-level blend mode dropdown controls how the filter output blends with content below.
+Film-like grain overlay. The grain composites onto the content below it; the filter row's blend mode dropdown controls how the whole filter output blends with content below.
 
 | Parameter | Range | Default | Description |
 |-----------|-------|---------|-------------|
@@ -30,7 +42,7 @@ Film-like grain overlay. The grain is internally composited using overlay blend 
 | **Monochrome** | Color / Mono | Mono | Color noise (RGB) vs grayscale noise |
 | **Distribution** | Uniform / Gaussian | Uniform | Random distribution shape |
 | **Roughness** | 0–1 | 0 | 0 = structured/quantized grain, 1 = per-pixel organic film grain |
-| **Midtone Bias** | 0–1 | 0 | Concentrate noise in midtones (0 = uniform, 1 = peaks at 50% gray) |
+| **Midtone Bias** | 0–100 | 0 | Concentrate noise in midtones (0 = uniform, 100 = peaks at 50% gray) |
 
 Colors: none.
 
@@ -61,28 +73,28 @@ Classic print halftone dots with standard and CMYK modes.
 | **Shape** | Circle / Diamond / Line | Circle | Dot shape within each cell |
 | **Grid** | Square / Hex | Square | Cell arrangement pattern |
 | **Contrast** | 0–1 | 0.5 | Luminance contrast applied before dot sizing |
-| **Inverted** | 0–1 | 0 | Invert luminance (0 = normal, 1 = inverted, continuous blend) |
+| **Inverted** | 0–100 | 0 | Invert luminance (0 = normal, 100 = inverted, continuous blend) |
 | **Colors** | Custom / Original | Custom | Use custom colors or original image colors |
 | **Softness** | 0–1 | 0 | Dot edge softness (0 = hard, 1 = blurred) |
 | **Gain** | 0–2 | 1.0 | Dot radius multiplier (>1 = dots overflow cells, creating overlap patterns) |
 | **Min Dot** | 0–0.5 | 0.15 | Minimum dot size in highlights (prevents white gaps) |
 
-**Colors:** 6 in the data model. The UI shows a subset depending on mode and settings:
+**Color swatches:** which swatches appear depends on Mode and the Colors setting:
 
-- **Standard + Custom colors:** Background (0) + Foreground (1) = 2 swatches
-- **Standard + Original colors:** Background (0) only = 1 swatch
-- **CMYK:** Paper (0) + Cyan (2) + Magenta (3) + Yellow (4) + Black (5) = 5 swatches
+- **Standard + Custom colors:** Background + Foreground (2 swatches)
+- **Standard + Original colors:** Background only (1 swatch)
+- **CMYK:** Paper + Cyan + Magenta + Yellow + Black (5 swatches)
 
-| Index | Standard | CMYK | Default |
-|-------|----------|------|---------|
-| 0 | Background | Paper | #F2F1E8 (cream) |
-| 1 | Foreground | (hidden) | #2B2B2B (dark gray) |
-| 2 | -- | Cyan | #1ABAED |
-| 3 | -- | Magenta | #E8558A |
-| 4 | -- | Yellow | #F5D623 |
-| 5 | -- | Black | #2A2725 |
+| Role | Default |
+|------|---------|
+| Background / Paper | #F2F1E8 (cream) |
+| Foreground (Standard only) | #2B2B2B (dark gray) |
+| Cyan (CMYK) | #1ABAED |
+| Magenta (CMYK) | #E8558A |
+| Yellow (CMYK) | #F5D623 |
+| Black (CMYK) | #2A2725 |
 
-**CMYK mode** renders 4 rotated dot layers (C=15deg, M=75deg, Y=0deg, K=45deg) with subtractive color mixing, mimicking real print output.
+**CMYK mode** renders four rotated dot layers (Cyan 15deg, Magenta 75deg, Yellow 0deg, Black 45deg) with subtractive color mixing, mimicking real print output.
 
 ### Presets
 
@@ -140,24 +152,24 @@ Two-tone or tri-tone color mapping based on luminance.
 
 | Parameter | Range | Default | Description |
 |-----------|-------|---------|-------------|
-| **Contrast** | -1 to 1 | 0 | Luminance contrast before tone mapping |
-| **Brightness** | -1 to 1 | 0 | Luminance brightness shift |
-| **Intensity** | 0–1 | 1.0 | Effect strength (0 = original image, 1 = full duotone) |
+| **Contrast** | -100 to 100 | 0 | Luminance contrast before tone mapping |
+| **Brightness** | -100 to 100 | 0 | Luminance brightness shift |
+| **Intensity** | 0–100 | 100 | Effect strength (0 = original image, 100 = full duotone) |
 | **Midpoint** | 0.1–3 | 1.0 | Midpoint curve (<1 = highlight bias, >1 = shadow bias) |
-| **Saturation** | 0–1 | 0 | Preserve original color saturation in the output |
+| **Saturation** | 0–100 | 0 | Preserve original color saturation in the output |
 | **Tri Midpoint** | 0.1–0.9 | 0.5 | Tritone midpoint position (where midtone color sits) |
 
-**Colors:** 3 (2 required + 1 optional tritone).
+**Color swatches:** two required, plus an optional third for tritone. Use the **+** button on the filter row to add the third swatch.
 
-| Index | Purpose | Default |
-|-------|---------|---------|
-| 0 | Shadow/dark color | #1A1A2E (dark blue) |
-| 1 | Highlight/light color | #E94560 (coral) |
-| 2 | Midtone (tritone) | Transparent (disabled) |
+| Role | Default |
+|------|---------|
+| Shadow / dark color | #1A1A2E (dark blue) |
+| Highlight / light color | #E94560 (coral) |
+| Midtone (tritone) | not present until added |
 
-**Tritone mode** activates when the third color (index 2) has alpha > 0. Luminance below the midpoint interpolates dark-to-mid; above interpolates mid-to-light.
+**Tritone mode** activates once a third (midtone) color is added with non-zero opacity. Luminance below the midpoint interpolates dark-to-mid; above it interpolates mid-to-light.
 
-Per-color alpha controls tint strength (how much that color contributes vs the original image).
+Each swatch's opacity controls how strongly it tints the result versus showing the original image.
 
 ### Presets
 
@@ -183,7 +195,7 @@ Reduce color levels for poster-style banding.
 | **Levels** | 2–32 | 4 | Discrete color levels per channel (2 = B&W, 4 = 64 colors in RGB mode) |
 | **Mode** | RGB / Luminosity / HSL | RGB | Quantization method |
 | **Smoothing** | 0–1 | 0 | Transition smoothness between levels (0 = hard steps) |
-| **Intensity** | 0–1 | 1.0 | Blend posterized result with original |
+| **Intensity** | 0–100 | 100 | Blend posterized result with original |
 | **Gamma** | 0.2–5 | 1.0 | Gamma curve before quantization |
 
 Colors: none.
@@ -219,17 +231,17 @@ Ordered dithering patterns for retro/print effects.
 | **Pattern** | Bayer / Noise / Blue Noise | Bayer | Dither algorithm |
 | **Pixel Size** | 1–50 | 1 | Upscaling factor for pattern (4 = 4x4 pixel groups) |
 | **Contrast** | 0–1 | 0.5 | Dither threshold intensity |
-| **Brightness** | -1 to 1 | 0 | Luminance offset before dithering |
+| **Brightness** | -100 to 100 | 0 | Luminance offset before dithering |
 | **Colors** | Custom / Original | Original | Two-color mode or preserve original colors |
 
-**Colors:** 2 (only visible in the UI when Colors is set to Custom; hidden when set to Original).
+**Color swatches:** two, shown only when the **Colors** parameter is set to Custom (hidden when set to Original).
 
-| Index | Purpose | Default |
-|-------|---------|---------|
-| 0 | Background/dark color | #1A1A2E |
-| 1 | Foreground/light color | #E8E8E8 |
+| Role | Default |
+|------|---------|
+| Background / dark color | #1A1A2E |
+| Foreground / light color | #E8E8E8 |
 
-When **Colors** is set to Custom, the filter maps luminance to the two selected colors. When set to Original (default), the dither pattern is applied to the source image colors directly and no color swatches are shown.
+When **Colors** is set to Custom, the filter maps luminance to the two selected colors. When set to Original (the default), the dither pattern is applied to the source colors directly and no swatches are shown.
 
 ### Presets
 
@@ -246,30 +258,29 @@ When **Colors** is set to Custom, the filter maps luminance to the two selected 
 
 ---
 
-## Adding Filters via Commands
+## Adding filters via the command palette
 
-Use the command palette (Cmd+Shift+P) to add filters by name:
+Open the command palette with Cmd+Shift+P and search for the filter name. Each command adds that filter as a new fill (with defaults) on the selected element:
 
-| Command | ID | Description |
-|---------|-----|-------------|
-| Add Noise / Grain | `add_noise_grain_fill` | Adds noise/grain filter fill with defaults |
-| Add Halftone | `add_halftone_fill` | Adds halftone filter fill with defaults |
-| Add Pixelate | `add_pixelate_fill` | Adds pixelate filter fill with defaults |
-| Add Duotone | `add_duotone_fill` | Adds duotone filter fill with defaults |
-| Add Posterize | `add_posterize_fill` | Adds posterize filter fill with defaults |
-| Add Dither | `add_dither_fill` | Adds dither filter fill with defaults |
-| Add Color Adjust | `add_color_adjust_fill` | Adds color adjust filter fill with defaults (see [effects.md](./effects.md#color-adjust-fill)) |
+| Command name | Command ID |
+|--------------|-----------|
+| Add Noise / Grain | `add_noise_grain_fill` |
+| Add Halftone | `add_halftone_fill` |
+| Add Pixelate | `add_pixelate_fill` |
+| Add Duotone | `add_duotone_fill` |
+| Add Posterize | `add_posterize_fill` |
+| Add Dither | `add_dither_fill` |
+| Add Color Adjust | `add_color_adjust_fill` (see [effects.md](./effects.md#color-adjust-fill)) |
 
 ---
 
-## General Notes
+## General notes
 
-- **No compact blueprint syntax**: Image filters (noise/grain, halftone, pixelate, duotone, posterize, dither) and Color Adjust cannot be authored in the `f[...]` blueprint compact form. Add via commands (above) or by setting fill type via the UI dropdown, then tune params via slider drags or the property inspector. After adding, parameters are stored as `ImageFilterData.params` (key/value floats) and `colors` (List<Color>).
-- **Underlying type**: All image filters are `PaintStyleType` values with `isImageFilter == true` (`noiseGrain`, `halftone`, `pixelate`, `duotone`, `posterize`, `dither`). Color Adjust is `PaintStyleType.colorAdjust` (not an image filter per `isImageFilter`, but lives in the same "Filters" UI category).
-- **Stable across zoom**: Filter patterns use logical coordinates (via a `uScale = dpr * zoomScale` shader uniform), so grain/dot/cell sizes remain consistent as you zoom in and out
-- **Export**: PNG/JPEG/WebP capture the filter at full quality. SVG and PDF pre-rasterize filters as embedded PNG images. Strokes with filter paint styles are also pre-rasterized for vector export.
-- **Stacking**: Multiple filters can be stacked on one element; each processes all fills below it (image filters are paint-style fills, so z-order is the fills-list order).
-- **Strokes**: All filters work identically on strokes (applied to the stroke's rendered area)
-- **Per-color alpha**: For filters with color inputs, each color's alpha controls its tint strength (contribution vs original), not output transparency. Halftone uses a custom alpha-packing scheme (single packed float for 6 alphas) to fit Metal's 31-uniform fragment shader limit.
-- **Blend mode**: Every image filter has a fill-level blend mode dropdown in the expanded view, controlling how the filter output composites with content below
-- **Token bindings**: Duotone and any filter with colors can bind individual color stops to design system tokens via `ImageFilterData.colorTokenRefs` / `colorOpacityTokenRefs`.
+- **Strokes too**: Every filter works identically when added to the Strokes list. It then reprocesses the stroke's rendered area instead of the fill area.
+- **Stacking**: Multiple filters can coexist on one element. Each reprocesses everything below it in the fills (or strokes) list, so the stacking order is just the fill order. Reorder by dragging fill rows.
+- **Blend mode**: Each filter row has a blend mode dropdown in its expanded config, controlling how the filter's output composites with the content below it.
+- **Stable across zoom**: Pattern sizes (grain, dots, cells) are measured in logical pixels, so they stay visually consistent as you zoom in and out.
+- **Per-color tint strength**: For filters with color swatches (Halftone, Duotone, Dither), each swatch's alpha controls how strongly that color tints the result versus showing the original image, not the output's transparency.
+- **Design token colors**: Filter color swatches can be bound to design system color tokens (so Duotone or Halftone colors follow the active brand/mode), the same way any fill color can. For token-authoring syntax, see the design-systems knowledge files.
+- **Authoring**: Image filters and Color Adjust have no compact authoring syntax in the Blueprint DSL. Add them through the UI type dropdown or the command palette commands above, then tune parameters by dragging the sliders or editing fields in the property inspector. For Blueprint authoring syntax in general, see the blueprint knowledge files.
+- **Export**: PNG, JPEG, and WebP capture filters at full quality. SVG and PDF export pre-rasterizes any element using a filter (fill or stroke) as an embedded raster image, since these effects cannot be expressed as vector primitives.

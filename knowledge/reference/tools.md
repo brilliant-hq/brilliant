@@ -3,11 +3,9 @@ name: "knowledge-tools"
 description: "Drawing, shape, and utility tools in Brilliant: Move/Scale/Hand, Pen, Pencil, Line, Arrow, Rectangle (fill/stroke), Circle (fill/stroke), Frame, Text, Snip. Shortcuts, modifiers, creation styles, and edit modes."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # Tools
 
-The `Tool` enum has 11 values: `move`, `hand`, `pen`, `pencil`, `line`, `arrow`, `rectangle`, `circle`, `frame`, `text`, `snip`. Rectangle and Circle each have a Fill variant and a Stroke variant (separate command IDs, same `Tool` value plus a `CreationStyle`). Scale mode is a flag layered on the Move tool, not a separate `Tool`.
+Brilliant has 11 tools: Move, Hand, Pen, Pencil, Line, Arrow, Rectangle, Circle, Frame, Text, Snip. Rectangle and Circle each have a Fill variant and a Stroke variant (separate commands and shortcuts that differ only in which creation style they set). Scale mode is a flag layered on the Move tool, not a separate tool.
 
 ## Tool Overview
 
@@ -24,7 +22,7 @@ The `Tool` enum has 11 values: `move`, `hand`, `pen`, `pencil`, `line`, `arrow`,
 | Rectangle (Stroke) | Shift+R | Stroke-only rectangle |
 | Circle (Fill) | O | Filled circle/ellipse |
 | Circle (Stroke) | Shift+O | Stroke-only circle/ellipse |
-| Frame | F | Parent container (`ParentType.frame`); auto-captures fully-contained siblings |
+| Frame | F | Parent container; auto-captures fully-contained siblings |
 | Text | T | Text element with inline editing |
 | Snip | S | Screen-region capture stored as an image-fill rectangle |
 
@@ -71,7 +69,7 @@ The default tool. Used for selecting, transforming, and direct-manipulation edit
 - Double-click a vector element to enter vector edit mode; double-click text to edit; double-click a boolean parent to enter boolean edit mode; double-click a mask parent to enter mask edit mode; Alt+double-click an element with a gradient fill shows gradient handles
 - Frames pass double-clicks through to their children (Figma behavior). Childless frames with an image fill are an exception and consume double-click for crop entry
 - Shift+Enter selects the parent of the current selection
-- Tab and Shift+Tab cycle siblings within the current parent
+- Tab and Shift+Tab cycle siblings within the current parent (plain Tab selects the previous sibling, Shift+Tab the next)
 
 ## Scale Mode (K)
 
@@ -110,7 +108,7 @@ Straight lines between two points. Shift snaps to 45 degree increments.
 
 ## Arrow Tool (Shift+L)
 
-A line with an end-cap arrowhead. Shift snaps to 45 degree increments. Start and end caps are independently configurable in the right toolbar (`StrokeCap2`): none, round, square, arrow, circle (filled dot marker).
+A line with an end-cap arrowhead. Shift snaps to 45 degree increments. Start and end caps are independently configurable in the right toolbar's stroke section: none, round, square, arrow, circle (filled dot marker).
 
 ## Rectangle Tool (R, Shift+R)
 
@@ -150,15 +148,15 @@ A cursor companion tooltip shows the handle name and live value while hovering o
 
 ## Frame Tool (F)
 
-Creates parent containers (`ParentType.frame`). New frames auto-capture sibling elements whose AABB is fully contained within the frame bounds, reparenting them with z-order preserved. Frames support fills, strokes, per-corner radius, layout grids, and `clipContent`. Shift while dragging produces a perfect square.
+Creates parent containers (frames). New frames auto-capture sibling elements whose bounding box is fully contained within the frame bounds, reparenting them with z-order preserved. Frames support fills, strokes, per-corner radius, layout grids, and clip-content (clip children to bounds). Shift while dragging produces a perfect square.
 
 Frame conversions:
 
 | Action | Shortcut | Result |
 |--------|----------|--------|
-| Group selection | Cmd+G | Wraps selection in a group (`ParentType.group`, always hug-sized) |
+| Group selection | Cmd+G | Wraps selection in a group (always hug-sized) |
 | Ungroup | Cmd+Shift+G | Removes the group, promoting children to its parent |
-| Frame selection | Cmd+F | Wraps selection in a frame (`ParentType.frame`) |
+| Frame selection | Cmd+F | Wraps selection in a frame |
 | Add auto layout | Shift+A | Wraps selection in an auto-layout frame (or converts a selected frame) |
 
 ## Text Tool (T)
@@ -176,7 +174,7 @@ Text styling lives in the right toolbar: family, weight, size, line height, lett
 
 ## Snip Tool (S)
 
-Captures a screen region as an image element. Drag to define the capture rectangle; Shift constrains to a square. The native macOS screen capture API is invoked with the snip preview rectangle hidden, so the screenshot does not include the marquee outline. The captured image is stored in the per-canvas image cache and embedded as a `PaintStyle.image` fill on a new rectangle element (no stroke). After capture, the tool auto-reverts to Move and the new element is selected. Snip has no dedicated bottom-toolbar button; invoke it with S or via the command palette.
+Captures a screen region as an image element. Drag to define the capture rectangle; Shift constrains to a square. The native macOS screen capture is invoked with the snip preview rectangle hidden, so the screenshot does not include the marquee outline. The captured image becomes an image fill on a new rectangle element (no stroke). After capture, the tool auto-reverts to Move and the new element is selected. Snip is macOS-only, has no dedicated bottom-toolbar button, and is invoked with S or via the command palette.
 
 ## Creation Style
 
@@ -198,7 +196,7 @@ Combine selected vector/shape elements into a single boolean parent. Operations 
 
 ## Masks
 
-Use a vector or shape as a mask for sibling elements. The topmost element (last in z-order, `childIds.last`) becomes the mask shape and clips the siblings below it.
+Use a vector or shape as a mask for sibling elements. The topmost element (last in z-order) becomes the mask shape and clips the siblings below it.
 
 | Action | Shortcut | Effect |
 |--------|----------|--------|
@@ -209,4 +207,4 @@ Mask types are configurable per-mask in the right toolbar: vector (default), alp
 
 ## Outline Text
 
-Cmd+Ctrl+O (macOS only) converts a selected text element into a **group** containing one vector element per glyph (each character becomes its own editable vector inside the group). To get a single compound vector instead, use **Flatten Text** (Cmd+Alt+O) or **Flatten** (Cmd+Enter).
+**Outline Text** converts a selected text element into a **group** containing one vector element per glyph (each character becomes its own editable vector inside the group). Shortcut Cmd+Ctrl+O on macOS; on Windows the chord is disabled (it collides), so reach it via the menu, command palette, or context menu. To get a single compound vector instead, use **Flatten Text** (Cmd+Alt+O) or **Flatten** (Cmd+Enter). Outline/Flatten Text work on both macOS and Windows.

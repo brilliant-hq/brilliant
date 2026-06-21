@@ -3,8 +3,6 @@ name: "knowledge-ui"
 description: "All UI panels in Brilliant: top toolbar, left toolbar, right toolbar, bottom toolbar, command palette, color picker, code editor, Claude Code chat, combos, and context menus."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # UI Panels
 
 ## Top Toolbar
@@ -115,7 +113,7 @@ Render order in `_buildContentView` (`right_toolbar_view.dart`): Design System, 
 
 **Layout Grid Section**: Layout grid editor for frames. Three grid types: Grid (uniform cells), Columns, Rows. Per-grid: visibility toggle, color swatch, expand toggle for properties (count, gutter, margin, alignment, span), and remove button.
 
-**Export Section**: Multi-config export panel. Each config row: format dropdown (PNG, JPEG, WebP, SVG, PDF, MP4, MOV, Replay; the Replay row also shows a separate `replayContainer` dropdown that picks MP4 or MOV), resolution preset (Original 1x/2x/3x/4x, 720p, 1080p, 1440p, 4K, 8K, Portrait Post · IG, FB, Square Post · IG, X, Story / Reel · IG, TikTok, iPhone 16 Pro, MacBook Pro 14", Custom; vector formats hide the resolution row), expand for advanced (width/height with constrain proportions, fit mode = Fit/Fill/Stretch/Repeat, background, plus video duration / FPS / codec / quality and replay-specific pacing/intro for video and replay rows), and remove. Add multiple configs with `+` to export several formats in one click. The right-toolbar UI does NOT expose JPEG-quality, WebP-quality, or WebP-lossless toggles: those are only reachable via the MCP `export` tool.
+**Export Section**: Multi-config export panel. Each config row: format dropdown (PNG, JPEG, WebP, SVG, PDF, HTML, React, MP4, MOV, Replay; MOV is hidden on Windows). The HTML entry exposes a second dropdown to pick the variant (Page = standalone document, Snippet, Flexbox). The Replay row shows a separate `replayContainer` dropdown that picks MP4 or MOV. Resolution preset (Original 1x/2x/3x/4x, 720p, 1080p, 1440p, 4K, 8K, Portrait Post · IG, FB, Square Post · IG, X, Story / Reel · IG, TikTok, iPhone 16 Pro, MacBook Pro 14", Custom; vector and markup formats hide the resolution row). Expand for advanced (width/height with constrain proportions, fit mode = Fit/Fill/Stretch/Repeat, background, PDF multi-page toggle, plus video duration / FPS / codec / quality and replay-specific pacing/intro for video and replay rows). Add multiple configs with `+` to export several formats in one click. The right-toolbar UI does NOT expose JPEG-quality, WebP-quality, or WebP-lossless toggles: those are only reachable via the MCP `export` tool.
 
 **Figma Import Section**: Figma file URL import. Visible only when nothing is selected and the Move tool is active (same condition as Canvas Section).
 
@@ -193,7 +191,7 @@ Inline after the tool buttons (separated by a divider). Width is 320 px. Press *
 
 A collapse/expand chevron toggles the input. When collapsed, only the connection indicator and the expand chevron remain. When the AI chat panel is open with an active session, the bottom toolbar shows the connection indicator instead of the full input (the chat input lives in the panel above).
 
-The connection indicator opens a hover-menu listing six providers in this order: Claude Code, Anthropic, OpenAI, Google, OpenRouter, Quiver. Anthropic / OpenAI / Google / OpenRouter are chat providers. Quiver is an SVG generation provider (text-to-SVG and raster-to-SVG vectorization). Each row shows a green dot when credentialed and a dim icon when not. Clicking an unconnected row inline-prompts for the API key in the AI input field; clicking a connected row removes that key. Esc cancels.
+The connection indicator is a small check-circle (connected) / x-circle (not connected) dot. **Click it** to jump straight to Settings -> AI Providers (Cmd+, then the AI Providers page), which is where all API keys are managed. **Hover** it to see a display-only popup of per-provider status: Claude Code, Anthropic, OpenAI, Google, OpenRouter, Quiver (plus a "Playground mode" row first when playground replay is the active path). Anthropic / OpenAI / Google / OpenRouter are chat providers; Quiver is an SVG generation provider (text-to-SVG and raster-to-SVG vectorization). Each row shows a green check when credentialed and a dim icon when not. The popup rows are status-only: they do not accept key input. The dot reads connected (green) if the Claude CLI is installed, any chat provider has credentials, or a replay/playground path is active.
 
 While agents are running, one small `AgentActivityIndicator` bar per processing session appears at the right end of the toolbar. The submit button switches to a stop button while the user's request is processing; if the AI returns a "command not recognized" response a brief `?` indicator is shown instead. See `ai.md` for the full AI feature reference.
 
@@ -282,7 +280,7 @@ Tabs sit inline in the bottom toolbar after the tool buttons (sessions occupy th
 - Drag tabs to reorder; horizontal scrolling kicks in once the row exceeds available width
 - Double-click a tab to rename (Esc to cancel)
 - X to close
-- Minimized session width 150 px; expanded session width 400 px (clamped 160–640 px)
+- Minimized session tabs collapse to a compact width; expanding a session opens the resizable chat panel (width clamped 300–1200 px)
 - Cmd+1..9, Cmd+0 jump to and expand session 1..10
 - Cmd+Shift+] / Cmd+Shift+[ cycle between sessions
 - Cmd+W closes the focused chat
@@ -297,7 +295,7 @@ Tabs sit inline in the bottom toolbar after the tool buttons (sessions occupy th
 
 ### Resize
 
-- **Width per session:** clamped 160–640 px (default 400 px, minimized 150 px). The chat panel honors a per-session minimum width returned by `AIChatManager.minAiChatWidth` (e.g., the Claude Code setup onboarding raises this floor temporarily).
+- **Width:** drag the side edge to resize the chat panel; width is clamped to 300–1200 px. The chat panel honors a per-session minimum width returned by `AIChatManager.minAiChatWidth` (e.g., the Claude Code setup onboarding raises this floor temporarily).
 - **Height:** drag the top edge of the panel.
 
 ---
@@ -347,11 +345,11 @@ Combos persist across sessions (stored in `~/.config/brilliant/combos.json`).
 
 ## Context Menus
 
-**Right-click on element** (in order): Select This Item + Add to Selection (if not already selected), Cut, Copy, Copy as (PNG, PNG @2x, PNG @4x, SVG, CSS, YAML, Blueprint), Paste, Duplicate, Delete, Rename, Group/Ungroup/Add Auto Layout + Operations submenu (Union, Subtract, Intersect, Exclude, Mask) when 2+ elements, Component submenu (Create Component, Create Instance, Detach Instance, Go to Master, Reset Overrides, Push Overrides to Master) when applicable, Arrange (Bring to Front, Bring Forward, Send Backward, Send to Back), Align & Transform (for multi-selection: Align Left/Right/Top/Bottom, Align Horizontally/Vertically, Distribute Horizontally/Vertically; always: Flip Horizontally/Vertically, Scale Up/Down, Fit to Parent), Select Parent (for nested elements), Toggle Clip Content (for frames), Export as (PNG, PNG @2x, PNG @4x, SVG), Text submenu (for text elements: Bold, Italic, Underline, Align Text Left/Center/Right, Size Auto Size/Auto Height/Fixed Size, Switch Font), View (Zoom to Elements, Center on Elements).
+**Right-click on element** (in order): Select This Item + Add to Selection (if not already selected), Cut, Copy, Copy as (PNG, PNG @2x, PNG @4x, WebP, SVG, HTML, React, CSS, YAML, Blueprint), Send to (Figma; enabled only when the Figma plugin is paired), Paste, Duplicate, Delete, Rename, Group/Ungroup/Add Auto Layout + Operations submenu (Union, Subtract, Intersect, Exclude, Mask) when 2+ elements, Component submenu (Create Component, Create Instance, Detach Instance, Go to Master, Reset Overrides, Push Overrides to Master) when applicable, Arrange (Bring to Front, Bring Forward, Send Backward, Send to Back), Align & Transform (for multi-selection: Align Left/Right/Top/Bottom, Align Horizontally/Vertically, Distribute Horizontally/Vertically; always: Flip Horizontally/Vertically, Scale Up/Down, Fit to Parent), Select Parent (for nested elements), Toggle Clip Content (for frames), Export as (PNG, PNG @2x, PNG @4x, SVG, Replay), Text submenu (for text elements: Bold, Italic, Underline, Align Text Left/Center/Right, Size Auto Size/Auto Height/Fixed Size, Switch Font), View (Zoom to Elements, Center on Elements).
 
 **Right-click with selection** (items selected, click on selected element): Shows "[N] items selected" header, then same structure as element menu but operating on the full selection. Includes Canvas submenu (Toggle Background, Whiteboard, Blackboard, Toggle Alignment Guides).
 
-**Right-click on empty canvas**: Paste, Select All, Create submenu (Text, Rectangle, Circle, Line, Arrow, Pencil, Frame), Canvas submenu (Toggle Background, Whiteboard, Blackboard, Toggle Alignment Guides, Clear All Elements), Import..., Export as (PNG, PNG @2x, PNG @4x, SVG).
+**Right-click on empty canvas**: Paste, Select All, Create submenu (Text, Rectangle, Circle, Line, Arrow, Pencil, Frame), Canvas submenu (Toggle Background, Whiteboard, Blackboard, Toggle Alignment Guides, Clear All Elements), Import..., Export as (PNG, PNG @2x, PNG @4x, SVG, Replay).
 
 **File explorer right-click on files**: Open, Rename, Cut, Copy, Paste, Duplicate, Delete, Reveal in Finder, Copy Filename, Copy Relative Path, Copy Absolute Path.
 

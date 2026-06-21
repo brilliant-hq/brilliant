@@ -24,42 +24,42 @@ Set the mode in the right toolbar's **image fill** or **image stroke** section v
 
 | Method | Behavior |
 |--------|----------|
-| **Double-click** an element with an image fill | Enters crop on the topmost image fill (or the focused fill if one is currently focused in the right toolbar). For childless parent frames with image fills, double-click also enters crop. Requires Move tool active. |
-| **Enter** key on a selected non-parent element with an image fill | Routes through `EnterCommand`. Uses the focused fill if any. **Does NOT enter crop on parent frames** (`EnterCommand` returns early for `ElementType.parent`). For childless image-fill frames, use double-click instead. |
-| **Scale Mode dropdown** Crop | Auto-enters crop on that fill or stroke when exactly one element is selected and exactly one fill is targeted in the dropdown context |
+| **Double-click** an element with an image fill | Enters crop on the topmost image fill (or the focused fill, if one is currently focused in the right toolbar). For childless parent frames with image fills, double-click also enters crop. Requires the Move tool (V) active. |
+| **Enter** key on a selected non-parent element with an image fill | Enters crop on the focused fill, or the topmost image fill. **Does NOT enter crop on parent frames** (Enter never enters crop on frames). For childless image-fill frames, use double-click instead. |
+| **Scale Mode dropdown -> Crop** | Auto-enters crop on that fill or stroke when exactly one element is selected |
 
 When entering crop mode:
 - The element is selected
-- If the current scale mode is not already Crop, it is auto-converted to Crop. Crop data is initialized to **cover-mode corners** computed from element/image aspect ratios via `_ensureCoverModeCropData()` (visual stays the same)
+- If the current scale mode is not already Crop, it is auto-converted to Crop. The crop is initialized to cover the element (visual stays the same)
 - The crop overlay appears (ghost image + container brackets at corners and edge midpoints)
-- An undo entry is registered. When undone, the element reverts to its pre-entry state and exits crop mode
+- An undo entry is registered. Undoing it reverts the element to its pre-entry state and exits crop mode
 
 **Element type rules (double-click):**
 - Rectangle / circle with an image fill (or image stroke) enters crop
-- **Childless parent frame** with an image fill enters crop (used as clipped image container)
+- **Childless parent frame** with an image fill enters crop (used as a clipped image container)
 - Text element enters text editing mode (NOT crop) even if it has an image fill
 - Vector enters vector editing mode (NOT crop) even if it has an image fill
-- **Frame with children** drills into children (NOT crop). Only **childless** frames with an image fill enter crop
+- **Frame with children** drills into its children (NOT crop). Only **childless** frames with an image fill enter crop
 
 **Element type rules (Enter key):**
-- Same as double-click EXCEPT parent frames are skipped entirely (no crop entry, no children drill-down via `EnterCommand`)
+- Same as double-click EXCEPT parent frames are skipped entirely (no crop entry, no children drill-down)
 
 ## Exiting Crop Mode
 
 | Action | Result |
 |--------|--------|
-| **Enter** | Exit via `EnterCommand` (each operation registered its own undo, so individual steps can still be undone afterward) |
-| **Escape** | Exit via `EscapeCropCommand` (gated on `editingModeIsCrop`, command palette closed) |
+| **Enter** | Exit (each crop operation registered its own undo, so individual steps can still be undone afterward) |
+| **Escape** | Exit (only while in crop mode and the command palette is closed) |
 | **Click outside the element** (mouseup, no drag) | Exit |
-| **Double-click anywhere** | Exit (top-priority case in the double-tap handler) |
+| **Double-click anywhere** | Exit |
 | **Change scale mode** to Fill / Fit / Repeat | Exit (then mode change applied) |
 | Canvas switch, repo switch, studio/overlay switch | Auto-exit (state cleared) |
 | Delete the cropped element | Auto-exit before deletion |
-| Undo/redo invalidates crop state (element deleted, fill removed, scale mode changed) | Auto-exit via `validateState()` |
+| Undo/redo that invalidates crop state (element deleted, fill removed, scale mode changed) | Auto-exit |
 
 ## Crop Interactions
 
-Crop mode handle hit-testing and image pan require the **Move tool (V)** to be active. With the pen, hand, or other tools selected, crop handles are bypassed entirely (the drag start branch is gated on `currentTool == Tool.move`).
+Crop mode handle hit-testing and image pan require the **Move tool (V)** to be active. With the pen, hand, or other tools selected, crop handles are bypassed entirely.
 
 Crop mode provides two layers of handles: **container handles** (visible blue L-brackets at the corners + short edge mid-line marks) and **image handles** (invisible hit zones overlaid on the image area).
 
@@ -108,53 +108,54 @@ When zones overlap, the priority order is:
 | **Blue L-brackets** | At element corners, marking the container boundary |
 | **Blue edge mid-lines** | Short lines at edge midpoints (visual hint; full edge is interactive) |
 
-Bracket arms scale inversely with zoom (`14.0 / zoomScale`), edge lines `12.0 / zoomScale`, stroke width `5.0 / zoomScale`. Image-resize, image-rotation, and container-rotation handles are **invisible hit-test zones** with no rendering.
+Bracket arms and edge marks keep a constant on-screen size at any zoom. Image-resize, image-rotation, and container-rotation handles are **invisible hit-test zones** with no rendered marker.
 
-For nested elements (image inside a frame), the overlay applies the parent's world transform so handles render at correct world-space positions.
+For nested elements (image inside a frame), the overlay follows the parent's transform so handles render at the correct world-space positions.
 
 ## Crop Compensation
 
-Crop compensation adjusts crop corners so the image's world-space position stays fixed when the element changes geometry. It uses point-based remapping: each crop corner goes from old element unit-square → parent-local → new element unit-square.
+Crop compensation keeps the image's world-space position fixed when the element changes geometry, instead of stretching the image with the container.
 
 | Trigger | What happens | Modifier needed |
 |---------|--------------|-----------------|
-| Resize / rotate **container** while in crop mode | Crop data of the actively edited fill/stroke compensates automatically | (none: automatic) |
-| Resize element **outside crop mode** | Crop data of all image fills compensates so each image stays fixed in world space | **Cmd held** |
-| Rotate element **outside crop mode** | NO compensation (image rotates with the element) | n/a |
+| Resize / rotate the **element (container)** while in crop mode | The image being cropped stays fixed in world space automatically | (none: automatic) |
+| Resize an element **outside crop mode** | Every image fill stays fixed in world space | **Cmd held** (Ctrl on Windows/Linux) |
+| Rotate an element **outside crop mode** | NO compensation (the image rotates with the element) | n/a |
 | Repeat scale mode | NEVER compensated; tiling is resolution-based | n/a |
 
-**Outside-crop-mode behavior with Cmd held:**
-- Works for **fill, fit, and crop** modes (not repeat)
-- For fill / fit, the image is auto-converted to crop mode with equivalent corners (`coverMode` for fill, `fitMode` for fit) before compensation
-- Outside crop mode, only **image fills** are compensated; image strokes are not
-- Inside crop mode, the actively edited fill or stroke (per `_cropEditingIsStroke`) is compensated; other crop fills on the same element are not
+**Outside-crop-mode behavior with Cmd held (Ctrl on Windows/Linux):**
+- Works for **Fill, Fit, and Crop** modes (not Repeat)
+- For Fill / Fit images, the mode is auto-converted to Crop with equivalent framing before compensation
+- Only **image fills** are compensated outside crop mode; image strokes are not
 
-Without Cmd held, resizing outside crop mode scales the image with the container (Figma default).
+Without that modifier held, resizing outside crop mode scales the image with the container (the Figma default).
+
+> Note: the command modifier is **Cmd on macOS, Ctrl on Windows/Linux**. On Windows/Linux this is the same key used for proportional image resize (Shift/Ctrl), so resizing the element with Ctrl held compensates the image fill rather than resizing the image inside crop mode.
 
 ## Supported Elements
 
-- **Rectangle, circle**: image fills enter crop on double-click. Image strokes enter crop only via the stroke section's Scale Mode dropdown or by focusing the stroke first (double-click with no focused fill picks the topmost image **fill** only)
-- **Vector**: image fills / strokes supported for rendering, but vectors **never** enter crop on Enter / double-click (they always go to vector editing). Enter crop via the Scale Mode dropdown
-- **Text**: image fills supported for rendering; Enter/double-click always goes to text editing. Enter crop via the Scale Mode dropdown
-- **Childless parent frames** with image fills: double-click enters crop (used as clipped image containers). Enter key does NOT (parent type is short-circuited in `EnterCommand`)
+- **Rectangle, circle**: image fills enter crop on double-click or Enter. Image strokes enter crop via the stroke section's Scale Mode dropdown (double-click with no focused fill picks the topmost image **fill** only)
+- **Vector**: image fills / strokes render, but vectors **never** enter crop on Enter / double-click (they always go to vector editing). Enter crop via the Scale Mode dropdown
+- **Text**: image fills render, but Enter / double-click always goes to text editing. Enter crop via the Scale Mode dropdown
+- **Childless parent frames** with image fills: double-click enters crop (used as clipped image containers). Enter does NOT enter crop on frames
 - **Parent frames with children**: drill into children on Enter / double-click; cannot enter crop directly
 
 ## Undo
 
-Crop mode operations register granular undo entries:
+Crop mode registers granular undo entries:
 
-- Entering crop mode registers one undo (reverts to pre-entry state AND exits crop mode). Redo re-applies the post-entry state but does NOT re-enter crop mode (mirrors text edit pattern)
-- Each pan / image resize / image rotate registers its own undo via `_registerCropOperationUndo()` ("Pan Crop Image", "Resize Crop Image", "Rotate Crop Image")
-- Container resize / rotate during crop mode use the regular resize/rotate undo system (not crop's). After such operations, `updateCropOriginalElement()` advances `_cropOriginalElement` so subsequent crop edits see the new baseline
+- Entering crop mode registers one undo (reverts to the pre-entry state AND exits crop mode). Redo re-applies the post-entry state but does NOT re-enter crop mode
+- Each pan / image resize / image rotate registers its own undo ("Pan Crop Image", "Resize Crop Image", "Rotate Crop Image")
+- Container resize / rotate during crop mode use the regular resize/rotate undo, so each becomes its own undo step
 
-`Cmd+Z` undoes one operation at a time. To revert all in-progress crop edits, undo until the "Enter Crop Mode" entry is consumed (which exits crop mode and restores the element).
+Undo (`Cmd+Z`, or `Ctrl+Z` on Windows/Linux) undoes one operation at a time. To revert all in-progress crop edits, undo until the "Enter Crop Mode" entry is consumed (which exits crop mode and restores the element).
 
 ## Tips
 
 - Start with **Fill** mode for cover-style imagery; switch to **Crop** only for fine positioning
 - Use **Fit** for logos and icons that must be fully visible
 - Hold **Shift** (or Ctrl) while dragging an image resize handle to keep aspect ratio
-- **Cmd+resize** outside crop mode preserves the image's world-space position (auto-converts fill/fit to crop with equivalent crop data)
+- **Cmd+resize** (Ctrl+resize on Windows/Linux) outside crop mode preserves the image's world-space position (auto-converts fill/fit to crop with equivalent crop data)
 - Image strokes accept the same scale modes and crop interactions as image fills
 
 ---

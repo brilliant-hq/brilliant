@@ -3,8 +3,6 @@ name: "knowledge-canvas"
 description: "Canvas navigation, zoom, pan, snap guides, background modes, and display options in Brilliant."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # Canvas
 
 ## Zoom
@@ -88,18 +86,18 @@ Press and drag the middle mouse button to pan. This temporarily swaps to the Han
 
 ## Coordinate Spaces
 
-The canvas has four nested coordinate systems. AI tools working with positions need to know which space they are in.
+The canvas has four nested coordinate systems. Understanding which space a coordinate lives in matters when reasoning about positions.
 
 | Space | What it is | Where it shows up |
 |-------|-----------|-------------------|
 | **Screen** | Raw pointer pixel coordinates from the OS | Pointer events, before any transform |
 | **World** | Absolute canvas coordinates, after inverse zoom transform | Hit testing input, rendering output, marquee rects |
-| **Parent-local** | Position relative to the element's parent frame | `element.points`, `element.aabb`, the values you set via MCP `create_modify_elements` |
+| **Parent-local** | Position relative to the element's parent frame | An element's stored X/Y position and bounds |
 | **Element-local** | Geometry inside an element's own frame | Vector path nodes, internal text layout |
 
-Stored element coordinates (`x`, `y`, `width`, `height` in blueprint, `points` / `aabb` internally) are **parent-local**. Top-level elements live under a synthetic root parent, so for top-level elements parent-local equals world.
+An element's stored X/Y/width/height are **parent-local**: relative to the frame that contains it. Top-level elements live under a synthetic root parent, so for top-level elements parent-local equals world. A child inside a rotated frame sits in a rotated parent-local space, so its world bounds are computed by rotating about the frame center.
 
-`lookup` returns blueprint coordinates that are parent-local. To position an element in world space, account for its ancestor chain. Frames have rotation, so a rotated frame's children sit in a rotated parent-local space (their world bounds are computed by rotating about the frame center).
+The position shown in the right toolbar's X/Y fields is parent-local (relative to the selected element's parent frame).
 
 ## Selection and Hit Testing
 
@@ -137,8 +135,8 @@ Drag on empty canvas to draw a selection rectangle. Rules:
 
 | Key | Action |
 |-----|--------|
-| Tab | Select previous sibling (within the current parent's children) |
-| Shift+Tab | Select next sibling |
+| Tab | Select previous sibling (within the current parent's children, wrapping around). With nothing selected, selects the first top-level element. |
+| Shift+Tab | Select next sibling (within the current parent's children, wrapping around). With nothing selected, selects the last top-level element. |
 | Shift+Enter | Select parent of the current selection (Enter dives into a parent) |
 | Cmd+A | Select all (within the focused parent context) |
 | Escape | Clear selection (when no other Escape target consumes the event first) |
@@ -176,18 +174,18 @@ Both nudge variants register undo and respect per-parent constraints.
 
 ## Blend Modes
 
-Brilliant supports blend modes at four scopes: element, fill, stroke, and effect. All default to `normal` (`srcOver`).
+Brilliant supports blend modes at four scopes: element, fill, stroke, and effect. All default to Normal.
 
-| Scope | Property (blueprint) | What it composites |
-|-------|----------------------|--------------------|
-| Element | `blendMode` on the element | Entire element (all fills + strokes + effects) against the canvas underneath |
-| Fill | `blendMode` on a fill entry | This single fill against the canvas underneath |
-| Stroke | `blendMode` on a stroke entry | This single stroke against the canvas underneath |
-| Effect | `blendMode` on a drop shadow / outer glow / element blur. Inner shadow and inner glow each have their own `blendMode` in their data (inner glow defaults to `screen`). | Per-effect output |
+| Scope | Where to set it | What it composites |
+|-------|-----------------|--------------------|
+| Element | Blend-mode dropdown in the right toolbar's element/canvas section (next to opacity) | Entire element (all fills + strokes + effects) against the canvas underneath |
+| Fill | Blend-mode control on a fill row (right toolbar Fill section) | This single fill against the canvas underneath |
+| Stroke | Blend-mode control on a stroke row (right toolbar Stroke section) | This single stroke against the canvas underneath |
+| Effect | Blend-mode dropdown on a drop shadow / outer glow / element blur (right toolbar Effects section). Inner shadow and inner glow carry their own blend mode (inner glow defaults to Screen). | Per-effect output |
 
-Element-level blend mode wraps the whole element in a single composite layer so its fills, strokes and effects composite normally with each other first, then the unit blends against the canvas. Fill/stroke/effect modes are independent and apply only to their own render pass.
+Element-level blend mode wraps the whole element in a single composite layer so its fills, strokes and effects composite normally with each other first, then the unit blends against the canvas. Fill, stroke, and effect modes are independent and apply only to their own render pass.
 
-Supported modes (16): `normal` (srcOver), `darken`, `multiply`, `colorBurn`, `lighten`, `screen`, `colorDodge`, `overlay`, `softLight`, `hardLight`, `difference`, `exclusion`, `hue`, `saturation`, `color`, `luminosity`. Same set exports cleanly to SVG (`mix-blend-mode`) and PDF.
+Supported modes (16): Normal, Darken, Multiply, Color Burn, Lighten, Screen, Color Dodge, Overlay, Soft Light, Hard Light, Difference, Exclusion, Hue, Saturation, Color, Luminosity. The same set exports cleanly to SVG (`mix-blend-mode`) and PDF.
 
 ## Rendering Performance
 
@@ -316,7 +314,7 @@ Overlay mode is **opt-in**. Until the user enables it (Settings: "Overlay Mode")
 | Toggle left toolbar | Cmd+Shift+Left | |
 | Toggle right toolbar | Cmd+Shift+Right | |
 | Toggle bottom toolbar | Cmd+Shift+Down | |
-| Toggle desktop icons | Ctrl+I | Hide macOS desktop icons (overlay use case) |
+| Toggle desktop icons | Ctrl+I | macOS-only; currently a no-op placeholder (reserves the chord) |
 | Clear all elements | C | Removes all elements from the active canvas (undoable) |
 
 Passthrough mode is overlay-only. In overlay mode, Cmd+\ produces a clean transparent drawing surface for annotation or tracing.

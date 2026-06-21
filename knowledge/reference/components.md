@@ -3,8 +3,6 @@ name: "knowledge-components"
 description: "Component system in Brilliant: masters, instances, overrides, syncing, and detaching."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # Components
 
 Components let you create reusable design elements. A **master component** defines the source of truth, and **instances** are linked copies that stay in sync with the master while allowing per-instance overrides.
@@ -16,7 +14,7 @@ Components let you create reusable design elements. A **master component** defin
 | **Master component** | The original frame that defines the component. Changes to the master propagate to all instances. |
 | **Instance** | A linked copy of a master. Inherits all properties from the master unless overridden. |
 | **Override** | A property change on an instance that differs from the master. Overrides are preserved during sync. |
-| **Slot** | A child inside an instance whose subtree is fully owned by the instance (sync skips it). |
+| **Slot** | A child inside a component whose subtree is fully owned by each instance (sync skips it). Slots can only be designated through blueprint authoring; there is no by-hand UI to mark an element as a slot. |
 
 ## Creating a Component
 
@@ -61,9 +59,9 @@ You can also create instances at a specific position programmatically.
 
 | Visual | Meaning |
 |--------|---------|
-| Purple frame label | Element is a component master or instance root |
+| Purple frame label | Element is a component master or instance root (and elements inside a component also render their label purple) |
 | Purple selection chrome | Element is part of a component (master or instance) |
-| Diamond glyph in frame label | Master vs instance distinguished by fill (filled = master, outlined = instance) |
+| `◆` prefix on the frame label | Component master only. Instances get the purple label color but NO diamond prefix on canvas; the master/instance distinction is shown in the layers panel icon, not the canvas label. |
 
 ### Layers Panel
 
@@ -213,7 +211,7 @@ How it works:
 
 Brilliant components are a master/instance system with property overrides, slots, and cross-canvas references. The following Figma-style concepts are NOT currently in Brilliant:
 
-- **Swap Instance.** There is no swap-instance UI or command. To switch an instance to a different master, detach and recreate, or edit the blueprint to change `inst(#ref)`.
+- **Swap Instance.** There is no swap-instance UI or command. To switch an instance to a different master, detach it and create a fresh instance of the other master.
 - **Components panel / page.** There is no left-toolbar Components panel and no separate "Components" canvas type. Masters live as regular frames on a canvas; you can keep them on a dedicated canvas by convention and reference them across canvases.
 - **Per-property override badges in the inspector.** There is no inspector chip or label that flags which individual property is overridden. Overrides are tracked internally and used by sync, but the only visible component chrome is the purple frame label and the diamond icon (filled = master, outline = instance).
 - **Component variants / props** (no boolean props, enum variants, or variant matrices). Instead, create separate master components or rely on overrides
@@ -241,67 +239,9 @@ Brilliant components are a master/instance system with property overrides, slots
 | Instance child not syncing | Child is marked as a slot | Slots are owned by the instance; edit directly |
 | Cannot drop element into component instance | Reparent guard rejects the drop | Drop into a `slot`-marked subtree, or detach the instance first |
 
-## Creating Components via Blueprint
+## Authoring Components via Blueprint
 
-Components and instances can be created in blueprint syntax using the `comp`, `inst(#ref)`, and `slot` keywords.
+Components, instances, slots, and per-instance overrides can also be authored programmatically (the AI's blueprint path) rather than by hand on the canvas. The hand-driven flows above and the blueprint flows produce the same data: a master created in blueprint can be instanced and overridden by hand, and vice versa. For the blueprint authoring syntax (the `comp` / `inst` / `slot` / override keywords and cross-canvas referencing), see the blueprint knowledge files. Do not author that syntax from this reference.
 
-### Component Master
-
-Add the `comp` bare flag to create a component master:
-
-```
-al(h,x(c),y(c),g($spacing.sm),pad($spacing.md,$spacing.lg)) s(hug,hug) f[($slate.faint),(f2,inner($color.shadow,o($visibility.faint),x(2),y(2),blur(4))),(f3,inner($neutral.hint,o($visibility.mid),x(-1),y(-1),blur(2)))] rd($radius.md) shadow($color.shadow,o($visibility.faint),y(1),blur(2)) shadow($color.shadow,o($visibility.faint),y(4),blur(12)) comp #btn "Button"
-  svg(icon:sparkle) s(16,16) f[($slate.bold)] "Icon" #btn_icon
-  t("Get Started",$font.family,$font.size.sm,sb) f[($slate.intense)] "Label" #btn_label
-```
-
-**What happens:**
-- The frame is created with all its children
-- `createComponentFromFrame()` is called to establish it as a master
-- Children marked with `slot` get `isSlot: true` on their `ChildComponentData`
-
-### Component Instance
-
-Use `inst(#ref)` to create an instance of an existing component master. Override children by `#ref`:
-
-```
-inst(#btn) p(300,100) f[($indigo.faint),(f2,inner($color.shadow,o($visibility.faint),x(2),y(2),blur(4))),(f3,inner($neutral.hint,o($visibility.mid),x(-1),y(-1),blur(2)))]
-  override(#btn_icon) svg(icon:rocket) f[($indigo.bold)]
-  override(#btn_label) t("Launch") f[($indigo.intense)]
-```
-
-**What happens:**
-- The system finds the component master by ID (or name)
-- A linked instance is created at the specified position
-- Indented children are treated as overrides:
-  - Named children match against the instance's existing children by name
-  - Property changes are applied as overrides
-  - Slot children can have new content injected
-
-### Cross-Canvas Instances in Blueprint
-
-To create an instance of a master that lives on a different canvas, pass the canvas path as a second argument with `canvas(...)`:
-
-```
-inst(#btn, canvas(components.design)) p(300,100)
-  override(#btn_label) t("Launch")
-```
-
-The path is relative to the current canvas's location in the project.
-
-### Slots
-
-Mark a child with the `slot` bare flag to designate it as instance-owned content:
-
-```
-al(v,g($spacing.md),pad($spacing.lg)) s(320,hug) f[($color.surface)] rd($radius.md) comp #card "Card"
-  t("Card Title",$font.family,$font.size.xl,b) s(fill,hug) f[($color.text.primary)] "Header"
-  fr s(fill,hug) slot "Content"
-```
-
-Slot children are skipped during sync: instances fully own their slot content. This allows each instance to have completely different content in the slot area while keeping the rest of the component in sync with the master.
-
-Adding to a slot **appends** — it does not clear what is already there. Only the first fill of a never-touched slot replaces the master's seed content; every add after that (whether by parenting into the slot or re-opening a slot block on the instance) stacks on top. To swap a slot's contents, delete the existing slot children first, then add the new ones. (If you re-fill a slot and end up with duplicates, this is why.)
-
-> **See also:** [knowledge/FRAMES.md](./FRAMES.md) for parent types, auto layout, and nesting
-> **See also:** [knowledge/EDITING.md](./EDITING.md) for selection and navigation within component hierarchies
+> **See also:** [frames.md](./frames.md) for parent types, auto layout, and nesting
+> **See also:** [editing.md](./editing.md) for selection and navigation within component hierarchies

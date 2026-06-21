@@ -3,31 +3,27 @@ name: "knowledge-layout-guides"
 description: "Column, row, and grid layout guides for alignment and snap targets in frames."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # Layout Guides
 
-Layout guides (a.k.a. layout grids, stored in `ParentData.layoutGrids` as `List<LayoutGrid>`) are visual overlays on parent elements that double as **snap targets** for elements moved or resized inside the parent. Only parent elements (frames, groups, auto layout, masks, booleans) carry layout guides; the Layout Guides section in the right toolbar appears whenever any parent is selected.
+Layout guides (also called layout grids) are visual overlays on parent elements that double as **snap targets** for elements moved or resized inside the parent. Only parent elements (frames, groups, auto layout, masks, booleans) carry layout guides. The **Layout Guides** section in the right toolbar appears whenever any parent is selected. Each parent keeps its own list of guides, and a parent can hold any number of guides in any mix of types.
 
 ## Types
 
 | Type | Description | Use Case |
 |------|-------------|----------|
-| **Grid** | Uniform pixel grid (graph paper) | Pixel-level alignment. Default size 10 |
+| **Grid** | Uniform pixel grid (graph paper) | Pixel-level alignment. Default cell size 10 |
 | **Columns** | Vertical sections with optional gutter | Multi-column layouts |
 | **Rows** | Horizontal sections with optional gutter | Multi-row layouts |
-
-A frame can hold any number of guides in any combination of types.
 
 ## Adding Layout Guides
 
 1. Select a parent element
 2. Right toolbar → **Layout Guides** section
-3. Click the **+** (Add Layout Grid) button. The new guide is a `LayoutGridType.grid` (uniform pixel grid)
+3. Click the **+** button. The new guide starts as a uniform **Grid**
 4. To switch type, change the **Type dropdown** in the new guide's header row to Grid / Columns / Rows
-5. Click the **slider icon** (expand button) on the right of the header to expand property fields
+5. Click the **expand button** (slider icon, to the left of the remove button) to reveal the guide's property fields
 
-The Add command (`add_layout_grid`) always inserts a `Grid` type guide; switch to Columns or Rows via the row's Type dropdown afterwards. There is **no default keyboard shortcut** for adding a guide. The visibility toggle keybinding is **Shift+G** (global, `toggle_layout_grids`).
+Adding always inserts a Grid-type guide; switch to Columns or Rows via the row's Type dropdown afterwards. There is **no default keyboard shortcut** for adding a guide. The show/hide-all keyboard shortcut is **Shift+G**.
 
 ## Header Row Controls
 
@@ -35,11 +31,11 @@ Every guide displays a compact header row. Layout (left to right):
 
 | Control | Description |
 |---------|-------------|
-| **Drag handle** | Visible only when 2+ guides exist. Drag to reorder. |
+| **Drag handle** | Always present, but only draggable when 2+ guides exist. Drag to reorder. |
 | **Type dropdown** | Grid / Columns / Rows. The dropdown's prefix is a color swatch (tap to open the color picker). |
-| **Opacity field (%)** | Color opacity, 0 to 100. Supports tokens. |
+| **Opacity field (%)** | Color opacity, 0 to 100. Supports design system tokens. |
 | **Expand button** (slider icon) | Show/hide the guide's property fields and eye toggle. |
-| **Remove button** (-) | Delete the guide. |
+| **Remove button** (minus) | Delete the guide. |
 
 ## Per-Guide Properties (Expanded)
 
@@ -87,22 +83,13 @@ Three rows of fields:
 
 ### Gutter = 0 Behavior
 
-When Gutter is set to **0**, columns/rows render as **crisp thin divider lines** instead of filled sections. Useful as alignment references without visual clutter; matches Figma.
-
-- Lines drawn at `1.0 / zoomScale` (constant screen-pixel width regardless of zoom)
-- Anti-aliasing disabled for pixel-perfect crispness
-- Both edges of every section are drawn (left and right for columns, top and bottom for rows)
+When Gutter is set to **0**, columns/rows render as **crisp thin divider lines** instead of filled sections. Useful as alignment references without visual clutter (matches Figma). Both edges of every section are drawn (left and right for columns, top and bottom for rows), at a constant ~1 screen-pixel width regardless of zoom.
 
 ## Reordering Guides
 
-When 2+ guides exist:
+When 2+ guides exist, drag a guide's row by its drag handle and drop it at a new position. Reordering is undoable.
 
-1. Drag a guide row in the Layout Guides section
-2. Drop it at a new position
-
-The UI displays guides in **reverse array order** (last array element at the top). Reorder is undo/redo friendly via `_registerPerParentUndo`.
-
-Topmost in the displayed list = drawn last = appears on top visually.
+The topmost guide in the list draws last, so it appears on top visually.
 
 ## Visibility (Two Levels)
 
@@ -110,7 +97,7 @@ Layout guide visibility has two independent toggles. Both must be on for a guide
 
 | Level | Control | Scope |
 |-------|---------|-------|
-| **Global** | **Shift+G** (`toggle_layout_grids`) | Hides/shows ALL layout guides on ALL frames |
+| **Global** | **Shift+G** | Hides/shows ALL layout guides on ALL frames |
 | **Per-guide** | Eye toggle in the expanded fields | Hides/shows one guide |
 
 ## Snapping to Guides
@@ -121,21 +108,21 @@ Elements inside a frame snap to that frame's visible guides:
 - **Rows:** top and bottom edges of each row
 - **Grid:** both horizontal and vertical lines (snaps per-axis)
 
-Snapping works on **rotated frames**: guide positions are transformed via the frame's local basis to world coordinates.
+Snapping works on **rotated and skewed frames**: guide positions follow the frame's orientation. Both the global show/hide toggle and the per-guide eye must be on for a guide to act as a snap target; hidden guides do not snap.
 
 ## Color and Opacity
 
-- **Color** is RGBA. Default `0x1AFF0000` (semi-transparent red)
-- **Opacity** is a 0 to 100% field; supports design system tokens via `opacityTokenRef`
-- Click the color swatch (prefix icon on the Type dropdown) to open the standard color picker (uses `ChangeColorContext.layoutGrid`)
+- **Color** defaults to a semi-transparent red. Click the color swatch (the prefix icon on the Type dropdown) to open the standard color picker.
+- **Opacity** is a separate 0 to 100% field in the header row.
+- Both color and opacity can be bound to design system tokens. For design-system authoring syntax, see the design-systems knowledge files.
 
 ## Tips
 
 - **Gutter = 0** for crisp dividers instead of filled bars
 - **Multiple guides per frame** (e.g., 8px Grid + 12-column Columns) compose freely
-- **Per-frame**: each frame has its own guide list (`ParentData.layoutGrids`)
-- **Nested frames** can have different guides than parents
-- Guides are stored on the frame element and follow the frame across canvases when moved
+- **Per-frame**: each frame has its own guide list
+- **Nested frames** can have different guides than their parents
+- Guides live on the frame and travel with it (including across canvases)
 
 ## Quick Reference
 
@@ -154,3 +141,4 @@ Snapping works on **rotated frames**: guide positions are transformed via the fr
 
 - [frames.md](./frames.md): Parent types and auto layout
 - [shortcuts.md](./shortcuts.md): Keyboard shortcuts
+- [design-systems.md](./design-systems.md): Binding guide color/opacity to tokens

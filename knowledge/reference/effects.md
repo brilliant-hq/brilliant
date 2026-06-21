@@ -1,117 +1,105 @@
 ---
 name: "knowledge-effects"
-description: "Element visual effects in Brilliant: shadows, glows, and blurs."
+description: "Element visual effects in Brilliant: drop shadow, outer glow, element blur, inner shadow, inner glow, background blur, and color adjust: where they live in the UI, their properties, and limits."
 ---
-
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
 
 # Effects
 
-Visual effects that enhance elements with shadows, glows, and blurs.
+Visual effects that enhance elements with shadows, glows, and blurs. Effects are non-destructive: they wrap or layer over the element's geometry and can be toggled, reordered, or removed without altering the underlying shape.
 
-## Two Systems
+## Two Systems (Two UI Homes)
 
-Two parallel systems with different storage and different UI homes:
+Effects are split across two storage models with two different panels in the right toolbar. Which home an effect lives in determines its z-order behavior.
 
-### Effects (Effects Section, `element.effects`)
+### Effects section (`element.effects`)
 
-`EffectType` enum: `dropShadow`, `outerGlow`, `layerBlur` (UI label "Element Blur"). Stored in a dedicated `List<Effect>` on the element. Managed in the Effects section of the right toolbar.
+Three effect types, stored in a dedicated effects list and managed in the **Effects section** of the right toolbar:
 
-| Type | UI Label | Description |
-|------|----------|-------------|
-| `dropShadow` | Drop Shadow | Shadow behind the element |
-| `outerGlow` | Outer Glow | Luminous glow around the element |
-| `layerBlur` | Element Blur | Blurs the element itself |
+| Type | UI Label | Description | Z-order |
+|------|----------|-------------|---------|
+| Drop Shadow | Drop Shadow | Shadow cast behind the element | Always paints behind the element body |
+| Outer Glow | Outer Glow | Luminous glow around the element | Always paints behind the element body |
+| Element Blur | Element Blur | Blurs the element itself (fills, strokes, shadows, glows) | Wraps the whole element |
 
-### Inner Shadow, Inner Glow, Background Blur (Fills Section, `PaintStyleType`)
+Drop shadows and outer glows always render behind the element, regardless of where they sit in the effects list. Stacking multiple shadows or glows is supported; later entries in the list paint on top of earlier ones.
 
-These are fill types (`PaintStyleType.innerShadow`, `PaintStyleType.innerGlow`, `PaintStyleType.backgroundBlur`). They live in the element's `fills` list (and can also appear in `strokes`), participating in z-order alongside solid/gradient/image/shader/filter fills.
+### Fills/Strokes section (paint-style effects)
+
+Inner shadow, inner glow, and background blur are **fill types**, not entries in the effects list. They live in the element's Fills list (and can also be applied as strokes) and participate in full z-order alongside solid, gradient, image, shader, and filter fills.
 
 | Type | Description |
 |------|-------------|
-| `innerShadow` | Shadow inside element edges. Renders via clip + saveLayer + dstOut compositing on canvas |
-| `innerGlow` | Luminous glow inside edges. Same compositing approach |
-| `backgroundBlur` | Blurs content behind the element. Renders at the widget level via `BackdropFilter` + `ClipPath`, not on canvas |
+| Inner Shadow | Shadow inside the element's edges (inset look) |
+| Inner Glow | Luminous glow inside the element's edges |
+| Background Blur | Blurs the canvas content showing through the element (frosted glass) |
 
-Interleave them with other fills, for example place an inner shadow between two solid fills.
+Because these are fills, you can interleave them with other fills, for example placing an inner shadow between two solid fills for a custom depth effect.
+
+**Color Adjust** is also a fill type (photo-style adjustments applied to everything beneath it). See the Color Adjust section below. Image filters (noise/grain, halftone, pixelate, duotone, posterize, dither) are likewise fill types; see [image-filters.md](./image-filters.md).
 
 ## Adding Effects
 
-### Effects (Drop Shadow, Outer Glow, Element Blur)
+### Drop Shadow, Outer Glow, Element Blur
 
-Click the **+** button on the Effects section header in the right toolbar. The first add inserts a drop shadow with default settings. To switch types, use the type dropdown on the effect row (Drop Shadow, Outer Glow, Element Blur).
+Click the **+** button on the Effects section header in the right toolbar. The first add inserts a **drop shadow** with default settings (the + button is not a type chooser). To change the type, use the type dropdown on the effect row (Drop Shadow / Outer Glow / Element Blur). Switching type resets the effect to that type's defaults.
 
 ### Inner Shadow, Inner Glow, Background Blur
 
-These are fill types: add them as fills (they also work as strokes):
-1. Click "+" in the Fills section (or Strokes section)
-2. Use the type dropdown to switch to an inner effect type (under the "Static" category)
+These are fill types, so add them through the Fills section (they also work as strokes):
 
-### Via Commands
+1. Click **+** in the Fills section (or Strokes section) to add a fill.
+2. Open the fill row's type dropdown and select the effect type. Inner Shadow, Inner Glow, and Background Blur are grouped under "Static" in the dropdown.
 
-Use the command palette (Cmd+Shift+P) to add effects by name:
+### Via command palette
 
-| Command | ID | Description |
-|---------|-----|-------------|
-| Add Drop Shadow | `add_drop_shadow` | Adds drop shadow with defaults |
-| Add Outer Glow | `add_outer_glow` | Adds outer glow with defaults |
-| Add Element Blur | `add_layer_blur` | Adds element blur with defaults |
-| Add Inner Shadow | `add_inner_shadow_fill` | Adds inner shadow fill with defaults |
-| Add Inner Glow | `add_inner_glow_fill` | Adds inner glow fill with defaults |
-| Add Background Blur | `add_background_blur_fill` | Adds background blur fill with defaults |
-| Add Color Adjust | `add_color_adjust_fill` | Adds color adjust filter fill with defaults |
+Open the command palette (Cmd+Shift+P) and run any of these by name:
 
-Additional management commands (target a specific effect via `targetEffectId` context):
+| Command | ID |
+|---------|-----|
+| Add Drop Shadow | `add_drop_shadow` |
+| Add Outer Glow | `add_outer_glow` |
+| Add Element Blur | `add_layer_blur` |
+| Add Inner Shadow | `add_inner_shadow_fill` |
+| Add Inner Glow | `add_inner_glow_fill` |
+| Add Background Blur | `add_background_blur_fill` |
+| Add Color Adjust | `add_color_adjust_fill` |
 
-| Command | ID | Notes |
-|---------|-----|-------|
-| Remove Effect | `remove_effect` | Removes effect by id |
-| Toggle Effect Visibility | `toggle_effect_visibility` | Toggles `enabled` flag |
-| Reorder Effect | `reorder_effect` | Drag handle reorder (later effects render on top) |
-| Change Effect Type | `change_effect_type` | DropdownValueCommand<EffectType>, resets to type defaults |
-| Toggle Show Behind Transparent | `toggle_effect_show_behind_transparent` | Drop shadow knockout flag |
-| Set Effect Blend Mode | `set_effect_blend_mode` | DropdownValueCommand<BlendMode> |
-| Draggable Update Effect Property | `draggable_update_effect_property` | offsetX/offsetY/blur/spread/radius/opacity drag |
-| Draggable Update Effect Fill Property | `draggable_update_effect_fill_property` | innerShadow/innerGlow/backgroundBlur fields |
-| Change Shader Effect Type | `change_shader_effect_type` | DropdownValueCommand<PaintStyleType> for swapping fill type |
+> For Blueprint DSL authoring of effects (the compact syntax used by `create_modify_elements`), see the blueprint knowledge files. Do not author DSL from this reference.
 
-### Via Compact Format
+## Managing Effects
 
-Inner effects are specified as fills using the compact blueprint syntax:
+### Effects section (Drop Shadow / Outer Glow / Element Blur)
 
-| Type | Syntax | Example |
-|------|--------|---------|
-| Inner shadow | `f[(id,inner(<color>,o(N),x(N),y(N),blur(N),sp(N),blend(mode)))]` | `f[(inner($color.shadow,o($visibility.mid),y(2),blur(4)))]` |
-| Inner glow | `f[(id,glow(<color>,o(N),blur(N),sp(N),blend(mode)))]` | `f[(glow($color.glow,o($visibility.mid),blur(4)))]` |
-| Background blur | `f[(id,blur(radius))]` | `f[(blur(12))]` |
+The effect row's controls, left to right: a color swatch (drop shadow and outer glow only; tap to open the color picker) or blur icon, an inline opacity % field, an expand toggle, and a remove (minus) button.
 
-`<color>` accepts any token reference. Bare `inner()` / `glow()` (no args) bind to `$color.shadow` / `$color.glow` automatically.
+| Action | How |
+|--------|-----|
+| Remove | Click the minus button on the row |
+| Toggle visibility | Expand the row, then click the eye icon in the expanded body |
+| Expand properties | Click the expand (sliders) toggle on the row to show/hide the property fields |
+| Change type | Use the type dropdown on the row (Drop Shadow / Outer Glow / Element Blur) |
+| Edit color | Tap the color swatch on the row, or use the hex/token field in the expanded body (drop shadow and outer glow only) |
+| Set blend mode | Use the inline blend-mode dropdown in the expanded body (drop shadow and outer glow only) |
+| Reorder | When 2+ effects exist, drag a row to reorder. The list is shown topmost-first; the top row is the highest in render order |
 
-`inner()` defaults: opacity=0.5, offsetY=2, blurRadius=4, blendMode=srcOver. Only non-default params needed. Examples: `f[(inner())]` defaults · `f[(inner($red.mid))]` accent · `f[(inner($color.shadow,o(0.3),y(4),blur(8),sp(2)))]` with spread.
+With 2 or more effects, the rows become drag-reorderable; a single effect has no drag handle. When multiple elements are selected, the Effects section displays the **first selected element's** effects, but edits apply across the whole selection.
 
-`glow()` defaults: opacity=0.6, blurRadius=4, blendMode=screen. Examples: `f[(glow())]` defaults · `f[(glow($emerald.mid))]` green · `f[(glow($emerald.mid,o(0.8),blur(12),sp(4)))]` with spread.
+### Fills section (Inner Shadow / Inner Glow / Background Blur)
 
-`blur(radius)` has one optional param, default 8. Pair with a low-opacity fill for frosted glass: `f[(solid($neutral.hint,o($visibility.subtle))),(f2,blur(12))]`.
-
-Image filter fills (noise/grain, halftone, pixelate, duotone, posterize, dither) and color adjust have NO compact blueprint syntax. Add them via commands (`add_noise_grain_fill`, `add_halftone_fill`, etc.) or by setting fill type via the UI dropdown. See [image-filters.md](./image-filters.md) for parameters.
-
-Shader fills (metaballs, liquidMetal, holographic, liquidStainlessSteel, reactiveGrid, dithering) DO have compact blueprint syntax. See shader knowledge for details.
-
-Outer effects (drop shadow, outer glow, element blur) have compact blueprint syntax as standalone tokens (not inside `f[...]`):
-
-| Type | Syntax | Example |
-|------|--------|---------|
-| Drop shadow | `shadow(<color>,o(opacity),x(n),y(n),blur(n),sp(n),blend(mode))` | `shadow($color.shadow,o(0.25),y(4),blur(8))` |
-| Outer glow | `outerglow(<color>,o(opacity),blur(n),sp(n),blend(mode))` | `outerglow($color.glow,o(0.6),blur(8))` |
-| Element blur | `eblur(radius)` | `eblur(4)` |
-
-Bare `shadow()` / `outerglow()` (no args) bind to `$color.shadow` / `$color.glow` from the active DS automatically.
-
-All params are named and optional with defaults matching the effect defaults above. `shadow()`, `outerglow()`, and `eblur()` with empty parens use all defaults.
+| Action | How |
+|--------|-----|
+| Remove | Click the delete button on the fill row |
+| Edit color | Tap the color swatch on the row, or use the hex/token field in the expanded body (inner shadow and inner glow only; background blur has no color) |
+| Edit parameters | Expand the fill row, then adjust the numeric fields. Background blur shows only a radius field |
+| Set blend mode | Inline blend-mode field beside the color in the expanded body (inner shadow and inner glow only) |
+| Change type | Use the fill type dropdown (shared with solid/gradient/image/shader/filter types) |
+| Reorder | Drag the fill row to change z-order relative to other fills |
 
 ## Effect Properties
 
-### Drop Shadow (`Effect`, EffectType.dropShadow)
+Numeric fields can be typed directly or scrubbed by dragging the field. Opacity displays as 0-100% in the UI.
+
+### Drop Shadow
 
 | Property | Range | Default |
 |----------|-------|---------|
@@ -119,35 +107,34 @@ All params are named and optional with defaults matching the effect defaults abo
 | Y offset | -200 to 200 | 4 |
 | Blur | 0 to 200 | 8 |
 | Spread | -100 to 100 | 0 |
-| Color | Any | `#000000` |
-| Opacity | 0 to 1 (UI shows 0-100%) | 0.25 |
-| Blend Mode | Any of 16 designBlendModes | `srcOver` (Normal) |
-| Show Behind Transparent Areas | bool | false |
+| Color | Any | Black |
+| Opacity | 0 to 100% | 25% |
+| Blend Mode | Any of the standard blend modes | Normal (srcOver) |
+| Show Behind Transparent Areas | toggle | off |
 
-**Show Behind Transparent Areas:** When enabled, the shadow shows through transparent fills. When disabled (default), the element shape is knocked out from the shadow. The toggle is only exposed in the UI for drop shadow (the `showBehindTransparentAreas` field exists on outer glow data too but its UI toggle is hidden).
+**Show Behind Transparent Areas:** when off (default), the element's shape is knocked out of the shadow (Figma-style). When on, the shadow shows through transparent fills. This toggle is exposed in the UI for drop shadow only.
 
-### Outer Glow (`Effect`, EffectType.outerGlow)
+### Outer Glow
 
 | Property | Range | Default |
 |----------|-------|---------|
 | Blur | 0 to 200 | 8 |
 | Spread | -100 to 100 | 0 |
-| Color | Any | `#FFFFFF` |
-| Opacity | 0 to 1 | 0.6 |
-| Blend Mode | Any | `screen` |
-| Show Behind Transparent Areas | bool, data only | false |
+| Color | Any | White |
+| Opacity | 0 to 100% | 60% |
+| Blend Mode | Any | Screen |
 
-Outer glow is symmetric: the inspector does not expose X/Y offset fields (the `offsetX`/`offsetY` fields exist on the Effect class but stay at 0). The `showBehindTransparentAreas` field is supported on the Effect class for outer glow but the UI toggle is also hidden (drop shadow only). Outer glow uses 3-pass `MaskFilter.blur` rendering.
+Outer glow is symmetric: there are no X/Y offset fields in the inspector (it always emanates evenly).
 
-### Element Blur (`Effect`, EffectType.layerBlur)
+### Element Blur
 
 | Property | Range | Default |
 |----------|-------|---------|
 | Radius | 0 to 200 | 4 |
 
-Renders via Canvas `saveLayer` + `ImageFilter.blur` wrapping the entire element subtree (fills, strokes, drop shadows, outer glows). Sits inside the element opacity layer.
+Element Blur has no color or blend mode. The effect row still shows the inline opacity % field (shared by all effect rows), but opacity has no rendering effect for a blur. Element Blur blurs the entire element (fills, strokes, drop shadows, and outer glows) as one unit, inside the element's opacity layer.
 
-### Inner Shadow (Fill, `PaintStyleType.innerShadow`, `InnerShadowData`)
+### Inner Shadow (fill)
 
 | Property | Range | Default |
 |----------|-------|---------|
@@ -155,142 +142,113 @@ Renders via Canvas `saveLayer` + `ImageFilter.blur` wrapping the entire element 
 | Y offset | -200 to 200 | 2 |
 | Blur | 0 to 200 | 4 |
 | Spread | -100 to 100 | 0 |
-| Color | Any | `#000000` |
-| Opacity | 0 to 1 | 0.5 |
-| Blend Mode | Any | `srcOver` |
+| Color | Any | Black |
+| Opacity | 0 to 100% | 50% |
+| Blend Mode | Any | Normal (srcOver) |
 
-### Inner Glow (Fill, `PaintStyleType.innerGlow`, `InnerGlowData`)
+### Inner Glow (fill)
 
 | Property | Range | Default |
 |----------|-------|---------|
 | Blur | 0 to 200 | 4 |
 | Spread | -100 to 100 | 0 |
-| Color | Any | `#FFFFFF` |
-| Opacity | 0 to 1 | 0.6 |
-| Blend Mode | Any | `screen` |
+| Color | Any | White |
+| Opacity | 0 to 100% | 60% |
+| Blend Mode | Any | Screen |
 
-Inner glow has no offset fields (unlike inner shadow). Use spread for size, blur for softness.
+Inner glow has no offset fields (unlike inner shadow). Use spread for size and blur for softness.
 
-### Background Blur (Fill, `PaintStyleType.backgroundBlur`, `BackgroundBlurData`)
+### Background Blur (fill)
 
 | Property | Range | Default |
 |----------|-------|---------|
 | Radius | 0 to 200 | 8 |
 
-Background blur has no color, no opacity, no blend mode in the data class. The fill row in the inspector shows the radius inline on the collapsed row (no expand toggle). Pair with a low-alpha solid fill above it for the standard frosted-glass look.
+Background blur has no color, no opacity, and no blend mode. The radius field is the only control. Pair it with a low-alpha solid fill above it for the standard frosted-glass look.
 
-### Design System Token Binding
+## Design System Token Binding
 
-Effect opacity (`opacityTokenRef`) and effect color (`colorTokenRef`) can each be bound to design system tokens independently. When bound, the painter resolves through the active design system at render time and the stored numeric/color value is the offline fallback. Manually editing opacity via the drag command clears the opacity token binding (color follows the standard fill color-picker token-clear flow).
+Effect color and opacity can each be bound to design system tokens, independently. When bound, the color/opacity resolves through the element's active design system (canvas/folder mode, ancestor overrides) at display time, and the stored literal value acts as the offline fallback. Inner shadow and inner glow support the same color and opacity token binding. Background blur has no color or opacity, so no bindings.
 
-`InnerShadowData` and `InnerGlowData` carry the same `colorTokenRef` / `opacityTokenRef` fields. `BackgroundBlurData` has no color or opacity so no token bindings. Image filter duotone color stops are token-bindable via `ImageFilterData.colorTokenRefs` / `colorOpacityTokenRefs`.
+Manually editing a token-bound value clears that binding (the value becomes a fixed literal again).
 
-### Composite Shadow Tokens
+For design-system authoring (defining tokens, modes, brands), see the design-systems knowledge files.
 
-The design system supports composite shadow tokens that bundle multiple drop shadow layers (color, offset, blur, spread, opacity per layer) into a single named token. Applying a shadow token replaces all existing drop shadows on the element while leaving outer glow and element blur effects alone. Manually editing any drop shadow on a token-bound element clears the binding.
+## Composite Shadow Tokens
 
-## Managing Effects
-
-### Effects (Effects Section)
-
-| Action | How |
-|--------|-----|
-| Add effect | Click "+" on the section header (adds a drop shadow by default), then change type with the dropdown. Or use command palette: "Add Drop Shadow", "Add Outer Glow", "Add Element Blur" |
-| Remove effect | Click the delete button on the effect row |
-| Toggle visibility | Expand the effect, then click the eye icon in the expanded view |
-| Expand properties | Click the sliders icon on the effect row to expand/collapse the property fields |
-| Change type | Use the type dropdown on the collapsed row (Drop Shadow, Outer Glow, Element Blur) |
-| Set blend mode | Use the blend mode dropdown in the expanded view (any of the standard design blend modes) |
-| Reorder | Drag the handle on the row to change render order (later effects render on top) |
-
-### Inner Shadow / Inner Glow / Background Blur (Fills Section)
-
-| Action | How |
-|--------|-----|
-| Add effect fill | Click "+" in Fills section, then switch type via the dropdown |
-| Remove | Click delete button on the fill row |
-| Edit color | Click color swatch on the type dropdown (inner shadow and inner glow only; background blur has no color) |
-| Edit parameters | Expand the fill row with the sliders icon, then adjust fields (inner shadow and inner glow only; background blur shows its radius inline on the collapsed row with no expand toggle) |
-| Change type | Use the type dropdown (shared with shaders and image filters) |
-| Reorder | Drag to change z-order relative to other fills |
+A design system can define composite shadow tokens that bundle multiple drop-shadow layers (each with its own color, offset, blur, spread, opacity) under one named token, for consistent elevation. Applying a shadow token replaces all existing drop shadows on the element while leaving outer glow and element blur untouched. Manually editing any drop shadow on a token-bound element clears the binding. See the design-systems knowledge files for defining these tokens.
 
 ## Rendering Order
 
-Per-element canvas layer stack (inside `element_renderer_mixins.dart`):
+The per-element layer stack, top to bottom:
 
-```
-1. Opacity saveLayer (if element.opacity < 1.0 OR blend mode != srcOver)
-2.   Element-blur saveLayer (if any layerBlur effect enabled, uses ImageFilter.blur)
-3.     Drop shadows + outer glows (in element.effects list order, BEFORE fills)
-4.     Fills in z-order: solid, gradient, image, shaders, innerShadow, innerGlow, image filters, color adjust
-5.     Strokes (same supported PaintStyleType set as fills)
-6.   Restore element-blur layer
-7. Restore opacity layer
-```
+1. Element opacity / blend-mode layer (if element opacity < 100% or blend mode is not Normal)
+2. Element Blur wrap (if an Element Blur effect is enabled)
+3. Drop shadows and outer glows (behind the body, in effects-list order)
+4. Fills in z-order: solid, gradient, image, shaders, inner shadow, inner glow, image filters, color adjust
+5. Strokes (same supported types as fills)
 
-`EffectType` has exactly 3 values: `dropShadow`, `outerGlow`, `layerBlur`. Drop shadow and outer glow are "outer effects" (`Effect.isOuterEffect`). Outer glow uses multi-pass `MaskFilter.blur` or `saveLayer + ImageFilter.blur` depending on path complexity.
+**Background blur** is not part of this canvas stack: it samples and blurs the canvas content showing through the element. This is why it has no color, opacity, or blend mode.
 
-**Background blur** is NOT in this canvas stack. It renders at the widget level via `BackdropFilter` + `_ElementShapeClipper` in `canvas_render_view.dart`. This is why background blur is the only inner effect with no color, opacity, or blend mode.
+**Color adjust and image filters** capture and reprocess everything below them in the fill/stroke list. Place them at the top of the Fills list to affect all fills beneath.
 
-**Image filters and color adjust** are fills that capture and reprocess everything below them in the fill/stroke list via GLSL shaders. Place them at the top of the fills list to affect all fills below.
-
-**Vector regions:** Vector elements with detected enclosed regions can carry per-region fills, including `innerShadow`/`innerGlow` (rendered per region) and per-region strokes with effect paint styles.
+**Vector regions:** vector elements with detected enclosed regions can carry per-region fills, including inner shadow and inner glow rendered per region.
 
 ## Export Support
 
-| Format | Effects Support |
+| Format | Effects support |
 |--------|----------------|
-| PNG/JPEG/WebP | Full support (rasterized) |
-| SVG | Drop shadow, outer glow, and layer blur via SVG filter primitives. Inner shadow, inner glow, background blur, shaders, image filters, and color adjust are pre-rasterized as embedded PNG images |
-| PDF | Full support. All effects rasterized with transparency via soft masks; background blur rasterizes preceding content |
+| PNG / JPEG / WebP | Full (rasterized) |
+| SVG | Drop shadow, outer glow, and element blur export as SVG filter primitives. Inner shadow, inner glow, background blur, shaders, image filters, and color adjust are pre-rasterized as embedded PNG images |
+| PDF | Full. Effects rasterized with transparency; background blur rasterizes the content behind the element |
 
-## Color Adjust (Fill)
+For export workflow and formats, see [export.md](./export.md).
 
-A special fill type that applies non-destructive photo-style adjustments to all fills below it. Add via the type dropdown in the Fills section or the command palette ("Add Color Adjust").
+## Color Adjust (fill)
+
+A special fill type that applies non-destructive, photo-style adjustments to all fills below it. Add it via the fill type dropdown (under "Filters") or the command palette ("Add Color Adjust").
 
 ### Parameters
 
-Organized into 4 sections in the right toolbar (`ColorAdjustData`):
+Organized into 4 groups in the expanded fill row, plus a separate opacity control:
 
-| Section | Parameters |
-|---------|-----------|
-| **Light** | Exposure, Contrast, Highlights, Shadows, Whites, Blacks, Brilliance |
-| **Color** | Saturation, Vibrance, Temperature, Tint, Hue |
-| **Detail** | Clarity, Sharpness |
-| **Effects** | Vignette, Sepia, Inversion |
+| Group | Parameters |
+|-------|-----------|
+| Light | Exposure, Contrast, Highlights, Shadows, Whites, Blacks, Brilliance |
+| Color | Saturation, Vibrance, Temperature, Tint, Hue |
+| Detail | Clarity, Sharpness |
+| Effects | Vignette, Sepia, Inversion |
 
-`ColorAdjustData` has 17 adjustment params plus `opacity`. Sliders also expose a separate Opacity row.
-
-**Storage vs display:** Most parameters are stored as -1.0 to 1.0 floats and displayed as -100% to 100% in the inspector (`displayScale = 100`). Exceptions: Inversion and Sepia store 0.0 to 1.0 (UI 0-100%); Hue stores 0.0 to 360.0 degrees (no scaling). All defaults are 0 except `opacity` (default 1.0). When you set values in blueprints or via MCP, use the stored range, not the percentage. The data class `isDefault` getter returns true when all 17 adjustment params are 0 (regardless of opacity).
+Most sliders display as -100% to 100%; Inversion and Sepia are 0-100%; Hue is 0-360 degrees. All adjustments default to 0 (no change); opacity defaults to 100%.
 
 ### Presets
 
-A built-in preset dropdown offers quick starting points, organized into 4 categories:
+A preset dropdown offers quick starting points in 4 categories:
 
 | Category | Presets |
 |----------|--------|
-| **Basic** | Vivid, Warm, Cool, Dramatic, B&W |
-| **Cinematic** | Noir, Vintage, Cinematic, Golden, Moody, Portrait |
-| **Creative** | Lark, Clarendon, Dreamy, Fade, Chrome, Food, Landscape, Sepia, Punch |
-| **Enhancement** | Sharp & Clear, Vintage Film |
+| Basic | Vivid, Warm, Cool, Dramatic, B&W |
+| Cinematic | Noir, Vintage, Cinematic, Golden, Moody, Portrait |
+| Creative | Lark, Clarendon, Dreamy, Fade, Chrome, Food, Landscape, Sepia, Punch |
+| Enhancement | Sharp & Clear, Vintage Film |
 
-The dropdown shows the active preset name when parameters match, and reverts to "Presets" when you manually adjust any slider.
+The dropdown shows the active preset name when sliders match it, and reverts to "Presets" once you manually adjust any slider.
 
-### Key Behaviors
+### Key behaviors
 
-- **Z-order aware**: Processes all fills below it. Place it as the top fill to adjust everything.
-- **Opacity**: Has its own opacity slider (separate from adjustments).
-- **Non-destructive**: Original fills are preserved; remove the Color Adjust fill to restore them.
-- **Vignette**: Positive values darken edges; negative values lighten edges toward white.
-- **Clarity**: Enhances midtone local contrast for a "punchier" look.
-- **Sharpness**: Enhances edges for crisper details.
-- **Whites/Blacks**: Finer control than Highlights/Shadows, targeting only the very brightest/darkest tones.
+- **Z-order aware:** processes all fills below it. Place it as the top fill to adjust everything.
+- **Non-destructive:** original fills are preserved; remove the Color Adjust fill to restore them.
+- **Opacity:** has its own opacity control, separate from the adjustments.
+- **Vignette:** positive values darken edges; negative values lighten edges toward white.
+- **Clarity:** enhances midtone local contrast for a punchier look.
+- **Sharpness:** enhances edges for crisper detail.
+- **Whites / Blacks:** finer control than Highlights / Shadows, targeting only the very brightest and darkest tones.
 
 ## Tips
 
-- **Subtle shadows**: Use `y:2/blur:4` with low opacity (0.1-0.2) for modern UI shadows
-- **Elevation hierarchy**: Stack multiple drop shadows with increasing offset/blur for material depth
-- **Frosted glass**: Combine background blur fill with a semi-transparent solid fill (white at 0.3-0.5 opacity)
-- **Neon glow**: Outer glow with a bright color, high blur (12+), screen blend mode
-- **Inset/pressed**: Inner shadow fill with y:2 and low opacity for a pressed button look
-- **Z-order control**: Place an inner shadow between two solid fills for a custom depth effect
+- **Subtle UI shadows:** small Y offset (2) and small blur (4) with low opacity (10-20%).
+- **Elevation hierarchy:** stack multiple drop shadows with increasing offset and blur for material depth.
+- **Frosted glass:** a Background Blur fill plus a semi-transparent solid fill above it (white at 30-50%).
+- **Neon glow:** Outer Glow with a bright color, high blur (12+), and Screen blend mode.
+- **Inset / pressed look:** Inner Shadow with a small Y offset and low opacity.
+- **Custom depth:** place an Inner Shadow between two solid fills to control where the inset appears in the stack.

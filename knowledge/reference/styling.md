@@ -3,8 +3,6 @@ name: "knowledge-styling"
 description: "Colors, fills, strokes, opacity, and corner radius in Brilliant."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # Styling
 
 ## Colors
@@ -67,7 +65,7 @@ Command id: `toggle_color_pick_mode`. Shortcut is **Ctrl+Shift+C on all platform
 
 The color picker includes additional sections below the main controls:
 
-- **Design Tokens**: Color tokens from the active design system (`.styles` file). Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color. Tokens stay bound through theme/mode switches.
+- **Design Tokens**: Color tokens from the active design system. Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color. Tokens stay bound through theme/mode switches. For how design systems and tokens are authored, see the design-systems knowledge files.
 - **Canvas Colors**: Unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
 - **Recent Colors**: Recently used colors across sessions. Hover a swatch to see its value in the active format.
 
@@ -75,14 +73,14 @@ In contexts that only support solid colors (canvas background, layout grid color
 
 ### Token Bindings
 
-A solid `PaintStyle` has two independent token bindings (stored on `SolidData`):
+A solid color can carry two independent token bindings:
 
-- **Color token** (e.g. `brand.50`): chosen via the design tokens section or the hex field's token dropdown. Resolves to the actual color at render time.
+- **Color token** (e.g. `brand.50`): chosen via the design tokens section or by typing the token name in the hex field. Resolves to the actual color at render time, so it follows mode/theme switches.
 - **Opacity token** (e.g. `opacity.50`): chosen via the opacity field's token dropdown when the design system has opacity tokens.
 
-Both can be set simultaneously. Manually dragging the opacity slider clears the opacity token binding; manually editing hex/RGB/HSB clears the color token binding.
+Both can be set at once. Manually dragging the opacity slider clears the opacity token binding; manually editing hex/RGB/HSB clears the color token binding.
 
-**Per-stop token bindings.** Gradient stops, shader colors, and image-filter colors carry their own parallel `colorTokenRefs` / `colorOpacityTokenRefs` lists (one slot per color). Editing a stop's hex field, picking a token from the stop's dropdown, or typing a token name in the hex field writes to that stop's slot only. Changing fill type between gradient flavors (Linear / Radial / Angular) preserves per-stop bindings; converting solid -> gradient seeds both stops with the solid's token (if any).
+**Per-stop token bindings.** Gradient stops, shader colors, and image-filter colors each carry their own color and opacity token. Editing a stop's hex field, picking a token from the stop's dropdown, or typing a token name in the hex field binds that stop only. Switching between Linear / Radial / Angular preserves per-stop bindings; converting a solid to a gradient seeds both new stops with the solid's token, if any. A purple diamond badge marks a field that has a token binding. For how tokens are authored, see the design-systems knowledge files.
 
 ## Fills
 
@@ -136,7 +134,7 @@ The design tokens, canvas colors, and recent colors sections remain visible belo
 |------|-------------|
 | **Fill** (default) | Image covers the entire element, excess clipped. Aspect ratio preserved |
 | **Fit** | Image fits entirely within the element, letterboxed if needed. Aspect ratio preserved |
-| **Crop** | Custom positioning with interactive crop editor (see [CROP.md](./CROP.md)) |
+| **Crop** | Custom positioning with interactive crop editor (see [crop.md](./crop.md)) |
 | **Repeat** | Image tiles at natural pixel size relative to the element |
 
 Change the scale mode in the right toolbar under the image fill section.
@@ -145,7 +143,7 @@ Change the scale mode in the right toolbar under the image fill section.
 
 Animated, GPU-rendered procedural patterns. 6 shader types total:
 
-- **Animated group** (5): Metaballs, Liquid Metal, Iridescent (internal name `PaintStyleType.holographic`), Liquid Stainless Steel, Dithering
+- **Animated group** (5): Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering
 - **Interactive group** (1): Reactive Grid (cursor-reactive)
 
 See [shaders.md](./shaders.md) for full parameter reference.
@@ -163,11 +161,11 @@ GPU-powered post-processing filters applied to all fills below them in the z-ord
 | **Posterize** | Reduce color levels for poster-style banding (RGB/luminosity/HSL modes) |
 | **Dither** | Ordered dithering patterns (Bayer/noise/blue noise, 2x2/4x4/8x8 matrix sizes) |
 
-Each filter has adjustable parameters, optional color inputs, and built-in presets. Filters work on fills, strokes, text, and vector regions. See [IMAGE_FILTERS.md](./IMAGE_FILTERS.md) for detailed per-filter parameter reference.
+Each filter has adjustable parameters, optional color inputs, and built-in presets. Filters work on fills, strokes, text, and vector regions. See [image-filters.md](./image-filters.md) for detailed per-filter parameter reference.
 
 ### Color Adjust Fills
 
-Non-destructive photo-style adjustments (exposure, contrast, saturation, whites, blacks, clarity, sharpness, vignette, hue, temperature, tint, vibrance, brilliance, highlights, shadows, sepia, inversion). Processes all fills below it in the z-order. Includes built-in presets (Vivid, Cinematic, Vintage, B&W, etc.). Available in the **Filters** category alongside image filters. Data is stored as -1.0..1.0 (or 0..1, or 0..360 for hue) and the inspector displays it as percentages. Hue-rotate and saturate adjustments live here, not as element-level CSS-style filters. See [effects.md](./effects.md#color-adjust-fill) for the full parameter table.
+Non-destructive photo-style adjustments (exposure, contrast, saturation, whites, blacks, clarity, sharpness, vignette, hue, temperature, tint, vibrance, brilliance, highlights, shadows, sepia, inversion). Processes all fills below it in the z-order. Includes built-in presets (Vivid, Cinematic, Vintage, B&W, etc.). Available in the **Filters** category alongside image filters. The inspector shows each adjustment as a percentage. Hue-rotate and saturate adjustments live here, not as element-level CSS-style filters. See [effects.md](./effects.md#color-adjust-fill) for the full parameter table.
 
 ### Multiple Fills
 
@@ -195,7 +193,7 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 
 ### Stroke Properties
 
-**Position** (`StrokePosition` enum, default Center):
+**Position** (default Center):
 
 | Position | Description |
 |----------|-------------|
@@ -203,22 +201,22 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 | Center | Centered on the element edge (default) |
 | Outside | Drawn outside the element edge |
 
-**Thickness:** Adjust via right toolbar, size level shortcuts 0-9 (`set_size_level_0` ... `set_size_level_9`, plain digit keys), Shift+= to increase, `-` to decrease.
+**Thickness:** Adjust via right toolbar, size level shortcuts 0-9 (`set_size_level_0` ... `set_size_level_9`, plain digit keys), Shift+= to increase, `-` to decrease. These size shortcuts are context-dependent: they set stroke width for shapes, but font size for text elements (or when the text tool is active).
 
-**Dash pattern:** The `Stroke` data model has no dash pattern fields. Dashed strokes are not first-class on element strokes; the only dashed rendering in Brilliant is for UI overlays (selection, snap guides). SVG / Sketch import preserves dashPattern in serialization but it is not editable in the inspector.
+**Dash pattern:** Dashed strokes are NOT available on element strokes. The only dashed rendering in Brilliant is for UI overlays (selection, snap guides). SVG / Sketch import keeps a dash pattern internally, but it is not editable in the inspector.
 
-**Caps** are NOT a property of `Stroke`. They live on the geometry:
-- **Vector paths:** per-node `cap` field on leaf nodes (degree 1 endpoints). Values from `StrokeCap2` enum: `none` (butt), `round` (default), `square`, `arrow`, `circle` (filled dot marker, radius approx. thickness).
-- **Circles:** `startCap` and `endCap` on `CircleData` (default `round`). Cap controls appear in the stroke section of the inspector only when the circle's arc sweep is less than 100% (any arc, including ring sectors).
+**Caps** are not a stroke property: they belong to the geometry, so they appear only for open shapes:
+- **Vector paths:** each open endpoint (a path that does not close on itself) gets a cap. Options: None (butt), Round (default), Square, Arrow, Circle (filled dot marker). Set per endpoint.
+- **Circles:** start cap and end cap (default Round). These controls appear in the stroke section only when the circle's arc sweep is less than 100% (any arc, including ring sectors).
 - **Rectangles** and other closed shapes have no caps.
 
-**Join:** The `Stroke` model has no `strokeJoin` / miter / bevel field. Joins are not user-configurable; the renderer uses Flutter's default join behavior.
+**Join:** Stroke joins (miter / bevel / round) are not user-configurable.
 
-**Fields on `Stroke`:** `id`, `thickness` (TokenizedDouble, supports design tokens), `style` (PaintStyle), `position` (StrokePosition), `blendMode` (default `srcOver`). No cap, join, or dash fields.
+**What a stroke holds:** thickness (supports design tokens), a paint style (its fill type), position (inside/center/outside), and a blend mode. No cap, join, or dash settings live on the stroke itself.
 
 ### Stroke Style Types
 
-Strokes support the same `PaintStyleType` set as fills (one unified dropdown is reused, command id `change_shader_effect_type`). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). Total 21 `PaintStyleType` values. Inner Shadow / Inner Glow as strokes render the inner-shadow/glow primitive over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
+Strokes support the same fill-type set as fills (the same type dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). 21 types total. Inner Shadow / Inner Glow as a stroke render over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
 
 Text ranges only support Solid.
 
@@ -288,7 +286,7 @@ All parent types support corner radius. With `clipContent` enabled (disabled by 
 
 ## Circle Arc & Ratio
 
-Circle elements have additional properties for creating arcs, pie sectors, and donut/ring shapes. Edit them in the right toolbar or use the interactive drag handles (see [TOOLS.md](./TOOLS.md#arc-drag-handles)).
+Circle elements have additional properties for creating arcs, pie sectors, and donut/ring shapes. Edit them in the right toolbar or use the interactive drag handles (see [tools.md](./tools.md#arc-drag-handles)).
 
 | Property | Range | Description |
 |----------|-------|-------------|
@@ -298,13 +296,11 @@ Circle elements have additional properties for creating arcs, pie sectors, and d
 
 **Stroke caps on arcs:** When sweep < 100% (any arc, including ring sectors), start/end cap controls appear in the stroke section. Use round caps for progress rings, arrow caps for directional arcs.
 
-**Common combinations:**
-- **Progress ring:** stroke-only circle + `arc(90, 75) ratio(1)` + round caps for 75% completion (90° = top)
-- **Pie sector:** filled circle + `arc(90, 25)` for a 25% wedge starting at top
-- **Donut chart:** filled circle + `arc(90, 50)` + `ratio(0.5)` for a half-ring
-- **Full donut:** filled circle + `ratio(0.6)` (no arc needed)
-
-See [DATA_VISUALIZATION.md](../building/DATA_VISUALIZATION.md#circular-progress-ring) for detailed examples and multi-ring dashboard patterns.
+**Common shapes by hand:**
+- **Progress ring:** stroke-only circle, set Ratio to 1, set Sweep to the completion percentage, set Start to 90° (top), round caps.
+- **Pie sector:** filled circle, set Sweep to the wedge percentage, Start at 90° for a wedge starting at top.
+- **Donut chart segment:** filled circle, set Sweep to the segment percentage, set Ratio to ~0.5 for a thick ring.
+- **Full donut:** filled circle, set Ratio above 0 (e.g. 0.6), leave Sweep at 100%.
 
 ## Effects
 
@@ -312,24 +308,24 @@ Effects add shadows, glows, blurs, and texture. Brilliant has two parallel syste
 
 ### Outer Effects (Effects Section)
 
-Live in `element.effects` (a separate list from fills). Managed in the Effects section of the right toolbar, or add via the command palette (Cmd+Shift+P): "Add Drop Shadow", "Add Outer Glow", "Add Element Blur". Compact blueprint tokens: `shadow(...)`, `outerglow(...)`, `eblur(...)`.
+Live in a separate effects list (not fills). Managed in the Effects section of the right toolbar, or add via the command palette (Cmd+Shift+P): "Add Drop Shadow", "Add Outer Glow", "Add Element Blur".
 
-| EffectType | Description |
-|------------|-------------|
-| `dropShadow` | Shadow behind the element |
-| `outerGlow` | Luminous glow around the element |
-| `layerBlur` (UI label "Element Blur") | Blurs the element itself |
+| Effect | Description |
+|--------|-------------|
+| Drop Shadow | Shadow behind the element |
+| Outer Glow | Luminous glow around the element |
+| Element Blur | Blurs the element itself |
 
 ### Inner/Fill Effects (Fills Section)
 
-Live in the `fills` list as `PaintStyleType` values, giving full z-order control alongside solid/gradient/image/shader fills. Added as fills, not effects.
+These live in the fills list (not the effects list), so they sit in z-order alongside solid/gradient/image/shader fills. Added as fills, not effects.
 
-| PaintStyleType | Description |
-|----------------|-------------|
-| `innerShadow` | Shadow inside the element edges |
-| `innerGlow` | Luminous glow inside the element edges |
-| `backgroundBlur` | Blurs content behind the element (frosted glass), rendered at the widget level via BackdropFilter |
+| Fill type | Description |
+|-----------|-------------|
+| Inner Shadow | Shadow inside the element edges |
+| Inner Glow | Luminous glow inside the element edges |
+| Background Blur | Blurs content behind the element (frosted glass) |
 
 Inner effects are in the fill type dropdown under the **Static** group (alongside Image). Inner effect fills can be interleaved with other fill types.
 
-See [effects.md](./effects.md) for default values, parameter ranges, blueprint syntax, and shadow tokens.
+See [effects.md](./effects.md) for default values, parameter ranges, and shadow tokens.

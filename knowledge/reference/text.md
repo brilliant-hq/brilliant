@@ -1,168 +1,113 @@
 ---
 name: "knowledge-text"
-description: "Text editing, inline editing, text sizing modes, typography, fonts, and text styling in Brilliant."
+description: "Working with text in Brilliant by hand: creating and editing text, sizing modes, typography controls (font, weight, size, alignment, line height, letter spacing, case, OpenType features, truncation), rich-text ranges, design-token bindings, and outline/flatten."
 ---
 
-> **Parent skill:** [knowledge/SKILL.md](./SKILL.md)
-
 # Text
+
+Text is a regular element type. A text element is its bounding box plus a text payload; the same selection, move, resize, rotate, and flip operations apply to it as to any shape. Text color comes from fills (not strokes), and text also supports strokes (outlined text). All typography controls live in the right toolbar's Typography section when a text element is selected.
 
 ## Creating Text
 
 | Action | How |
 |--------|-----|
-| Activate Text tool | Press **T**, or pick "Text" from the bottom toolbar |
-| Place a text element | With Text tool active, click on the canvas; the cursor lands and starts editing |
-| Drag-create | The Text tool currently behaves like click-to-create only. Drag does not produce a fixed-width box; resize manually after creation if you want a fixed width. |
+| Activate Text tool | Press **T**, or pick the Text tool in the bottom toolbar |
+| Place a text element | With the Text tool active, click on the canvas; the caret lands and editing starts immediately |
 
-A new text element starts with empty content, the current font family, and the current font size (default 24 px). Both axes start in `hug` mode, so the box grows with content until you resize it manually or change the sizing mode.
+New text starts empty with the current font family (default "System Font") and current font size (default 24px). These defaults carry forward from the last text you styled. A fresh text element hugs its content in both axes (Auto Size), so it grows as you type until you resize it or change its sizing mode.
 
-## Text Editing
+The Text tool is click-to-place only. Dragging does not create a fixed-width box; to get a fixed width, resize the element after creating it (which switches it to a fixed sizing mode).
 
-### Entering Edit Mode
+## Editing Text
+
+### Entering edit mode
 
 | Action | How |
 |--------|-----|
-| Edit existing text | Double-click the text element, or select it and press **Enter** |
-| With Text tool | Click on an existing text element to edit it directly |
+| Edit an existing text element | Double-click it, or select it and press **Enter** |
+| With the Text tool active | Click an existing text element to edit it directly |
 
-### While Editing
+### While editing
 
-- Type to insert text at the cursor position
-- Standard text editing shortcuts work (Cmd+A, Cmd+C, Cmd+X, Cmd+V, Cmd+Z, Cmd+Shift+Z, etc.)
-- The text element updates live as you type
+- Type to insert at the caret.
+- Standard editing shortcuts work: Cmd+A, Cmd+C, Cmd+X, Cmd+V, Cmd+Z, Cmd+Shift+Z.
+- The element re-measures and reflows live as you type.
 
-### Exiting Edit Mode
+### Exiting edit mode
 
-Press **Enter** to finish editing, **Escape** to cancel, or click outside the text element. Use **Shift+Enter** to insert a new line instead of exiting.
+- **Enter** finishes editing and exits.
+- **Escape** cancels and exits (reverts an in-progress edit).
+- Click outside the element to commit and exit.
+- **Shift+Enter** inserts a newline instead of exiting.
+
+If a text element is left empty when you exit, it is deleted automatically.
 
 ## Text Sizing Modes
 
-### Auto Size (Hug)
+Sizing is controlled by the sizing row in the Typography section (a width control and a height control), and also by direct resizing on the canvas. The four modes:
 
-The text box automatically resizes in both width and height to fit content. Text grows horizontally without wrapping. Set via "Auto Size" in the right toolbar sizing dropdown or the AI command "auto size text".
+| Mode | Width | Height | Behavior |
+|------|-------|--------|----------|
+| Auto Size | hug | hug | Box hugs content on both axes. Text never wraps; it can overflow a parent. |
+| Auto Height | fixed | hug | Width is fixed; text wraps; height grows to fit. |
+| Auto Width | hug | fixed | Height is fixed; width grows to fit; text does not wrap. |
+| Fixed Size | fixed | fixed | Both dimensions locked; text wraps inside and may clip. |
 
-### Auto Height
+Manually resizing a text element on the canvas locks the dragged axis to fixed. The same hug/fill/fixed controls used for any element drive text sizing, so inside an auto layout frame a text element's width sizing also accepts **fill** (expand to the available space).
 
-Width is fixed, height grows to fit. Text wraps at the fixed width. Useful for specific column widths. Set via "Auto Height" in the right toolbar dropdown or "auto height text".
+### Text inside auto layout frames
 
-### Auto Width
+The decision for any text in an auto layout frame is: **should this text wrap?**
 
-Height is fixed, width grows to fit content. Text expands horizontally without wrapping. Set via "Auto Width" in the right toolbar dropdown or "auto width text".
+- **No wrap** (labels, numbers, metrics, units, dates, nav items, headings, badges, button text, prices): keep the width sizing as **hug**. The box stays as wide as the content. This is the right choice for most UI text.
+- **Wrap** (descriptions, paragraphs, body copy): set the width sizing to **fill** so the text is constrained to the frame's content width and wraps inside it.
 
-### Fixed Size
+Note: hug width means the layout engine will not constrain the text, so long hug text can overflow a narrow frame. If text wraps when it should not, its width sizing is fill (or fixed) and should be hug. If text overflows and should wrap, its width sizing is hug and should be fill.
 
-Both width and height are explicit. Text wraps within fixed width and may overflow. Manually resizing a text element switches to fixed size.
+For auto layout sizing behavior in general, see [frames.md](./frames.md). For blueprint authoring syntax (how sizing is expressed in the DSL), see the blueprint knowledge files.
 
-### Text Inside Auto Layout Frames
+## Typography Controls
 
-**The fundamental question: "Should this text wrap?"**
+All controls are in the right toolbar's Typography section while a text element is selected. When the selection mixes text elements with **different** values for a property, the field shows **Mixed**; typing a value applies it to the whole selection.
 
-- **No** (labels, numbers, metrics, units, dates, nav items, section headers, badges, button text, prices) → use `hug`: omit `s()` or set `s(hug,hug)` explicitly
-- **Yes** (descriptions, paragraphs, body copy, multi-sentence content) → use `fill`: set `s(fill,hug)`
+Typography commands applied to a selected frame (not in edit mode) cascade to all text descendants of that frame.
 
-Most text in UI is labels and values that should never wrap. Only use fill for prose.
+### Font family
 
-**Smart defaults (how the system behaves if you omit sizing):**
+1. Click the font name in the Typography section, or press **Cmd+Shift+F**.
+2. The font picker opens (it is the global command palette pre-filtered to fonts).
+3. Type to fuzzy-search by name; hover a font to preview it live on the selected text.
+4. Click or press **Enter** to apply; **Escape** restores the original font.
 
-- **Vertical auto layout**: text automatically gets `fill` width, EXCEPT in `hug`-width parents where text stays `hug`. This default is convenient for prose but **wrong for labels/values**: override with `s(hug,hug)` when text should not wrap. When fill IS applied, text alignment is auto-inferred from the parent's cross-axis: `center` → center text, `end` → right text.
-- **Horizontal auto layout**: text keeps `hug` width by default. You must **explicitly set `s(fill,hug)`** on the text element that should expand to fill remaining space. This is intentional: in a row with multiple text elements (e.g., bullet "•" + item text), only one should expand.
+Recently used fonts appear at the top when the search box is empty.
 
-**Example: bullet list row:**
-```
-al(h,x(s),y(s),g(8),pad($spacing.none)) s(fill,hug) "Bullet Row"
-  t("•",$font.family,$font.size.md) f[($orange.mid)]
-  t("Launch multiplayer cursors",$font.family,$font.size.md) s(fill,hug) f[($slate.bold)]
-```
-The bullet stays hug width, the item text fills remaining space.
+**Available fonts:** about 300 curated Google Fonts plus all system fonts installed on your OS. Google Fonts load on demand (first use triggers a fetch, then cached). There is no in-app custom font upload; to use a font not in the list, install it as a system font and it appears in the picker. The "System Font" entry maps to the platform default font.
 
-**Common issues:**
-- "Text wraps when it shouldn't" → text has `fill` width (possibly via smart default in vertical layout): change to `hug`. This is the most common text sizing error, especially in narrow cards like 3-column metric grids where numbers wrap.
-- "Text overflows and doesn't wrap" → text has `hug` width: set `s(fill,hug)` for prose that should wrap.
+### Font weight
 
-## Typography
+Set via the weight dropdown in the Typography section, which lists only the weights the current font actually provides. Standard scale: Thin (100), Extra Light (200), Light (300), Regular (400, default), Medium (500), Semibold (600), Bold (700), Extra Bold (800), Black (900).
 
-All typography properties are in the right toolbar when a text element is selected.
-
-When the selection contains text elements with **different values** for a given property (font size, line height, letter spacing, font weight, font family, alignment, sizing mode), the inspector field shows the placeholder **`Mixed`** instead of a single value. Typing a value in a `Mixed` field applies that value to the whole selection.
-
-### Font Family
-
-1. Click the font name in the right toolbar Typography section
-2. Font selector opens (also **Cmd+Shift+F**)
-3. Search or scroll, hover to preview live on the canvas, click or press **Enter** to apply
-4. Press **Escape** to cancel and restore the original font
-
-### Font Selector
-
-The font selector is the **Fonts** filter view of the global command palette. Pressing the font selector shortcut opens the palette pre-filtered to fonts.
+### Font size
 
 | Action | How |
 |--------|-----|
-| Open font selector | **Cmd+Shift+F** (`toggle_font_family` command) or click the font name in the right toolbar Typography section |
-| Search | Type to fuzzy-search by font name |
-| Preview | Hover over a font; selected text updates live on canvas |
-| Apply | Click or press **Enter** |
-| Cancel | Press **Escape** to restore the original font |
-
-Recently used fonts surface at the top of the list when the search field is empty.
-
-### Available Fonts
-
-Brilliant bundles a curated list of about **300 Google Fonts** (`curatedGoogleFonts` in `lib/managers/font_manager.dart`) plus all **system fonts** from your OS. Examples by category:
-
-| Category | Examples |
-|----------|----------|
-| Sans-Serif | Inter, Roboto, Poppins, Montserrat, Open Sans, Lato, DM Sans |
-| Serif | Playfair Display, Merriweather, Lora, Crimson Text, Source Serif Pro |
-| Display / Heading | Bebas Neue, Oswald, Anton, Righteous, Abril Fatface |
-| Script / Handwritten | Dancing Script, Great Vibes, Satisfy, Pacifico, Caveat |
-| Monospace | Roboto Mono, Source Code Pro, JetBrains Mono, Fira Code |
-| Rounded / Friendly | Nunito, Quicksand, Varela Round, Fredoka |
-
-System fonts come from the OS font registry. Google Fonts are loaded on-demand via the `google_fonts` package; the first use of a font triggers a network fetch (subsequent uses are cached).
-
-Custom font upload is not supported in-app. To use a font that is not in the bundled list, install it as a system font on your OS and it will appear in the selector.
-
-### Font Size
-
-| Action | How |
-|--------|-----|
-| Set exact size | Type in the font size field |
+| Exact value | Type in the font size field |
 | Drag to adjust | Drag horizontally on the font size field |
-| AI command | "text size 24" or "bigger text" |
 
-**Range:** 0.2 to 1000. Scaling a text element adjusts font size proportionally.
+Range 0.2 to 1000. Scaling a text element on the canvas adjusts font size proportionally.
 
-### Font Weight
+### Bold / Italic / Underline / Strikethrough
 
-| Weight | Name |
-|--------|------|
-| w100 | Thin |
-| w200 | Extra Light |
-| w300 | Light |
-| w400 | Regular (default) |
-| w500 | Medium |
-| w600 | Semibold |
-| w700 | Bold |
-| w800 | Extra Bold |
-| w900 | Black |
+| Style | Shortcut | Notes |
+|-------|----------|-------|
+| Bold | Cmd+B | Toggle button in Typography section |
+| Italic | Cmd+I | Toggle button |
+| Underline | Cmd+U | Toggle button |
+| Strikethrough | (no default shortcut) | Toggle button in Typography section; also command palette |
 
-Font weight can also be set via the weight dropdown in the right toolbar Typography section, which shows only the weights available for the current font.
+All four work on whole text elements (no edit mode required) and on the active text selection inside an open editor (applied as a per-range override). Underline and strikethrough are the only text-decoration lines available.
 
-### Bold, Italic, Underline
-
-| Style | Shortcut |
-|-------|----------|
-| Bold | Cmd+B |
-| Italic | Cmd+I |
-| Underline | Cmd+U |
-
-These work both on whole text elements (no edit mode required) and on the active selection inside an open text editor (per-range overrides).
-
-There is no strikethrough decoration in Brilliant; the only supported decoration is underline.
-
-### Text Alignment
+### Text alignment
 
 | Alignment | Shortcut |
 |-----------|----------|
@@ -170,82 +115,59 @@ There is no strikethrough decoration in Brilliant; the only supported decoration
 | Align Center | Cmd+Alt+T |
 | Align Right | Cmd+Alt+R |
 
-Also settable via the right toolbar Typography section or AI commands ("align text left/center/right"). Alignment is whole-element only; per-range alignment is not supported.
+Also settable via the alignment buttons in the Typography section. Alignment is whole-element only (no per-range alignment). There is no Justify alignment and no vertical alignment; text anchors to the top edge of its box.
 
-There is no Justify alignment and no vertical alignment (text always anchors to the top edge).
+### Line height
 
-### Text Direction
+A multiplier of font size (1.5 = 1.5x). Set via the line height field: type a value or drag to adjust. Common values: 1.0 tight, 1.2 headings, 1.5 body, 2.0 double-spaced. A value of 0 or less clears the override and uses the font's default ("Auto"). Whole-element only (no per-range override).
 
-Text direction controls whether text flows left-to-right (LTR, the default) or right-to-left (RTL). Toggle via the command palette: search "Toggle Text Direction". No default keybinding.
+### Letter spacing
 
-### Line Height
+Horizontal space between characters, in pixels. Set via the letter spacing field next to line height: type a value or drag to adjust. 0 means default (no override); positive widens, negative tightens.
 
-Line height is a **multiplier** of font size (e.g., 1.5 = 1.5x font size). Set via the right toolbar field. Type a value, drag to adjust, or use "auto line height" for font defaults. Common values: 1.0 (tight), 1.2 (headings), 1.5 (body text), 2.0 (double-spaced). Any value `<= 0` clears the override and falls back to the font's default line height. Line height is whole-element only (no per-range override).
+### Text case
 
-### Letter Spacing
+A display-only transform that does not change the stored text. Dropdown in the Typography section with: None, Uppercase, Lowercase, Title Case.
 
-Letter spacing controls the horizontal space between characters. Set via the right toolbar field next to line height. Type a value or drag to adjust. A value of 0 means default spacing (no override). Positive values increase spacing, negative values tighten it.
+### Truncation (max lines)
 
-## AI Typography Commands
+A dropdown in the Typography section limits the text to a maximum number of lines and adds an ellipsis when it overflows. Options: No truncation, 1 line, 2/3/4/5/6/8/10 lines.
 
-- "font size 24": set font size
-- "bold" / "italic" / "underline": toggle style
-- "align text left/center/right": set alignment
-- "line height 1.5": set line height
-- "bigger text" / "smaller text": adjust size
-- "set font [name]": apply font family
-- "auto size text" / "auto height text" / "auto width text" / "fixed size text": sizing mode
+### OpenType features
+
+The "OpenType features" button in the Typography section opens a stay-open checklist of font features (each toggles independently; multiple can be on). Available toggles: Ligatures, Tabular Figures, Small Caps, Slashed Zero, Fractions. Effects depend on the current font actually supporting that feature.
+
+### Text direction
+
+Toggle left-to-right (LTR, default) and right-to-left (RTL) via the command palette: search "Toggle Text Direction". No default keybinding. Whole-element only.
 
 ## Styled Ranges (Rich Text)
 
-You can apply different styles to portions of text within a single text element:
+Apply different styles to portions of a single text element:
 
-1. Enter edit mode (double-click or select + Enter)
-2. Select a range of text (click and drag, or Shift+Arrow)
-3. Apply style changes (Cmd+B for bold, Cmd+I for italic, etc.)
+1. Enter edit mode (double-click, or select and press Enter).
+2. Select a range of text (drag, or Shift+Arrow).
+3. Apply a style change (Cmd+B, Cmd+I, Cmd+U, a font/size/weight/color change, etc.).
 
-`TextStyleRange` supports these per-range overrides (each nullable; null means "inherit from base"):
+Per-range overrides supported: font weight, italic, underline, strikethrough, font size, font family, text color, letter spacing. Each override is independent; anywhere a range leaves a property unset, it inherits the element's base style.
 
-| Property | Per-range override field |
-|----------|--------------------------|
-| Font weight | `fontWeight` |
-| Italic | `isItalic` |
-| Underline | `isUnderlined` |
-| Font size | `fontSize` |
-| Font family | `fontFamily` |
-| Text color | `color` |
-| Letter spacing | `letterSpacing` |
+Not available per-range: line height, alignment, text direction, text case, OpenType features, max-lines, and design-token bindings (those are whole-element only). Per-range color is solid color only (no gradient, shader, or image fill on a substring).
 
-Properties NOT supported per-range: line height (whole-element only), text alignment, text direction, decorations beyond underline (no strikethrough at all), and design token bindings (token refs are base-level only).
-
-Per-range color is restricted to solid colors (no gradients, shaders, or image fills on a sub-string).
-
-Ranges are non-overlapping and stored sorted by character offset. Editing the surrounding text (insert, delete) shifts range offsets automatically. A range whose properties all match the base style is dropped automatically.
+Ranges are non-overlapping. Editing the surrounding text shifts range offsets automatically, and a range whose overrides all match the base style is dropped.
 
 ## Text and Design Tokens
 
-Text properties can be bound to design system tokens. Bindings resolve at render time via `RenderContext`, so mode switching (light/dark/custom) and `.styles` edits update bound text live.
+Text properties can be bound to design-system tokens. Bindings resolve at render time, so switching modes (light/dark/custom) or editing the design system updates bound text live. The inspector shows a token chip on a bound field.
 
-| Property | Token key pattern | Stored on `TextData` field |
-|----------|------------------|---------------------------|
-| Font size | `font.size.{step}` (e.g., `font.size.md`) plus bare seed `font.size` | `fontSizeTokenRef` |
-| Font weight | `font.weight.{step}` (e.g., `font.weight.bold`) plus bare seed `font.weight` | `fontWeightTokenRef` |
-| Line height | `font.lineHeight.{step}` (e.g., `font.lineHeight.normal`) plus bare seed `font.lineHeight` | `lineHeightTokenRef` |
-| Font family | `font.family` (seed) | `fontFamilyTokenRef` |
-| Text color | color token (via fill `tokenRef`) | on `Fill.style.tokenRef` |
-| Composite typography | `typography.{name}` | `typographyTokenRef` |
+Bindable: font size, font weight, line height, font family, text color (via the fill's token binding), and composite typography tokens. A **composite typography token** bundles font family, size, weight, line height, and letter spacing into one named style; applying one via the **Apply Typography Token** command sets all of those at once and clears the individual font token bindings. Manually changing the font family clears the composite binding.
 
-Scale step names come from `kFontSizeMultipliers`, `kFontWeightSteps`, `kLineHeightSteps` in `lib/state/dsl/catalog.dart`. Seed-only systems (with just `font.size`, no scale seeds) generate the full scale automatically.
-
-A **composite typography token** bundles font family, size, weight, line height, and letter spacing into one named style. Applying a typography token via the **Apply Typography Token** command sets all five fields, stores the key in `typographyTokenRef`, and clears the four individual font token refs. Built-in composites (15 total, defined in `defaultDesignSystemTokens`): `typography.h1`–`h4` (heading scale, h5/h6 were dropped in V2), `typography.display.lg`/`md`/`sm` (hero/landing), `typography.body.sm`/`md`/`lg`, `typography.button`, `typography.input`, `typography.label`, `typography.caption`, `typography.code` (monospace family). See the design system reference for default values.
-
-Manually changing the font family clears `typographyTokenRef`. Other inspector edits update the underlying value but may leave the composite ref in place; the inspector chip is the authoritative indicator.
+For the token system, default typography tokens, and design-system authoring syntax, see [design-systems.md](./design-systems.md).
 
 ## Text Navigation While Editing
 
 | Shortcut | Action |
 |----------|--------|
-| Shift+Enter | Insert new line |
+| Shift+Enter | Insert newline |
 | Double-click | Select word |
 | Triple-click | Select line |
 | Quadruple-click | Select all |
@@ -258,48 +180,37 @@ Manually changing the font family clears `typographyTokenRef`. Other inspector e
 | Cmd+Up/Down | Jump to document start/end |
 | Cmd+Backspace | Delete to line start |
 | Alt+Backspace | Delete previous word |
-| Fn+Delete | Forward delete |
-| Cmd+Fn+Delete | Delete to line end |
-| Alt+Fn+Delete | Delete next word |
-| Home | Jump to line start |
-| End | Jump to line end |
 
-## Outline Text and Flatten Text (macOS + Windows)
+## Outline Text and Flatten
 
-Both convert a text element to vector geometry. Both are one-way conversions: the result is no longer editable as text.
+Both convert a text element to vector geometry, and both are one-way (the result is no longer editable as text).
 
-| Command | Default Shortcut | Result |
-|---------|-----------------|--------|
-| Outline Text | **Cmd+Ctrl+O** (macOS) | A group of per-character vector outlines (each character is its own editable vector) |
-| Flatten Text | **Cmd+Alt+O** (macOS) / **Ctrl+Alt+O** (Windows) | A single compound vector element (all characters merged into one path) |
+| Command | Default shortcut | Result | Use for |
+|---------|------------------|--------|---------|
+| Outline Text | **Cmd+Ctrl+O** (macOS/Windows) | A group of per-character vector outlines (each glyph is its own editable vector) | Editing individual characters, per-character coloring, character-level boolean ops |
+| Flatten | **Cmd+Enter** | A single compound vector (all glyphs merged into one path) | Masking, boolean ops against other shapes, exporting as one path |
 
-Use Outline Text when you want to edit individual characters (custom letter modifications, per-character coloring, character-level boolean ops). Use Flatten Text when you want a single shape for masking, boolean operations against other shapes, or export as one path.
-
-**Platform:** macOS (CoreText) and Windows (DirectWrite). On Windows, Outline Text has no keyboard shortcut (its Cmd+Ctrl+O chord would collide with Ctrl+O) — run it from the right-click menu, command palette, or the canvas context menu. On Linux both commands stay hidden (no native glyph-outline backend).
+**Platform:** Outline Text is macOS and Windows only (Linux has no glyph-outline backend; it is hidden there). On Windows its Cmd+Ctrl+O chord is run from the right-click/context menu or command palette. Flatten works on all platforms and applies to any selection, not just text; on a text element it produces the merged single-path result described above.
 
 ## Tips
 
-- **Enter** finishes editing and exits edit mode; use **Shift+Enter** to insert a new line.
-- **Escape** cancels editing and exits edit mode.
-- Text color is set via fills (not strokes). Text supports all fill types (solid, gradient, image, shader, image filter, color adjust). See [styling.md](./styling.md#text-fills).
-- Text elements also support strokes (rendered as outlined text), with inside/center/outside positioning.
-- Text reflows from its top edge: when font size or family changes, the top stays anchored and the box grows downward.
-- Multi-line text uses real newlines (`\n`). There is no separate paragraph spacing field; tune spacing via line height or insert blank lines.
+- Text color is set via fills, not strokes. Text supports all fill types (solid, gradient, image, shader, image filter, color adjust). See [styling.md](./styling.md#text-fills).
+- Text also supports strokes (outlined text) with inside/center/outside positioning.
+- Text reflows from its top edge: when size or font changes, the top stays anchored and the box grows downward.
+- Multi-line text uses real newlines. There is no separate paragraph-spacing field; use line height or blank lines for paragraph gaps.
 
 ## Not Supported
 
-These typography features are not available in Brilliant today, so don't promise them to users:
+Do not promise these:
 
-- Vertical alignment (top/middle/bottom). Text is anchored to the top edge.
-- Justified text alignment. Only `TextAlign.start`/`center`/`end` are supported.
-- Bulleted or numbered lists. Use literal bullet characters in front of each line if you need a list.
-- Per-paragraph spacing. Tune visual paragraph gaps via `lineHeight` or extra blank lines.
+- Justified text alignment (only left/center/right).
+- Vertical alignment (text anchors to the top edge).
+- Bulleted or numbered lists (use literal bullet characters per line).
+- Per-paragraph spacing (tune with line height or blank lines).
 - Text-on-path (text following a curve).
 - Find and replace within or across text elements.
-- Per-range line height, text direction, or alignment.
-- Per-range token bindings (token refs are base-level only).
-- Strikethrough decoration (only underline is supported).
-- Custom font upload. Install as a system font instead.
-- Text-frame "auto-shrink to fit" mode (no automatic font-size scaling to fit a fixed box).
-- Text case transforms (uppercase / lowercase / title case) are not exposed in the UI; bake the desired case into the literal text.
-- Vector edit mode on text. Use **Outline Text** or **Flatten Text** first to convert to vectors.
+- Per-range line height, alignment, direction, case, OpenType features, max-lines, or token bindings.
+- Per-range non-solid fills (gradient/shader/image color on a substring).
+- Custom font upload (install as a system font instead).
+- Auto-shrink-to-fit (no automatic font scaling to fit a fixed box; truncation only clips with an ellipsis).
+- Vector edit mode directly on text (run Outline Text or Flatten first).
