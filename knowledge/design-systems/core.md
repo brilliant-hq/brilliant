@@ -14,7 +14,7 @@ Stops follow two vocabularies:
 - **T-shirt scale** (`$spacing`, `$radius`, `$font.size`):
   `xs sm md lg xl 2xl…Nxl`, plus `none`.
 
-Explicit mode halts on bare values in tokenizable slots: `g() pad() rd() o() w() lh() ls()`, `t()` size positional, and any color (`f[]`, `st[]`, gradient stops, shader colors, effect colors). Use a `$token`. `s()` sizing accepts bare numerics. Bare color seeds (`$primary` → `.mid`) are the one numeric-scale exception; primitive stops like `$primary.500` or `$spacing.4` halt — use role names.
+Explicit mode halts on bare values in tokenizable slots: `g() pad() rd() o() w() lh() ls()`, `t()` size positional, and any color (`f[]`, `st[]`, gradient stops, shader colors, effect colors). Use a `$token`. `s()` sizing accepts bare numerics. Bare color seeds (`$primary` → `.mid`) are the one numeric-scale exception; primitive stops like `$primary.500` or `$spacing.4` halt — use role names. None mode inverts this: no design system, so use bare values and never `$token` (tokens halt).
 
 A card, dark-themed, annotated:
 

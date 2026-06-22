@@ -296,7 +296,7 @@ Set via **W Sizing** and **H Sizing** dropdowns in the right toolbar's **Element
 
 **Hug** is offered when all selected elements are frames or text. **Fill** is offered when any selected element is inside a frame parent. Otherwise only Fixed is offered.
 
-**Auto-conversion:** Manually resizing or rotating a child converts it to **Fixed** sizing with current dimensions. Change the dropdown back to Fill if needed.
+**Auto-conversion to Fixed:** Manually resizing or rotating a child converts it to **Fixed** at its current dimensions. **Fill also freezes to Fixed (at the current rendered size) when an element leaves auto-layout:** moved or reparented to the canvas, a plain Frame, Group, Mask, or Boolean, or dragged within a plain Frame. Only the Fill axes change; Hug/Fixed axes are kept. Fill is preserved **only** when the destination is another Auto Layout frame. So do not assume a Fill element stays Fill after it leaves an auto-layout parent; change the dropdown back to Fill if needed.
 
 #### When to Use Each Mode
 
