@@ -97,7 +97,7 @@ Every shader fill or stroke has a **Transform** section that adjusts how the pat
 | **Offset Y** | -1.0–1.0 | 0.0 | Pan the pattern vertically |
 | **Rotation** | 0–360° | 0° | Rotate the pattern |
 
-**Where Rotation appears:** for shaders without a Shape dropdown (Metaballs, Dithering, Reactive Grid), the Rotation control sits in the Transform section next to Scale. For the shape-bearing shaders (Liquid Metal, Iridescent, Liquid Stainless Steel), the Transform row pairs Scale with the Shape dropdown instead, and Rotation moves up into the parameter sliders (alongside the first effect parameter). The control behaves identically either way; only its placement differs.
+**Where Rotation appears:** every shader has Scale, Offset, and Rotation. Rotation lives in the Transform section, except for the shape-bearing shaders (Liquid Metal, Iridescent, Liquid Stainless Steel), where it appears among the parameter sliders instead.
 
 **Cmd-resize / Ctrl-resize compensation:** when you resize an element while holding Command (macOS) or Ctrl (Windows), the shader pattern stays fixed in world space. The element boundary reveals more or less of the pattern instead of stretching it, mirroring image crop compensation. During a normal resize the pattern distorts with the element.
 

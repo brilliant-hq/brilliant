@@ -5,7 +5,7 @@ description: "Drawing, shape, and utility tools in Brilliant: Move/Scale/Hand, P
 
 # Tools
 
-Brilliant has 11 tools: Move, Hand, Pen, Pencil, Line, Arrow, Rectangle, Circle, Frame, Text, Snip. Rectangle and Circle each have a Fill variant and a Stroke variant (separate commands and shortcuts that differ only in which creation style they set). Scale mode is a flag layered on the Move tool, not a separate tool.
+Brilliant has 11 tools: Move, Hand, Pen, Pencil, Line, Arrow, Rectangle, Circle, Frame, Text, Snip. Rectangle and Circle each have a Fill variant and a Stroke variant (separate shortcuts that differ only in the creation style they preset). Scale mode is a flag layered on the Move tool, not a separate tool.
 
 ## Tool Overview
 
@@ -35,7 +35,7 @@ Bottom toolbar layout (left to right): Move/Scale/Hand dropdown, Shape dropdown 
 - Snip and Text auto-revert to Move after creation
 - V returns to Move from any tool
 - Switching to any tool other than Move clears Scale mode automatically
-- Escape cancels the current contextual action. The dispatcher chooses one based on context:
+- Escape cancels the current contextual action, chosen based on context:
   - Vector edit mode: first Escape clears node/handle selection, second exits vector edit and returns to Move
   - Pen tool active but not in vector edit mode: Escape switches to Move
   - Crop mode, mask edit, boolean edit, frame label rename, color pick mode, AI chat input: Escape exits each
@@ -61,7 +61,7 @@ The default tool. Used for selecting, transforming, and direct-manipulation edit
   - Selection vs peer element: gap distances on whichever axis has a gap; edge-to-edge offsets when bounding boxes overlap on both axes
   - Selection contains the hovered element (selection is a frame ancestor): 4-side padding from the hovered child to the frame edges
   - Hovered element is the parent frame of the selection: 4-side padding from selection to the frame edges
-  All measurement geometry is computed in world-space AABBs (matching Figma, even for rotated elements)
+  Measurements use upright (axis-aligned) bounding boxes, so rotated elements still measure horizontally/vertically, matching Figma
 - 8 selection handles per parent (4 corners, 4 edges); drag to resize
 - Rotation handles appear just outside the corner handles when hovered
 - Drag on empty canvas to draw a marquee. Top-level frames with children require full containment; other elements (and empty / nested frames) only need intersection. Holding Cmd during marquee selects through fills (deep-select)

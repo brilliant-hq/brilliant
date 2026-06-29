@@ -39,10 +39,10 @@ delete(#placeholder)  // structure revised
 -- delete() removes an element and its children
 
 clone(#pricing) p(400,0) ds(, theme(dark)) "Pricing Dark" #pricing_dark
-  override(#plan_name) t("Pro")  // dark variant added
+  #plan_name t("Pro")  // dark variant added
 -- clone() deep-copies; clone-line props override its root, indented
--- override(#ref) lines retarget children. The // on that last child
--- checkpoints the finished clone.
+-- child lines (leading #ref) retarget descendants. The // on that last
+-- child checkpoints the finished clone.
 ```
 
 A `// label` snapshots the session undo stack. Later, in any call this

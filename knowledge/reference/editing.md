@@ -173,6 +173,14 @@ You can also type an exact angle in the rotation field in the right toolbar.
 
 Flipping is a per-element property toggle, not a geometry rebuild. Children of flipped frames render flipped via the rendering transform.
 
+## Hide / Show
+
+| Action | Shortcut | What it does |
+|--------|----------|------|
+| Hide / Show | Cmd+Shift+H | Toggles visibility of the selected elements |
+
+Hidden elements disappear from the canvas but stay in the document. Each layer in the Layers explorer (left toolbar) also has an eye toggle you can click to hide or show that element.
+
 ## Scaling
 
 Scaling uniformly resizes the selection and scales its content (font sizes, stroke thickness, corner radii, effects, descendants). This differs from setting W/H in the right toolbar, which resizes the bounding box on one axis without scaling content.

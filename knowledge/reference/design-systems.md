@@ -55,6 +55,8 @@ Each axis the active system declares gets its own dropdown (theme, density, acce
 
 Most numeric and color properties in the inspector accept a token binding. When a property is bound, its field shows the token name instead of a raw value. Manually typing a value into a bound field clears the binding for that property.
 
+To bind a numeric or font field (radius, opacity, gap/padding, stroke width, font size/weight/line height/family), open the field's dropdown (the chevron next to the value): the menu lists the matching token type alongside the plain preset values, and picking a token replaces the literal with the token name. Bound fields are marked with a purple chevron and diamond indicator (mirroring the color picker's "Design tokens" swatches for color fields).
+
 Where you bind in the UI:
 
 | Property | Where in the inspector | Token type |
@@ -72,12 +74,12 @@ The color picker's **Design tokens** section (in the lower part of the picker, a
 
 Composite tokens are applied via commands, not inline fields:
 
-- **Apply Typography Token** (`apply_typography_token`): applies a `typography.*` composite to the selected text element(s).
-- **Apply Shadow Token** (`apply_shadow_token`): applies a `shadow.*` composite to the selected element(s).
+- **Apply Typography Token**: applies a `typography.*` composite to the selected text element(s).
+- **Apply Shadow Token**: applies a `shadow.*` composite to the selected element(s).
 
 ## Unbinding Tokens
 
-The **Unbind Tokens** command (`unbind_tokens`) takes the current selection (and its descendants), replaces every token binding with the literal value it currently renders as, and drops the per-element design-system assignment. The result looks identical but no longer tracks the design system. Use it to "freeze" a subtree. Undoable.
+The **Unbind Tokens** command takes the current selection (and its descendants), replaces every token binding with the literal value it currently renders as, and drops the per-element design-system assignment. The result looks identical but no longer tracks the design system. Use it to "freeze" a subtree. Undoable.
 
 ## What Brilliant Can and Cannot Do
 
@@ -99,19 +101,19 @@ Cannot:
 
 Most are in the command palette under the design-system group. The two exceptions are **Set Design System** and **Set Design System Mode**: these do not appear in the palette and are driven only by the inspector dropdowns. Brand/mode/reset operations are undoable via the per-canvas undo stack (Cmd+Z).
 
-| Command (display name) | Command ID | Purpose |
-|---|---|---|
-| Set Design System | `set_design_system` | Brand setter for the current scope (not in the palette; driven only by the inspector brand dropdown) |
-| Set Design System Mode | `set_design_system_mode` | Per-axis mode setter (not in the palette; driven only by the inspector axis dropdowns) |
-| Apply Typography Token | `apply_typography_token` | Apply a `typography.*` composite to selected text element(s) |
-| Apply Shadow Token | `apply_shadow_token` | Apply a `shadow.*` composite to selected element(s) |
-| Unbind Tokens | `unbind_tokens` | Replace all token bindings on the selection with literal values and drop the binding |
-| Create Design System Viewer | `create_design_system_viewer` | Insert an 800x600 viewer element visualizing the active system |
-| Open Design System File | `open_design_system_file` | Open the nearest `.styles` source in the code editor |
-| Regenerate Design System | `regenerate_design_system` | Rebuild all `.gen.yaml` files from their `.styles` sources |
-| Reset Design System | `reset_design_system` | Wipe the design system source to an empty default, discarding all authored tokens (undoable) |
+| Command (display name) | Purpose |
+|---|---|
+| Set Design System | Brand setter for the current scope (not in the palette; driven only by the inspector brand dropdown) |
+| Set Design System Mode | Per-axis mode setter (not in the palette; driven only by the inspector axis dropdowns) |
+| Apply Typography Token | Apply a `typography.*` composite to selected text element(s) |
+| Apply Shadow Token | Apply a `shadow.*` composite to selected element(s) |
+| Unbind Tokens | Replace all token bindings on the selection with literal values and drop the binding |
+| Create Design System Viewer | Insert an 800x600 viewer element visualizing the active system |
+| Open Design System File | Open the nearest `.styles` source in the code editor |
+| Regenerate Design System | Rebuild all `.gen.yaml` files from their `.styles` sources |
+| Reset Design System | Wipe the design system source to an empty default, discarding all authored tokens (undoable) |
 
-Note: `reset_design_system` wipes the *source file* to an empty default, discarding every authored token (it does not restore Brilliant's seed tokens). The **Reset design system** button in the inspector is a different action: it clears brand/mode overrides at the inspected scope without touching the source.
+Note: the **Reset Design System** command wipes the *source file* to an empty default, discarding every authored token (it does not restore Brilliant's seed tokens). The **Reset design system** button in the inspector is a different action: it clears brand/mode overrides at the inspected scope without touching the source.
 
 ## Related Knowledge
 

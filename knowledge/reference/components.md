@@ -15,6 +15,10 @@ Components let you create reusable design elements. A **master component** defin
 | **Instance** | A linked copy of a master. Inherits all properties from the master unless overridden. |
 | **Override** | A property change on an instance that differs from the master. Overrides are preserved during sync. |
 | **Slot** | A child inside a component whose subtree is fully owned by each instance (sync skips it). Slots can only be designated through blueprint authoring; there is no by-hand UI to mark an element as a slot. |
+| **Component set** | A component that holds multiple **variants** organized by named **properties**. Figma-style "variants." An instance of a set shows whichever variant matches its current configuration. |
+| **Property** | A named axis of a set (e.g. "State", "Size"), each with a list of possible **values** (e.g. on/off, sm/lg). |
+| **Variant** | One member frame of a set, tagged with a value for each property (e.g. State=on, Size=lg). Each property-value combination maps to one variant. |
+| **Configuration** | The set of chosen values (one per property) carried by an instance. The configuration selects which variant the instance displays. |
 
 ## Creating a Component
 
@@ -22,12 +26,12 @@ Components let you create reusable design elements. A **master component** defin
 2. Press **Cmd+Alt+K** (or use the **Create Component** command via command palette, or right-click and choose **Component → Create Component**)
 3. The selection becomes a master component
 
-There is no dedicated component button in the right toolbar inspector and no separate components page or panel in the left toolbar. Components are created from selection on the regular canvas; masters and instances are normal frames distinguished by their diamond icon, purple label, and component data.
+There is no separate Components panel or page in the left toolbar, and components are created from selection on the regular canvas: masters and instances are normal frames distinguished by their diamond icon and purple label. The right inspector does, however, show a contextual **Component** section when a component, set, variant, or instance is selected (see [Component Sets, Variants & Properties](#component-sets-variants--properties)).
 
 **What happens:**
-- The frame gains a `ComponentData` marker (no `elementRef` means it is the master)
-- All descendant elements get `ChildComponentData` linking them back to the master's children
-- The frame label and selection chrome use a purple component color
+- The frame becomes the master (the source of truth for its instances)
+- Every element inside it is linked to the matching child in future instances
+- The frame label and selection chrome turn purple
 - In the layers panel, a filled diamond icon marks the master
 
 **Validation:** Selection is rejected if any selected element is a non-instance descendant of a component instance (you cannot wrap a child of someone else's instance into a new component). Existing component masters and component instance roots CAN be wrapped into a new outer component.
@@ -41,17 +45,50 @@ There is no dedicated component button in the right toolbar inspector and no sep
 
 1. Select a master component
 2. Use the **Create Instance** command (via command palette, or right-click and choose **Component → Create Instance**)
-3. A linked copy appears offset 50px down and right from the master (translated via the master's `vectorPath`)
+3. A linked copy appears offset 50px down and to the right of the master
 
 **What happens:**
-- A deep copy of the master's subtree is created with new element IDs
-- The instance root has `ComponentData` with `elementRef` pointing to the master
-- Each child has `ChildComponentData` linking to the corresponding master child
+- A full copy of the master's contents is created
+- The copy is linked back to the master (root to master, each child to its matching master child)
 - The instance is automatically selected
 
 You can also create instances at a specific position programmatically.
 
 **Duplicate and copy-paste behavior:** Duplicating a component master (Cmd+D) creates an **instance**, not a second independent master. The same applies to copy-pasting a master -- the pasted result is an instance linked to the original master. Duplicating or pasting a component instance creates another instance linked to the same master.
+
+## Component Sets, Variants & Properties
+
+A **component set** is the Figma-style "variants" feature. Instead of one master, a set groups several **variants** of the same component (e.g. a button's default / hover / pressed looks) and organizes them along named **properties** (axes). Each property has a list of values, and every property-value combination maps to one variant. An **instance** of a set carries a **configuration** (one value per property) and displays the matching variant. To switch an instance's look, you flip its property dropdowns rather than swapping in a different element.
+
+### Creating a set
+
+1. Select two or more frames on the canvas (each becomes one variant)
+2. Right-click and choose **Create Component Set** (also available in the command palette)
+3. The frames are combined into a new set, one variant each
+
+You can also grow a single component into a set later with **Add Variant** (see below).
+
+### The Component inspector section
+
+When a set, variant, or instance is selected, a **Component** section appears in the right inspector. It has three modes depending on what you have selected:
+
+**Set selected.** The section header shows two buttons:
+- **+ Add Property** -- adds a new property (axis). Name it in the row that appears; suggestions are Size, State, Type, and Variant.
+- **+ Add Variant** -- adds another variant frame to the set.
+
+Below the header, each property shows a row with its editable name and a **−** button to remove that property.
+
+**Variant selected.** One dropdown per property lets you set THAT variant's value -- its coordinate within the set (e.g. State = on, Size = lg). If two variants end up with the same combination of values, a **"⚠ Two variants share the same configuration"** warning appears so you can disambiguate them.
+
+**Instance selected.** One dropdown per property lets you PICK the configuration -- i.e. flip the instance to a different variant (e.g. set State to on). The instance immediately re-renders as the matching variant. If the instance contains nested instances, their dropdowns are surfaced too, indented beneath the parent's.
+
+### Using a set
+
+1. Create an instance of the set (Create Instance, or duplicate / copy-paste an existing instance)
+2. Select the instance
+3. In the Component section, flip the property dropdowns to choose its variant
+
+This is the "flip a switch to a state" workflow: one instance, reconfigured by picking values, with no need to detach or swap elements.
 
 ## Visual Indicators
 
@@ -72,81 +109,51 @@ You can also create instances at a specific position programmatically.
 
 ## Overrides
 
-When you modify a property on an instance or its children, that property is automatically tracked as an **override**. Overrides are preserved when the master changes -- the sync engine skips overridden properties.
+When you change a property on an instance or one of its children, that change is automatically tracked as an **override**. From then on, edits to the master no longer touch that property on this instance: your override wins and is preserved through future syncs. Override tracking is automatic; there is nothing to mark or confirm.
 
-### Tracked Property Categories
+### What syncs, what doesn't
 
-| Category | What It Covers |
-|----------|---------------|
-| `fills` | Fill colors, gradients, images |
-| `strokes` | Stroke colors, widths, positions |
-| `textData` | Text content, font, size, weight |
-| `rotation` | Element rotation angle |
-| `isFlippedH` | Horizontal flip state |
-| `isFlippedV` | Vertical flip state |
-| `vectorPath` | Shape geometry (nodes, edges, handles) |
-| `rectangleData` | Rectangle-specific properties (corner radii) |
-| `parentData` | Frame properties (layout direction, spacing, padding) |
-| `layoutBehavior` | Sizing mode (hug/fill/fixed) |
-| `name` | Element name |
-| `effects` | Drop shadow, outer glow, element blur |
-| `opacity` | Element opacity |
-| `circleData` | Circle arc/ring properties |
-| `constrainProportions` | Aspect ratio lock |
-| `designSystem` | Element-level design system override |
+When you edit a master, those edits flow down to every instance **except where you've overridden**. Almost everything participates: fills, strokes, text content and styling, rotation, flips, shape geometry, corner radii, frame/layout properties, sizing mode, effects, opacity, circle arc/ring settings, aspect-ratio lock, and element-level design-system bindings.
 
-**Root vs child sync:** The sync engine treats instance roots differently from instance children. Instance **children** sync all 16 categories listed above plus the element `type` (structural, always copied), for a total of 17 synced categories. Instance **roots** sync a smaller subset: `name`, `textData`, `rectangleData`, `vectorPath`, and `type` are NOT synced for the root frame. Renaming a master frame does not propagate the name to instance roots, but renaming a master's child does propagate to instance children. All other categories (fills, strokes, parentData, layoutBehavior, rotation, flips, effects, opacity, circleData, constrainProportions, designSystem) sync for both roots and children.
-
-**Unsynced properties:** `blendMode`, `opacityTokenRef` (element-level), `shadowTokenRef`, and `cropData` are not part of the component sync engine. Changes to these on the master do not propagate to instances. `blendMode` is also not tracked for override detection, so changing it on an instance does not register as an override. (Per-fill/per-stroke `opacityTokenRef` IS synced indirectly via the `fills` and `strokes` categories.)
-
-### How Override Detection Works
-
-Override detection is automatic. When you update an element that is part of an instance:
-- The system compares the old and new values
-- Changed property categories are added to the element's `overriddenProperties` set
-- During sync, these categories are skipped
-
-Override detection is suppressed during undo/redo restores and during sync itself to avoid false positives.
+A few things stay independent and do NOT flow from master to instances:
+- **Blend mode** -- set it per instance if you need it to differ. (Changing blend mode on an instance is also not treated as an override.)
+- **Shadow token reference, crop, and element-level opacity token** -- managed per element.
+- **The instance's name** and a few root-only details -- renaming the master frame does not rename instances, though renaming a master's *child* does propagate to the matching child in each instance.
 
 ## Syncing
 
-When you edit a master component, all instances automatically sync:
+When you edit a master component, all instances update automatically:
 
-1. The sync engine walks the master's subtree
-2. For each master child, it finds the corresponding instance child via `elementRef`
-3. Non-overridden properties are copied from master to instance
-4. Overridden properties are preserved on the instance
-5. New children added to the master are deep-copied into instances
-6. Children removed from the master are removed from instances
-7. Z-order (child ordering) is synced to match the master
+- Non-overridden properties are copied from the master onto each instance child
+- Overridden properties are left untouched on the instance
+- Children you add to the master appear in every instance
+- Children you remove from the master are removed from every instance
+- Child ordering (z-order) is kept in step with the master
 
-**Slot children** (marked with `isSlot: true`) are skipped entirely during sync -- the instance fully owns their content.
+**Slot content** is the exception: a child designated as a slot is owned by the instance, so syncing never overwrites it.
 
 ### What You Cannot Do on an Instance
 
-The structure of an instance is owned by its master. Brilliant prevents structural drift on instances:
+The structure of an instance is owned by its master, and Brilliant prevents instances from drifting structurally:
 
-- You cannot drag elements into a component instance to add new children. The drop target is rejected during drag
-- You cannot drag elements out of an instance to reparent them somewhere else
-- New structural changes (add/remove children, reorder) must happen on the master and propagate via sync
-- The one exception is **slot subtrees**: any element nested at any depth inside a `slot`-marked child IS a normal target for adds and reparents. Slot content is owned by the instance
+- You cannot drag elements into an instance to add new children -- the drop is rejected
+- You cannot drag elements out of an instance to reparent them elsewhere
+- Adding, removing, or reordering children must be done on the master, and it propagates to every instance
+- The one exception is **slot content**: anything nested inside a slot is a normal drop target, because the instance owns it
 
-If you need to fully diverge from the master, **detach** the instance first.
+If you need an instance to fully diverge from its master, **detach** it first.
 
 ## Resetting Overrides
 
 To restore an instance to match its master:
 
-1. Select a component instance root (the command's WhenClause activates only on instance roots)
+1. Select a component instance
 2. Use the **Reset Component Instance Overrides** command (via command palette, or right-click and choose **Component → Reset Overrides**)
 
 **What happens:**
-- All `overriddenProperties` are cleared on the targeted elements
-- The instance re-syncs from the master, pulling fresh values for all properties
-- If you reset on the instance root, the entire subtree's overrides are cleared and re-synced
-- If you target an individual instance child (via MCP / programmatic invocation that includes both root and child), that child's overrides are cleared and the full instance re-syncs from the master. The whole instance subtree is refreshed, not just the reset child.
-
-**Keyboard vs MCP gap:** The command's WhenClause is `componentInstanceWhen` (instance roots only), so the keyboard/palette path requires an instance root to be selected. The execute body, however, accepts both instance roots and instance children, which is why MCP invocations can target individual children.
+- All overrides on the instance are cleared
+- The instance re-syncs from the master, pulling fresh values for every property
+- The entire instance, including its children, is refreshed to match the master
 
 ## Detaching an Instance
 
@@ -156,8 +163,7 @@ To break the link between an instance and its master:
 2. Press **Cmd+Alt+B** (or use the **Detach Instance** command via command palette, or right-click and choose **Component → Detach Instance**)
 
 **What happens:**
-- `ComponentData` is removed from the instance root
-- `ChildComponentData` is removed from all descendant elements
+- The link to the master is removed from the frame and all its contents
 - The frame becomes a regular frame with no component links
 - Future changes to the master will not affect this frame
 - The frame's content is preserved as-is
@@ -184,15 +190,15 @@ A master component can live on a different canvas than its instance. This lets y
 
 How it works:
 
-- An instance stores a `canvasPath` (relative path to the master's `.design` file) on its `componentData` when the master lives elsewhere
-- When the instance's canvas is loaded, Brilliant resolves the cross-canvas master and syncs the instance with the latest master values
-- Editing a master propagates to instances on every currently loaded canvas; instances on canvases not in the cache pick up the latest master values the next time their canvas loads
-- **Push Overrides to Master** and **Go to Master Component** only work when the master is resolvable on the current canvas's `CanvasElements` (same-canvas only). Switch to the master's canvas first to push or jump to it.
-- Pasting a component master into a different canvas creates an instance whose `canvasPath` points back to the source canvas (the master is not duplicated)
+- An instance remembers which canvas its master lives on
+- When you open the instance's canvas, Brilliant finds the master and syncs the instance to the latest master values
+- Editing a master updates instances on every canvas you currently have open; instances on canvases you haven't opened pick up the latest values the next time you open them
+- **Push Overrides to Master** and **Go to Master Component** only work when the master is on the canvas you're currently viewing. Switch to the master's canvas first to push to it or jump to it.
+- Pasting a master into a different canvas creates an instance that points back to the original master (the master is not duplicated)
 
 **Caveats:**
-- When you delete a master, instances on other canvases that are not currently loaded are NOT detached immediately. They are cleaned up the next time that canvas loads.
-- Cross-canvas instances can be incorrectly stripped of their component link by a bug in orphan cleanup that ignores `canvasPath`. If a canvas containing instances opens before the master's canvas has been loaded into the cache, those instances may get detached. Workaround: open the master's canvas first to populate the cache.
+- Deleting a master does not immediately detach instances on canvases you don't have open. Those instances are cleaned up the next time you open their canvas.
+- If a canvas full of cross-canvas instances is the first thing you open in a session, those instances may not find their master yet. To be safe, open the master's canvas first, then the canvas that uses it.
 
 ## Keyboard Shortcuts
 
@@ -200,6 +206,7 @@ How it works:
 |--------|----------|
 | Create Component | **Cmd+Alt+K** |
 | Detach Instance | **Cmd+Alt+B** |
+| Create Component Set | Command palette / right-click (no default keybinding) |
 | Create Instance | Command palette only (no default keybinding) |
 | Reset Component Instance Overrides | Command palette only (no default keybinding) |
 | Go to Master Component | Command palette only (no default keybinding) |
@@ -209,12 +216,11 @@ How it works:
 
 ## What's Not Supported
 
-Brilliant components are a master/instance system with property overrides, slots, and cross-canvas references. The following Figma-style concepts are NOT currently in Brilliant:
+Brilliant components are a master/instance system with property overrides, slots, component sets (variants), and cross-canvas references. The following Figma-style concepts are NOT currently in Brilliant:
 
-- **Swap Instance.** There is no swap-instance UI or command. To switch an instance to a different master, detach it and create a fresh instance of the other master.
-- **Components panel / page.** There is no left-toolbar Components panel and no separate "Components" canvas type. Masters live as regular frames on a canvas; you can keep them on a dedicated canvas by convention and reference them across canvases.
-- **Per-property override badges in the inspector.** There is no inspector chip or label that flags which individual property is overridden. Overrides are tracked internally and used by sync, but the only visible component chrome is the purple frame label and the diamond icon (filled = master, outline = instance).
-- **Component variants / props** (no boolean props, enum variants, or variant matrices). Instead, create separate master components or rely on overrides
+- **Swap Instance.** There is no swap-instance UI or command. To switch an instance to a different master, detach it and create a fresh instance of the other master. (Within a component set, you don't swap -- you flip the instance's property dropdowns to pick a variant.)
+- **Components panel / page.** There is no left-toolbar Components panel and no separate "Components" canvas type. Masters live as regular frames on a canvas; you can keep them on a dedicated canvas by convention and reference them across canvases. (A contextual Component section does appear in the right inspector when a component, set, variant, or instance is selected.)
+- **Per-property override badges.** There is no chip or label that flags which individual property is overridden on an instance. The Component section shows property dropdowns for sets and instances, but it does not mark which properties you've overridden; the visible component chrome is the purple frame label and the diamond icon (filled = master, outline = instance).
 - **Component descriptions or metadata** (no description field, no documentation popovers)
 - **Component publishing / library export** (no separate library file format; masters live on canvases inside your project)
 - **Component diff view** (no side-by-side master vs instance comparison UI)
@@ -232,16 +238,16 @@ Brilliant components are a master/instance system with property overrides, slots
 | Symptom | Likely Cause | Fix |
 |---------|--------------|-----|
 | Instance not updating when master changes | Property was overridden on the instance | Reset overrides, then re-apply only needed changes |
-| `blendMode` change on master not reaching instances | `blendMode` is unsynced by design | Set blend mode on each instance individually, or detach if you need divergent blend behavior managed manually |
-| Cannot create component | No element selected, or element is a non-instance descendant of a component instance | Select elements outside any component instance, or select the instance root itself (it CAN be wrapped). Non-parents are auto-wrapped. |
-| Cross-canvas instance lost its component link after canvas reload | Orphan cleanup bug strips component data when master's canvas is not cached | Open the master's canvas first, then the instance canvas |
+| Blend mode change on master not reaching instances | Blend mode stays independent per instance by design | Set blend mode on each instance individually, or detach if you need it managed separately |
+| Cannot create component | No element selected, or the element is part of someone else's instance | Select elements outside any component instance, or select the instance root itself (it CAN be wrapped). Non-frames are auto-wrapped. |
+| Cross-canvas instance lost its component link after reopening | The instance's canvas was opened before its master's canvas in this session | Open the master's canvas first, then the canvas that uses it |
 | Push Overrides / Go to Master grayed out | Master is on a different canvas than the instance | Switch to the master's canvas before invoking the command |
-| Instance child not syncing | Child is marked as a slot | Slots are owned by the instance; edit directly |
-| Cannot drop element into component instance | Reparent guard rejects the drop | Drop into a `slot`-marked subtree, or detach the instance first |
+| Instance child not syncing | Child is a slot | Slots are owned by the instance; edit them directly |
+| Cannot drop element into component instance | Instances can't take new children | Drop into a slot, or detach the instance first |
 
 ## Authoring Components via Blueprint
 
-Components, instances, slots, and per-instance overrides can also be authored programmatically (the AI's blueprint path) rather than by hand on the canvas. The hand-driven flows above and the blueprint flows produce the same data: a master created in blueprint can be instanced and overridden by hand, and vice versa. For the blueprint authoring syntax (the `comp` / `inst` / `slot` / override keywords and cross-canvas referencing), see the blueprint knowledge files. Do not author that syntax from this reference.
+Components, instances, sets, variants, slots, and per-instance overrides can also be authored programmatically (the AI's blueprint path) rather than by hand on the canvas. The hand-driven flows above and the blueprint flows produce the same data: a master created in blueprint can be instanced and overridden by hand, and vice versa. For the blueprint authoring syntax (the component, instance, variant, slot, and override keywords and cross-canvas referencing), see the blueprint knowledge files. Do not author that syntax from this reference.
 
 > **See also:** [frames.md](./frames.md) for parent types, auto layout, and nesting
 > **See also:** [editing.md](./editing.md) for selection and navigation within component hierarchies

@@ -464,7 +464,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 
 | Action | Shortcut |
 |--------|----------|
-| Toggle overlay mode | Ctrl+F on macOS (registered as an OS-level global hotkey via `hotkey_manager`, fires even when Brilliant is unfocused; switches between studio and overlay). Unbound by default on Windows. The hotkey is gated by the per-user overlay-mode feature flag (`overlayModeEnabledProvider` in `KeybindingsManager`). |
+| Toggle overlay mode | Ctrl+F on macOS — an OS-level global hotkey that fires even when Brilliant is unfocused; switches between studio and overlay. Requires overlay mode enabled in settings. Unbound by default on Windows. |
 | Toggle passthrough (overlay only) | Ctrl+A on macOS (global hotkey while in overlay; makes the window click-through to apps below). Unbound by default on Windows. |
 | Show/hide UI | Cmd+\\ (toggles toolbars in both window modes; in overlay creates a clean transparent drawing surface) |
 | Expand/collapse all right-toolbar sections | Cmd+/ (id `toggle_sections`) |

@@ -146,7 +146,7 @@ Each node has a **point type** controlling how its Bezier handles behave. Select
 | **Asymmetric** | Handles stay co-linear (same angle through the node) but lengths are independent. |
 | **Disconnected** | Each handle is fully independent. |
 
-Click the point type button in the right toolbar to change it. The four commands (`set_point_type_straight`, `set_point_type_mirrored`, `set_point_type_asymmetric`, `set_point_type_disconnected`) are also in the command palette and Shortcuts panel. None have default keybindings; assign one via **Shift+?** if needed.
+Click the point type button in the right toolbar to change it. The four commands (**Set Point Type: Straight**, **Set Point Type: Mirrored**, **Set Point Type: Asymmetric**, **Set Point Type: Disconnected**) are also in the command palette and Shortcuts panel. None have default keybindings; assign one via **Shift+?** if needed.
 
 **Nodes with 3+ edges:** the point type row is grayed out. Mirrored/Asymmetric constraints only apply to 2-edge nodes (where there is a single "opposite" handle).
 

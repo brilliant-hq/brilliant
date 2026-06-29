@@ -48,7 +48,7 @@ Per-canvas state saved into the `.design` file: element data, hierarchy, fills/s
 
 Right-click a folder in the file explorer for: Rename, Delete, Duplicate, Cut, Copy, Paste, New Canvas, New Folder (inside this folder), Expand/Collapse/Expand All/Collapse All, Reveal in Finder, Copy Relative Path, Copy Absolute Path. Folders can be nested, and canvases can be dragged between them (multi-select supported).
 
-**Color tags:** append a color suffix to a folder or canvas name to color its icon and breadcrumb. Supported suffixes: `.red`, `.green`, `.yellow`, `.orange`, `.purple`, `.pink`, `.gray`. Without a suffix the icon is blue. Example: naming a folder `Components.purple` shows a purple icon. The suffix is hidden from the displayed name and preserved through renames.
+**Color tags:** append a color suffix to a folder or canvas name to color its icon and breadcrumb. Supported suffixes: `.red`, `.green`, `.yellow`, `.orange`, `.purple`, `.pink`, `.gray` (or `.grey`). Without a suffix the icon is blue. Example: naming a folder `Components.purple` shows a purple icon. The suffix is hidden from the displayed name and preserved through renames.
 
 ## File Explorer
 
@@ -97,7 +97,7 @@ Centered in the window, the top toolbar shows the active file's location as brea
 
 - Double-click the canvas-name segment to rename inline
 - Hover the breadcrumb to reveal a Copy Path button that copies the absolute path of the active file
-- Save status is shown by the canvas name's opacity: dimmed (~0.6) while there are unsaved changes or a save is in flight, brighter (~0.9) once saved. There is no separate save chip or spinner.
+- Save status is shown by the canvas name's brightness: dimmed while there are unsaved changes or a save is in flight, brighter once saved. There is no separate save chip or spinner.
 - The breadcrumb area is the window-drag handle (when not maximized/fullscreen)
 
 ## Previews and the Code Editor
@@ -107,14 +107,14 @@ Clicking a non-canvas file in the explorer (or navigating to it with Alt+Arrow) 
 | File type | Preview |
 |-----------|---------|
 | Image (PNG, JPG, JPEG, GIF, BMP, WebP; on macOS also TIFF/TIF, HEIC, HEIF, AVIF) | Full-size centered image |
-| Text/code (JS, TS, JSX, TSX, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Go, Swift, SQL, Shell/Bash/Zsh, XML, TOML, INI, plain text, `.styles`, `.gen.yaml`, `.svg`) | Built-in code editor (CodeMirror 6) |
+| Text/code (JS, TS, JSX, TSX, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Go, Swift, SQL, Shell/Bash/Zsh, XML, TOML, INI, plain text, `.styles`, `.gen.yaml`, `.svg`) | Built-in code editor |
 | Unknown types | Sniffed: text shows in the editor, binary shows an unsupported placeholder |
 
 `.svg` opens in the code editor as XML text, not as an image. To use an SVG as a design element, import it (Cmd+Shift+O) or paste it on the canvas — both convert it into native editable vector elements.
 
 The code editor replaces the canvas while a text file is active. Features:
-- Syntax highlighting (VS Code Dark+/Light+, auto-matched to Brilliant's brightness)
-- Vim mode via `@replit/codemirror-vim`; auto-loads config from `~/.config/nvim/init.vim`, `~/.config/nvim/init.lua`, or `~/.vimrc`. A mode indicator (Normal/Insert/Visual) appears in the top toolbar when active.
+- Syntax highlighting (dark/light theme auto-matched to Brilliant's brightness)
+- Vim mode; auto-loads config from `~/.config/nvim/init.vim`, `~/.config/nvim/init.lua`, or `~/.vimrc`. A mode indicator (Normal/Insert/Visual) appears in the top toolbar when active.
 - Cmd+F search and replace; side-by-side diff/merge view
 - Alt+Right/Left switches files; Ctrl+Alt+Left jumps to the previously active file
 
@@ -223,7 +223,7 @@ Brilliant auto-saves continuously. There is no Cmd+S and you never need to save 
 - **Scratch mode** (no folder open): work is auto-saved to `~/.config/brilliant/scratch/`
 
 Behavior:
-- Each edit starts a 500 ms debounce timer; once edits stop, the active canvas is written in a background isolate so saves never block interaction
+- Shortly after you stop editing, the active canvas is written in the background so saves never block interaction
 - The save captures element state, hierarchy, fills/strokes/effects, components, design-system bindings, ruler guides, zoom, pan, and background settings
 - The dirty indicator is the canvas name's opacity in the top toolbar breadcrumb
 - On quit and on workspace switch, all dirty canvases are flushed first

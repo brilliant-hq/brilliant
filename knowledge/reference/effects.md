@@ -11,9 +11,9 @@ Visual effects that enhance elements with shadows, glows, and blurs. Effects are
 
 Effects are split across two storage models with two different panels in the right toolbar. Which home an effect lives in determines its z-order behavior.
 
-### Effects section (`element.effects`)
+### Effects section
 
-Three effect types, stored in a dedicated effects list and managed in the **Effects section** of the right toolbar:
+Three effect types, managed in the **Effects section** of the right toolbar:
 
 | Type | UI Label | Description | Z-order |
 |------|----------|-------------|---------|
@@ -23,9 +23,9 @@ Three effect types, stored in a dedicated effects list and managed in the **Effe
 
 Drop shadows and outer glows always render behind the element, regardless of where they sit in the effects list. Stacking multiple shadows or glows is supported; later entries in the list paint on top of earlier ones.
 
-### Fills/Strokes section (paint-style effects)
+### Fills / Strokes section
 
-Inner shadow, inner glow, and background blur are **fill types**, not entries in the effects list. They live in the element's Fills list (and can also be applied as strokes) and participate in full z-order alongside solid, gradient, image, shader, and filter fills.
+Inner shadow, inner glow, and background blur are **fill types**, not entries in the Effects section. They live in the element's Fills list (and can also be applied as strokes) and participate in full z-order alongside solid, gradient, image, shader, and filter fills.
 
 | Type | Description |
 |------|-------------|
@@ -54,15 +54,15 @@ These are fill types, so add them through the Fills section (they also work as s
 
 Open the command palette (Cmd+Shift+P) and run any of these by name:
 
-| Command | ID |
-|---------|-----|
-| Add Drop Shadow | `add_drop_shadow` |
-| Add Outer Glow | `add_outer_glow` |
-| Add Element Blur | `add_layer_blur` |
-| Add Inner Shadow | `add_inner_shadow_fill` |
-| Add Inner Glow | `add_inner_glow_fill` |
-| Add Background Blur | `add_background_blur_fill` |
-| Add Color Adjust | `add_color_adjust_fill` |
+| Command |
+|---------|
+| Add Drop Shadow |
+| Add Outer Glow |
+| Add Element Blur |
+| Add Inner Shadow |
+| Add Inner Glow |
+| Add Background Blur |
+| Add Color Adjust |
 
 > For Blueprint DSL authoring of effects (the compact syntax used by `create_modify_elements`), see the blueprint knowledge files. Do not author DSL from this reference.
 
@@ -109,7 +109,7 @@ Numeric fields can be typed directly or scrubbed by dragging the field. Opacity 
 | Spread | -100 to 100 | 0 |
 | Color | Any | Black |
 | Opacity | 0 to 100% | 25% |
-| Blend Mode | Any of the standard blend modes | Normal (srcOver) |
+| Blend Mode | Any of the standard blend modes | Normal |
 | Show Behind Transparent Areas | toggle | off |
 
 **Show Behind Transparent Areas:** when off (default), the element's shape is knocked out of the shadow (Figma-style). When on, the shadow shows through transparent fills. This toggle is exposed in the UI for drop shadow only.
@@ -144,7 +144,7 @@ Element Blur has no color or blend mode. The effect row still shows the inline o
 | Spread | -100 to 100 | 0 |
 | Color | Any | Black |
 | Opacity | 0 to 100% | 50% |
-| Blend Mode | Any | Normal (srcOver) |
+| Blend Mode | Any | Normal |
 
 ### Inner Glow (fill)
 
@@ -184,7 +184,7 @@ The per-element layer stack, top to bottom:
 
 1. Element opacity / blend-mode layer (if element opacity < 100% or blend mode is not Normal)
 2. Element Blur wrap (if an Element Blur effect is enabled)
-3. Drop shadows and outer glows (behind the body, in effects-list order)
+3. Drop shadows and outer glows (behind the body, in Effects section order)
 4. Fills in z-order: solid, gradient, image, shaders, inner shadow, inner glow, image filters, color adjust
 5. Strokes (same supported types as fills)
 

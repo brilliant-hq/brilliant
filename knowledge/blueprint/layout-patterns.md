@@ -11,11 +11,9 @@ al(h,x(e),y(c),g($spacing.md),pad($spacing.none)) s(fill,hug)   ← push all chi
 al(h,x(c),y(c),g($spacing.sm),pad($spacing.none)) s(hug,hug)    ← self-sizing centered row (button, chip)
 al(v,y(sb),x(s),g($spacing.none),pad($spacing.none)) s(fill,600)           ← pin footer to bottom (g($spacing.none) = intentional zero gap)
 al(h,g($spacing.overlap.md),pad($spacing.none))              ← negative gap pulls children into overlap (avatar stacks, badge over icon, hero break-out). Scale: $spacing.overlap.xs/sm/md/lg/xl/2xl (-2 → -32)
-al(h,g($spacing.sm),pad($spacing.none)) s(fill,hug)          ← N equal-width items: all children s(fill,fill)
-al(h,g($spacing.md),pad($spacing.none)) s(fill,hug)          ← fixed + flexible: s(240,fill) + s(fill,fill)
+al(h,g($spacing.sm),pad($spacing.none)) s(fill,hug)          ← N equal-width items: children s(fill,fill); fixed+flexible: s(240,fill) + s(fill,fill)
 al(v,y(e),x(c),g($spacing.sm),pad($spacing.none)) s(hug,fill)   ← bottom-align in column (container needs fixed height)
-gr s(200,200)                              ← group for free positioning with p(x,y)
-gr s(200,200)                              ← center child inside group/frame using p(c,c)
+gr s(200,200)                              ← group for free p(x,y) positioning; p(c,c) centers a child
   r abs p(c,c) s(100,100)                 ← abs: free positioning inside auto layout
 ```
 
@@ -35,15 +33,15 @@ Frame/auto-layout: structured content (gap, padding, alignment) + linear overlap
 N copies on a circle: **compute each `p()`/`rot()`, never eyeball** (estimates come out lopsided). For copy at angle `θ` (0=up, step `360/N`): `p.x = cx + R·sinθ − halfW`, `p.y = cy − R·cosθ − halfH`. `cx,cy`=hub (group center), `R`=orbit radius, `halfW/H`=half the copy's *rendered* size (subtract: `p()` is top-left). 8 petals, hub (140,140), R=58, copy 64×130:
 ```
 gr p(c,c) s(280,280) "Lotus"
-  v(...) comp p(108,17) s(80,130) f[(...)] "Petal" #petal  // θ=0 top. comp on a vector wraps it; rendered size (here 64×130) may differ from s() — use it for halfW/H
-  inst(#petal) p(149,34)  rot(45)   // rot() pivots on the copy's OWN center, so position FIRST then rotate — rotating in place collapses all copies onto the hub as a star
-  inst(#petal) p(166,75)  rot(90)   // right
+  v(...) comp p(108,17) s(80,130) f[(...)] "Petal" #petal  -- θ=0 top. comp on a vector wraps it; rendered size (here 64×130) may differ from s() — use it for halfW/H
+  inst(#petal) p(149,34)  rot(45)   -- rot() pivots on the copy's OWN center, so position FIRST then rotate — rotating in place collapses all copies onto the hub as a star
+  inst(#petal) p(166,75)  rot(90)   -- right
   inst(#petal) p(149,116) rot(135)
-  inst(#petal) p(108,133) rot(180)  // bottom
+  inst(#petal) p(108,133) rot(180)  -- bottom
   inst(#petal) p(67,116)  rot(225)
-  inst(#petal) p(50,75)   rot(270)  // left
+  inst(#petal) p(50,75)   rot(270)  -- left
   inst(#petal) p(67,34)   rot(315)
-  c p(c,c) s(64,64) f[(...)] "Hub"  // center last = on top
+  c p(c,c) s(64,64) f[(...)] "Hub"  -- center last = on top
 ```
 
 ## Debugging

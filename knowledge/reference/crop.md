@@ -9,13 +9,13 @@ Brilliant supports four image scale modes and an interactive crop editor for pre
 
 ## Image Scale Modes
 
-Every image fill or image stroke has a scale mode (`ImageScaleMode`):
+Every image fill or image stroke has a scale mode:
 
 | Mode | Behavior | Interactive editing |
 |------|----------|---------------------|
 | **Fill** (default) | Image covers element, excess clipped. Aspect preserved | No |
 | **Fit** | Image fits inside element, letterboxed/pillarboxed. Aspect preserved | No |
-| **Crop** | Image positioned by `ImageCropData` (4 corners in unit square). Free pan/resize/rotate | Yes |
+| **Crop** | Image positioned freely. Free pan/resize/rotate | Yes |
 | **Repeat** | Image tiles at natural pixel size relative to element. NO crop compensation | No |
 
 Set the mode in the right toolbar's **image fill** or **image stroke** section via the **Scale Mode** dropdown (image's expanded config). Switching to a non-Crop mode automatically clears any stored crop data.
@@ -65,7 +65,7 @@ Crop mode provides two layers of handles: **container handles** (visible blue L-
 
 ### Pan Image
 
-Drag anywhere on the image area to reposition the image within the container. The image is permitted to move freely; clamping prevents only the case where the image leaves the viewport entirely (permissive overlap check on the unit-square AABB).
+Drag anywhere on the image area to reposition the image within the container. You can move the image freely; it is only prevented from leaving the visible area entirely.
 
 ### Resize Image
 
@@ -76,11 +76,11 @@ Drag any of the 8 image resize zones (4 corners + 4 full-edge zones) to scale th
 | None | Free resize (aspect unlocked) |
 | **Shift** or **Ctrl** | Proportional resize (aspect locked) |
 
-Crop image resize ignores the element's `constrainProportions` flag.
+Crop image resize is not affected by the lock-aspect-ratio setting; hold Shift (or Ctrl) to keep the image aspect ratio.
 
 ### Rotate Image
 
-Drag any of the 4 image rotation handles (outside image corners) to rotate the image within the container. Implementation rotates corners in world space and maps back to the unit square: naturally isotropic, so non-square elements rotate correctly without skew.
+Drag any of the 4 image rotation handles (outside image corners) to rotate the image within the container. Image rotation works correctly even on non-square elements (no skew).
 
 ### Resize Container
 

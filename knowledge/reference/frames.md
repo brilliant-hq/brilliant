@@ -70,7 +70,7 @@ All parent types support:
 
 - **Frame** and **Auto Layout** support all sizing modes and accept reparenting (drag elements in/out).
 - **Group** is always Hug on both axes. Changing sizing from Hug on either axis auto-converts it to a **Frame**. Groups are NOT reparent targets; children cannot be dragged out during drag.
-- **Mask** is always Hug on both axes. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape. Only Vector masking is selectable in the UI (the file format can store Alpha and Luminance mask types, but there is no UI to pick them).
+- **Mask** is always Hug on both axes. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape. Only Vector masking is selectable in the UI.
 - **Boolean** is always Hug on both axes. The combined path is rendered. Double-click to enter edit mode (children become editable; Subtract is z-order sensitive: front shapes subtract from the back).
 
 ## Frames
@@ -118,7 +118,7 @@ If the group is a component master, its component relationship is cleaned up fir
 
 ### Editing Inside a Group
 
-1. Click the group's frame label to select it
+1. Click the group's label to select it
 2. Press **Enter** to drill in (selects first child)
 3. Click children individually
 4. Press **Shift+Enter** to select the parent (go up)
@@ -128,7 +128,7 @@ If the group is a component master, its component relationship is cleaned up fir
 - **Fill** (Shift+F), **Stroke** (Shift+S), **Corner radius**, **Effects**
 - **Clip content** off by default
 - **Sizing**: always Hug (changing it converts the group to a Frame)
-- **Rename**: Cmd+R, or double-click the frame label on canvas
+- **Rename**: Cmd+R, or double-click the group label on canvas
 
 ## Masks (Ctrl+Cmd+M)
 
@@ -156,15 +156,15 @@ A mask uses one element to clip others, like a cookie cutter. The **topmost elem
 | Type | Description |
 |------|-------------|
 | Vector (default) | Clip via the mask shape's vector outline including stroke geometry |
-| Alpha | Stored in the file format only; no UI selector |
-| Luminance | Stored in the file format only; no UI selector |
+| Alpha | Not selectable in the UI |
+| Luminance | Not selectable in the UI |
 
 The active masking type is always Vector. Alpha and Luminance round-trip through saved files but cannot be selected via the right toolbar.
 
 ### Mask Properties
 
 - **Sizing**: always Hug on both axes
-- **Fill, stroke, corner radius, effects**: rendered on the mask result shape (same overlay path used by booleans)
+- **Fill, stroke, corner radius, effects**: fills/strokes are painted on the combined result shape
 - **Tip**: any element type can be the mask shape (rectangle, circle, vector, text). Reorder children in the layers explorer to change which is the mask shape (last/topmost = mask).
 
 ## Boolean Operations
@@ -181,7 +181,7 @@ Boolean parents combine child paths. Always Hug on both axes. Not reparent targe
 **Editing:** Double-click to enter edit mode (children individually editable). Escape exits. Subtract is z-order sensitive: front shapes subtract from the back.
 
 **Type conversion:**
-- Boolean ↔ Boolean (or Boolean ↔ Mask): preserves fills/strokes (both render them on the result shape via post-children overlay) and renames
+- Boolean ↔ Boolean (or Boolean ↔ Mask): preserves fills/strokes (both paint them on the combined result shape) and renames
 - Boolean → non-Boolean / non-Mask: standard conversion, keeps fills/strokes
 - Non-Boolean/Non-Mask → Boolean or Mask: clears fills/strokes, forces hug, renames (Mask → "Mask"; booleans → e.g. "Union")
 
@@ -386,7 +386,7 @@ In wrapped layouts, the insertion index is computed in 2D (find the row/column f
 | Resize a child | Converts to Fixed sizing, re-layouts |
 | Rotate a child | Converts to Fixed sizing, re-layouts |
 | Delete a child | Siblings reflow |
-| Add a child | Re-layouts via reactive hook |
+| Add a child | Re-layouts automatically |
 | Arrow keys | Reorders flow children along main axis (absolute children nudge normally) |
 | Drag within frame | Drag-reorder for flow children, free move for absolute children |
 | Drag to different frame | Reparents both, both re-layout |

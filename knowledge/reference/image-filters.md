@@ -262,22 +262,22 @@ When **Colors** is set to Custom, the filter maps luminance to the two selected 
 
 Open the command palette with Cmd+Shift+P and search for the filter name. Each command adds that filter as a new fill (with defaults) on the selected element:
 
-| Command name | Command ID |
-|--------------|-----------|
-| Add Noise / Grain | `add_noise_grain_fill` |
-| Add Halftone | `add_halftone_fill` |
-| Add Pixelate | `add_pixelate_fill` |
-| Add Duotone | `add_duotone_fill` |
-| Add Posterize | `add_posterize_fill` |
-| Add Dither | `add_dither_fill` |
-| Add Color Adjust | `add_color_adjust_fill` (see [effects.md](./effects.md#color-adjust-fill)) |
+| Command name |
+|--------------|
+| Add Noise / Grain |
+| Add Halftone |
+| Add Pixelate |
+| Add Duotone |
+| Add Posterize |
+| Add Dither |
+| Add Color Adjust (see [effects.md](./effects.md#color-adjust-fill)) |
 
 ---
 
 ## General notes
 
 - **Strokes too**: Every filter works identically when added to the Strokes list. It then reprocesses the stroke's rendered area instead of the fill area.
-- **Stacking**: Multiple filters can coexist on one element. Each reprocesses everything below it in the fills (or strokes) list, so the stacking order is just the fill order. Reorder by dragging fill rows.
+- **Stacking**: Multiple filters can coexist on one element, each processing everything below it in fill order — see [Z-order processing](#z-order-processing).
 - **Blend mode**: Each filter row has a blend mode dropdown in its expanded config, controlling how the filter's output composites with the content below it.
 - **Stable across zoom**: Pattern sizes (grain, dots, cells) are measured in logical pixels, so they stay visually consistent as you zoom in and out.
 - **Per-color tint strength**: For filters with color swatches (Halftone, Duotone, Dither), each swatch's alpha controls how strongly that color tints the result versus showing the original image, not the output's transparency.

@@ -33,7 +33,7 @@ Every guide displays a compact header row. Layout (left to right):
 |---------|-------------|
 | **Drag handle** | Always present, but only draggable when 2+ guides exist. Drag to reorder. |
 | **Type dropdown** | Grid / Columns / Rows. The dropdown's prefix is a color swatch (tap to open the color picker). |
-| **Opacity field (%)** | Color opacity, 0 to 100. Supports design system tokens. |
+| **Opacity field (%)** | Color opacity, 0 to 100. |
 | **Expand button** (slider icon) | Show/hide the guide's property fields and eye toggle. |
 | **Remove button** (minus) | Delete the guide. |
 
@@ -99,6 +99,8 @@ Layout guide visibility has two independent toggles. Both must be on for a guide
 |-------|---------|-------|
 | **Global** | **Shift+G** | Hides/shows ALL layout guides on ALL frames |
 | **Per-guide** | Eye toggle in the expanded fields | Hides/shows one guide |
+
+Layout guides are on-screen design aids only. They never appear in exports (PNG, JPEG, WebP, SVG, PDF) or in copied output.
 
 ## Snapping to Guides
 

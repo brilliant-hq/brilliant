@@ -27,7 +27,7 @@ Note: there is no built-in "Zoom to 100%" Cmd+0 binding. `0` alone (without Cmd)
 - **Min zoom:** 2% (0.02x), unless "Disable Zoom Out" (Cmd+Ctrl+D) is active, which clamps to 100% and constrains pan to canvas bounds
 - **Keyboard zoom (Cmd+= and Cmd+-):** centers on the viewport
 - **Cmd+scroll, Cmd+trackpad drag, trackpad pinch:** zoom around the cursor
-- **Smooth animation:** zoom transitions use time-normalized exponential-decay smoothing (smoothSpeed = 60) so retargeting mid-flight stays smooth. Toggle via "Toggle Zoom Animation" command (no default shortcut).
+- **Smooth animation:** zoom transitions ease smoothly, so retargeting mid-flight stays smooth. Toggle via "Toggle Zoom Animation" command (no default shortcut).
 - **Per-canvas zoom state:** each canvas remembers its own zoom and pan; switching canvases restores them. The first time a canvas with content is opened, the viewport zoom-fits to its bounds automatically.
 
 ### Zoom to Content
@@ -78,7 +78,7 @@ Two-finger drag on trackpad pans. Cmd+two-finger drag zooms around the cursor.
 
 ### Scroll-Wheel Pan
 
-Mouse scroll wheel pans (vertical scroll = vertical pan). Shift+scroll pans horizontally. Cmd+scroll zooms around the cursor instead. Trackpad pan and hand-tool drag include momentum (quick flick decelerates after release; decay 0.94/frame, min flick speed 3.0; momentum stops on pointer down or `PointerScrollInertiaCancelEvent`). Mouse scroll wheel has no added momentum (the OS handles its own acceleration).
+Mouse scroll wheel pans (vertical scroll = vertical pan). Shift+scroll pans horizontally. Cmd+scroll zooms around the cursor instead. Trackpad pan and hand-tool drag include momentum: a quick flick keeps gliding and decelerates after release, and stops on the next click or scroll. Mouse scroll wheel has no added momentum (the OS handles its own acceleration).
 
 ### Middle-Mouse Drag
 
@@ -116,13 +116,13 @@ How clicks resolve to elements, and how the result is shown.
 | Boolean / mask parent | Uses the resulting visible shape, not the rectangular bounding box |
 | Circle arc / ring | Hit test follows the arc fill path or ring band, not the full ellipse |
 
-Tolerance is `4.0 / zoomScale`: 4 screen pixels at any zoom level. Stacking order is topmost-first (last-rendered wins) and matches DFS pre-order via `CanvasElements.all`.
+Tolerance is 4 screen pixels at any zoom level. Stacking order is topmost-first: the last-drawn element wins.
 
 ### Selection rectangles
 
 Selection is per-parent. With 2 elements selected in Frame A and 3 in Frame B, two selection rectangles render, one per parent. Each has its own resize and rotate handles, and align/distribute/resize commands operate within each parent's coordinate space independently.
 
-Selection handles auto-hide when they would be visually too large relative to the selection bounds (`maxHandleToSelectionRatio = 0.30`); multi-parent selections always show handles, and two-point paths (lines) always show handles.
+Selection handles auto-hide when they would dwarf a small selection; multi-parent selections always show handles, and two-point paths (lines) always show handles.
 
 ### Marquee (drag-to-select)
 
@@ -189,22 +189,11 @@ Supported modes (16): Normal, Darken, Multiply, Color Burn, Lighten, Screen, Col
 
 ## Rendering Performance
 
-Two render modes managed by `RenderModeController`, switched automatically. The user does not need to opt in or out.
-
-| Mode | When | What it does |
-|------|------|---------------|
-| Widget mode | Default; below the tile thresholds | Each element renders as its own Flutter widget with `RepaintBoundary` |
-| Tile mode | Jank-triggered (6 of 8 recent frames > 15ms, OR 2 consecutive frames > 40ms) gated on >= 256 visible elements, OR proactively on zoom/pan start when >= 512 visible elements | All elements drawn into cached GPU-resident tile images via a single `TilePainter`; during drag, small selections (<= 100 elements) promote to per-element widgets on top, larger selections use a single snapshot image |
-
-Exit back to widget mode requires visible elements below 512 for 3 consecutive checks. Mode switches enforce a 3-second cooldown to prevent oscillation.
+On very large canvases (hundreds of elements) Brilliant automatically switches to a faster rendering mode, and switches back once the canvas is lighter. This is fully automatic; no user action is needed.
 
 ### Studio vs Overlay screen capture
 
 When the canvas is zoomed/panned in overlay mode, the OS desktop image is captured and painted as the background behind the canvas content. In studio mode this is skipped (capture would record the app's own window); the void background fills the area instead.
-
-### Profiler overlay
-
-**Cmd+Shift+Alt+P** toggles the render profiler overlay (frame timings, jank counters, mode transitions, manager notification costs). Debug builds only.
 
 ## Snap Guides
 
@@ -281,9 +270,9 @@ The canvas paints three background layers in order: void, background color, blac
 
 ### Layer stack
 
-1. **Void**: visible only when the canvas is "outside" the editable area (studio mode, preview mode, or overlay mode while zoomed/panned). The void renders a theme-aware base (light grey on light theme, very dark grey on dark theme) plus a tiled `CheckerboardPattern` at 5% opacity to signal "no canvas content here". The void is skipped when an opaque background or blackboard color would fully occlude it.
-2. **Background color**: the canvas's configured background, drawn over the void. Shown when `isBackgroundEnabled` is true and there is no blackboard color.
-3. **Blackboard color**: highest-priority opaque fill. Drawn over everything else when `blackboardColor` is set.
+1. **Void**: visible only when the canvas is "outside" the editable area (studio mode, preview mode, or overlay mode while zoomed/panned). The void renders a theme-aware base (light grey on light theme, very dark grey on dark theme) plus a faint checkerboard pattern to signal "no canvas content here". The void is skipped when an opaque background or blackboard color would fully occlude it.
+2. **Background color**: the canvas's configured background, drawn over the void. Shown when the canvas background is enabled and no blackboard color is set.
+3. **Blackboard color**: highest-priority opaque fill. Drawn over everything else when a blackboard color is set.
 
 ### Background Modes
 
@@ -314,7 +303,7 @@ Overlay mode is **opt-in**. Until the user enables it (Settings: "Overlay Mode")
 | Toggle left toolbar | Cmd+Shift+Left | |
 | Toggle right toolbar | Cmd+Shift+Right | |
 | Toggle bottom toolbar | Cmd+Shift+Down | |
-| Toggle desktop icons | Ctrl+I | macOS-only; currently a no-op placeholder (reserves the chord) |
+| Toggle desktop icons | Ctrl+I | macOS-only; reserved, currently does nothing |
 | Clear all elements | C | Removes all elements from the active canvas (undoable) |
 
 Passthrough mode is overlay-only. In overlay mode, Cmd+\ produces a clean transparent drawing surface for annotation or tracing.

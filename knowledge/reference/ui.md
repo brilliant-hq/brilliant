@@ -17,7 +17,7 @@ Centered at the top of the screen. Displays workspace breadcrumbs in the form `W
 - Drag the toolbar background to move the OS window (disabled in fullscreen / maximized; cursor turns grab/grabbing).
 - When editing a text file with vim mode enabled and the code editor is focused, a small vim mode indicator (NORMAL / INSERT / VISUAL) is shown to the left of the breadcrumbs.
 
-There is no save chip in the top toolbar: auto-save runs in the background via `AutoSaveManager` with a 500 ms debounce. The last breadcrumb's opacity is the only save-state cue.
+There is no save chip in the top toolbar: auto-save runs in the background with a ~500 ms debounce. The last breadcrumb's opacity is the only save-state cue.
 
 ## Window Modes
 
@@ -32,11 +32,11 @@ Brilliant runs in two window modes, switched on a single window:
 | Toggle passthrough (overlay only) | Ctrl+A |
 | Toggle desktop icons (overlay only) | Ctrl+I |
 
-**Overlay mode is opt-in.** The Ctrl+F global hotkey is only registered when "Overlay mode" is turned on in Settings (Cmd+,). With the setting off, Ctrl+F does nothing: toggle the setting to use overlay mode. The toggle is persisted via `SharedPreferences` (`OverlayModeEnabled`).
+**Overlay mode is opt-in.** The Ctrl+F global hotkey is only registered when "Overlay mode" is turned on in Settings (Cmd+,). With the setting off, Ctrl+F does nothing: toggle the setting to use overlay mode. The toggle persists across launches.
 
-In passthrough mode (overlay only), mouse clicks pass through Brilliant to the apps below. Studio window state (position, size, fullscreen, maximized) is saved before entering overlay and restored on exit. The bottom toolbar uses an `_overlayBottomEdgeInset` of 80 px while in overlay mode (vs the standard `toolbarVerticalInset` in studio).
+In passthrough mode (overlay only), mouse clicks pass through Brilliant to the apps below. Studio window state (position, size, fullscreen, maximized) is saved before entering overlay and restored on exit. The bottom toolbar sits slightly higher off the bottom edge while in overlay mode than in studio.
 
-The overlay-mode toggle is registered as a global hotkey via `KeybindingsManager` only when the opt-in is on, so it works even when Brilliant is not the focused application. Reassigning the keybinding re-registers the global hotkey. Passthrough and desktop-icon toggles are regular in-app shortcuts (overlay window must be active).
+The overlay-mode toggle is a global hotkey only when the opt-in is on, so it works even when Brilliant is not the focused application. Reassigning the keybinding re-registers the global hotkey. Passthrough and desktop-icon toggles are regular in-app shortcuts (overlay window must be active).
 
 ## Left Toolbar
 
@@ -52,9 +52,9 @@ The header is right-aligned. Order, left to right: reset-position button, toggle
 
 ### File Explorer
 
-Tree of all canvases, folders, and asset files in the workspace. Features: folder expand/collapse, multi-selection (Cmd/Shift+Click), right-click context menu, drag/drop reorder and reparent, inline renaming (double-click or Cmd+R), keyboard navigation, type-to-filter. Hidden files (`.foo`) are gated by the `toggle_hidden_files` command.
+Tree of all canvases, folders, and asset files in the workspace. Features: folder expand/collapse, multi-selection (Cmd/Shift+Click), right-click context menu, drag/drop reorder and reparent, inline renaming (double-click or Cmd+R), keyboard navigation, type-to-filter. Hidden files (`.foo`) are gated by the Show Hidden Files command.
 
-Within the file explorer, undo/redo (Cmd+Z / Cmd+Shift+Z) operates on canvas/folder lifecycle (create, delete, rename, move) via a separate explorer-scoped UndoManager. Outside the file explorer, undo/redo applies to the active canvas.
+Within the file explorer, undo/redo (Cmd+Z / Cmd+Shift+Z) operates on canvas/folder lifecycle (create, delete, rename, move) via a separate explorer-scoped undo history. Outside the file explorer, undo/redo applies to the active canvas.
 
 **Canvas search** (Cmd+P) opens the global search palette pre-filtered to files (canvases + assets).
 
@@ -63,7 +63,7 @@ Within the file explorer, undo/redo (Cmd+Z / Cmd+Shift+Z) operates on canvas/fol
 All elements on the active canvas in a hierarchical tree.
 
 Features:
-- Element type icons (`LayerIcon`) per type, including component master / instance markers
+- Element type icons per type, including component master / instance markers
 - Indentation lines show parent-child relationships
 - Click to select on canvas; Cmd/Shift+Click for multi-select
 - Drag to reorder (changes z-order) or reparent into a frame
@@ -78,7 +78,7 @@ Features:
 
 Right-anchored, expandable to 240 px and collapsible to a 20 px rail. Sections appear dynamically based on the current selection and tool. Drag the toolbar to reposition; "Reset position" returns it to the right edge.
 
-While dragging a selection rectangle that touches many elements, sections auto-collapse via the `SectionJankGuardMixin` (5-frame window, collapses if 2+ frames exceed 30 ms). They re-expand when the drag ends.
+While dragging a selection that touches many elements, sections auto-collapse to stay responsive, then re-expand when the drag ends.
 
 | Action | Shortcut |
 |--------|----------|
@@ -87,7 +87,7 @@ While dragging a selection rectangle that touches many elements, sections auto-c
 
 ### Sections (in order from top to bottom)
 
-Render order in `_buildContentView` (`right_toolbar_view.dart`): Design System, Canvas, Current Stroke, Current Fill, Element, Parent, Typography, Selection Strokes, Selection Fills, Selection Colors, Effects (`SelectionEffectsSection`), Layout Grid, Export, Figma Import. Each section decides its own visibility internally; this list reflects the slot order, not which sections are visible at any moment.
+Top to bottom: Design System, Canvas, Current Stroke, Current Fill, Element, Parent, Typography, Selection Strokes, Selection Fills, Selection Colors, Effects, Layout Grid, Export, Figma Import. Each section decides its own visibility based on the current selection and tool; this list reflects the slot order, not which sections are visible at any moment.
 
 **Header** (above the section stack): Reset position, toggle-toolbar (close/expand), and toggle-sections (expand or collapse all) buttons on the left. Zoom percentage on the right: drag to adjust, click to open a preset dropdown (2, 25, 50, 75, 100, 125, 150, 200, 300, 400, 600, 800, 1000, 2000, 3000, 5000).
 
@@ -113,13 +113,13 @@ Render order in `_buildContentView` (`right_toolbar_view.dart`): Design System, 
 
 **Layout Grid Section**: Layout grid editor for frames. Three grid types: Grid (uniform cells), Columns, Rows. Per-grid: visibility toggle, color swatch, expand toggle for properties (count, gutter, margin, alignment, span), and remove button.
 
-**Export Section**: Multi-config export panel. Each config row: format dropdown (PNG, JPEG, WebP, SVG, PDF, HTML, React, MP4, MOV, Replay; MOV is hidden on Windows). The HTML entry exposes a second dropdown to pick the variant (Page = standalone document, Snippet, Flexbox). The Replay row shows a separate `replayContainer` dropdown that picks MP4 or MOV. Resolution preset (Original 1x/2x/3x/4x, 720p, 1080p, 1440p, 4K, 8K, Portrait Post · IG, FB, Square Post · IG, X, Story / Reel · IG, TikTok, iPhone 16 Pro, MacBook Pro 14", Custom; vector and markup formats hide the resolution row). Expand for advanced (width/height with constrain proportions, fit mode = Fit/Fill/Stretch/Repeat, background, PDF multi-page toggle, plus video duration / FPS / codec / quality and replay-specific pacing/intro for video and replay rows). Add multiple configs with `+` to export several formats in one click. The right-toolbar UI does NOT expose JPEG-quality, WebP-quality, or WebP-lossless toggles: those are only reachable via the MCP `export` tool.
+**Export Section**: Multi-config export panel. Each config row: format dropdown (PNG, JPEG, WebP, SVG, PDF, HTML, React, MP4, MOV, Replay; MOV is hidden on Windows). The HTML entry exposes a second dropdown to pick the variant (Page = standalone document, Snippet, Flexbox). The Replay row shows a separate container dropdown that picks MP4 or MOV. Resolution preset (Original 1x/2x/3x/4x, 720p, 1080p, 1440p, 4K, 8K, Portrait Post · IG, FB, Square Post · IG, X, Story / Reel · IG, TikTok, iPhone 16 Pro, MacBook Pro 14", Custom; vector and markup formats hide the resolution row). Expand for advanced (width/height with constrain proportions, fit mode = Fit/Fill/Stretch/Repeat, background, PDF multi-page toggle, plus video duration / FPS / codec / quality and replay-specific pacing/intro for video and replay rows). Add multiple configs with `+` to export several formats in one click. The right-toolbar UI does NOT expose JPEG-quality, WebP-quality, or WebP-lossless toggles: those are only reachable via the MCP `export` tool.
 
 **Figma Import Section**: Figma file URL import. Visible only when nothing is selected and the Move tool is active (same condition as Canvas Section).
 
 Design tokens also surface in the color picker (token swatches at the bottom) and in numeric property fields that accept tokens (font size, line height, font weight, corner radius, padding). The Design System section at the top of the toolbar handles brand/mode switching only.
 
-A `SketchImportSection` widget exists in the codebase but is not mounted in `_buildContentView`. Sketch files import through the global Import command (Cmd+Shift+O) instead.
+Sketch files import through the global Import command (Cmd+Shift+O), not an inspector section.
 
 ### Interactive Fields
 
@@ -183,7 +183,7 @@ Single horizontal row, grouped left to right with vertical dividers:
 3. **Tools (canvas tools dropdown buttons):** Selection Tools dropdown (Move V, Scale K, Hand H), Shape Tools dropdown (Rectangle R, Line L, Arrow Shift+L, Circle O), Drawing Tools dropdown (Pen P, Pencil Shift+P), Frame (F), Text (T).
 4. **AI input area:** input field, processing/success/failure indicators, collapse chevron, connection indicator, running-agent activity bars.
 
-Each dropdown stores the most-recently-used variant as the head icon. Stroke-only variants of Rectangle (Shift+R) and Circle (Shift+O) are accessible only by keyboard. The Snip tool (S) is accessible only via the keyboard shortcut. Scale mode (K) is presented as a sub-option of the Selection Tools dropdown rather than as its own tool: selecting it puts the Move tool into persistent scale mode (`isForceScaleOn`).
+Each dropdown stores the most-recently-used variant as the head icon. Stroke-only variants of Rectangle (Shift+R) and Circle (Shift+O) are accessible only by keyboard. The Snip tool (S) is accessible only via the keyboard shortcut. Scale mode (K) is presented as a sub-option of the Selection Tools dropdown rather than as its own tool: selecting it puts the Move tool into persistent scale mode.
 
 ### AI Input
 
@@ -193,11 +193,11 @@ A collapse/expand chevron toggles the input. When collapsed, only the connection
 
 The connection indicator is a small check-circle (connected) / x-circle (not connected) dot. **Click it** to jump straight to Settings -> AI Providers (Cmd+, then the AI Providers page), which is where all API keys are managed. **Hover** it to see a display-only popup of per-provider status: Claude Code, Anthropic, OpenAI, Google, OpenRouter, Quiver (plus a "Playground mode" row first when playground replay is the active path). Anthropic / OpenAI / Google / OpenRouter are chat providers; Quiver is an SVG generation provider (text-to-SVG and raster-to-SVG vectorization). Each row shows a green check when credentialed and a dim icon when not. The popup rows are status-only: they do not accept key input. The dot reads connected (green) if the Claude CLI is installed, any chat provider has credentials, or a replay/playground path is active.
 
-While agents are running, one small `AgentActivityIndicator` bar per processing session appears at the right end of the toolbar. The submit button switches to a stop button while the user's request is processing; if the AI returns a "command not recognized" response a brief `?` indicator is shown instead. See `ai.md` for the full AI feature reference.
+While agents are running, one small activity bar per processing session appears at the right end of the toolbar. The submit button switches to a stop button while the user's request is processing; if the AI returns a "command not recognized" response a brief `?` indicator is shown instead. See `ai.md` for the full AI feature reference.
 
 ## Command Palette
 
-A single floating, draggable, search-driven palette with multiple content modes (`CommandPaletteContent`): `globalSearch`, `commands`, `canvasSelection`, `fontFamily`, `layerSearch`, `colorSelector`, `settings`, `updates`, `keyboardShortcuts`, `combos`. Modes that share `globalSearchList` (the searchable list view) all use the same search field with a left-side filter dropdown. The legacy mode-per-shortcut entries (`commands`, `canvasSelection`, `fontFamily`, `layerSearch`) auto-redirect into `globalSearch` with the appropriate `GlobalSearchFilter` applied; chat search is a `chats` filter on the same global search palette (no dedicated mode).
+A single floating, draggable, search-driven palette with multiple content modes: global search, commands, canvas (file) selection, font family, layer search, color selector, settings, updates, keyboard shortcuts, and combos. The list-based modes all use the same search field with a left-side filter dropdown. The category-specific shortcuts (command search, canvas search, font selector, layer search) open the same global-search palette pre-filtered to that category; chat search is just a `chats` filter on the same palette (no dedicated mode).
 
 | Mode | Shortcut |
 |------|----------|
@@ -211,23 +211,23 @@ A single floating, draggable, search-driven palette with multiple content modes 
 | Settings | Cmd+, |
 | Keyboard shortcuts | Shift+? |
 | Combos | Cmd+Shift+M |
-| Updates | Cmd+Shift+U (also via `check_for_updates`) |
+| Updates | Cmd+Shift+U (also via the Check for Updates command) |
 
 Note: **/** focuses the AI input in the bottom toolbar (then opens the chat panel), it does not open the command palette.
 
 All search modes support: type to search, Up/Down to navigate, Enter to execute, Escape to close, draggable title bar.
 
-**Unified Global Search** (Cmd+K): Shows commands + files + layers + fonts + chats in one list, each section capped by the layout. The filter dropdown switches to a single category (filter values: `all`, `commands`, `files`, `layers`, `fonts`, `chats`). The category-specific shortcuts (Cmd+Shift+P, Cmd+P, Cmd+L, Cmd+Shift+F, Cmd+Shift+I) open the same palette pre-filtered. In "all" mode, layers only run when the query is 2+ characters (otherwise the first 5 elements show as a stub) and fonts are skipped (too many entries).
+**Unified Global Search** (Cmd+K): Shows commands + files + layers + fonts + chats in one list, each section capped by the layout. The filter dropdown switches to a single category (All, Commands, Files, Layers, Fonts, Chats). The category-specific shortcuts (Cmd+Shift+P, Cmd+P, Cmd+L, Cmd+Shift+F, Cmd+Shift+I) open the same palette pre-filtered. In "all" mode, layers only run when the query is 2+ characters (otherwise the first 5 elements show as a stub) and fonts are skipped (too many entries).
 
 ### Keyboard Shortcuts View (Shift+?)
 
-A floating palette mode (`KeyboardShortcutsView`) for viewing and customizing every command's keybinding.
+A floating palette mode for viewing and customizing every command's keybinding.
 
 - **Search**: filter by command name, group, or keybinding text.
 - **Two-column scrollable layout**: commands grouped by category (Drawing Tools, Selection & Editing, Canvas, Color, Effects, Auto Layout, etc.).
 - **Per-row actions on hover:** record (reassign), trash (clear), reset (restore default: only shown when modified).
 - **Click a command name** to execute it immediately. Useful for unbound commands.
-- **Info button (i)**: hover to see the command's description and `WhenClause` "Active when" activation context.
+- **Info button (i)**: hover to see the command's description and its "Active when" activation context.
 - **Conflict detection**: warning triangle on conflicting shortcuts with a filter button (also a triangle) in the search bar to show only conflicts.
 - **Context picker**: when a row has a conflict, a dropdown appears letting you scope its activation (`Canvas`, `Always`, `Has Selection`, `Multiple Selected`, `Auto Layout Selected`, `Parent Selected`, `Component Instance`, `Text Editing`, `AI Input`, `Vector Mode`, `Code Editor`).
 
@@ -254,20 +254,20 @@ Open by clicking any color swatch or pressing **Ctrl+C**.
 
 ### Eyedropper (Ctrl+Shift+C)
 
-Toggles `toggle_color_pick_mode`. Cursor follows the pointer with a magnified pixel-grid loupe; click anywhere on the screen to sample that pixel's color into the active swatch. Esc cancels (priority 2 in the Escape stack: see `shortcuts.md`).
+Toggles the eyedropper / color-pick mode. Cursor follows the pointer with a magnified pixel-grid loupe; click anywhere on the screen to sample that pixel's color into the active swatch. Esc cancels (priority 2 in the Escape stack: see `shortcuts.md`).
 
 ## Code Editor
 
 When opening a non-design file (`.md`, `.dart`, `.json`, `.txt`, etc.) from the file explorer, a CodeMirror 6 text editor replaces the canvas. The breadcrumb's last segment is the editable file name.
 
 - Syntax highlighting for common languages.
-- Vim mode is toggleable (`toggle_vim_mode`, no default keybinding) and reads vimrc-style mappings from disk; the active vim mode (NORMAL / INSERT / VISUAL) shows in the top toolbar.
+- Vim mode (no default shortcut) is toggleable and reads vimrc-style mappings from disk; the active vim mode (NORMAL / INSERT / VISUAL) shows in the top toolbar.
 - Find / replace uses standard CodeMirror keybindings.
-- Dirty state shows by dimming the last breadcrumb (60% opacity); auto-save persists to disk; `textFileNeedsSave` drives the indicator.
+- Dirty state shows by dimming the last breadcrumb (60% opacity); auto-save persists to disk.
 - HTML preview mode is available for `.html` files.
 - File switching is via the file explorer or canvas/file navigation shortcuts.
 
-When the code editor is focused, undo/redo is captured by CodeMirror, not by Brilliant's UndoManagerRouter.
+When the code editor is focused, undo/redo is captured by the editor, not by the canvas undo history.
 
 ## AI Chat Panel
 
@@ -295,7 +295,7 @@ Tabs sit inline in the bottom toolbar after the tool buttons (sessions occupy th
 
 ### Resize
 
-- **Width:** drag the side edge to resize the chat panel; width is clamped to 300–1200 px. The chat panel honors a per-session minimum width returned by `AIChatManager.minAiChatWidth` (e.g., the Claude Code setup onboarding raises this floor temporarily).
+- **Width:** drag the side edge to resize the chat panel; width is clamped to 300–1200 px. The minimum width can rise temporarily for some sessions (e.g., during Claude Code setup onboarding).
 - **Height:** drag the top edge of the panel.
 
 ---

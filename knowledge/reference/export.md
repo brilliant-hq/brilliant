@@ -32,7 +32,7 @@ There are three by-hand entry points:
 | **React (JSX)** | Markup | Same DOM as HTML, JSX style objects, camelCase attrs. Pasteable into a `.tsx` file. Command palette / Copy as only |
 | **MP4** | Video | H.264 or HEVC, no alpha. macOS only. Export panel only |
 | **MOV** | Video | HEVC (with alpha) or ProRes 4444. macOS only, supports transparent background. Export panel only |
-| **Replay** | Video | Animated reveal: elements fade in one after another with a shimmer pass. Files as MP4. Has a command and a context-menu entry |
+| **Replay** | Video | Animated reveal: elements fade in one after another with a shimmer pass. Defaults to MP4, but MOV is selectable (required for a transparent background). Has a command and a context-menu entry |
 
 Video export is macOS only (hardware-accelerated via VideoToolbox). On Windows and Linux the video formats are not available.
 
@@ -42,17 +42,17 @@ The Export panel and the `Copy as WebP` command both produce lossy WebP at quali
 
 ## Export commands
 
-| Command | ID | Shortcut |
-|---------|-----|----------|
-| Export to PNG | `export_to_png` | **Cmd+E** |
-| Export to JPEG | `export_to_jpeg` | command palette |
-| Export to WebP | `export_to_webp` | command palette |
-| Export to SVG | `export_to_svg` | command palette |
-| Export to PDF | `export_to_pdf` | command palette |
-| Export to HTML | `export_to_html` | command palette |
-| Export to React (JSX) | `export_to_react` | command palette |
-| Export to Replay | `export_to_replay` | command palette / context menu (context-menu default is 2x scale) |
-| Send to Figma | `copy_to_figma` | command palette / `Send to → Figma` (only enabled when the Brilliant Figma plugin is paired; otherwise falls back to clipboard) |
+| Command | Shortcut |
+|---------|----------|
+| Export to PNG | **Cmd+E** |
+| Export to JPEG | command palette |
+| Export to WebP | command palette |
+| Export to SVG | command palette |
+| Export to PDF | command palette |
+| Export to HTML | command palette |
+| Export to React (JSX) | command palette |
+| Export to Replay | command palette / context menu (context-menu default is 2x scale) |
+| Send to Figma | command palette / `Send to → Figma` (only enabled when the Brilliant Figma plugin is paired; otherwise falls back to clipboard) |
 
 Plain MP4/MOV have no command or shortcut. They are reachable only from the Export panel. Replay is the one video format with a command because it has a sensible one-click default.
 
@@ -103,7 +103,7 @@ Video currently animates shader fills only (metaballs, liquid metal, holographic
 
 ### Replay export
 
-Replay is a one-click animated reveal of the current selection: each element fades in one after another with a shimmer pass. It is always written as MP4 on disk. Run it from the command palette (`Export to Replay`), the right-click `Export as → Replay` (which uses 2x scale for crisp retina output), or the Export panel.
+Replay is a one-click animated reveal of the current selection: each element fades in one after another with a shimmer pass. It defaults to MP4, but you can switch the container to MOV (required if you want a transparent background). Run it from the command palette (`Export to Replay`), the right-click `Export as → Replay` (which uses 2x scale for crisp retina output), or the Export panel.
 
 | Option | Values | Default |
 |--------|--------|---------|
@@ -132,18 +132,18 @@ Multi-page is a per-config-row setting, so a single batch click can ship a singl
 
 Copy the selection to the clipboard in several representations. Useful for pasting into code editors, docs, other design tools, or chat. Reach these from the command palette or the right-click `Copy as` submenu.
 
-| Command | ID | What it copies |
-|---------|-----|----------------|
-| Copy as PNG | `copy_as_png` | PNG image at screen resolution (device pixel ratio) |
-| Copy as WebP | `copy_as_webp` | WebP image, lossy q=90, macOS only; narrow app support, prefer PNG |
-| Copy as SVG | `copy_as_svg` | SVG markup text |
-| Copy as HTML | `copy_as_html` | HTML/CSS snippet (auto-layout frames absolute-positioned) |
-| Copy as HTML (document) | `copy_as_html_document` | Self-contained HTML document with Google Fonts link for detected web fonts |
-| Copy as HTML (flex) | `copy_as_html_flex` | HTML where auto-layout frames emit `display:flex` + gap + padding |
-| Copy as React | `copy_as_react` | React JSX snippet (camelCase style object and SVG attrs) |
-| Copy as CSS | `copy_as_css` | CSS properties (size, position, colors, border, radius, rotation, text) |
-| Copy as YAML | `copy_as_yaml` | Full element serialization including hierarchy |
-| Copy as Blueprint | `copy_as_blueprint` | Brilliant's native element format; pasteable back into Brilliant or shared with AI tools |
+| Command | What it copies |
+|---------|----------------|
+| Copy as PNG | PNG image at screen resolution (device pixel ratio) |
+| Copy as WebP | WebP image, lossy q=90, macOS only; narrow app support, prefer PNG |
+| Copy as SVG | SVG markup text |
+| Copy as HTML | HTML/CSS snippet (auto-layout frames absolute-positioned) |
+| Copy as HTML (document) | Self-contained HTML document with Google Fonts link for detected web fonts |
+| Copy as HTML (flex) | HTML where auto-layout frames emit `display:flex` + gap + padding |
+| Copy as React | React JSX snippet (camelCase style object and SVG attrs) |
+| Copy as CSS | CSS properties (size, position, colors, border, radius, rotation, text) |
+| Copy as YAML | Full element serialization including hierarchy |
+| Copy as Blueprint | Brilliant's native element format; pasteable back into Brilliant or shared with AI tools |
 
 The right-click `Copy as` submenu contains: PNG, PNG @2x, PNG @4x, WebP, SVG, HTML, React, CSS, YAML, Blueprint. The @2x / @4x entries multiply the PNG scale for higher-resolution clipboard output.
 
@@ -154,7 +154,7 @@ Clipboard notes:
 
 ## MCP export tool (for AI agents)
 
-Production AI agents can export programmatically via the MCP `export` tool, which supports `png`, `jpeg`, `webp`, `svg`, `pdf`, `html` (snippet), `htmlDoc` (self-contained document), `htmlFlex` (semantic flexbox), and `react` (JSX). Only MP4, MOV, and Replay are not exposed through MCP (commands/UI only). The tool accepts an explicit element ID list and target canvas, a `scale` (default 2.0) or `width`/`height` + `fitMode`, `jpegQuality`, `webpQuality`, `webpLossless`, `background`, and an optional `outputPath`. For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. The full parameter schema is delivered with the tool itself.
+AI agents can export programmatically via the MCP `export` tool (image and markup formats only — MP4/MOV/Replay are commands/UI only). For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. The full parameter schema is delivered with the tool itself.
 
 ## Other application formats
 

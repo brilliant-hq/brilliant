@@ -1,53 +1,52 @@
 ---
 assumes: blueprint/core, blueprint/layout
-dsl: [comp, inst, override, slot]
+dsl: [comp, inst, axes, variant, at, override, slot]
 ---
-# Blueprint Components & Iteration
+# Blueprint Components
 
-3+ near-identical elements (nav items, cards, tiles, table rows)?
-Declare the shape once with `comp` on the parent, then stamp copies
-with `inst(#master)` in source order. Editing the master propagates
-to every instance.
+Two types of components, pick by what varies:
+
+|           | degenerate                              | set                                          |
+|-----------|-----------------------------------------|----------------------------------------------|
+| mindset   | DRY                                     | library                                      |
+| use when  | same shape, only content differs        | discrete states |
+| placement | *inline*, first-as-master                 | *outside*, first-as-instance |
+| build     | mark the first `comp`, `inst()` the rest, `override()` content | `comp … axes[state[…]]`, a `variant()` per state, then `inst() at(state(…))` |
+
+For both, editing the master propagates to every instance. Editing a variant, to every instance in that state. A variant can `inst()` another set.
 
 ```
-al(h,g($spacing.md),pad($spacing.md)) s(900,hug) "Board" #board
+-- DEFINE off to the side. A small reusable set...
+al(v,g($spacing.lg),pad($spacing.lg)) s(hug,hug) f[($color.surface.container)] rd($radius.lg) "iOS Components" #lib
+  comp "Toggle" axes[state[on,off]] #toggle
+    al(h,x(e),y(c),pad($spacing.xs)) variant(state(on)) s(51,31) f[($color.success)] rd($radius.full)
+      al(pad($spacing.none)) s(23,23) f[($color.surface)] rd($radius.full)
+    al(h,x(s),y(c),pad($spacing.xs)) variant(state(off)) s(51,31) f[($color.surface.container.high)] rd($radius.full)
+      al(pad($spacing.none)) s(23,23) f[($color.surface)] rd($radius.full)
+  -- ...nested inside a bigger one. accessory[] is the axis; each variant is a row.
+  comp "Settings Row" axes[accessory[chevron,toggle]] #row
+    al(h,y(c),g($spacing.md),pad($spacing.sm,$spacing.md)) variant(accessory(chevron)) s(320,hug) f[($color.surface)] rd($radius.md)
+      al(h,x(c),y(c),pad($spacing.none)) s(29,29) slot #row_leading              -- slot: instance fills it
+      t("Label",$font.family,$font.size.md) s(fill,hug) f[($color.text.primary)] #row_title   -- ref: overridable
+      svg(icon:caret-right) s(14,14) f[($color.text.disabled)]
+    al(h,y(c),g($spacing.md),pad($spacing.sm,$spacing.md)) variant(accessory(toggle)) s(320,hug) f[($color.surface)] rd($radius.md)
+      al(h,x(c),y(c),pad($spacing.none)) s(29,29) slot
+      t("Label",$font.family,$font.size.md) s(fill,hug) f[($color.text.primary)]
+      inst(#toggle) at(state(on))                                                -- compose: this row (organism) instances the Toggle (molecule)
 
-  -- comp goes on the parent type. The master IS the first instance —
-  -- this row IS Backlog. Children that vary per instance need #refs.
-  -- One child can be a `slot` for heterogeneous per-instance content.
-  al(v,g($spacing.sm),pad($spacing.md)) comp s(280,fill) f[($color.surface)] rd($radius.md) "Backlog" #col
-    t("Backlog",$font.family,$font.size.md,sb) f[($color.text.primary)] #col_title
-    al(v,g($spacing.sm),pad($spacing.none)) s(fill,fill) slot "Body" #col_body
-      al(h,g($spacing.none),pad($spacing.sm)) s(fill,hug) f[($color.surface.container)] rd($radius.sm) "Audit docs"
-        t("Audit docs",$font.family,$font.size.sm) f[($color.text.primary)]
+-- USE. at() picks the variant; override() retargets a #ref'd child; override(#slot) slot + indented fills a slot.
+al(v,g($spacing.sm),pad($spacing.lg)) s(hug,hug) f[($color.surface.container)] rd($radius.lg) "Settings" #list
+  inst(#row) at(accessory(chevron))
+    override(#row_title) t("Wi-Fi")
+    override(#row_leading) slot
+      al(h,x(c),y(c),pad($spacing.none)) s(29,29) f[($color.info)] rd($radius.md)
+        svg(icon:wifi-high) s(18,18) f[($color.surface)]
 
-  -- Trailing props on inst() modify the INSTANCE FRAME — use this to
-  -- make one stamp special (active tab, current column, selected row).
-  -- override(#child) edits a master child by ref. Each override LOCKS
-  -- that token category against future master edits: t() locks all
-  -- text props, s() locks sizing, f[]/o()/rot()/effects each lock
-  -- independently. Reset via reset_component_instance_overrides.
-  inst(#col) f[($color.primary.container)] shadow($color.shadow,o($visibility.faint),y(2),blur(8)) "In Progress"
-    override(#col_title) t("In Progress",$font.family,$font.size.md,sb) f[($color.primary)]
-
-  -- Slot fill: bare `#slot_ref` (or `override(#slot_ref)`, same) opens a
-  -- block; on a NEW instance the indented children replace the master's
-  -- seed for THIS instance only.
-  inst(#col) "Shipped"
-    override(#col_title) t("Shipped today",$font.family,$font.size.md,sb)
-    #col_body
-      al(h,g($spacing.none),pad($spacing.sm)) s(fill,hug) f[($color.primary.container)] rd($radius.sm) "v2.4 release"
-        t("v2.4 release",$font.family,$font.size.sm) f[($color.primary)]
-
--- Add to an instance ALREADY on canvas (e.g. one more card): parent the
--- new element into the slot by ref. clone(#card) parent(#slot) works too.
--- ONLY a slot accepts adds — parenting onto a normal instance child drops
--- the line with a warning (add it to the master instead).
-al(v,g($spacing.sm),pad($spacing.md)) parent(#col_body) f[($color.surface)] rd($radius.md) "New card"
-  t("Ship the thing",$font.family,$font.size.sm,sb) f[($color.text.primary)]
-
--- Slot adds APPEND — they never clear. Re-filling a slot stacks on top of
--- what's there (only the first fill of an untouched slot replaces the
--- seed). To swap content, delete() the old slot children first.
-delete(#old_card)
+-- EDIT later by re-declaring axes against the #ref; variants + instances follow.
+#row axes[+state[idle,active]]       -- + adds an axis (existing rows get the first value)
+#row axes[accessory[+swipe]]         -- + adds a value
+#row axes[accessory->trailing]       -- -> renames, keys kept (at(trailing(toggle)) still lands)
+#row axes[-state]                    -- - removes (flags collisions Figma-style, never deletes content)
 ```
+
+Reconfigure on canvas: `#row_2 at(accessory(toggle))`; `override()` on a non-slot child changes its existing props (locks that category vs master edits); new content needs a `slot`.

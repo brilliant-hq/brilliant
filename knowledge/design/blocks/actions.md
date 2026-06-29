@@ -13,7 +13,7 @@ H-row `g(0-2)`. Without gap: first `rd($radius.sm,0,0,$radius.sm)`, middle `rd(0
 
 Declare the segment as a `comp` master with the active styling baked in (Daily is active here), then stamp the inactive segments as `inst()` blocks that clear the active fill/shadow on the frame and revert the label to the muted treatment. **Even with only one active state, the iteration is still right** — don't drop to hand-coded copies:
 ```
-al(h,pad($spacing.xs),g(2)) s(hug,hug) f[($color.surface.container)] rd($radius.sm) "Segmented" #segmented
+al(h,pad($spacing.xs),g($spacing.none)) s(hug,hug) f[($color.surface.container)] rd($radius.sm) "Segmented" #segmented
   al(h,x(c),y(c),pad($spacing.sm,$spacing.md)) comp s(hug,hug) f[($color.surface)] shadow($neutral.intense,o($visibility.faint),y(1),blur(2)) rd($radius.sm) "Daily" #seg
     t("Daily",$font.family,$font.size.sm,sb) f[($color.text.primary)] #seg_label
   inst(#seg) f[(unstyled)] shadow(unstyled) "Weekly"
@@ -21,7 +21,7 @@ al(h,pad($spacing.xs),g(2)) s(hug,hug) f[($color.surface.container)] rd($radius.
   inst(#seg) f[(unstyled)] shadow(unstyled) "Monthly"
     override(#seg_label) t("Monthly",$font.family,$font.size.sm,m) f[($color.text.secondary)]
 ```
-Properties on the `inst()` line apply to that instance frame: `f[(unstyled)] shadow(unstyled)` clears the active styling so the inactive segments visually subordinate.
+Properties on the `inst()` line apply to that instance frame: `f[(unstyled)] shadow(unstyled)` clears the active styling so the inactive segments visually subordinate. For the flip-in-the-inspector set form, see `blueprint/components`.
 
 ## Toggle Switch
 Knob via alignment — `x(e),y(c)` for on, `x(s),y(c)` for off:
@@ -30,6 +30,7 @@ al(h,x(e),y(c),g($spacing.none),pad($spacing.xs)) s(44,26) f[($color.primary)] r
   al(h,x(c),y(c),g($spacing.none),pad($spacing.none)) s(20,20) f[($color.on-primary)] rd($radius.full) shadow($neutral.intense,o($visibility.soft),y(1),blur(2)) "Knob"
 inst(#on) al(h,x(s),y(c),g($spacing.none),pad($spacing.xs)) f[($color.outline.variant)] "Off"
 ```
+For the flip-in-the-inspector set form, see `blueprint/components`.
 
 ## FAB
 Centered frame `s(56,56) rd($radius.full)` accent fill + high shadow. Icon `s(24,24)` white.

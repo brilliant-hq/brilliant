@@ -59,7 +59,7 @@ red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gra
 
 ### Eyedropper (Ctrl+Shift+C)
 
-Command id: `toggle_color_pick_mode`. Shortcut is **Ctrl+Shift+C on all platforms** (uses the Control key, not the Command key, even on macOS). Sample a color from anywhere on screen. A magnified pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
+Shortcut is **Ctrl+Shift+C on all platforms** (uses the Control key, not the Command key, even on macOS). Sample a color from anywhere on screen. A magnified pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
 
 ### Color Picker Sections
 
@@ -201,7 +201,7 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 | Center | Centered on the element edge (default) |
 | Outside | Drawn outside the element edge |
 
-**Thickness:** Adjust via right toolbar, size level shortcuts 0-9 (`set_size_level_0` ... `set_size_level_9`, plain digit keys), Shift+= to increase, `-` to decrease. These size shortcuts are context-dependent: they set stroke width for shapes, but font size for text elements (or when the text tool is active).
+**Thickness:** Adjust via right toolbar, or use the number keys 0-9 to set the size level (Shift+= to increase, `-` to decrease). These size shortcuts are context-dependent: they set stroke width for shapes, but font size for text elements (or when the text tool is active).
 
 **Dash pattern:** Dashed strokes are NOT available on element strokes. The only dashed rendering in Brilliant is for UI overlays (selection, snap guides). SVG / Sketch import keeps a dash pattern internally, but it is not editable in the inspector.
 
@@ -282,7 +282,7 @@ The corner radius row has two toggle buttons for expanding into per-corner editi
 
 ### Parent Corner Radius
 
-All parent types support corner radius. With `clipContent` enabled (disabled by default for all parent types), children are clipped to the rounded bounds.
+All parent types support corner radius. With the **Clip content** toggle enabled (off by default for all parent types), children are clipped to the rounded bounds.
 
 ## Circle Arc & Ratio
 

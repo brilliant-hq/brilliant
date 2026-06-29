@@ -26,6 +26,7 @@ Commands run sequentially; pass `previewIds` + `previewScale` for a PNG.
 - **Import**: `import_figma` (`{figmaUrl}`)
 - **Canvas**: `create_canvas` (`{fullPath}`), `get_canvases`, `rename_canvas`, `delete_canvas`, `duplicate_canvas`, `create_folder`, `delete_folder`, `create_structure`
 - **Background**: `set_background_color` (`{value}`), `toggle_background`, `toggle_whiteboard`, `toggle_blackboard`
+- **Appearance** (no `elementIds`): `toggle_dark_mode` flips the app between light and dark; `set_theme_follow_system` makes appearance track the OS setting
 - **Keybindings**: `list_keybindings`, `set_keybinding`
 - **Provider keys**: `set_anthropic_api_key` and the `_openai_` / `_google_` / `_openrouter_` variants
 - **View toggles** (no `elementIds`): `toggle_pixel_grid`, `toggle_snap_to_pixel_grid`, `toggle_rulers`, `toggle_layout_grids`, `toggle_snap_guides`, `toggle_dimension_labels`, `toggle_presentation_mode`, `toggle_ui`

@@ -27,6 +27,11 @@ colors, effect colors); token-bound stops follow brand and mode, and bare
 hex is rejected (see `design-systems/core`). Radial accepts placement:
 `radial(cx(25),cy(15),r(50),$primary.mid,$primary.intense)`.
 
+**Editing one fill (`+`/`-`/`->`).** When modifying an element, a bare `f[...]`
+replaces the whole stack; prefix items to edit it in place instead — match is by
+paint: `#card f[+($color.primary)]` appends, `f[-($color.primary)]` removes that
+fill, `f[($color.primary)->($color.danger)]` swaps it. Same operators on `st[]`.
+
 ## Strokes
 
 `st[(paint,w(N)),...]` takes every fill type (solids, gradients, shaders)
