@@ -10,13 +10,12 @@ Load **all rows that apply** — most designs match 3-5 rows:
 
 | Task | Keys to load |
 |------|-------------|
-| **Any new design** | `design-systems/core` + `design/foundations` + relevant `design/blocks/*` |
+| **Any new design** | `design-systems/core` + `design/foundations` + `blueprint/components` + relevant `design/blocks/*` |
 | **Authoring or modifying a design system** (only when the user asks) | `design-systems/authoring` (+ `design-systems/authoring-modes` if overriding default mode behavior) |
 | **Effects** | + `effects/{glass,neon,clay,dark-mode}` |
 | **Dashboard / analytics** | + relevant `charts/*` |
 | **Recreate from image** | `recreation/from-image` |
 | **Recreate from URL** | `recreation/from-web` |
-| **3+ similar elements** (cards, tiles, rows, buttons, list items, dots, swatches, calendar days, table cells, anything you'd otherwise hand-stamp) — define the shape once with `comp` on a frame, then `inst(#ref)` each copy and indent `override(#child) ...` lines per-instance for variations. NEVER hand-code N near-identical lines. | + `blueprint/components` |
 | **Modify existing elements** (parent/before/clone/replace/delete) | + `blueprint/directives` |
 | **Lines / arrows / flowcharts / dependency arrows / callouts** | + `blueprint/lines` |
 | **Shaders** | + `blueprint/shaders/{overview,...}` |
