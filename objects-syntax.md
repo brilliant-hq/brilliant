@@ -30,6 +30,15 @@ al(v, g($spacing.4), pad($spacing.6)) ds(dashboard-blue) p(100,100) s(hug,hug) f
 - `#ref` session refs work in `execute_commands` and `export`.
 - After loading knowledge, build immediately. Don't describe — build.
 
+**Elements are created by writing `<objects>` tags directly in your reply, NOT by calling a tool.** There is no `create_element`, `add_element`, or any creation command, and no creation tool. You write the `<objects>` block inline in your normal assistant message, mixed with your prose — exactly the way you'd write a code block in a chat reply, like this:
+
+Sure! let me build it for you.
+
+<objects canvasId="THE_CANVAS_ID" previewIds="#card">
+al(v, g(16), pad(24)) s(320, hug) f[(#FFFFFF)] rd(16) "Card" #card
+  t("Title", Inter, 20, b) f[(#111111)] "Title" #title
+</objects>
+
 ### One Block → Feedback → Next Block
 
 After each `<objects>` block the runtime injects feedback. Your response handling depends on whether the block was successful:
