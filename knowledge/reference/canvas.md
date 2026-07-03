@@ -36,7 +36,7 @@ Note: there is no built-in "Zoom to 100%" Cmd+0 binding. `0` alone (without Cmd)
 |--------|----------|-------------|
 | Fit all content | Cmd+Ctrl+A | Zoom and pan to show all elements on the canvas |
 | Zoom to selection | Cmd+Ctrl+F | Zoom and pan to fit the current selection. Falls back to fit-all when nothing is selected. |
-| Center on selection | Cmd+Ctrl+C | Pan to center the selection without changing zoom |
+| Center on selection | Cmd+Ctrl+C (macOS; unbound on Windows) | Pan to center the selection without changing zoom |
 | Reset zoom | (no default; `reset_zoom`) | Snap back to 100% and zero pan; user-bindable |
 | Toggle zoom | 0 (Move or Hand tool only) | Toggle between 100% and the previously-zoomed state. With no previous state it jumps to 200%. |
 
@@ -160,7 +160,7 @@ Both nudge variants register undo and respect per-parent constraints.
 | Closed hand | Hand tool dragging, or window-drag in the top toolbar breadcrumb |
 | Resize arrows | Hovering a selection handle (axis-aware) |
 | Rotate | Hovering a corner just outside the selection bounds |
-| Eyedropper | Color pick mode (Ctrl+Shift+C) |
+| Eyedropper | Color pick mode (Ctrl+Shift+C; Alt+Shift+C on Windows) |
 | I-beam | Hovering a text element while in Move tool |
 
 ### Highlights rendered during work
@@ -336,6 +336,9 @@ A 1-pixel grid overlay for pixel-perfect work at high zoom levels.
 - **Appears at 400%+ zoom** (4x and above)
 - **Fades in smoothly** between 400% and 500% zoom
 - Theme-aware: light gray on dark theme, dark gray on light theme
+- **Not shown on Windows** (temporarily, due to a graphics-driver line-rendering
+  limitation). Snap-to-pixel-grid still works there — only the visual overlay is
+  absent.
 
 ### Toggle
 

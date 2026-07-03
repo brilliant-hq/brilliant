@@ -81,6 +81,17 @@ Five chat providers: **Claude CLI** (local `claude` binary), **Anthropic**, **Op
 - Click the **model selector** in the chat input bar to change the model for the current session. The chosen model becomes the default for new sessions.
 - Type `/model` for an interactive provider-then-model picker.
 
+### Enabling extra models
+
+The selector normally lists a curated set of models per provider. To use a model that is not shipped (an older, newer, or niche one the key can reach), enable it manually:
+
+1. Open **Settings** (Cmd+,) and go to **AI Providers**.
+2. On a connected provider row (Anthropic, OpenAI, Google, or OpenRouter), click the **Choose models** button (sliders icon).
+3. The panel fetches that provider's full model list live. Shipped models sit at the top, locked on. Every other model is a toggle. A search field at the top filters the list.
+4. Toggle on the models to add. They appear in the chat model selector immediately (under the same provider), no restart.
+
+Capabilities for a manually enabled model (context window, thinking support) are inferred from its id, so a niche model may show a conservative context window or no thinking selector. Claude CLI has no picker: it lists whatever the installed binary reports.
+
 ### Thinking / reasoning levels
 
 A thinking-level selector sits next to the model selector when the model supports it.

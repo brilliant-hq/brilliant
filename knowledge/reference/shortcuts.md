@@ -71,17 +71,19 @@ On Windows several macOS defaults are unbound, because their Cmd-based chords co
 | Snip tool (`change_tool_snip`, default S) | Screen capture is macOS-only. |
 | `toggle_desktop_icons` (default Ctrl+I) | macOS-only no-op; frees Ctrl+I for Italic. |
 | Outline Text (`Cmd+Ctrl+O`) | Collapses to Ctrl+O and collides; use the menu/command palette instead. |
+| Center on selection (`Cmd+Ctrl+C`) | Collapses onto Copy (Ctrl+C); Alt+C is used by the color selector on Windows. Use Zoom to selection (Alt+Z) or the command palette. |
 | All quick colors (Ctrl+R/G/B/Y/O/P/W/K) and gradient colors (Ctrl+D/L) | Collide with Cmd→Ctrl editing commands (Bold, Group, Rename, etc.); set color via the inspector or command palette. |
 | Blue / green / red highlighter combos (Ctrl+Shift+B/G/R) | Collide with Blackboard / Ungroup / Focus Layers. The yellow highlighter combo stays bound. |
 
 ### Windows-remapped defaults
 
-On Windows some Cmd+Ctrl defaults are moved to free chords (the plain Ctrl chord is reserved by an essential command). A Windows user should expect these instead of the macOS chords listed elsewhere in this guide:
+On Windows some macOS defaults are moved to free chords (their macOS chord collapses onto — or was authored on — a chord owned by an essential command). A Windows user should expect these instead of the macOS chords listed elsewhere in this guide:
 
 | Command | macOS | Windows |
 |---------|-------|---------|
 | Fit all content | Cmd+Ctrl+A | Alt+A |
-| Center on selection | Cmd+Ctrl+C | Alt+C |
+| Color selector | Ctrl+C | Alt+C |
+| Color pick mode (eyedropper) | Ctrl+Shift+C | Alt+Shift+C |
 | Zoom to selection | Cmd+Ctrl+F | Alt+Z |
 | Disable zoom out | Cmd+Ctrl+D | Alt+D |
 | Duplicate canvas | Cmd+Ctrl+N | Alt+N |
