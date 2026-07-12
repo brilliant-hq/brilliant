@@ -36,10 +36,10 @@ al(h,x(c),y(c),g($spacing.none),pad($spacing.sm,$spacing.md)) s(hug,hug) f[(irid
   t("Tropical",$font.family,$font.size.xs,sb) f[($neutral.hint)] #tropical_label
 ```
 
-**Glass card over iridescent background:**
+**Glass card over iridescent background** (real refractive `glass` fill — see `effects/glass`):
 ```
-fr s(360,220) f[($neutral.intense),(f2,irid($pink.mid,$purple.mid,$indigo.mid)),(f3,solid($neutral.intense,o($visibility.mid)))] rd($radius.lg) clip "Hero" #hero
-  al(v,y(c),x(c),g($spacing.md),pad($spacing.lg)) s(280,hug) f[(solid($neutral.hint,o($visibility.faint))),(f2,blur(2)),(f3,inner($neutral.hint,o($visibility.faint),y(-1),blur(2))),(f4,glow($neutral.hint,o($visibility.soft)))] st[(linear(180,solid($neutral.hint,o($visibility.soft)),solid($neutral.hint,o($visibility.faint))),w($stroke.width.subtle))] rd($radius.lg) shadow($neutral.intense,o($visibility.soft),y(12),blur(32)) abs p(40,c) "Glass" #glass
+fr s(360,220) f[($neutral.intense),(f2,irid($pink.mid,$purple.mid,$indigo.mid))] rd($radius.lg) clip "Hero" #hero
+  al(v,y(c),x(c),g($spacing.md),pad($spacing.lg)) s(280,hug) f[(glass(frost(4),chroma(0.4)))] st[(solid($neutral.hint,o($visibility.soft)),w($stroke.width.subtle))] rd($radius.lg) shadow($neutral.intense,o($visibility.soft),y(12),blur(32)) abs p(40,c) "Glass" #glass
     t("Pink Nebula",$font.family,$font.size.xl,sb,align(c)) f[($neutral.hint)] #title
     t("Custom palette",$font.family,$font.size.sm,align(c)) f[(solid($neutral.hint,o($visibility.firm)))] #sub
 ```

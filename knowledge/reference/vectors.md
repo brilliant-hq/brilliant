@@ -273,6 +273,8 @@ These convert a selected text element into vector geometry (macOS and Windows; o
 - **Outline Text** (`Cmd+Ctrl+O`) converts text into a **group of per-character vector outlines**: each glyph becomes its own editable vector inside a group. On Windows the chord collides with another command, so reach it via the menu, command palette, or context menu.
 - **Flatten Text** (`Cmd+Alt+O`) converts text into a **single compound vector element** (all glyphs merged into one path).
 
+Each converted glyph is a **single clean outline** with its counters (the holes in letters like e, o, a) preserved as holes, so a stroke or effect traces the letter's silhouette with no seams inside it. Curves stay true beziers, so outlined text scales without going polygonal.
+
 Both are one-way conversions: the result is no longer editable as text.
 
 ---

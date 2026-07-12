@@ -1,6 +1,6 @@
 ---
 assumes: blueprint/core
-dsl: [solid, metaballs, metal, irid, steel]
+dsl: [solid, metaballs, metal, irid, steel, glass]
 ---
 # Blueprint Paint
 
@@ -19,8 +19,17 @@ f[(radial($color.surface,$color.on-surface))]       radial gradient
 f[(angular($amber.mid,$red.mid))]                   angular gradient
 f[(metaballs($primary.soft,$primary.mid,$primary.bold))]  shader
 f[(img(https://picsum.photos/id/42/800/400))]       image
+f[(glass)]                                          liquid glass (defaults)
+f[(glass(chroma(0.5),frost(8)))]                    glass, params overridden
 f[($neutral.intense),(f2,solid($primary.mid,o($visibility.soft)))]  stacked
+f[]                                                 deliberately no fill (outline-only text/shapes; keeps a stroke visible)
 ```
+
+Liquid glass refracts the backdrop like a glass pane. Bare `glass` uses the
+tuned defaults; override any of `frost(N)` (backdrop blur), `thickness(N)`,
+`bevel(N)`, `ior(N)`, `chroma(N)`, `glow(N)`, `edge(N)`, `angle(deg)`,
+`sat(N)`, `tint(color[,o(N)])` — a `$token` or hex tint. Fill-only (not a
+stroke).
 
 Every color slot takes a `$token` (solid fills, gradient stops, shader
 colors, effect colors); token-bound stops follow brand and mode, and bare

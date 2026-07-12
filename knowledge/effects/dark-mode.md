@@ -45,4 +45,4 @@ fr s(400,160) ds(, theme(dark)) f[($color.surface)] rd($radius.md) "Dark Preview
     t("Aliases resolve through theme.dark here",$font.family,$font.size.sm) s(fill,hug) f[($color.text.secondary)]
 ```
 
-Dark glass (lower tint opacity, inner glow as the edge): see `effects/glass`.
+Dark glass (a `glass` fill with a low-opacity dark tint): see `effects/glass`.

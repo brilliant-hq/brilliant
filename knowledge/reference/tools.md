@@ -186,17 +186,19 @@ The fill/stroke variant shortcuts (R vs Shift+R, O vs Shift+O) set the active cr
 
 Combine selected vector/shape elements into a single boolean parent. Operations are non-destructive: the boolean parent stores the operands and re-renders on every change. Double-click a boolean element to enter boolean edit mode; Escape exits.
 
+Discovery: right-click context menu, Boolean submenu (Union, Subtract, Intersect, Exclude), shown only with 2+ elements selected. The shortcuts likewise require 2+ selected. Running a boolean op on a single existing boolean/mask parent switches that parent's type in place instead of creating a new one.
+
 | Operation | Shortcut | Effect |
 |-----------|----------|--------|
 | Union | Alt+Shift+U | Sum of all shapes |
 | Subtract | Alt+Shift+S | First shape minus the rest |
 | Intersect | Alt+Shift+I | Region common to all shapes |
 | Exclude | Alt+Shift+E | Symmetric difference (XOR) |
-| Flatten | Cmd+Enter | Bake the boolean (or any group) into a single editable vector path |
+| Flatten | Cmd+Enter | Bake the boolean (or any group) into a single editable vector path (context menu: Flatten) |
 
 ## Masks
 
-Use a vector or shape as a mask for sibling elements. The topmost element (last in z-order) becomes the mask shape and clips the siblings below it.
+Use a vector or shape as a mask for sibling elements. The topmost element (last in z-order) becomes the mask shape and clips the siblings below it. Discovery: right-click context menu, "Use as Mask". Running it on a single existing boolean/mask parent switches that parent's type to mask in place.
 
 | Action | Shortcut | Effect |
 |--------|----------|--------|
@@ -207,4 +209,4 @@ Mask types are configurable per-mask in the right toolbar: vector (default), alp
 
 ## Outline Text
 
-**Outline Text** converts a selected text element into a **group** containing one vector element per glyph (each character becomes its own editable vector inside the group). Shortcut Cmd+Ctrl+O on macOS; on Windows the chord is disabled (it collides), so reach it via the menu, command palette, or context menu. To get a single compound vector instead, use **Flatten Text** (Cmd+Alt+O) or **Flatten** (Cmd+Enter). Outline/Flatten Text work on both macOS and Windows.
+**Outline Text** converts a selected text element into a **group** containing one vector element per glyph (each character becomes its own editable vector inside the group). Shortcut Cmd+Ctrl+O on macOS; on Windows the chord is disabled (it collides), so reach it via the menu, command palette, or context menu. Discovery: right-click context menu, "Outline Text", shown when the selection contains text. To get a single compound vector instead, use **Flatten Text** (Cmd+Alt+O, no context-menu entry) or **Flatten** (Cmd+Enter). Outline/Flatten Text work on both macOS and Windows.

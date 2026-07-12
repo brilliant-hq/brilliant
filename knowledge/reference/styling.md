@@ -24,7 +24,7 @@ description: "Colors, fills, strokes, opacity, and corner radius in Brilliant."
 
 ### Color Picker
 
-Open by clicking any color swatch in the right toolbar. There is no global keybinding to open the picker. The picker opens on the swatch you click, focused on that fill / stroke / effect / text-range / layout-grid.
+Open by clicking any color swatch (the small **color rectangle** on the left of any fill / stroke / effect / text-range / layout-grid row) in the right toolbar. The picker opens anchored to the right, focused on that target. There is also a global toggle: **Ctrl+C** (remapped to **Alt+C on Windows**) opens / closes the color selector for the current selection's fill or stroke.
 
 Components (top to bottom):
 1. **Color rectangle** (280x280) for solid / gradient / shader modes. X = saturation, Y = brightness. Drag the crosshair. In image mode this slot is replaced by the Image Manager (preview + select / drop / paste, accepts image files or URLs).
@@ -32,7 +32,7 @@ Components (top to bottom):
 3. **Opacity slider** (width 280). Alpha 0%-100% for the focused color.
 4. **Gradient bar** (width 280). Only in gradient mode. Click empty space to add a stop, click an existing stop to focus it, drag to reposition, Delete / Backspace removes the focused stop (minimum 2 stops).
 5. **Format inputs** row. Format dropdown (Hex / RGB / HSB / CSS) + value fields + copy button. The format dropdown has hover-preview (hovering a format previews the value display before clicking).
-6. **Design Tokens** section, then **Canvas Colors**, then a divider, then **Recent Colors** (always present regardless of fill type, including image mode).
+6. **Swatch sections** at the bottom, always present regardless of fill type (including image mode), top to bottom: the design-token strip (a horizontal row of color-token group dropdowns, no text heading, shown only when the active design system has color tokens), then a section headed **Canvas**, then a divider, then a section headed **Recent**.
 
 In shader mode, the rectangle/hue/opacity controls edit one shader-color slot at a time. To pick which slot, click the individual color swatches in the right toolbar's expanded shader fill row before opening the picker.
 
@@ -57,17 +57,17 @@ OKLCH and HSL formats are not exposed in the picker. Color tokens (e.g. `brand.5
 
 red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gray, grey, navy, teal, maroon, olive, lime, aqua, coral, salmon, turquoise, indigo, violet, gold, silver, brown, beige, tan, crimson, lavender, plum, orchid, khaki, azure, ivory, mint, peach, rose, charcoal, slate, transparent
 
-### Eyedropper (Ctrl+Shift+C)
+### Eyedropper (Ctrl+Shift+C, Alt+Shift+C on Windows)
 
-Shortcut is **Ctrl+Shift+C on all platforms** (uses the Control key, not the Command key, even on macOS). Sample a color from anywhere on screen. A magnified pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
+Shortcut is **Ctrl+Shift+C** on macOS and Linux (uses the Control key, not the Command key, even on macOS), remapped to **Alt+Shift+C on Windows**. Sample a color from anywhere on screen. A magnified pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
 
 ### Color Picker Sections
 
 The color picker includes additional sections below the main controls:
 
-- **Design Tokens**: Color tokens from the active design system. Grouped by category (brand, neutral, success, etc.). Click a swatch to apply a token-bound color. Tokens stay bound through theme/mode switches. For how design systems and tokens are authored, see the design-systems knowledge files.
-- **Canvas Colors**: Unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
-- **Recent Colors**: Recently used colors across sessions. Hover a swatch to see its value in the active format.
+- **Design tokens** (no text heading in the panel): color tokens from the active design system, shown as a horizontal strip of per-group dropdowns. Grouped by category (brand, neutral, success, etc.). Click a token to apply a token-bound color. Tokens stay bound through theme/mode switches. Only shown when the active design system has color tokens. For how design systems and tokens are authored, see the design-systems knowledge files.
+- **Canvas** (heading text: "Canvas"): unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
+- **Recent** (heading text: "Recent"): recently used colors across sessions (up to 24). Hover a swatch to see its value in the active format.
 
 In contexts that only support solid colors (canvas background, layout grid color, effect color, text-range color, AI-input callback editing), gradients and shader fills are filtered out of all three sections.
 
@@ -127,6 +127,8 @@ Import an image via Cmd+Shift+O (Import), drag-and-drop from the OS file manager
 The design tokens, canvas colors, and recent colors sections remain visible below the image area. A replace button is also available in the expanded image fill config row.
 
 **Supported formats:** PNG, JPG / JPEG, GIF, BMP, WebP on all platforms. TIFF / TIF, HEIC / HEIF, and AVIF are additionally supported on macOS (converted to PNG via native NSImage decoding). On Windows / Linux those macOS-only formats are excluded from file pickers and drop targets.
+
+**Resolution:** large, high-resolution source images (well beyond typical screen dimensions) render fine and stay clean at any zoom, the app downsamples them smoothly when zoomed out, so detailed images don't shimmer or alias.
 
 **Image Scale Modes:**
 
@@ -216,7 +218,7 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 
 ### Stroke Style Types
 
-Strokes support the same fill-type set as fills (the same type dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). 21 types total. Inner Shadow / Inner Glow as a stroke render over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
+Strokes support the same fill-type set as fills (the same type dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur, Liquid Glass), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). 22 types total. Inner Shadow / Inner Glow as a stroke render over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
 
 Text ranges only support Solid.
 
@@ -325,7 +327,12 @@ These live in the fills list (not the effects list), so they sit in z-order alon
 | Inner Shadow | Shadow inside the element edges |
 | Inner Glow | Luminous glow inside the element edges |
 | Background Blur | Blurs content behind the element (frosted glass) |
+| Liquid Glass | Refracts the content behind the element like a glass lens (rim magnification, chromatic fringing, specular highlights, glow) |
 
 Inner effects are in the fill type dropdown under the **Static** group (alongside Image). Inner effect fills can be interleaved with other fill types.
+
+**Liquid Glass** is engine-rendered: the native canvas refracts the backdrop through a physically-modeled glass slab. It appears in raster (PNG/JPEG/WebP) and video exports, and embeds as a rasterized image in SVG/PDF. HTML/React export omits it (no CSS equivalent). It applies to rectangles, circles, vectors, frames, and text (glyph refraction). Parameters (with defaults): **Thickness** 48 (glass slab thickness, 0–64px, how far the refracted ray travels; 0 = plain backdrop blur), **Bevel** 40 (rim band width where the surface rises), **IOR** 2.0 (index of refraction, 1.0–3.0; higher bends light more), **Chroma** 0.8 (chromatic dispersion, 0–3; >1 = extreme fringing), **Glow** 0.05 (additive rim glow, 0–1), **Edge** 0 (specular rim highlight, 0–1), **Angle** 2.3561945 rad / 135° (light direction, top-left), **Saturation** 1.05 (backdrop saturation remix, 0–2), **Blur** 0 (backdrop blur sigma). All values are plain numbers (not token-bindable).
+
+The color row for a glass fill is the material **Tint** (labeled "Tint" in the inspector), not an opaque fill, its alpha is the tint strength (0 alpha = clear glass). The glass section opens with a **Presets** dropdown that applies a full parameter bundle in one undoable step (a reset button restores defaults). Five presets ship (rim glow and specular rim are held at or below 0.1 on every preset): **Clear** (the bold user-validated reference, a thick, wide-bevel, strongly dispersive clear pane; equals the defaults), **Frosted** (thin blurred backdrop, softer fringe), **Deep** (mid slab), **Chromatic** (crisp thin-slab dispersion fringe), **Smoke** (dark tint, blurred desaturated backdrop). Editing any slider or the tint after applying a preset is fine, presets are just starting-point bundles, not a locked mode.
 
 See [effects.md](./effects.md) for default values, parameter ranges, and shadow tokens.

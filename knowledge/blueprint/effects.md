@@ -1,6 +1,6 @@
 ---
 assumes: blueprint/paint
-dsl: [shadow, outerglow, eblur, inner]
+dsl: [shadow, outerglow, eblur, inner, glass]
 ---
 # Blueprint Effects
 
@@ -30,7 +30,8 @@ al(v,g($spacing.md),pad($spacing.md)) s(300,hug) f[($color.surface)] rd($radius.
 ```
 f[($color.surface.container),(f2,inner($neutral.intense,o($visibility.faint),y(1),blur(2)))]    ← inner shadow
 f[($color.surface),(f2,glow($color.secondary,o($visibility.firm),blur(8)))]                  ← inner glow
-f[(solid($color.on-surface,o($visibility.subtle))),(f2,blur(12))]                            ← background blur (glass)
+f[(solid($color.on-surface,o($visibility.subtle))),(f2,blur(12))]                            ← background blur
+f[(glass)] · f[(glass(chroma(0.5),frost(8)))]                                                ← liquid glass (refracts backdrop; see `blueprint/paint`)
 ```
 
 Fill-type effects stack with other fills in z-order. If you're tempted to create a separate element for a visual effect, it's almost certainly a fill layer instead.

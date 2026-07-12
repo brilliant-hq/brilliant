@@ -1,39 +1,81 @@
 ---
-assumes: blueprint/effects
+assumes: blueprint/paint
 ---
-# Effect: Glass
+# Effect: Liquid Glass
 
-**Glass = tint + backdrop blur + edge, all on one element.** `blur()` is a true backdrop filter, so glass only reads over a **textured backdrop** (shader, gradient, radial mesh, image) — over a flat fill it collapses to a tinted rectangle. Use on one or two elevated elements, never every panel.
+Assumes: `blueprint/paint`
 
-**Tint depends on the scene, not the theme:** light backdrop → `$color.surface`; dark backdrop / shader → `$color.glow` (mode-immune near-white). Never `$color.surface` on dark — it resolves near-black and the glass vanishes. (`$color.glow`/`$color.shadow` are the always-light/always-dark anchors.)
+**Liquid glass is a real refractive fill (`glass`), not a blur+shadow stack.**
+The native engine refracts the backdrop through a physically-modeled glass
+slab — rim magnification, chromatic fringing, specular highlights. Bare
+`glass` is the tuned Apple-like clear look; add params to taste. It reads
+only over a **rich backdrop** (shader, gradient, mesh, image) — over a flat
+fill it collapses to a near-invisible pane. Use on one or two elevated
+elements, never every panel.
 
-## Glass — light scene
+Works on **rectangles, circles, vectors, frames, and text** (glyph
+refraction). Engine-rendered: it appears in raster and video exports, and
+embeds (pre-rasterized) in SVG / PDF. HTML / React export omits it (no CSS
+equivalent).
 
-Pastel metaballs make a great light backdrop — `$color.surface` as the first
-color dilutes the blobs toward white, and `.soft` stops keep them gentle.
+## Recipes
 
-```
-fr s(900,360) clip f[(metaballs($color.surface,$violet.soft,$pink.soft,$quaternary.soft,$primary.soft,count(19),size(0.25),speed(0.3),scale(3)))] rd($radius.lg) "Scene"
-  al(v,y(c),x(c),g($spacing.sm),pad($spacing.lg)) p(c,c) s(420,hug) f[(solid($color.surface,o($visibility.subtle))),(f2,blur(16)),(f3,inner($color.shadow,o($visibility.hint),y(1),blur(3)))] st[(solid($color.surface,o($visibility.soft)),w($stroke.width.subtle))] rd($radius.lg) shadow($color.shadow,o($visibility.faint),y(2),blur(4)) shadow($color.shadow,o($visibility.faint),y(8),blur(24)) "Glass"
-    t("Glass over metaballs",$font.family,$font.size.lg,sb) f[($color.text.primary)]
-    t("Soft solid edge, inner shadow, two drop shadows to float.",$font.family,$font.size.sm,r) s(fill,hug) f[($color.text.secondary)]
-```
-
-## Glass — dark scene
-
-`$color.glow` tint, inner `glow()` edge, `subtle` tint + `blur(20)`. Flowing
-`steel()` is a calm, premium dark backdrop that needs no dim overlay (a bright
-shader like `irid()` would — stack `solid($color.shadow,o($visibility.soft))`).
+Copyable `glass(...)` fills (the five built-in looks, derived from the app's
+presets). Only non-default params are listed; bare `glass` = Clear.
 
 ```
-fr s(900,360) ds(, theme(dark)) clip f[(steel($primary.faint,$secondary.faint,flow(0.5),roughness(0.3),distortion(1),depth(1),angle(45),speed(0.4),scale(2)))] rd($radius.lg) "Scene"
-  al(v,y(c),x(c),g($spacing.sm),pad($spacing.lg)) p(c,c) s(420,hug) f[(solid($color.glow,o($visibility.subtle))),(f2,blur(20)),(f3,glow($color.glow,o($visibility.subtle),blur(6)))] st[(solid($color.glow,o($visibility.subtle)),w($stroke.width.subtle))] rd($radius.lg) shadow($color.shadow,o($visibility.firm),y(8),blur(24)) "Glass"
-    t("Glass over steel",$font.family,$font.size.lg,sb) f[($color.text.primary)]
-    t("Flowing liquid-steel backdrop, subtle tint keeps text crisp.",$font.family,$font.size.sm,r) s(fill,hug) f[($color.text.secondary)]
+f[(glass)]                                                    Clear — bold refractive pane (thick, dispersive)
+f[(glass(frost(8),thickness(12),bevel(12),chroma(0.35),sat(1.1)))]   Frosted — thin blurred backdrop
+f[(glass(frost(4),thickness(24),bevel(24),chroma(0.4)))]      Deep — mid slab, softer fringe
+f[(glass(chroma(2)))]                                         Chromatic — extreme dispersion rainbow
+f[(glass(tint($color.shadow,o($visibility.mid)),frost(10),thickness(10),bevel(10),chroma(0.25),sat(0.9)))]   Smoke — dark tinted glass
+```
+
+Tint takes a `$token` (resolved at create time) or `#hex`, with opacity as a
+`$visibility.*` token — its alpha is the tint strength (clear by default):
+
+```
+f[(glass(tint($color.surface,o($visibility.soft)),frost(12)))]   light frosted tint
+```
+
+## Params
+
+`glass(frost(N),thickness(N),bevel(N),ior(N),chroma(N),glow(N),edge(N),angle(DEG),sat(N),tint(color[,o(N)]))`
+
+| Param | Default | Range | Effect |
+|---|---|---|---|
+| `frost` | 0 | ≥0 | backdrop blur sigma (0 = crisp pane) |
+| `thickness` | 48 | 0..64 | slab depth; how far light bends (0 = plain blur, no refraction) |
+| `bevel` | 40 | 0..120 | rim band width where the lens rises |
+| `ior` | 2 | 1..3 | index of refraction; higher bends more |
+| `chroma` | 0.8 | 0..3 | chromatic fringe at the rim (1 = strong; >1 = extreme dispersion) |
+| `glow` | 0.05 | 0..1 | luminous rim glow |
+| `edge` | 0 | 0..1 | specular rim highlight |
+| `angle` | 135 | degrees | light direction (135 = top-left) |
+| `sat` | 1.05 | 0..2 | backdrop saturation remix (vibrancy) |
+| `tint` | clear | — | `$token`/`#hex` + `o($visibility.*)` |
+
+Out-of-range values clamp with a diagnostic; unknown params are dropped and
+surfaced. Glass is fill-only — `glass` in `st[...]` is an error.
+
+## Scene
+
+Glass card over a shader backdrop. The card carries the `glass` fill and a
+faint bright edge; text lives in children with their own solid fills (never
+draw text directly onto the refraction).
+
+```
+fr s(640,400) clip f[(metaballs($violet.mid,$pink.mid,$amber.mid,$primary.mid))] rd($radius.lg) "Hero"
+  al(v,y(c),x(c),g($spacing.sm),pad($spacing.lg)) p(c,c) s(360,hug) f[(glass(frost(8),chroma(0.4)))] st[(solid($color.glow,o($visibility.subtle)),w($stroke.width.subtle))] rd($radius.lg) "Card"
+    t("Liquid Glass",$font.family,$font.size.xl,sb) f[($color.glow)] "Title"
+    t("Refracts the backdrop through a real glass slab.",$font.family,$font.size.sm,r) s(fill,hug) f[(solid($color.glow,o($visibility.firm)))] "Sub"
 ```
 
 ## Notes
 
-- **Tint opacity:** `faint` = airy frost (start here), `subtle` = more body / busy backdrops, `soft`+ = opaque panel (not glass). Pair higher tint with more blur.
-- **Radial-mesh backdrop:** stack radials, but each OUTER stop must be transparent — `solid($color.shadow,o($visibility.invisible))`. An opaque outer stop occludes the layers beneath, so only the last shows.
-- **Text never sits on the blur** — put it in a child with its own solid fill.
+- **Backdrop matters.** More texture and contrast under the glass = more
+  visible refraction. Add `shadow(...)` under the card to float it.
+- **Dark scenes:** use `$color.glow` (mode-immune near-white) for the edge
+  stroke and text; a low-opacity dark `tint` deepens the smoke look.
+- **Clear vs frosted:** `frost(0)` keeps the backdrop sharp through the lens;
+  raise `frost` for the diffused frosted-glass read.

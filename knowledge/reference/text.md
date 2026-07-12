@@ -93,8 +93,10 @@ Set via the weight dropdown in the Typography section, which lists only the weig
 |--------|-----|
 | Exact value | Type in the font size field |
 | Drag to adjust | Drag horizontally on the font size field |
+| Increase by 1px | **Shift+=** |
+| Decrease by 1px | **-** |
 
-Range 0.2 to 1000. Scaling a text element on the canvas adjusts font size proportionally.
+Range 0.2 to 1000. Scaling a text element on the canvas adjusts font size proportionally. Shift+= and - step the size by 1px; with a range selected while editing, they step that range only. (Shift+= / - are shared with stroke width: on a non-text shape they nudge the stroke instead.)
 
 ### Bold / Italic / Underline / Strikethrough
 
@@ -115,7 +117,9 @@ All four work on whole text elements (no edit mode required) and on the active t
 | Align Center | Cmd+Alt+T |
 | Align Right | Cmd+Alt+R |
 
-Also settable via the alignment buttons in the Typography section. Alignment is whole-element only (no per-range alignment). There is no Justify alignment and no vertical alignment; text anchors to the top edge of its box.
+Also settable via the alignment buttons in the Typography section. Alignment is whole-element only (no per-range alignment). Justify has no Typography button but works via Blueprint `align(j)`. There is no vertical alignment; text anchors to the top edge of its box.
+
+Explicitly choosing **Align Left** always renders physically left. A text element with **no** alignment chosen is direction-aware: left-to-right text sits flush left, right-to-left text sits flush right naturally.
 
 ### Line height
 
@@ -139,7 +143,7 @@ The "OpenType features" button in the Typography section opens a stay-open check
 
 ### Text direction
 
-Toggle left-to-right (LTR, default) and right-to-left (RTL) via the command palette: search "Toggle Text Direction". No default keybinding. Whole-element only.
+Toggle left-to-right (LTR, default) and right-to-left (RTL) via the command palette: search "Toggle Text Direction". No default keybinding. Whole-element only. In RTL, text with no explicit alignment flushes right (see Text alignment).
 
 ## Styled Ranges (Rich Text)
 
@@ -191,6 +195,16 @@ Both convert a text element to vector geometry, and both are one-way (the result
 | Flatten | **Cmd+Enter** | A single compound vector (all glyphs merged into one path) | Masking, boolean ops against other shapes, exporting as one path |
 
 **Platform:** Outline Text is macOS and Windows only (Linux has no glyph-outline backend; it is hidden there). On Windows its Cmd+Ctrl+O chord is run from the right-click/context menu or command palette. Flatten works on all platforms and applies to any selection, not just text; on a text element it produces the merged single-path result described above.
+
+## Multilingual Text and Emoji
+
+Text shapes with the correct platform fonts for complex scripts automatically, so marks attach and conjuncts form properly. No setup is required.
+
+- **Indic and Southeast Asian scripts:** Devanagari, Bengali, Telugu, Tamil, Kannada, Oriya, Sinhala, Khmer, Myanmar, Lao, Thai (and more) all render with correct glyph shaping.
+- **Spaceless scripts** (Thai, Lao, Khmer, Myanmar) wrap at dictionary word boundaries, not mid-word.
+- **RTL scripts** (Arabic, Hebrew): set the element to RTL (see [Text direction](#text-direction)); default alignment then flushes right naturally.
+- **Emoji:** color emoji render by default. A variation selector overrides presentation: VS16 (U+FE0F) forces the color emoji, VS15 (U+FE0E) forces the monochrome text glyph. ZWJ sequences (family, profession, flag emoji) form as single glyphs.
+- **Soft hyphen** (U+00AD): stays invisible unless a line breaks at that point, where it renders a hyphen.
 
 ## Tips
 

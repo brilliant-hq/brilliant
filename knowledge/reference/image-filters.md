@@ -277,7 +277,7 @@ Open the command palette with Cmd+Shift+P and search for the filter name. Each c
 ## General notes
 
 - **Strokes too**: Every filter works identically when added to the Strokes list. It then reprocesses the stroke's rendered area instead of the fill area.
-- **Stacking**: Multiple filters can coexist on one element, each processing everything below it in fill order — see [Z-order processing](#z-order-processing).
+- **Stacking**: Multiple filters can coexist on one element, each processing everything below it in fill order, see [Z-order processing](#z-order-processing).
 - **Blend mode**: Each filter row has a blend mode dropdown in its expanded config, controlling how the filter's output composites with the content below it.
 - **Stable across zoom**: Pattern sizes (grain, dots, cells) are measured in logical pixels, so they stay visually consistent as you zoom in and out.
 - **Per-color tint strength**: For filters with color swatches (Halftone, Duotone, Dither), each swatch's alpha controls how strongly that color tints the result versus showing the original image, not the output's transparency.

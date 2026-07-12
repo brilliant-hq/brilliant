@@ -7,9 +7,9 @@ description: "Brilliant's integrated AI: the multi-provider chat that designs on
 
 Brilliant has one integrated AI system: a multi-provider chat that drives a model (Claude, GPT, Gemini, or a local Claude CLI) to design directly on the canvas. The entry point is the AI input in the bottom toolbar. Type a prompt, press Enter, and a chat session starts. Anything the AI produces lands on the canvas and stays fully editable by hand.
 
-Brilliant chat is **bring-your-own-key (BYOK) only**. Every call uses the user's own provider API key (Anthropic, OpenAI, Google, OpenRouter) or a local `claude` CLI install. Chat traffic goes straight to the chosen provider; nothing routes through Brilliant servers. A separate Quiver key powers AI vector generation and image vectorization (not chat). The user pays their provider directly.
+Brilliant chat is **bring-your-own-key (BYOK) only**. Every call uses the user's own provider API key (Anthropic, OpenAI, Google, OpenRouter), a local `claude` CLI install, or a custom/self-hosted OpenAI-compatible endpoint. Chat traffic goes straight to the chosen provider; nothing routes through Brilliant servers, and there is no hosted Brilliant AI. A separate Quiver key powers AI vector generation and image vectorization (not chat). The user pays their provider directly.
 
-If no provider is connected, the chat opens in a limited "replay" demo mode instead of a live session. Connecting a key unlocks real chat.
+If no provider is connected, the chat opens in a "demo" (playground) replay mode instead of a live session. Connecting a provider unlocks real chat. For all of setup, custom endpoints, demo mode, and key troubleshooting, see [ai-setup.md](./ai-setup.md). To drive Brilliant from your own coding tool (Cursor, Claude Code, etc.) instead of chatting inside it, see [mcp-connections.md](./mcp-connections.md).
 
 ---
 
@@ -70,7 +70,7 @@ Tabs can be dragged to reorder. The toolbar scrolls horizontally when tabs overf
 
 ## Providers and Models
 
-Five chat providers: **Claude CLI** (local `claude` binary), **Anthropic**, **OpenAI**, **Google (Gemini)**, and **OpenRouter**. The model selector only lists models whose provider currently has a valid key (or, for Claude CLI, a detected install). Each model shows a short quality/speed subtitle (for example "Best", "Excellent", "Good + Fast").
+Built-in chat providers: **Claude CLI** (local `claude` binary), **Anthropic**, **OpenAI**, **Google (Gemini)**, and **OpenRouter**. Any **custom or self-hosted OpenAI-compatible** endpoint can be added too (see [ai-setup.md](./ai-setup.md)); its models then appear under its own name. The model selector only lists models whose provider currently has a valid key (or, for Claude CLI, a detected install). Each model shows a short quality/speed subtitle (for example "Best", "Excellent", "Good + Fast").
 
 - The exact model lineup changes between releases. Read the live list in the model selector rather than assuming specific model names.
 - Context-window size varies per model. The session's context-usage indicator reflects the real per-model window.
@@ -104,22 +104,11 @@ A thinking-level selector sits next to the model selector when the model support
 
 ## BYOK: Setting Up API Keys
 
-Keys are stored locally in the OS credential store (macOS Keychain, Windows Credential Manager) and sent only to the provider's own API endpoint. Brilliant also reads provider environment variables as a fallback (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`).
+Keys live in the OS credential store (macOS Keychain, Windows Credential Manager) and are sent only to the provider's own API endpoint. Brilliant also reads provider environment variables as a fallback (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`).
 
-To connect a provider:
+Keys are managed in **Settings (Cmd+,) → AI Providers**. Reach it fast by clicking the **connection indicator** in the bottom toolbar (the check/x circle beside the AI input); hovering it shows a read-only provider-status popup. On the AI Providers list, paste a key into a provider's inline field (validated on save), or use the pencil/x buttons on a saved row to update or remove it. **Google** can sign in with Google (localhost OAuth) instead of a key; **Claude Code** needs no key (install the CLI, sign in with `/login`); **Quiver** (vector generation) is set the same way but is not a chat provider. **Custom / self-hosted OpenAI-compatible** endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more) are added under **Custom Providers** on the same pane.
 
-1. Open the chat panel (click the connection indicator in the bottom toolbar, or run **Toggle AI Chat**). With no providers connected, an onboarding view offers a button per provider.
-2. Hover the **connection indicator** to see all providers (green dot = connected, dim = not).
-3. Click an unconnected provider. The chat input turns into a key-entry field ("Enter to set key", "Esc to close").
-4. Paste the key and press **Enter**. Brilliant validates it against the provider and stores it on success.
-5. To remove a key, hover the connection indicator and click a connected provider row.
-
-Notes:
-
-- **Google** also accepts OAuth sign-in (localhost redirect) instead of a raw key.
-- **Claude CLI** has no key field: install the `claude` CLI and Brilliant detects it on launch. Sign in to the CLI from chat with `/login`.
-- **Quiver** (for AI vector generation / vectorization) is a separate key set the same way; it is not a chat provider.
-- A **Configure provider…** shortcut also lives in the AI Providers section of Settings (Cmd+,).
+Sending a prompt with no provider connected instead starts a short in-chat setup conversation. Full setup detail (all paths, custom endpoints, demo mode, key-rejected troubleshooting) lives in [ai-setup.md](./ai-setup.md).
 
 ---
 
@@ -127,10 +116,11 @@ Notes:
 
 Outbound chat traffic is **explicit-consent only**. Brilliant does not auto-attach screenshots of the screen, system info, app version, recent files, telemetry, or other ambient context. The default is to send nothing extra beyond your prompt.
 
-Two layers of context can travel with a message:
+Context that can travel with a message:
 
-1. **Canvas context (first message of a session):** when the first message is sent, Brilliant includes a snapshot of the canvas and an overview screenshot so the model can see the work in progress. Later messages send only changed state. To send a prompt with no canvas context, start the chat in an empty workspace.
-2. **Per-message attachments (opt-in):** each shows as a chip above the input with an X to remove before sending. Nothing attaches unless you add it.
+1. **Canvas context (first message of a session):** the first message carries a *text* snapshot of the canvas: an adaptive-depth Blueprint of the element structure, the design-system state, the component catalog, and the element count / current selection. This is text, not an image; no screenshot of the canvas or screen is captured for the initial context. Later messages send only changed state. To send a prompt with no canvas context, start the chat in an empty workspace.
+2. **Per-message attachments (opt-in):** each shows as a chip above the input with an X to remove before sending. Nothing attaches unless you add it. An **element** attachment (via `@` or paste) sends that element's Blueprint plus a PNG render of just that element; **image / file** attachments send what you added.
+3. **Automatic self-review screenshot (after edits):** once the AI applies a block of changes, Brilliant renders a screenshot of *those changed elements* and sends it back to the model so it can check its own work (spacing, contrast, alignment, clipping). It is a render of the design content only, never the screen or other apps. Text-only models never receive it, and it is suppressed for the rest of a session once an endpoint rejects image input.
 
 | Attachment | How to add |
 |------------|------------|
@@ -215,6 +205,7 @@ Exporting a session as a video replay is not a slash command: it is an action on
 
 - Click the stop button in the chat input bar, or type `/stop`.
 - The active request aborts immediately and no further tools are dispatched.
+- Anything the AI already created before you stopped stays on the canvas. The stopped turn's card has a **Revert** control that undoes everything that turn changed in one step (and a Redo to bring it back); you can also undo normally.
 - Sub-agents inherit cancellation from their parent session.
 
 ---

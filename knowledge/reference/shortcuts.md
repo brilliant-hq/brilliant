@@ -77,7 +77,7 @@ On Windows several macOS defaults are unbound, because their Cmd-based chords co
 
 ### Windows-remapped defaults
 
-On Windows some macOS defaults are moved to free chords (their macOS chord collapses onto — or was authored on — a chord owned by an essential command). A Windows user should expect these instead of the macOS chords listed elsewhere in this guide:
+On Windows some macOS defaults are moved to free chords (their macOS chord collapses onto, or was authored on, a chord owned by an essential command). A Windows user should expect these instead of the macOS chords listed elsewhere in this guide:
 
 | Command | macOS | Windows |
 |---------|-------|---------|
@@ -144,6 +144,7 @@ On Windows some macOS defaults are moved to free chords (their macOS chord colla
 | Select parent frame | Shift+Enter |
 | Rename selected layer | Cmd+R |
 | Delete selected | Backspace |
+| Hide / show selection | Cmd+Shift+H (id `toggle_visibility`; Figma parity. Plain Shift+H is flip-horizontally) |
 
 ### Escape Behavior (Context-Aware)
 
@@ -466,7 +467,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 
 | Action | Shortcut |
 |--------|----------|
-| Toggle overlay mode | Ctrl+F on macOS — an OS-level global hotkey that fires even when Brilliant is unfocused; switches between studio and overlay. Requires overlay mode enabled in settings. Unbound by default on Windows. |
+| Toggle overlay mode | Ctrl+F on macOS, an OS-level global hotkey that fires even when Brilliant is unfocused; switches between studio and overlay. Requires overlay mode enabled in settings. Unbound by default on Windows. |
 | Toggle passthrough (overlay only) | Ctrl+A on macOS (global hotkey while in overlay; makes the window click-through to apps below). Unbound by default on Windows. |
 | Show/hide UI | Cmd+\\ (toggles toolbars in both window modes; in overlay creates a clean transparent drawing surface) |
 | Expand/collapse all right-toolbar sections | Cmd+/ (id `toggle_sections`) |

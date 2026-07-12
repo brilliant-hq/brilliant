@@ -50,7 +50,9 @@ The right toolbar shows a **Selection Colors** section when implicit selection a
 
 ### Per-Parent Selection
 
-When elements are selected across multiple frames, separate selection rectangles appear, one per parent. Operations execute independently within each parent's coordinate space.
+Selection is grouped **per parent**, not as one flat set. Select 2 elements in Frame A and 3 in Frame B and you get **two selection rectangles**, one around each parent's group, each with its own set of resize handles. This surprises Figma users, who expect a single bounding box around the whole selection.
+
+Every geometric operation runs **once per parent, in that parent's own coordinate space**: Align Left aligns the 2 elements in Frame A among themselves and separately aligns the 3 in Frame B, resize scales each group against its own box, distribute distributes within each parent. Nothing snaps or aligns across a frame boundary. A selection whose elements all share one parent (including top-level elements, whose parent is the canvas root) shows a single rectangle and behaves as expected.
 
 ### Visual Feedback
 
@@ -60,7 +62,19 @@ When elements are selected across multiple frames, separate selection rectangles
 | Thin blue outline on hover | Hovered |
 | Resize handles (squares at corners and edges) | Can be resized |
 | Rotation cursor (just outside corners) | Hover outside a corner handle to rotate |
-| Dashed lines with pixel labels (Alt+hover) | Distance measurements (see [canvas.md](./canvas.md#measurement-overlays)) |
+| Solid line with pixel label (Alt+hover) | Distance measurements (see Measurement Overlays below) |
+
+### Measurement Overlays (Alt+Hover)
+
+Hold **Alt/Option** and hover a **non-selected** element (a selection must already exist, and you must not be dragging) to show Figma-style distance guides between the selection and the hovered target. Pure read-only: it never moves or changes elements and has no undo footprint.
+
+Three cases, by what you hover:
+
+- **Element to element:** the gap between the two boxes; if they also overlap on the other axis, the edge-to-edge alignment offset for that axis is shown too.
+- **Frame padding:** hover a frame that contains selected children to see the four paddings from the children's union box to the frame edges.
+- **Child-to-frame padding:** with a frame selected, hover one of its children to see that child's four paddings to the frame edges.
+
+Distances use geometric bounds (no stroke inflation), so they never jump with stroke width. The measurement line is **solid** with a numeric pixel label; extension connectors (drawn when the line misses the target's extent) are dashed. Guides recompute after every command, so nudging the selection with arrow keys while Alt is held keeps the numbers live against the same hovered target. Alt detection is cross-platform (Option on macOS, Alt on Windows/Linux).
 
 ## Movement
 

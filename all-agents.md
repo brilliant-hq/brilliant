@@ -23,6 +23,7 @@ Load **all rows that apply** — most designs match 3-5 rows:
 | **Deep color / typography** | + `design/colors`, `design/typography` |
 | **AI images** | + `images/prompts`, `images/templates` |
 | **Answer a question** | relevant `reference/*` key |
+| **Visually walk the user through Brilliant's UI** | `reference/ui-walkthroughs` |
 
 design/blocks: `actions` (buttons), `layout` (hero/header/footer), `data-display` (cards/stats), `navigation`, `inputs` (forms), `feedback` (modals/toasts), `patterns`. When unsure, load all — they're small.
 
@@ -48,7 +49,7 @@ RIGHT:  get_knowledge(keys: ["design-systems/core", "design/foundations", "desig
 - charts/{tables, bar-charts, line-charts, sparklines, misc}
 - images/{prompts, templates, integration}
 - recreation/{from-image, from-web}
-- reference/{shortcuts, tools, ui, editing, canvas, frames, text, vectors, components, styling, effects, export, design-systems, crop, shaders, canvases, layout-guides, ai}
+- reference/{shortcuts, tools, ui, ui-walkthroughs, editing, canvas, frames, text, vectors, components, styling, effects, export, design-systems, crop, shaders, canvases, layout-guides, ai}
 - webgl/{overview, setup, metaballs, liquid-metal, holographic, liquid-stainless-steel, dithering, reactive-grid, color-adjust, noise-grain, halftone, pixelate, duotone, posterize, dither}
 
 ## Canvas Exploration

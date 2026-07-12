@@ -40,6 +40,8 @@ Note: there is no built-in "Zoom to 100%" Cmd+0 binding. `0` alone (without Cmd)
 | Reset zoom | (no default; `reset_zoom`) | Snap back to 100% and zero pan; user-bindable |
 | Toggle zoom | 0 (Move or Hand tool only) | Toggle between 100% and the previously-zoomed state. With no previous state it jumps to 200%. |
 
+**Windows remaps:** the Cmd+Ctrl+* chords above collapse onto essential Ctrl commands on Windows, so three are re-homed to Alt: Fit all content = Alt+A, Zoom to selection = Alt+Z, Disable zoom out = Alt+D. Center on selection is unbound on Windows (command palette only).
+
 ### Scroll and Trackpad
 
 - Scroll wheel: pans the canvas (vertical scroll = vertical pan)
@@ -56,7 +58,7 @@ Displayed in the right toolbar header. The percentage is a draggable value (drag
 
 ### Disable Zoom Out
 
-**Cmd+Ctrl+D** toggles a clamp that prevents zooming below 100% and constrains pan to canvas bounds. Useful for overlay mode and presentations.
+**Cmd+Ctrl+D** (Alt+D on Windows) toggles a clamp that prevents zooming below 100% and constrains pan to canvas bounds. Useful for overlay mode and presentations.
 
 ## Pan
 
@@ -189,7 +191,7 @@ Supported modes (16): Normal, Darken, Multiply, Color Burn, Lighten, Screen, Col
 
 ## Rendering Performance
 
-On very large canvases (hundreds of elements) Brilliant automatically switches to a faster rendering mode, and switches back once the canvas is lighter. This is fully automatic; no user action is needed.
+Brilliant renders all canvas content through a native GPU engine that scales to very large canvases (tens of thousands of elements) automatically; no user action or mode switching is needed.
 
 ### Studio vs Overlay screen capture
 
@@ -291,15 +293,15 @@ The canvas paints three background layers in order: void, background color, blac
 | Studio (default) | Regular desktop window: title bar, shadow, resizable, visible in Dock. Launches on startup. |
 | Overlay | Fullscreen transparent layer above other apps: borderless, always-on-top, hidden from Dock. |
 
-Overlay mode is **opt-in**. Until the user enables it (Settings: "Overlay Mode"), the global hotkey is not registered. Once enabled, **Ctrl+F** toggles between studio and overlay mode. The hotkey fires even when Brilliant is unfocused, minimized, or invisible. Studio window state (position, size, fullscreen, maximized) is saved on entering overlay and restored on exit.
+Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and `toggle_pass_through` shortcuts are disabled on Windows; reach them via menus/command palette). Until the user enables it (Settings: "Overlay Mode"), the global hotkey is not registered. Once enabled, **Ctrl+F** toggles between studio and overlay mode. The hotkey fires even when Brilliant is unfocused, minimized, or invisible. Studio window state (position, size, fullscreen, maximized) is saved on entering overlay and restored on exit.
 
 | Action | Shortcut | Notes |
 |--------|----------|-------|
-| Toggle overlay mode | Ctrl+F | Global hotkey |
+| Toggle overlay mode | Ctrl+F | Global hotkey; macOS-focused, disabled on Windows |
 | Toggle passthrough | Ctrl+A | Overlay only: pointer events pass through to apps below |
 | Toggle presentation mode | Alt+P | Hides UI panels for a clean view |
 | Toggle UI (panels) | Cmd+\ | Hide/show all toolbars |
-| Toggle inspector sections | Cmd+/ | Collapse/expand all right-toolbar sections |
+| Toggle inspector sections | Cmd+/ | Collapse/expand all collapsible toolbar sections (the right-toolbar inspector groups) |
 | Toggle left toolbar | Cmd+Shift+Left | |
 | Toggle right toolbar | Cmd+Shift+Right | |
 | Toggle bottom toolbar | Cmd+Shift+Down | |
@@ -334,11 +336,12 @@ A 1-pixel grid overlay for pixel-perfect work at high zoom levels.
 ### Visibility
 
 - **Appears at 400%+ zoom** (4x and above)
-- **Fades in smoothly** between 400% and 500% zoom
-- Theme-aware: light gray on dark theme, dark gray on light theme
-- **Not shown on Windows** (temporarily, due to a graphics-driver line-rendering
-  limitation). Snap-to-pixel-grid still works there — only the visual overlay is
-  absent.
+- **Fades in smoothly** between 400% and 600% zoom
+- **Adaptive contrast:** each line reads the content beneath it and shifts its
+  luminance away from the local backdrop (darker on light content, lighter on
+  dark), so the grid stays visible on any background — including photos and
+  gradients — and never dominates. It is not a flat theme color.
+- Shown on all platforms (macOS, Windows, Linux).
 
 ### Toggle
 
