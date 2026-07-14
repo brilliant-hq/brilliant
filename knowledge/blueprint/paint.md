@@ -1,6 +1,6 @@
 ---
 assumes: blueprint/core
-dsl: [solid, metaballs, metal, irid, steel, glass]
+dsl: [solid, metaballs, metal, irid, steel, dithering, reactiveGrid, glass, colorAdjust, noiseGrain, halftone, pixelate, duotone, posterize, dither]
 ---
 # Blueprint Paint
 
@@ -18,7 +18,10 @@ f[(linear(135,$violet.mid,$pink.mid))]              linear gradient
 f[(radial($color.surface,$color.on-surface))]       radial gradient
 f[(angular($amber.mid,$red.mid))]                   angular gradient
 f[(metaballs($primary.soft,$primary.mid,$primary.bold))]  shader
+f[(dithering(#101820,#22D3EE,size(6)))]             shader (ordered dither)
+f[(reactiveGrid())]                                 shader (grid, cursor-reactive)
 f[(img(https://picsum.photos/id/42/800/400))]       image
+f[(img(...)),(halftone(dotSize(8),mode(cmyk)))]     image filter over the fill below
 f[(glass)]                                          liquid glass (defaults)
 f[(glass(chroma(0.5),frost(8)))]                    glass, params overridden
 f[($neutral.intense),(f2,solid($primary.mid,o($visibility.soft)))]  stacked
@@ -28,7 +31,7 @@ f[]                                                 deliberately no fill (outlin
 Liquid glass refracts the backdrop like a glass pane. Bare `glass` uses the
 tuned defaults; override any of `frost(N)` (backdrop blur), `thickness(N)`,
 `bevel(N)`, `ior(N)`, `chroma(N)`, `glow(N)`, `edge(N)`, `angle(deg)`,
-`sat(N)`, `tint(color[,o(N)])` — a `$token` or hex tint. Fill-only (not a
+`sat(N)`, `tint(color[,o(N)])`, a `$token` or hex tint. Fill-only (not a
 stroke).
 
 Every color slot takes a `$token` (solid fills, gradient stops, shader
@@ -36,8 +39,25 @@ colors, effect colors); token-bound stops follow brand and mode, and bare
 hex is rejected (see `design-systems/core`). Radial accepts placement:
 `radial(cx(25),cy(15),r(50),$primary.mid,$primary.intense)`.
 
+## Image filters
+
+Image filters restyle whatever renders beneath them in the stack, so put one
+after the fill it acts on: `f[(img(...)),(halftone(mode(cmyk)))]`. Bare uses
+tuned defaults; pass named params as numbers or option labels (`shape(hexagonal)`).
+`opacity(N)` sets the filter's own strength.
+
+```
+colorAdjust  photo grade: exposure, contrast, saturation, temperature, hue, vibrance, whites, blacks, vignette
+noiseGrain   film grain: amount, size, monochrome(color|mono)
+halftone     dot screen: dotSize, angle, shape(circle|diamond|line), mode(standard|cmyk)  (colors: bg, fg, +CMYK inks)
+pixelate     mosaic: cellSize, shape(square|hexagonal|diamond|circle|triangle)
+duotone      two-tone map (2 color slots): contrast, brightness, saturation
+posterize    banding: levels, mode(rgb|luminosity|hsl)
+dither       ordered dither (2 color slots): levels, pattern(bayer|noise|blueNoise), pixelSize
+```
+
 **Editing one fill (`+`/`-`/`->`).** When modifying an element, a bare `f[...]`
-replaces the whole stack; prefix items to edit it in place instead — match is by
+replaces the whole stack; prefix items to edit it in place instead. Match is by
 paint: `#card f[+($color.primary)]` appends, `f[-($color.primary)]` removes that
 fill, `f[($color.primary)->($color.danger)]` swaps it. Same operators on `st[]`.
 

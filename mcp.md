@@ -4,7 +4,9 @@ Brilliant is a Figma-like 2D vector design tool. Auto layout, frames, groups, hu
 
 ## Session Identity
 
-`init` returns a unique session ID (`mcp:<id>`). **Pass that exact string as the `sessionId` argument on every `create_modify_elements` and `create_html` call.** It scopes your element refs (`#name`) and design-system state so concurrent agents never collide. Omitting it falls back to a shared stateless session — fine for a single agent, but always prefer the minted ID.
+`init` returns a unique session ID (`mcp:<id>`). **Pass that exact string as the `sessionId` argument on every `create_modify_elements` and `create_html` call.** It scopes your element refs (`#name`) and design-system state so concurrent agents never collide, and gives you your own distinct labelled cursor on the canvas — two agents that each echo their ID show as two separate cursors instead of one thrashing between both. Omitting it falls back to a shared stateless session (and a shared cursor) — fine for a single agent, but always prefer the minted ID.
+
+Optionally pass `agentName` (a short 2-3 word label) to `init` to name your canvas cursor; otherwise a name is auto-assigned.
 
 ## Element Creation
 

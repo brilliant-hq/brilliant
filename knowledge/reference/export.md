@@ -13,9 +13,9 @@ Selecting a frame includes all of its children in the export. To export everythi
 
 There are three by-hand entry points:
 
-1. **Export panel (right toolbar)** — the main hub. Appears at the bottom of the right toolbar when one or more elements are selected. Choose format, resolution, fit, background, video options, PDF page mode, and run multiple export configs in one click. This is the only place plain video (MP4/MOV) and PDF multi-page are available.
-2. **Commands / shortcuts** — `Cmd+E` exports PNG with a save dialog. All other format commands are reached through the command palette.
-3. **Right-click context menu** — `Export as` submenu (quick file export), `Copy as` submenu (clipboard), and `Send to` submenu (Figma).
+1. **Export panel (right toolbar)**: the main hub. Appears at the bottom of the right toolbar when one or more elements are selected. Choose format, resolution, fit, background, video options, PDF page mode, and run multiple export configs in one click. This is the only place plain video (MP4/MOV) and PDF multi-page are available.
+2. **Commands / shortcuts**: `Cmd+E` exports PNG with a save dialog. All other format commands are reached through the command palette.
+3. **Right-click context menu**: `Export as` submenu (quick file export), `Copy as` submenu (clipboard), and `Send to` submenu (Figma).
 
 `Cmd+E` (PNG) is the only export keyboard shortcut. Every other format is reached via the command palette, the right-click submenus, or the Export panel.
 
@@ -30,11 +30,11 @@ There are three by-hand entry points:
 | **PDF** | Vector | Embedded fonts (Google Fonts cache + system, Helvetica fallback). Any element with an enabled effect is rasterized whole. Supports single-page or multi-page |
 | **HTML** | Markup | HTML + inline CSS. Three variants: snippet, full document (with Google Fonts link), and flex (auto-layout frames become `display:flex`). Command palette / Copy as only |
 | **React (JSX)** | Markup | Same DOM as HTML, JSX style objects, camelCase attrs. Pasteable into a `.tsx` file. Command palette / Copy as only |
-| **MP4** | Video | H.264 or HEVC, no alpha. macOS only. Export panel only |
-| **MOV** | Video | HEVC (with alpha) or ProRes 4444. macOS only, supports transparent background. Export panel only |
-| **Replay** | Video | Animated reveal: elements fade in one after another with a shimmer pass. Defaults to MP4, but MOV is selectable (required for a transparent background). Has a command and a context-menu entry |
+| **MP4** | Video | No alpha. macOS: H.264 or HEVC (VideoToolbox). Windows: H.264 only (Media Foundation). Not available on Linux. Export panel only |
+| **MOV** | Video | HEVC (with alpha) or ProRes 4444. macOS only (Windows has no QuickTime writer; Linux has no video export), supports transparent background. Export panel only |
+| **Replay** | Video | Animated reveal: elements fade in one after another with a shimmer pass. Defaults to MP4 (macOS and Windows); MOV is selectable on macOS (required for a transparent background). Has a command and a context-menu entry |
 
-Video export is macOS only (hardware-accelerated via VideoToolbox). On Windows and Linux the video formats are not available.
+MP4 export runs on macOS (VideoToolbox, H.264/HEVC) and Windows (Media Foundation, H.264 only). MOV and its alpha-capable codecs are macOS only. Linux has no video export. Replay follows the same rules as its chosen container (MP4 on macOS and Windows; MOV on macOS).
 
 ### WebP quality
 
@@ -86,18 +86,18 @@ The `+` button in the Export panel header (`Add export config`) appends another 
 
 ## Video export (MP4 / MOV)
 
-Video export renders animated shader fills frame by frame into a hardware-accelerated file (macOS only). It is available **only from the Export panel** (no command, no shortcut, no context menu). Replay is the exception.
+Video export renders animated shader fills frame by frame into a hardware-accelerated file (macOS via VideoToolbox, Windows via Media Foundation; not on Linux). It is available **only from the Export panel** (no command, no shortcut, no context menu). Replay is the exception.
 
 Flow: select elements, choose MP4 or MOV in the format dropdown, configure the inline video options, click `Export`, then save. A progress bar shows "Frame X / Y" and can be cancelled.
 
 | Option | Values | UI default |
 |--------|--------|------------|
-| **Duration** | 0.5–60s (draggable + preset dropdown) | 10s |
+| **Duration** | 0.5 to 60s (draggable + preset dropdown) | 10s |
 | **FPS** | 15, 24, 30, 60 | 60 |
 | **Quality** | Low, Medium, High | Medium |
 | **Resolution** | Same presets as image export | Original (1x) |
 
-Codecs are constrained by format: MP4 offers H.264 and HEVC (no alpha); MOV offers HEVC (alpha) and ProRes 4444 (alpha, largest files). The codec dropdown adjusts automatically when you switch format. Only MOV with HEVC-with-alpha or ProRes 4444 supports a transparent background; MP4 always renders opaque (falls back to canvas color).
+Codecs are constrained by format: MP4 offers H.264 and HEVC (no alpha); MOV offers HEVC (alpha) and ProRes 4444 (alpha, largest files). The codec dropdown adjusts automatically when you switch format. Only MOV with HEVC-with-alpha or ProRes 4444 supports a transparent background; MP4 always renders opaque (falls back to canvas color). On Windows only H.264/MP4 is available: no HEVC, no MOV, no alpha (the codec dropdown is fixed at H.264).
 
 Video currently animates shader fills only (metaballs, liquid metal, holographic, etc.). Static elements look identical in every frame. There is no keyframe-timeline animation.
 
@@ -135,7 +135,7 @@ Copy the selection to the clipboard in several representations. Useful for pasti
 | Command | What it copies |
 |---------|----------------|
 | Copy as PNG | PNG image at screen resolution (device pixel ratio) |
-| Copy as WebP | WebP image, lossy q=90, macOS only; narrow app support, prefer PNG |
+| Copy as WebP | WebP image, lossy q=90 (macOS and Windows; Linux falls back to PNG). Narrow app support, prefer PNG |
 | Copy as SVG | SVG markup text |
 | Copy as HTML | HTML/CSS snippet (auto-layout frames absolute-positioned) |
 | Copy as HTML (document) | Self-contained HTML document with Google Fonts link for detected web fonts |
@@ -149,12 +149,12 @@ The right-click `Copy as` submenu contains: PNG, PNG @2x, PNG @4x, WebP, SVG, HT
 
 Clipboard notes:
 - **PNG** copies at device pixel ratio so what you see on screen matches what you paste (WYSIWYG). @2x / @4x multiply that.
-- **WebP** is written under the `org.webmproject.webp` UTI on macOS. Most apps prefer PNG when both are offered, so use `Copy as PNG` for general pasting. Always lossy q=90 on this path.
+- **WebP** is written under the `org.webmproject.webp` UTI on macOS, or as a `.webp` file to the clipboard on Windows (Linux falls back to PNG). Most apps prefer PNG when both are offered, so use `Copy as PNG` for general pasting. Always lossy q=90 on this path.
 - **CSS** emits the first solid fill and first solid stroke only; corner radius only for frames (not rectangle elements); only `linear-gradient` (any gradient fill, including radial, is emitted as a linear-gradient, so radial gradients render incorrectly rather than being omitted); no opacity, effects, or image fills.
 
 ## MCP export tool (for AI agents)
 
-AI agents can export programmatically via the MCP `export` tool (image and markup formats only — MP4/MOV/Replay are commands/UI only). For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. The full parameter schema is delivered with the tool itself.
+AI agents can export programmatically via the MCP `export` tool (image and markup formats only: MP4/MOV/Replay are commands/UI only). For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. The full parameter schema is delivered with the tool itself.
 
 ## Other application formats
 

@@ -30,13 +30,13 @@ Brilliant runs in two window modes, switched on a single window:
 |--------|----------|
 | Toggle overlay mode (global, opt-in) | Ctrl+F |
 | Toggle passthrough (overlay only) | Ctrl+A |
-| Toggle desktop icons (overlay only) | Ctrl+I |
+| Toggle desktop icons (macOS-only; works in either window mode) | Ctrl+I |
 
-**Overlay mode is opt-in.** The Ctrl+F global hotkey is only registered when "Overlay mode" is turned on in Settings (Cmd+,). With the setting off, Ctrl+F does nothing: toggle the setting to use overlay mode. The toggle persists across launches.
+**Overlay mode is macOS-only and opt-in.** The whole feature (transparent window + global hotkey) is gated on `Platform.isMacOS`; the toggle and its actions are not shown on Windows, and `toggle_overlay_mode` / `toggle_pass_through` are in the Windows-disabled keybinding set. The "Overlay Mode" toggle lives in Settings (Cmd+,) → General, off by default. The Ctrl+F global hotkey is only registered while that toggle is on; with it off, Ctrl+F does nothing. Turning it off while in overlay auto-exits to studio. The setting persists across launches (SharedPreferences key `OverlayModeEnabled`). Settings → General also exposes an "Open Accessibility Settings" action: accessibility access is required for the global hotkey to summon Brilliant from other apps.
 
 In passthrough mode (overlay only), mouse clicks pass through Brilliant to the apps below. Studio window state (position, size, fullscreen, maximized) is saved before entering overlay and restored on exit. The bottom toolbar sits slightly higher off the bottom edge while in overlay mode than in studio.
 
-The overlay-mode toggle is a global hotkey only when the opt-in is on, so it works even when Brilliant is not the focused application. Reassigning the keybinding re-registers the global hotkey. Passthrough and desktop-icon toggles are regular in-app shortcuts (overlay window must be active).
+The overlay-mode toggle is a global hotkey only when the opt-in is on, so it works even when Brilliant is not the focused application. Reassigning the keybinding re-registers the global hotkey. Passthrough is a regular in-app shortcut gated to overlay mode (its WhenClause requires `!isStudioMode`, so the overlay window must be active). Toggle desktop icons is a plain in-app shortcut on `BaseCommand.defaultWhen` (not overlay-gated); it fires in either window mode and is a macOS-only operation (the command hard-returns off macOS).
 
 ## Left Toolbar
 

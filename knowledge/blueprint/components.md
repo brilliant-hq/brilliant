@@ -47,6 +47,11 @@ al(v,g($spacing.sm),pad($spacing.lg)) s(hug,hug) f[($color.surface.container)] r
 #row axes[accessory[+swipe]]         -- + adds a value
 #row axes[accessory->trailing]       -- -> renames, keys kept (at(trailing(toggle)) still lands)
 #row axes[-state]                    -- - removes (flags collisions Figma-style, never deletes content)
+-- ADD A VARIANT: nest it under the #ref (unseen value labels register automatically).
+-- It lands below the existing variants; nothing else moves. Undo reverts the whole edit.
+#row
+  al(h,y(c),g($spacing.md),pad($spacing.sm,$spacing.md)) variant(accessory(swipe)) s(320,hug) f[($color.surface)] rd($radius.md)
+    t("Label",$font.family,$font.size.md) s(fill,hug) f[($color.text.primary)]
 ```
 
 Reconfigure on canvas: `#row_2 at(accessory(toggle))`; `override()` on a non-slot child changes its existing props (locks that category vs master edits); new content needs a `slot`.

@@ -5,7 +5,7 @@ description: "GPU image-filter fills (noise/grain, halftone, pixelate, duotone, 
 
 # Image Filters
 
-GPU post-processing filters that live in the Fills (or Strokes) list of an element. Each filter reprocesses everything painted below it in that list, producing effects like film grain, halftone printing, pixelation, and color reduction. They work on any fills (solid, gradient, image, shader), not just photos.
+GPU post-processing filters that live in the Fills (or Strokes) list of an element. Each filter reprocesses the fills painted below it in its segment of that list (see Z-order processing), producing effects like film grain, halftone printing, pixelation, and color reduction. They are designed to work over any fills (solid, gradient, image, shader), not just photos.
 
 The six image filters are: **Noise / Grain**, **Halftone**, **Pixelate**, **Duotone**, **Posterize**, **Dither**.
 
@@ -19,7 +19,9 @@ The new fill row now represents the filter. Click the row to expand it and revea
 
 ## Z-order processing
 
-A filter captures everything below it in the same fills/strokes list, applies the GPU shader, and outputs the result in that fill's slot. Fills above the filter paint on top of the processed output. To make a filter affect the whole element, place it at the top of the fills list. Multiple filters can be stacked: each processes everything below it. Reorder fills by dragging rows in the Fills section.
+The fills/strokes list renders bottom-to-top. The filter model treats every filter (`colorAdjust` or any `isImageFilter`) as a **segment boundary** and each filter reprocesses only the fills in its own segment: the run from the previous filter boundary up to (but not including) itself. It is NOT "everything below." Consequences: a single filter at the top of the list processes the whole element; stacking two filters does not double-process the bottom run, since each grades only its own segment; fills above the last filter paint normally on top with zero filter overhead. Reorder fills by dragging rows in the Fills section.
+
+**Rendering:** filter fills render through the native GPU engine, on canvas and in exports. Coverage includes shape-element fills (rectangles, ellipses), shape-element strokes, vector paths, boolean results, and text at rest (text routes through its glyph outlines, so the pattern renders through the glyph ink). Multi-fill segments, stacked filters, per-filter blend mode, and per-filter opacity all render. One residual gap: filters placed in the **Strokes** list of a **vector** element (per-chain vector strokes, distinct from shape-element strokes, which do render) do not yet render; this is a flagged follow-up, so avoid promising vector-stroke filter output specifically. On an older engine build that predates filter support, a filter fill is skipped cleanly: nothing else is affected and nothing crashes.
 
 ## Presets
 
@@ -276,11 +278,11 @@ Open the command palette with Cmd+Shift+P and search for the filter name. Each c
 
 ## General notes
 
-- **Strokes too**: Every filter works identically when added to the Strokes list. It then reprocesses the stroke's rendered area instead of the fill area.
-- **Stacking**: Multiple filters can coexist on one element, each processing everything below it in fill order, see [Z-order processing](#z-order-processing).
+- **Strokes too**: Every filter works identically when added to the Strokes list of a shape element. It then reprocesses the stroke's rendered area instead of the fill area. (Filters in the Strokes list of a vector element are the one case that does not yet render, see Z-order processing.)
+- **Stacking**: Multiple filters can coexist on one element, each processing only the fills in its own segment (from the previous filter boundary up to itself), not everything below it, see [Z-order processing](#z-order-processing).
 - **Blend mode**: Each filter row has a blend mode dropdown in its expanded config, controlling how the filter's output composites with the content below it.
 - **Stable across zoom**: Pattern sizes (grain, dots, cells) are measured in logical pixels, so they stay visually consistent as you zoom in and out.
 - **Per-color tint strength**: For filters with color swatches (Halftone, Duotone, Dither), each swatch's alpha controls how strongly that color tints the result versus showing the original image, not the output's transparency.
 - **Design token colors**: Filter color swatches can be bound to design system color tokens (so Duotone or Halftone colors follow the active brand/mode), the same way any fill color can. For token-authoring syntax, see the design-systems knowledge files.
 - **Authoring**: Image filters and Color Adjust have no compact authoring syntax in the Blueprint DSL. Add them through the UI type dropdown or the command palette commands above, then tune parameters by dragging the sliders or editing fields in the property inspector. For Blueprint authoring syntax in general, see the blueprint knowledge files.
-- **Export**: PNG, JPEG, and WebP capture filters at full quality. SVG and PDF export pre-rasterizes any element using a filter (fill or stroke) as an embedded raster image, since these effects cannot be expressed as vector primitives.
+- **Export**: exports are WYSIWYG with the canvas (engine readback). SVG and PDF export pre-rasterizes any element using a filter (fill or stroke) as an embedded raster image (`needsRasterizationForExport` in `element.dart`), since these effects cannot be expressed as vector primitives.
