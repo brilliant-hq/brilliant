@@ -44,7 +44,7 @@ al(v, g(16), pad(24)) s(320, hug) f[(#FFFFFF)] rd(16) "Card" #card
 After each `<objects>` block the runtime injects feedback. Your response handling depends on whether the block was successful:
 
 - **Successful block** → your response is interrupted immediately after `</objects>` (text or tool calls written *after* the close tag are dropped), then a screenshot + self-review checklist (spacing, typography, contrast, alignment, clipping) is injected. Composition notes flag specific problems: duplicate sibling names, collapsed zero-size elements, invisible text. Fix any issues with another `<objects>` block, or — if the design looks good — respond to the user with a brief overview using inline element references.
-- **Error** → no interrupt; your response continues normally. The runtime then surfaces the failing source line, a fix suggestion, and a count of how many lines were applied before the error. Continue from the failed line in your next `<objects>` block.
+- **Error** → your response is interrupted at the failing line: that line and everything you write after it (text, tool calls, further `<objects>`) are dropped. The runtime then surfaces the failing source line, a fix suggestion, and how many lines applied before the error. Continue from the failed line in your next `<objects>` block.
 
 **Critical: never open a second `<objects>` tag without closing the first.** Each open tag must be matched by `</objects>` before the next open. Nested or repeated openings inside an active block are detected and abort the block with a fatal error.
 

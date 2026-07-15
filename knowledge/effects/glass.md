@@ -20,15 +20,16 @@ equivalent).
 
 ## Recipes
 
-Copyable `glass(...)` fills (the five built-in looks, derived from the app's
-presets). Only non-default params are listed; bare `glass` = Clear.
+Copyable `glass(...)` fills (the five built-in looks, matching the app's
+presets). Only non-default params are listed; bare `glass` = Clear (the
+creation default).
 
 ```
-f[(glass)]                                                    Clear — bold refractive pane (thick, dispersive)
-f[(glass(frost(8),thickness(12),bevel(12),chroma(0.35),sat(1.1)))]   Frosted — thin blurred backdrop
-f[(glass(frost(4),thickness(24),bevel(24),chroma(0.4)))]      Deep — mid slab, softer fringe
-f[(glass(chroma(2)))]                                         Chromatic — extreme dispersion rainbow
-f[(glass(tint($color.shadow,o($visibility.mid)),frost(10),thickness(10),bevel(10),chroma(0.25),sat(0.9)))]   Smoke — dark tinted glass
+f[(glass)]                                                    Clear — max-depth clear slab, strong refraction
+f[(glass(frost(24),thickness(64),bevel(80),chroma(0.35),edge(0.05),sat(1.1),tint(#FFFFFF,o(0.05))))]   Frosted — heavy frost, whisper of white
+f[(glass(frost(4),thickness(64),bevel(120),chroma(0.4),glow(0.01),edge(0.01)))]   Deep — full pull into the widest bevel
+f[(glass(thickness(64),bevel(120),ior(3),chroma(0.5),glow(0.02),edge(0.01),sat(2)))]   Chromatic — max dispersion, vivid backdrop
+f[(glass(frost(10),bevel(120),chroma(0.25),glow(0.01),edge(0.01),sat(0.9),tint(#000000,o(0.5))))]   Smoke — dark smoked glass
 ```
 
 Tint takes a `$token` (resolved at create time) or `#hex`, with opacity as a
@@ -45,11 +46,11 @@ f[(glass(tint($color.surface,o($visibility.soft)),frost(12)))]   light frosted t
 | Param | Default | Range | Effect |
 |---|---|---|---|
 | `frost` | 0 | ≥0 | backdrop blur sigma (0 = crisp pane) |
-| `thickness` | 48 | 0..64 | slab depth; how far light bends (0 = plain blur, no refraction) |
-| `bevel` | 40 | 0..120 | rim band width where the lens rises |
-| `ior` | 2 | 1..3 | index of refraction; higher bends more |
+| `thickness` | 64 | 0..64 | slab depth; how far light bends (0 = plain blur, no refraction) |
+| `bevel` | 60 | 0..120 | rim band width where the lens rises |
+| `ior` | 3 | 1..3 | index of refraction; higher bends more |
 | `chroma` | 0.8 | 0..3 | chromatic fringe at the rim (1 = strong; >1 = extreme dispersion) |
-| `glow` | 0.05 | 0..1 | luminous rim glow |
+| `glow` | 0 | 0..1 | luminous rim glow |
 | `edge` | 0 | 0..1 | specular rim highlight |
 | `angle` | 135 | degrees | light direction (135 = top-left) |
 | `sat` | 1.05 | 0..2 | backdrop saturation remix (vibrancy) |

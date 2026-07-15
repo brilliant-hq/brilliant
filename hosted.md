@@ -4,7 +4,7 @@ Brilliant is a Figma-like 2D vector design tool. Auto layout, frames, groups, hu
 
 **CRITICAL: Your first action must be `mcp__brilliant__get_knowledge`.** Before designing, before answering questions, before exploring the canvas — load 10-15 relevant knowledge files. You do not have built-in knowledge about Brilliant's DSL, capabilities, or features.
 
-If your runtime defers MCP tool schemas, ONE ToolSearch call loads them all — `ToolSearch(query: "select:mcp__brilliant__get_knowledge,mcp__brilliant__execute_commands,mcp__brilliant__lookup,mcp__brilliant__get_selection,mcp__brilliant__export")` — and they are callable the moment it returns (an empty-looking result still means loaded). Call `mcp__brilliant__get_knowledge` immediately after; never re-search.
+If `ToolSearch` is among your tools, load all five brilliant tools with ONE call — `ToolSearch(query: "select:mcp__brilliant__get_knowledge,mcp__brilliant__execute_commands,mcp__brilliant__lookup,mcp__brilliant__get_selection,mcp__brilliant__export")` — then call them directly; they are callable the moment it returns, and an empty-looking or "no matching deferred tools" result means they are ALREADY callable. Never search twice.
 
 **You are running in hosted mode inside the Brilliant app.** Your tools (each is a separate MCP tool — call them independently, never nest one inside another):
 - `mcp__brilliant__get_knowledge` — load knowledge files (MUST be your first call)
@@ -35,10 +35,10 @@ Keep it shorter and more concrete than the title ("Pricing Page", "Logo Sketch",
 
 **Do NOT use sub-agents unless the user explicitly asks for them.** Build everything yourself — you are faster and produce better results for single designs. Sub-agents add overhead and produce output you'll need to fix anyway.
 
-When the user does ask for sub-agents:
+When the user does ask for sub-agents: a spawned agent starts with NO Brilliant context — the `Agent` tool has no `cwd` and the sub-agent reads no CLAUDE.md. You MUST prescribe the working protocol verbatim inside each sub-agent's `prompt`:
 
-1. **Set cwd to `./subagent/`** — always pass `cwd: "./subagent/"` when spawning sub-agents via the `Agent` tool. This directory has its own CLAUDE.md with MCP-appropriate instructions and pre-populated canvas context.
-2. **Sub-agents use MCP tools** (`create_html`, `create_modify_elements`) — they do NOT use `<objects>` tags. They do NOT need to call `init` — canvas context is already in their CLAUDE.md.
+1. **Put this protocol in the prompt (verbatim).** The sub-agent builds with the `mcp__brilliant__` MCP tools — `create_html` / `create_modify_elements`, NOT `<objects>` tags. It must call `mcp__brilliant__init` FIRST, echo the `sessionId` that call returns on every subsequent create call, and target this canvas explicitly by passing your `canvasId` on every create call.
+2. **Forbid the design system.** Tell the sub-agent to NEVER emit a `ds_file` — a `ds_file` from any agent pauses the entire session on a permission gate.
 3. **Own the result.** Sub-agents create elements directly on the canvas — do NOT re-create their output. After they finish, inspect with `lookup` (use `format: "blueprint"` for full trees) or `export`, then iterate via `<objects>` tags to fix spacing, alignment, colors, or anything that isn't good enough.
 
 ## Knowledge loading
