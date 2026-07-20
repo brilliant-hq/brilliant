@@ -20,7 +20,7 @@ In Brilliant, every container element is a **parent**. Parents come in 8 sub-typ
 | Artboard | Canvas (separate page) or Frame (bounded area) | |
 | **Mask** (Cmd+Option+M) | Mask (**Ctrl+Cmd+M**) | macOS reserves Cmd+Option+M for "Minimize All Windows" |
 | Constraints (pin to edges) | Not available | Use auto layout with hug/fill/fixed |
-| Absolute position | Pin button in the Element section sizing row | Same concept |
+| Absolute position | Pin button in the Element section position row | Same concept |
 | Boolean ops | Boolean parents | Each op produces a re-editable parent (double-click to edit) |
 
 **Frames, Groups, Masks, and Booleans are all parent elements** distinguished by their type. Convert between any of them via the **Type dropdown** in the right toolbar's Parent section.
@@ -65,6 +65,8 @@ All parent types support:
 - Conversion to any other parent type via the dropdown
 
 **Clip content is off by default** for all parent types. Toggle it with the scissors button next to the Type dropdown in the right toolbar's Parent section.
+
+**Resize to fit** snaps a plain frame (or group or mask parent) to exactly wrap its children, shrinking or expanding as needed. Children keep their positions on the canvas: only the frame border moves. Use the wrap button left of the scissors in the Parent section, or Option+Shift+Cmd+R. On an auto layout frame it sets both axes to hug, so the frame fits now and keeps fitting. Boolean parents and empty parents are skipped.
 
 ### Type-Specific Differences
 
@@ -221,6 +223,7 @@ Parent section
 ├─ Type row: Type dropdown      [Clip-content scissors button]
 └─ Auto layout controls (when all selected are auto layout):
    ├─ Row 1: 3x3 alignment grid │ Spacing field         │ Wrap toggle
+   │                            │ (Cross-gap field, when wrap is on)
    │                            │ Spacing-mode dropdown │
    ├─ Row 2: All-padding field  [H/V mode toggle]  [Individual mode toggle]
    ├─ (H/V padding row, if H/V mode is on): H field, V field
@@ -228,7 +231,7 @@ Parent section
    └─ Row 3: Direction buttons (Horizontal / Vertical)
 ```
 
-The **W/H Sizing dropdowns** and **absolute-position pin button** live in the **Element** section's sizing row (NOT the Parent section): the row sits between Dimensions and Rotation. The pin button is the rightmost button in that sizing row.
+The **W/H Sizing dropdowns** live in the **Element** section's sizing row (NOT the Parent section): the row sits between Dimensions and Rotation, and ends with a ruler-icon toggle for the min/max constraint rows. The **absolute-position pin button** sits in the Element section's position row, next to the Y field.
 
 ### Direction
 
@@ -280,7 +283,7 @@ The all-padding field accepts comma-separated input even in uniform mode: typing
 Wrap toggle button (rightmost in the alignment+spacing row). When enabled, overflowing children flow to the next row (horizontal) or column (vertical). CSS `flex-wrap: wrap` equivalent.
 
 - Wrap only takes effect when the frame has **fixed or fill** sizing on the **main axis** (need a constraint to wrap against)
-- Row/column gap equals the item spacing
+- The gap between rows/columns defaults to the item spacing; a **cross-gap field** appears under the Spacing field while wrap is on to set it independently (leave it empty to inherit the item spacing)
 - Fill children inside a wrapped row fill that row's main axis, not the frame's
 - Drag-reorder uses 2D cursor position to find the right row/column first, then position within it
 
@@ -314,11 +317,25 @@ Set via **W Sizing** and **H Sizing** dropdowns in the right toolbar's **Element
 
 Text on Hug width does not wrap (it renders at its natural single-line width). Set width to Fill for text that should wrap. With multiple text elements in a horizontal row (label + value, bullet + item), put only the expanding text on Fill width; short labels stay Hug.
 
+#### Min / Max Size Constraints
+
+Auto layout frames and their direct children can carry minimum and maximum width/height constraints (Figma parity). A ruler-icon toggle at the right end of the Element section's W/H sizing row (shown whenever the selection is an auto layout frame or a direct child of one) reveals two rows: Min W + Min H, then Max W + Max H. Unset shows "None". To clear a constraint, pick "None" from the field's dropdown, or type 0, or drag below 0.
+
+How they behave:
+
+| Sizing | Effect |
+|--------|--------|
+| Hug | The hugged result clamps: the frame stops growing at its max (content overflows, clipped if Clip Content is on) and never shrinks below its min |
+| Fill | The child fills up to its max / at least its min. Excess space freed by a capped child goes to the other Fill siblings; a floored child forces siblings smaller |
+| Fixed | The size clamps to the min/max range. Manually resizing a constrained element snaps to the bound live during the drag |
+
+If min is set above max, min wins. Constraints survive manual resize and rotation (only the sizing mode converts to Fixed, as usual). Blueprint: `min(w,h)` and `max(w,h)` after `s()`, empty slot skips an axis. Constraints round-trip through Figma import and Send to Figma.
+
 #### Flex Factor
 
 When several Fill children share an axis, they divide the remaining space proportionally by their **flex factor** (default 1.0). A flex of 3 next to a flex of 1 yields a 75% / 25% split.
 
-The **Flex** field appears in the Element section's corner-radius row, prefixed with "F", and is shown only when a Fill child on the parent's main axis is selected. If fixed/hug siblings consume all available space, fill children collapse to 0 (clamped, never negative).
+The **Flex** field appears in the Element section's corner-radius row, prefixed with "F", and is shown only when a Fill child on the parent's main axis is selected. When the corner smoothing toggle is also visible (nonzero radius), Flex moves to its own row above the radius row. If fixed/hug siblings consume all available space, fill children collapse to 0 (clamped, never negative).
 
 #### Fill Inside Hug Frames
 
@@ -349,7 +366,7 @@ The **Flex** field appears in the Element section's corner-radius row, prefixed 
 Children of auto layout frames can opt out of layout flow with **absolute positioning**. An absolute child stays nested (clipping, coordinate space, z-order) but does not participate in positioning, spacing, or hug sizing. It moves and resizes freely.
 
 **Toggle:**
-- Pin button in the right toolbar's **Element** section sizing row (rightmost button), or
+- Pin button in the right toolbar's **Element** section position row (next to the Y field), or
 - Command palette → "Toggle Ignore Auto Layout"
 
 The pin button only appears when at least one selected element is inside an auto layout frame.

@@ -78,7 +78,7 @@ When a set, variant, or instance is selected, a **Component** section appears in
 
 Below the header, each property shows a row with its editable name and a **−** button to remove that property.
 
-**Variant selected.** One dropdown per property lets you set THAT variant's value -- its coordinate within the set (e.g. State = on, Size = lg). If two variants end up with the same combination of values, a **"⚠ Two variants share the same configuration"** warning appears so you can disambiguate them.
+**Variant selected.** One dropdown per property lets you set THAT variant's value -- its coordinate within the set (e.g. State = on, Size = lg). If two variants end up with the same combination of values, a **"⚠ Multiple variants share the same property values"** warning appears so you can disambiguate them.
 
 **Instance selected.** One dropdown per property lets you PICK the configuration -- i.e. flip the instance to a different variant (e.g. set State to on). The instance immediately re-renders as the matching variant. If the instance contains nested instances, their dropdowns are surfaced too, indented beneath the parent's.
 
@@ -96,7 +96,7 @@ This is the "flip a switch to a state" workflow: one instance, reconfigured by p
 
 | Visual | Meaning |
 |--------|---------|
-| Purple frame label | Element is a component master or instance root (and elements inside a component also render their label purple) |
+| Purple frame label | Element is a component master or instance root (labels of plain frames inside a component stay gray) |
 | Purple selection chrome | Element is part of a component (master or instance) |
 | `◆` prefix on the frame label | Component master only. Instances get the purple label color but NO diamond prefix on canvas; the master/instance distinction is shown in the layers panel icon, not the canvas label. |
 

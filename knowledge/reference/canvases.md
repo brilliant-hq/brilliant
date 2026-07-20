@@ -1,6 +1,6 @@
 ---
 name: "knowledge-canvases"
-description: "Canvas and folder management, the file explorer, workspaces, import/export, auto-save, and version control in Brilliant — operated by hand."
+description: "Canvas and folder management, the file explorer, workspaces, import/export, auto-save, and version control in Brilliant, operated by hand."
 ---
 
 # Canvases
@@ -106,11 +106,13 @@ Clicking a non-canvas file in the explorer (or navigating to it with Alt+Arrow) 
 
 | File type | Preview |
 |-----------|---------|
-| Image (PNG, JPG, JPEG, GIF, BMP, WebP; on macOS also TIFF/TIF, HEIC, HEIF, AVIF) | Full-size centered image |
+| Image (PNG, JPG, JPEG, GIF, BMP, WebP; on macOS also TIFF/TIF, HEIC, HEIF, AVIF) | Centered image at natural size (large images scale down to fit) on an opaque viewer surface |
 | Text/code (JS, TS, JSX, TSX, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Go, Swift, SQL, Shell/Bash/Zsh, XML, TOML, INI, plain text, `.styles`, `.gen.yaml`, `.svg`) | Built-in code editor |
 | Unknown types | Sniffed: text shows in the editor, binary shows an unsupported placeholder |
 
-`.svg` opens in the code editor as XML text, not as an image. To use an SVG as a design element, import it (Cmd+Shift+O) or paste it on the canvas — both convert it into native editable vector elements.
+File previews fully replace the canvas view and never disturb it: the canvas viewport (zoom and pan) is exactly where you left it when you switch back.
+
+`.svg` opens in the code editor as XML text, not as an image. To use an SVG as a design element, import it (Cmd+Shift+O) or paste it on the canvas; both convert it into native editable vector elements.
 
 The code editor replaces the canvas while a text file is active. Features:
 - Syntax highlighting (dark/light theme auto-matched to Brilliant's brightness)
@@ -125,8 +127,8 @@ Text files larger than 5 MB load read-only. Design-system source files (`*.style
 Image files live in `Assets/` folders next to canvases. Each folder level can have its own `Assets/` directory.
 
 Right-click an asset in the explorer for:
-- **Rename** — automatically updates every reference to the asset across all `.design` files
-- **Delete** — warns first if the image is used by any canvas, then moves it to `.brilliant/trash/` (recoverable via undo)
+- **Rename**: automatically updates every reference to the asset across all `.design` files
+- **Delete**: warns first if the image is used by any canvas, then moves it to `.brilliant/trash/` (recoverable via undo)
 - **Reveal in Finder**
 - **Copy Filename**
 
@@ -163,6 +165,10 @@ Brilliant imports from Figma files via the Figma API, supporting whole files, sp
 Or run "Import from Figma" from the command palette.
 
 Multi-page files create a folder named after the Figma file with one canvas per page. Single-page files import onto the current canvas (if empty) or a new top-level canvas. If you are not signed in to Figma, the import opens a browser for OAuth sign-in; cancelling returns an error, so retry after signing in.
+
+**What comes across:** frames, groups, and auto layout (including wrap and its cross-axis row gap); components and instances; vectors and shapes; text with case, decoration (underline, strikethrough), and vertical alignment; fills and strokes including per-side widths, dashes, join, and miter; masks and boolean shapes; tiled and cropped images with their color adjustments. Missing fonts warn and fall back to a bundled font, so the text still lands.
+
+**Known gaps for URL import (REST API):** design-system tokens and liquid-glass parameters do not come across. Colors and spacing import as literal values rather than links to tokens, and glass is not exposed over Figma's REST API. To bring design-system variables and glass across, use the Brilliant Figma plugin instead: copy in Figma with the plugin, then paste (Cmd+V) into Brilliant.
 
 ### Importing SVG files
 

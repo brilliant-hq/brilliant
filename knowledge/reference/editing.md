@@ -106,7 +106,7 @@ Dragging elements over a frame or auto layout frame automatically reparents them
 - Masks
 - Component instances (and anything nested inside a component instance)
 
-Children of a group, boolean parent, or mask cannot be dragged out: they stay clipped/grouped. Children of an auto layout frame can be temporarily moved out of the layout flow by holding **Space** during the drag (prevents auto-layout snap). Self-containment is also blocked: an element cannot be dropped into its own descendant.
+Children of a group, boolean parent, or mask cannot be dragged out: they stay clipped/grouped. Holding **Space** during a drag prevents reparenting: the dragged element cannot leave its parent or be captured by another frame (an auto layout child keeps drag-reordering inside its frame). To take an auto layout child out of flow entirely, use absolute positioning (the pin button). Self-containment is also blocked: an element cannot be dropped into its own descendant.
 
 ### Snap Guides
 
@@ -210,7 +210,7 @@ To scale to a precise size by hand, enable scale mode (**K** or hold **Ctrl**) a
 
 ## Skewing
 
-Skew shears elements into parallelograms (useful for diagonal hero sections, isometric layouts, and dynamic visual effects). There is no dedicated skew handle on the canvas; skew is set via the skew X / skew Y fields in the right toolbar's transform section (in degrees: positive skew X leans right, positive skew Y leans down). Typical values: -8 to -12 for modern diagonal sections, 5 to 8 for subtle card tilts, 15 to 20 for bold editorial, ~30 for isometric projection.
+Skew shears elements into parallelograms (useful for diagonal hero sections, isometric layouts, and dynamic visual effects). There is no dedicated skew handle on the canvas and no inspector field; skew is applied via the `skew_elements` command (AI / MCP `execute_commands`) or the Blueprint `skew(x,y)` shorthand (in degrees: positive skew X leans right, positive skew Y leans down). Typical values: -8 to -12 for modern diagonal sections, 5 to 8 for subtle card tilts, 15 to 20 for bold editorial, ~30 for isometric projection.
 
 ## Alignment
 
@@ -312,7 +312,7 @@ Flattening that involves **text outlining** requires native glyph extraction (Co
 | Action | Shortcut |
 |--------|----------|
 | Outline Text | Ctrl+Cmd+O |
-| Flatten Text | no default shortcut (command palette or context menu) |
+| Flatten Text | Cmd+Alt+O |
 
 Both commands convert text into vector paths and are available on macOS and Windows (native glyph extraction), not on Linux. On Windows, Outline Text has no default keyboard shortcut because its chord collides with another command; reach it via the command palette, menu, or context menu.
 

@@ -1,6 +1,6 @@
 ---
 name: "knowledge-ai-setup"
-description: "Connecting an AI provider to Brilliant's integrated chat: BYOK API keys (Anthropic, OpenAI, Google, OpenRouter), the Claude Code CLI, custom and self-hosted OpenAI-compatible endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more), choosing or adding extra models, where keys are stored, the demo (playground) mode and its two exits, the in-chat setup conversation, and what to do when a key is rejected. Setup and how-it-works, not the chat UI (see ai.md) or driving Brilliant from another tool (see mcp-connections.md)."
+description: "Connecting an AI provider to Brilliant's integrated chat: BYOK API keys (Anthropic, OpenAI, Google, OpenRouter), the Claude Code CLI, the OpenAI Codex CLI (ChatGPT-subscription auth), custom and self-hosted OpenAI-compatible endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more), choosing or adding extra models, where keys are stored, the demo (playground) mode and its two exits, the in-chat setup conversation, and what to do when a key is rejected. Setup and how-it-works, not the chat UI (see ai.md) or driving Brilliant from another tool (see mcp-connections.md)."
 ---
 
 # Connecting an AI provider (BYOK setup)
@@ -34,6 +34,10 @@ On the AI Providers list:
 - **Claude Code** leads the list and has no key field: install the `claude` CLI
   and Brilliant detects it on launch. If the CLI is not signed in, run `/login`
   in the chat input.
+- **Codex** follows Claude Code and likewise has no key field: it signs in with
+  a ChatGPT subscription, not an API key. Install with `npm install -g
+  @openai/codex`, run `codex login` once, and Brilliant detects it on launch. Its
+  GPT-5.6-family and GPT-5.5 models then appear in the model selector.
 - **Quiver** powers AI vector generation and vectorization, not chat. It is set
   the same way but is not a chat provider.
 

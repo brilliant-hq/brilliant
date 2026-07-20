@@ -51,7 +51,7 @@ The Export panel and the `Copy as WebP` command both produce lossy WebP at quali
 | Export to PDF | command palette |
 | Export to HTML | command palette |
 | Export to React (JSX) | command palette |
-| Export to Replay | command palette / context menu (context-menu default is 2x scale) |
+| Export to Replay | command palette / context menu (both render at 2x scale) |
 | Send to Figma | command palette / `Send to → Figma` (only enabled when the Brilliant Figma plugin is paired; otherwise falls back to clipboard) |
 
 Plain MP4/MOV have no command or shortcut. They are reachable only from the Export panel. Replay is the one video format with a command because it has a sensible one-click default.
@@ -103,7 +103,7 @@ Video currently animates shader fills only (metaballs, liquid metal, holographic
 
 ### Replay export
 
-Replay is a one-click animated reveal of the current selection: each element fades in one after another with a shimmer pass. It defaults to MP4, but you can switch the container to MOV (required if you want a transparent background). Run it from the command palette (`Export to Replay`), the right-click `Export as → Replay` (which uses 2x scale for crisp retina output), or the Export panel.
+Replay is a one-click animated reveal of the current selection: each element fades in one after another with a shimmer pass. It defaults to MP4, but you can switch the container to MOV (required if you want a transparent background). Run it from the command palette (`Export to Replay`) or the right-click `Export as → Replay` (both render at 2x scale for crisp retina output), or the Export panel (which follows the panel resolution, default 1x).
 
 | Option | Values | Default |
 |--------|--------|---------|
@@ -161,7 +161,20 @@ AI agents can export programmatically via the MCP `export` tool (image and marku
 | Format | Import | Export | Notes |
 |--------|--------|--------|-------|
 | **.sketch** (Sketch) | Yes | Yes | Import via "Import Sketch File" (command palette), with page selection in the right toolbar. Export via "Save as Sketch File" (command palette) |
-| **.fig / Figma** | Via Figma URL (API) | Via "Send to Figma" (live plugin) | "Import from Figma" opens the import section in the right toolbar to paste a Figma URL (OAuth). Does not import `.fig` files directly. "Send to Figma" pushes the selection to the paired Brilliant Figma plugin |
+| **.fig / Figma** | Via Figma URL (API) or the plugin (paste) | Via "Send to Figma" (live plugin) | "Import from Figma" opens the import section in the right toolbar to paste a Figma URL (OAuth). Does not import `.fig` files directly. "Send to Figma" pushes the selection to the paired Brilliant Figma plugin. See "Send to Figma fidelity" below |
+
+### Send to Figma fidelity
+
+Sending the selection to the paired Brilliant Figma plugin round-trips most of a design as native, editable Figma objects, not a flat image:
+
+- Design-system tokens become Figma variable collections (per brand and mode) with colors, spacing, and numerics bound onto the nodes; typography and shadow tokens become Figma text and effect styles.
+- Components and instances rebuild as Figma components, with instance overrides reapplied (fills, strokes, effects, opacity, corner radii, and text).
+- Auto layout (including wrap and its cross-axis gap), per-side borders, dashes, masks, boolean shapes, tiled and cropped images, text case, strikethrough, vertical alignment, and liquid glass all map to their Figma equivalents.
+- Hidden elements ship as hidden. Variant names with reserved characters are sanitized automatically.
+
+Fills that Figma can't express (shader fills and image-filter fills) are pre-rasterized to an image so they still look right, and are no longer editable as parameters on the Figma side.
+
+Known gap: component boolean, text, and instance-swap properties do not transfer in either direction. Variant properties transfer fully; the other property kinds arrive as their current baked state.
 | **.ai** (Illustrator) | No | No | Bridge through SVG: export from Illustrator as SVG, then import |
 | **.psd** (Photoshop) | No | No | Export Photoshop layers as PNG, then import as images |
 

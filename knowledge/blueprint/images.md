@@ -13,6 +13,16 @@ Handy sources: `picsum.photos/id/{n}/800/400` (photos),
 `ui-avatars.com/api/?name=John+Smith` (letter avatars). `generate_image`
 returns an `assetPath` you feed straight into `img()`.
 
+Optional args after the source, any order: `img(src, mode, o(N))`. `mode`
+is `fill` (default, covers the element, excess clipped), `fit` (letterboxed
+inside the element, margins transparent), `crop` (free positioning), or
+`repeat` (tiles at natural pixel size from the top-left). `o(N)` sets image
+opacity (0-1). `crop` mode also takes `crop(x0,y0,x1,y1,x2,y2,x3,y3)` — the
+four crop-window corners, as emitted by `lookup`. `repeat` mode takes
+`scale(N)` to size the tile (e.g. `img(tile.png, repeat, scale(0.16))`).
+All render on canvas and in exports. Scale modes and interactive crop are
+detailed in `reference/crop`.
+
 ## SVG import
 
 `svg(icon:house)` for a bundled Phosphor icon, `svg(https://...)` for a

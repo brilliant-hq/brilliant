@@ -20,7 +20,11 @@ rectangle, `c` circle, `t("text",font,size)`, `line(...)` straight line
 
 **Props** (exact names; no CSS `width()`/`background()`): `p(x,y)`,
 `s(w,h)` with `number`/`fill`/`fill:N`/`hug`, `rd(N)` or
-`rd(TL,TR,BR,BL)`, `rot(N)`, `o(N)`, `clip`, `flip(h,v)`, `front`/`back`,
+`rd(TL,TR,BR,BL)` (add a trailing `smooth(0..1)` inside for iOS-style
+squircle corners: `rd(12,smooth(0.6))`), `rot(N)`, `o(N)`, `clip`,
+`isolate` (container flattens before blending, like Figma's Normal;
+default is pass-through; `no-isolate` clears it), `blend(mode)`,
+`flip(h,v)`, `front`/`back`,
 `abs` (frees a child from layout flow, position it with `p()`). `c` in
 `p()` centers: `p(c,c)`. Omit `p()` on top-level elements; they
 auto-place beside existing work. SVG size goes in `s(W,H)`, not `svg()`.

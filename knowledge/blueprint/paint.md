@@ -75,6 +75,11 @@ st[(metal($amber.mid,$amber.faint),w($stroke.width.mid))]
 `pos(c|i|o)` aligns the stroke center / inside / outside. Caps are set
 per node (vector endpoints) and per circle, not on the stroke.
 
+`w(t,r,b,l)` sets per-side widths on rectangles and frames (0 = no
+border on that side): `st[(#E5E7EB,w(0,0,1,0))]` is a bottom divider.
+Any side can bind a token with the same tagged form as the uniform
+width: `w(0,0,1:$stroke.width.subtle,0)`.
+
 ## SVG icons & region fills
 
 `svg(icon:house)` bundled Phosphor (kebab-case), `svg(https://...)` URL,

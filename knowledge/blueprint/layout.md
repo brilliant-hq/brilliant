@@ -34,8 +34,17 @@ buttons), the parent picks `fill`, a spec picks a fixed number. A `fill`
 child inside a `hug` ancestor on the same axis falls back to its content
 size. Prose text needs `s(fill,hug)` so it wraps rather than overflows.
 
+**Min/max**: `min(w,h)` and `max(w,h)` clamp an element's size. They
+bound a `hug` result and floor/cap a `fill` child, with any excess
+redistributed to siblings; `min` wins over `max` when they conflict. An
+empty slot leaves that axis unconstrained: `min(200,)` sets width only,
+`min(,120)` height only, and `min(200)` is width only. Bare `min()` /
+`max()` clear that kind. Write them right after `s()`, e.g.
+`s(fill,hug) min(200,) max(600,400)`.
+
 **Wrap**: `al(h,wrap,...)` flows overflowing children onto the next row;
-it needs a fixed or fill main-axis size.
+it needs a fixed or fill main-axis size. `g(main,cross)` sets the gap
+between wrap rows separately (`g(8,24)`); `g(N)` uses N for both.
 
 **Centering and `abs`**: `p(c,c)` centers a child, `p(c,20)` / `p(20,c)`
 center one axis. Inside an `al()` a child must be `abs` for `p()` to

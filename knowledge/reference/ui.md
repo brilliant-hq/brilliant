@@ -5,19 +5,22 @@ description: "All UI panels in Brilliant: top toolbar, left toolbar, right toolb
 
 # UI Panels
 
+The floating panels (left/right/bottom toolbars, command palette) are draggable. A dropped panel anchors to its nearest window edge per axis (or the center, for centered-ish drops), so it keeps its edge-relative position through any window resize and always stays fully onscreen.
+
 ## Top Toolbar
 
 Centered at the top of the screen. Displays workspace breadcrumbs in the form `Workspace / Folder / Canvas` (segments separated by a thin `/`). When the workspace is the special "Scratch" sandbox, the workspace segment is hidden.
 
 - **Double-click** the canvas name (last breadcrumb) to rename it inline. Press **Enter** to confirm, **Escape** to cancel. Color suffixes (e.g. `.blue`) are preserved across rename.
-- **Hover** the toolbar to reveal a copy-path button on the left and (if any notifications exist) a clear-notifications button on the right. Copy-path writes the full filesystem path of the current canvas's `.design` file (or the current asset path) to the clipboard. The tooltip flips to "Copied!" for one second.
+- **Hover** the toolbar to reveal, on the left, a checkpoint button (bookmark icon) then a copy-path button, and (if any notifications exist) a clear-notifications button on the right. Copy-path writes the full filesystem path of the current canvas's `.design` file (or the current asset path) to the clipboard. The tooltip flips to "Copied!" for one second.
+- **Checkpoint** (bookmark icon) saves a named version of the project. It appears only when checkpointing is available (a cloud project you can edit, or a desktop repository that isn't the scratch sandbox); viewers never see it. Each checkpoint is auto-named (`Checkpoint #N` on desktop). Also runnable from the command palette as **Create Checkpoint**.
 - A small unread-notifications dot appears at the top-right corner of the toolbar when notifications exist and the toolbar is not hovered.
 - When viewing a non-canvas asset (image preview), breadcrumb segments are the asset id split by `/`; the last segment is editable and includes the file extension.
 - Color-suffixed folders/canvases display their assigned color in the breadcrumb text. The last breadcrumb is bold; earlier ones are dimmer (50% opacity). Dirty state dims the last crumb to 60% until saved.
 - Drag the toolbar background to move the OS window (disabled in fullscreen / maximized; cursor turns grab/grabbing).
 - When editing a text file with vim mode enabled and the code editor is focused, a small vim mode indicator (NORMAL / INSERT / VISUAL) is shown to the left of the breadcrumbs.
 
-There is no save chip in the top toolbar: auto-save runs in the background with a ~500 ms debounce. The last breadcrumb's opacity is the only save-state cue.
+There is no save chip in the top toolbar: auto-save runs in the background with a ~500 ms debounce. The last breadcrumb's opacity is the only save-state cue (it also reflects cloud sync in a web/cloud project: dimmed while saving/syncing, full opacity once synced). If a cloud save or live sync hits trouble, a notification is raised so the failure is never silent.
 
 ## Window Modes
 
@@ -42,7 +45,11 @@ The overlay-mode toggle is a global hotkey only when the opt-in is on, so it wor
 
 Contains the **File Explorer** (top) and **Layers Explorer** (bottom) in a vertically split layout. Drag the divider between them to resize each panel's share of the toolbar height. Drag the right edge to resize the toolbar width. Collapses to a 20 px rail when toggled off; hovering the rail re-expands it.
 
-The header is right-aligned. Order, left to right: reset-position button, toggle-toolbar button, then either a team chip (when user belongs to a team; admins can click to open `https://brilliant.design/team/<slug>`) or a "free" plan chip when applicable, then the account avatar (hover opens a menu with email, plan, "Switch Account", "Open Settings -> Account").
+The header is right-aligned. Order, left to right: reset-position button, toggle-toolbar button, then either a team chip (when user belongs to a team; admins can click to open `https://brilliant.design/team/<slug>`) or a "free" plan chip when applicable, then a copy-link button (link icon), then a live-collaboration participants cluster, then the account avatar (hover opens a menu with email, plan, "Switch Account", "Open Settings -> Account", and — for a cloud project — "Project settings").
+
+- **Copy link** (link icon, "Copy Link" tooltip): for a cloud project, copies a shareable link to the current canvas straight to the clipboard (a toast confirms). If elements are selected, the link deep-links to that selection. Appears only in the web app, alongside the same action in the top-toolbar breadcrumb and the canvas right-click menu.
+- **Participants cluster:** in a live collaboration session, the other people on the project appear as overlapping avatars just left of your own avatar — up to three, then a "+N" bubble for the rest. Each shows the person's photo (or a colored initial) and their name on hover; colors match their live cursors. Absent when you are working solo.
+- **Sign in:** in a cloud/web project where you are signed out, the avatar slot shows a compact "Sign in" button; signing in swaps it for your account avatar.
 
 | Action | Shortcut |
 |--------|----------|
@@ -97,13 +104,13 @@ Top to bottom: Design System, Canvas, Current Stroke, Current Fill, Element, Par
 
 **Current Stroke / Current Fill Sections**: Default stroke and fill used for newly created elements. Always visible. When elements are selected the subtitle reads "+ selected" and edits also apply to the selection's strokes and fills.
 
-**Element Section**: X/Y position, W/H with a constrain-proportions toggle, sizing behavior (hug/fill/fixed per axis for auto layout children), rotation, opacity, corner radius (expand for per-corner or top/bottom pairs), flex (for auto layout fill children), and circle arc properties (start angle, sweep, inner ratio) for circle elements. In vector edit mode with nodes or handles selected: shows node/handle position and point type instead of W/H/rotation/opacity. A "More" expandable area exposes blend mode, absolute scale, alignment, arrange, and boolean operations (union, subtract, intersect, exclude) when 2+ elements are selected.
+**Element Section**: X/Y position (the row also holds the absolute-position pin button when the selection is inside an auto layout frame, and the "..." expander), W/H with a constrain-proportions toggle, sizing behavior (hug/fill/fixed per axis) ending in a ruler-icon toggle that reveals Min/Max W/H rows (auto layout frames and their direct children), rotation, opacity, corner radius (expand for per-corner or top/bottom pairs; an app-glyph toggle appears at nonzero radius and reveals a smoothing percent row for squircle corners), flex (for auto layout fill children; moves to its own row when the smoothing toggle shows), and circle arc properties (start angle, sweep, inner ratio) for circle elements. In vector edit mode with nodes or handles selected: shows node/handle position and point type instead of W/H/rotation/opacity. The "..." expander exposes blend mode (containers get a Pass through default plus Normal and the standard modes), absolute scale, alignment, arrange, and boolean operations (union, subtract, intersect, exclude) when 2+ elements are selected.
 
-**Parent Section**: Parent Type dropdown (Frame, Group, Auto Layout; Mask and Boolean parent types are created via separate commands and shown but not chosen here), Clip Content toggle, and, when every selected frame is auto layout: direction, wrap toggle, 3x3 main + cross alignment grid, item spacing, and padding (progressive disclosure: unified -> H/V pair -> four sides). Layout guides for non-auto-layout frames live in the Layout Grid section.
+**Parent Section**: Parent Type dropdown listing all 8 types (Frame, Group, Auto Layout, Union, Subtract, Intersect, Exclude, Mask; picking one converts the parent), a Resize to Fit button (Option+Shift+Cmd+R; shown for frames/groups/masks/auto-layout with children, left of the clip toggle), Clip Content toggle, and, when every selected frame is auto layout: direction, wrap toggle, 3x3 main + cross alignment grid, item spacing, and padding (progressive disclosure: unified -> H/V pair -> four sides). Layout guides for non-auto-layout frames live in the Layout Grid section.
 
-**Typography Section**: Font family (click opens font selector), font size, text direction toggle; line height + letter spacing; font weight dropdown + text sizing mode (Auto Size / Auto Height / Auto Width / Fixed); text alignment (left/center/right) + italic + underline. Visible when the effective selection contains a text element or when the Text tool is active with nothing selected.
+**Typography Section**: Font family (click opens font selector) + font size + text direction toggle; line height + letter spacing + OpenType features button; font weight dropdown + text sizing mode (Auto Size / Auto Height / Auto Width / Fixed) + Auto Size button; text alignment (left/center/right) + italic + underline + strikethrough + a "..." expander (vertical alignment trio, list toggles, paragraph indent + list spacing, case + truncation, paragraph spacing). Visible when the effective selection contains a text element or when the Text tool is active with nothing selected.
 
-**Selection Strokes Section**: Per-stroke color swatch, thickness, and position (inside / center / outside) for the selected elements. Stroke caps (start/end caps for open paths and arcs; unified cap dropdown for complex vectors). Add / remove buttons.
+**Selection Strokes Section**: Per-stroke color swatch, thickness, and position (inside / center / outside) for the selected elements. For rectangles and frames the expanded stroke config ends with a per-side width field (accepts "4", "4, 8", or "1, 2, 3, 4") plus pairs / individual editor toggles (see `styling.md`). Stroke caps (start/end caps for open paths and arcs; unified cap dropdown for complex vectors). Add / remove buttons.
 
 **Selection Fills Section**: Per-fill swatch (color, gradient, image, shader, or image-filter fill types: inner shadow, inner glow, background blur, color adjust, noise/grain, halftone, pixelate, duotone, posterize, dither). Add / remove buttons. For vector elements with regions, shows per-region fill controls. Clicking an image fill swatch opens the color picker in image mode (file picker, drag-and-drop, Cmd+V paste).
 
@@ -197,7 +204,7 @@ While agents are running, one small activity bar per processing session appears 
 
 ## Command Palette
 
-A single floating, draggable, search-driven palette with multiple content modes: global search, commands, canvas (file) selection, font family, layer search, color selector, settings, updates, keyboard shortcuts, and combos. The list-based modes all use the same search field with a left-side filter dropdown. The category-specific shortcuts (command search, canvas search, font selector, layer search) open the same global-search palette pre-filtered to that category; chat search is just a `chats` filter on the same palette (no dedicated mode).
+A single floating, draggable, search-driven palette with multiple content modes: global search, commands, canvas (file) selection, font family, layer search, color selector, settings, project settings, updates, keyboard shortcuts, and combos. The list-based modes all use the same search field with a left-side filter dropdown. The category-specific shortcuts (command search, canvas search, font selector, layer search) open the same global-search palette pre-filtered to that category; chat search is just a `chats` filter on the same palette (no dedicated mode).
 
 | Mode | Shortcut |
 |------|----------|
@@ -218,6 +225,16 @@ Note: **/** focuses the AI input in the bottom toolbar (then opens the chat pane
 All search modes support: type to search, Up/Down to navigate, Enter to execute, Escape to close, draggable title bar.
 
 **Unified Global Search** (Cmd+K): Shows commands + files + layers + fonts + chats in one list, each section capped by the layout. The filter dropdown switches to a single category (All, Commands, Files, Layers, Fonts, Chats). The category-specific shortcuts (Cmd+Shift+P, Cmd+P, Cmd+L, Cmd+Shift+F, Cmd+Shift+I) open the same palette pre-filtered. In "all" mode, layers only run when the query is 2+ characters (otherwise the first 5 elements show as a stub) and fonts are skipped (too many entries).
+
+### Project Settings
+
+A project-scoped page (titled with the project name), opened from the **Project Settings** command, the account-avatar menu's "Project settings" row, or the copy-link button. Available for cloud projects. Rows:
+
+- **Status:** "Published — public" or "Published — private". Cloud projects are published by default.
+- **Visibility** (project owner only): a toggle between public and private. Private is a paid feature — if the account isn't on a paid plan, the server declines and the page shows a "Paid" badge with an Upgrade link. Flipping to private stops any outstanding share links from working (private means private).
+- **Danger zone** (owner only): **Unpublish project** removes it from the web. It requires typing the project name to confirm. Links stop working immediately; the project is recoverable by support for a grace period before permanent deletion.
+
+Viewers and editors see only the status line.
 
 ### Keyboard Shortcuts View (Shift+?)
 

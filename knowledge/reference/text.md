@@ -44,7 +44,7 @@ If a text element is left empty when you exit, it is deleted automatically.
 
 ## Text Sizing Modes
 
-Sizing is controlled by the sizing row in the Typography section (a width control and a height control), and also by direct resizing on the canvas. The four modes:
+Sizing is controlled by the sizing-mode dropdown in the Typography section (Auto Size / Auto Height / Auto Width / Fixed, next to the font weight dropdown), by the Auto Size button beside it (one click back to hug-both), and by direct resizing on the canvas. The four modes:
 
 | Mode | Width | Height | Behavior |
 |------|-------|--------|----------|
@@ -68,7 +68,9 @@ For auto layout sizing behavior in general, see [frames.md](./frames.md). For bl
 
 ## Typography Controls
 
-All controls are in the right toolbar's Typography section while a text element is selected. When the selection mixes text elements with **different** values for a property, the field shows **Mixed**; typing a value applies it to the whole selection.
+All controls are in the right toolbar's Typography section while a text element is selected. Rows, top to bottom: (1) font family + font size + text-direction (RTL) toggle; (2) line height + letter spacing + OpenType features button; (3) font weight dropdown + sizing-mode dropdown + Auto Size button; (4) horizontal alignment trio + Italic + Underline + Strikethrough + a "..." expander. Behind the "..." expander: a buttons row (vertical alignment trio on the left, bulleted and numbered list toggles on the right), then paragraph indent + list spacing, then case + truncation dropdowns, then paragraph spacing last.
+
+When the selection mixes text elements with **different** values for a property, the field shows **Mixed**; typing a value applies it to the whole selection.
 
 Typography commands applied to a selected frame (not in edit mode) cascade to all text descendants of that frame.
 
@@ -102,8 +104,8 @@ Range 0.2 to 1000. Scaling a text element on the canvas adjusts font size propor
 
 | Style | Shortcut | Notes |
 |-------|----------|-------|
-| Bold | Cmd+B | Toggle button in Typography section |
-| Italic | Cmd+I | Toggle button |
+| Bold | Cmd+B | No toggle button; use the shortcut or the font weight dropdown |
+| Italic | Cmd+I | Toggle button in Typography section |
 | Underline | Cmd+U | Toggle button |
 | Strikethrough | (no default shortcut) | Toggle button in Typography section; also command palette |
 
@@ -117,7 +119,9 @@ All four work on whole text elements (no edit mode required) and on the active t
 | Align Center | Cmd+Alt+T |
 | Align Right | Cmd+Alt+R |
 
-Also settable via the alignment buttons in the Typography section. Alignment is whole-element only (no per-range alignment). Justify has no Typography button but works via Blueprint `align(j)`. There is no vertical alignment; text anchors to the top edge of its box.
+Also settable via the alignment buttons in the Typography section. Alignment is whole-element only (no per-range alignment). Justify has no Typography button but works via Blueprint `align(j)`.
+
+**Vertical alignment** (Top / Middle / Bottom, default Top): a button trio behind the Typography section's "..." expander places the text block inside a fixed-height box. It only has a visible effect when the height is fixed (hug-height boxes fit the text exactly). Blueprint: `valign(t|c|b)`. Commands: `align_text_top` / `align_text_middle` / `align_text_bottom` (no default shortcuts).
 
 Explicitly choosing **Align Left** always renders physically left. A text element with **no** alignment chosen is direction-aware: left-to-right text sits flush left, right-to-left text sits flush right naturally.
 
@@ -129,13 +133,23 @@ A multiplier of font size (1.5 = 1.5x). Set via the line height field: type a va
 
 Horizontal space between characters, in pixels. Set via the letter spacing field next to line height: type a value or drag to adjust. 0 means default (no override); positive widens, negative tightens.
 
+### Paragraph spacing and indent
+
+Both in pixels, default 0, whole-element only. **Paragraph spacing** adds vertical space between paragraphs (blocks separated by a hard newline); there is no space after the last paragraph. **Paragraph indent** shifts the first line of each paragraph along its leading edge (right for right-to-left text). Both fields are behind the Typography section's "..." expander: indent shares a row with list spacing, and paragraph spacing is the last row. Blueprint: `ps(N)` and `pi(N)` inside `t(...)`.
+
+### Lists (bullets and numbering)
+
+Any paragraph can be a list item: bulleted or numbered, per paragraph (a text can mix plain, bulleted, and numbered paragraphs). Toggle with the bullet / number buttons behind the Typography section's "..." expander, or Cmd+Shift+8 (bulleted) and Cmd+Shift+7 (numbered); pressing the active one again removes the list. While editing text, the toggle applies to the paragraphs in your selection; otherwise to the whole text. Pressing Enter inside a list item continues the list.
+
+List text indents by 1.5x the font size per nesting level with a hanging marker before the first line. Numbered markers count 1. 2. 3. at level one, a. b. c. at level two, i. ii. iii. at level three, then the cycle repeats; the numbering restarts after any non-numbered paragraph. **List spacing** (behind the same "..." expander, next to paragraph indent) replaces paragraph spacing between two consecutive list items. Nesting levels and markers round-trip with Figma in both directions. Blueprint: `li(...)` and `lsp(N)` inside `t(...)`.
+
 ### Text case
 
-A display-only transform that does not change the stored text. Dropdown in the Typography section with: None, Uppercase, Lowercase, Title Case.
+A display-only transform that does not change the stored text. Dropdown behind the Typography section's "..." button with: None, Uppercase, Lowercase, Title Case.
 
 ### Truncation (max lines)
 
-A dropdown in the Typography section limits the text to a maximum number of lines and adds an ellipsis when it overflows. Options: No truncation, 1 line, 2/3/4/5/6/8/10 lines.
+A dropdown behind the Typography section's "..." button limits the text to a maximum number of lines and adds an ellipsis when it overflows. Options: No truncation, 1 line, 2/3/4/5/6/8/10 lines.
 
 ### OpenType features
 
@@ -143,7 +157,7 @@ The "OpenType features" button in the Typography section opens a stay-open check
 
 ### Text direction
 
-Toggle left-to-right (LTR, default) and right-to-left (RTL) via the command palette: search "Toggle Text Direction". No default keybinding. Whole-element only. In RTL, text with no explicit alignment flushes right (see Text alignment).
+Toggle left-to-right (LTR, default) and right-to-left (RTL) with the direction button next to the font size field in the Typography section (the icon mirrors when the selection is RTL), or via the command palette ("Toggle Text Direction"). No default keybinding. Whole-element only. In RTL, text with no explicit alignment flushes right (see Text alignment).
 
 ## Styled Ranges (Rich Text)
 
@@ -192,9 +206,10 @@ Both convert a text element to vector geometry, and both are one-way (the result
 | Command | Default shortcut | Result | Use for |
 |---------|------------------|--------|---------|
 | Outline Text | **Cmd+Ctrl+O** (macOS/Windows) | A group of per-character vector outlines (each glyph is its own editable vector) | Editing individual characters, per-character coloring, character-level boolean ops |
-| Flatten | **Cmd+Enter** | A single compound vector (all glyphs merged into one path) | Masking, boolean ops against other shapes, exporting as one path |
+| Flatten Text | **Cmd+Alt+O** | A single compound vector (all glyphs merged into one path) | Masking, boolean ops against other shapes, exporting as one path |
+| Flatten | **Cmd+Enter** | Same single compound vector for a text-only selection; the generic flatten for any selection | Flattening text together with other shapes |
 
-**Platform:** Outline Text is macOS and Windows only (Linux has no glyph-outline backend; it is hidden there). On Windows its Cmd+Ctrl+O chord is run from the right-click/context menu or command palette. Flatten works on all platforms and applies to any selection, not just text; on a text element it produces the merged single-path result described above.
+**Platform:** glyph extraction is macOS and Windows only (Linux has no glyph-outline backend), so Outline Text and Flatten Text are hidden on Linux. On Windows the Cmd+Ctrl+O chord for Outline Text is unbound (collision); run it from the right-click/context menu or command palette. The generic Flatten (Cmd+Enter) applies to any selection on all platforms; on text it routes through the same glyph extraction, so text flattening also needs macOS or Windows.
 
 ## Multilingual Text and Emoji
 
@@ -211,16 +226,14 @@ Text shapes with the correct platform fonts for complex scripts automatically, s
 - Text color is set via fills, not strokes. Text supports all fill types (solid, gradient, image, shader, image filter, color adjust). See [styling.md](./styling.md#text-fills).
 - Text also supports strokes (outlined text) with inside/center/outside positioning.
 - Text reflows from its top edge: when size or font changes, the top stays anchored and the box grows downward.
-- Multi-line text uses real newlines. There is no separate paragraph-spacing field; use line height or blank lines for paragraph gaps.
+- Multi-line text uses real newlines. Paragraphs are newline-separated blocks; space them with the paragraph spacing field (or line height) and offset first lines with paragraph indent.
+- Bulleted and numbered lists are per-paragraph: toggles behind the Typography "..." expander, Cmd+Shift+8 / Cmd+Shift+7, list spacing field for the gap between items.
 
 ## Not Supported
 
 Do not promise these:
 
-- Justified text alignment (only left/center/right).
-- Vertical alignment (text anchors to the top edge).
-- Bulleted or numbered lists (use literal bullet characters per line).
-- Per-paragraph spacing (tune with line height or blank lines).
+- A justify button in the UI (justify is available via Blueprint `align(j)` only).
 - Text-on-path (text following a curve).
 - Find and replace within or across text elements.
 - Per-range line height, alignment, direction, case, OpenType features, max-lines, or token bindings.

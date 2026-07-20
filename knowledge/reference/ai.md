@@ -5,7 +5,7 @@ description: "Brilliant's integrated AI: the multi-provider chat that designs on
 
 # AI Features
 
-Brilliant has one integrated AI system: a multi-provider chat that drives a model (Claude, GPT, Gemini, or a local Claude CLI) to design directly on the canvas. The entry point is the AI input in the bottom toolbar. Type a prompt, press Enter, and a chat session starts. Anything the AI produces lands on the canvas and stays fully editable by hand.
+Brilliant has one integrated AI system: a multi-provider chat that drives a model (Claude, GPT, Gemini, a local Claude CLI, or OpenAI Codex) to design directly on the canvas. The entry point is the AI input in the bottom toolbar. Type a prompt, press Enter, and a chat session starts. Anything the AI produces lands on the canvas and stays fully editable by hand.
 
 Brilliant chat is **bring-your-own-key (BYOK) only**. Every call uses the user's own provider API key (Anthropic, OpenAI, Google, OpenRouter), a local `claude` CLI install, or a custom/self-hosted OpenAI-compatible endpoint. Chat traffic goes straight to the chosen provider; nothing routes through Brilliant servers, and there is no hosted Brilliant AI. A separate Quiver key powers AI vector generation and image vectorization (not chat). The user pays their provider directly.
 
@@ -70,7 +70,7 @@ Tabs can be dragged to reorder. The toolbar scrolls horizontally when tabs overf
 
 ## Providers and Models
 
-Built-in chat providers: **Claude CLI** (local `claude` binary), **Anthropic**, **OpenAI**, **Google (Gemini)**, and **OpenRouter**. Any **custom or self-hosted OpenAI-compatible** endpoint can be added too (see [ai-setup.md](./ai-setup.md)); its models then appear under its own name. The model selector only lists models whose provider currently has a valid key (or, for Claude CLI, a detected install). Each model shows a short quality/speed subtitle (for example "Best", "Excellent", "Good + Fast").
+Built-in chat providers: **Claude CLI** (local `claude` binary), **Codex** (local `codex` CLI, signed in with a ChatGPT subscription rather than an API key), **Anthropic**, **OpenAI**, **Google (Gemini)**, and **OpenRouter**. Any **custom or self-hosted OpenAI-compatible** endpoint can be added too (see [ai-setup.md](./ai-setup.md)); its models then appear under its own name. The model selector only lists models whose provider currently has a valid key (or, for Claude CLI, a detected install). Each model shows a short quality/speed subtitle (for example "Best", "Excellent", "Good + Fast").
 
 - The exact model lineup changes between releases. Read the live list in the model selector rather than assuming specific model names.
 - Context-window size varies per model. The session's context-usage indicator reflects the real per-model window.
@@ -96,8 +96,8 @@ Capabilities for a manually enabled model (context window, thinking support) are
 
 A thinking-level selector sits next to the model selector when the model supports it.
 
-- **Claude** models support **off, low, medium, high** (only Claude can be turned off).
-- **OpenAI** and **Gemini** reasoning models always reason; they offer **low, medium, high** (no off). Some OpenAI reasoning models add an **xhigh** level.
+- **Claude** models support **off, low, medium, high**, and flagship models add **xhigh** (only Claude can be turned off).
+- **OpenAI** and **Gemini** reasoning models always reason; they offer **low, medium, high** (no off). Some OpenAI reasoning models also add an **xhigh** level.
 - Text-only models that do not reason show no thinking selector.
 
 ---
@@ -106,7 +106,7 @@ A thinking-level selector sits next to the model selector when the model support
 
 Keys live in the OS credential store (macOS Keychain, Windows Credential Manager) and are sent only to the provider's own API endpoint. Brilliant also reads provider environment variables as a fallback (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`).
 
-Keys are managed in **Settings (Cmd+,) → AI Providers**. Reach it fast by clicking the **connection indicator** in the bottom toolbar (the check/x circle beside the AI input); hovering it shows a read-only provider-status popup. On the AI Providers list, paste a key into a provider's inline field (validated on save), or use the pencil/x buttons on a saved row to update or remove it. **Google** can sign in with Google (localhost OAuth) instead of a key; **Claude Code** needs no key (install the CLI, sign in with `/login`); **Quiver** (vector generation) is set the same way but is not a chat provider. **Custom / self-hosted OpenAI-compatible** endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more) are added under **Custom Providers** on the same pane.
+Keys are managed in **Settings (Cmd+,) → AI Providers**. Reach it fast by clicking the **connection indicator** in the bottom toolbar (the check/x circle beside the AI input); hovering it shows a read-only provider-status popup. On the AI Providers list, paste a key into a provider's inline field (validated on save), or use the pencil/x buttons on a saved row to update or remove it. **Google** can sign in with Google (localhost OAuth) instead of a key; **Claude Code** needs no key (install the CLI, sign in with `/login`); **Codex** needs no key either (install `@openai/codex`, sign in with `codex login`; it uses a ChatGPT subscription); **Quiver** (vector generation) is set the same way but is not a chat provider. **Custom / self-hosted OpenAI-compatible** endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more) are added under **Custom Providers** on the same pane.
 
 Sending a prompt with no provider connected instead starts a short in-chat setup conversation. Full setup detail (all paths, custom endpoints, demo mode, key-rejected troubleshooting) lives in [ai-setup.md](./ai-setup.md).
 

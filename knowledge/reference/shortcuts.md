@@ -292,6 +292,7 @@ Boolean ops require 2+ elements selected. If a single boolean or mask group is a
 
 | Action | Shortcut |
 |--------|----------|
+| Resize to fit (frame wraps children) | Option+Shift+Cmd+R |
 | Toggle clip content (frame) | (no default, id `toggle_clip_content`) |
 | Toggle constrain proportions (selected element) | (no default, id `toggle_constrain_proportions`) |
 | Toggle absolute position (auto layout child) | (no default, id `toggle_absolute_position`) |
@@ -331,6 +332,9 @@ See [vectors.md](./vectors.md) for full pen / pencil / vector editing reference.
 | Align text left | Cmd+Alt+L |
 | Align text center | Cmd+Alt+T |
 | Align text right | Cmd+Alt+R |
+| Align text top / middle / bottom (vertical) | (no defaults, ids `align_text_top`, `align_text_middle`, `align_text_bottom`) |
+| Bulleted list | Cmd+Shift+8 (id `set_list_unordered`) |
+| Numbered list | Cmd+Shift+7 (id `set_list_ordered`) |
 | Toggle text direction (LTR / RTL) | (no default, id `toggle_text_direction`) |
 | Auto-size text (Auto / Auto Width / Auto Height / Fixed) | (no defaults, ids `auto_size_text`, `auto_width_text`, `auto_height_text`, `fixed_size_text`; also `set_text_sizing_mode` dropdown) |
 | Increase / decrease text size | (no defaults, ids `increase_text_size`, `decrease_text_size`) |
@@ -339,7 +343,7 @@ See [vectors.md](./vectors.md) for full pen / pencil / vector editing reference.
 | Set font weight | (no default, id `set_font_weight`; dropdown in Typography section) |
 | Apply font family | (no default, id `apply_font_family`; via font selector Cmd+Shift+F) |
 | Outline text (text -> vector path) | Cmd+Ctrl+O |
-| Flatten text (collapse styled runs) | (no default, id `flatten_text`) |
+| Flatten text (text -> single compound vector) | Cmd+Alt+O (id `flatten_text`; macOS/Windows only) |
 
 ## Quick Colors
 
@@ -511,7 +515,6 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Copy as PNG / WebP / SVG / CSS / YAML / Blueprint | (no defaults, ids `copy_as_png`, `copy_as_webp`, `copy_as_svg`, `copy_as_css`, `copy_as_yaml`, `copy_as_blueprint`) |
 | Insert image / Import image | (no defaults, ids `insert_image`, `import_image`) |
 | Clean up unused assets | (no default, id `clean_up_unused_assets`) |
-| Load Getting Started canvas | (no default, id `load_getting_started`) |
 
 ## UI Panels
 

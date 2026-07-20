@@ -18,7 +18,7 @@ description: "Canvas navigation, zoom, pan, snap guides, background modes, and d
 | Cmd+scroll, Cmd+trackpad drag | Zoom around cursor |
 | Trackpad pinch | Zoom around focal point |
 
-Note: there is no built-in "Zoom to 100%" Cmd+0 binding. `0` alone (without Cmd) is `toggle_zoom`, and Cmd+0 is unbound by default. To jump to 100% explicitly, press `1`.
+Note: there is no built-in "Zoom to 100%" Cmd+0 binding. `0` alone (without Cmd) is `toggle_zoom`; Cmd+0 focuses chat session 10. To jump to 100% explicitly, press `1`.
 
 ### Zoom Behavior
 
@@ -123,6 +123,8 @@ Tolerance is 4 screen pixels at any zoom level. Stacking order is topmost-first:
 ### Selection rectangles
 
 Selection is per-parent. With 2 elements selected in Frame A and 3 in Frame B, two selection rectangles render, one per parent. Each has its own resize and rotate handles, and align/distribute/resize commands operate within each parent's coordinate space independently.
+
+The selection rectangle (and the hover highlight) hugs the shape geometry itself, not the stroke: a thick outside stroke or a per-side border never inflates the rectangle, like Figma. Hit testing still includes the stroke band, so you can click a stroke to select its element even though the rectangle sits on the shape edge.
 
 Selection handles auto-hide when they would dwarf a small selection; multi-parent selections always show handles, and two-point paths (lines) always show handles.
 
@@ -300,7 +302,7 @@ Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and 
 | Toggle overlay mode | Ctrl+F | Global hotkey; macOS-focused, disabled on Windows |
 | Toggle passthrough | Ctrl+A | Overlay only: pointer events pass through to apps below |
 | Toggle presentation mode | Alt+P | Hides UI panels for a clean view |
-| Toggle agent cursors | — | Named cursors for the user and AI agents (command palette: "Toggle Agent Cursors"; Settings → General) |
+| Toggle agent cursors | (none) | Named cursors for the user and AI agents (command palette: "Toggle Agent Cursors"; Settings → General) |
 | Toggle UI (panels) | Cmd+\ | Hide/show all toolbars |
 | Toggle inspector sections | Cmd+/ | Collapse/expand all collapsible toolbar sections (the right-toolbar inspector groups) |
 | Toggle left toolbar | Cmd+Shift+Left | |
@@ -311,7 +313,7 @@ Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and 
 
 Passthrough mode is overlay-only. In overlay mode, Cmd+\ produces a clean transparent drawing surface for annotation or tracing.
 
-**Agent cursors** (on by default; toggle via the command palette "Toggle Agent Cursors" or Settings → General → Agent Cursors; persisted across restarts) adds multiplayer-style named cursors. Each AI agent working on the canvas gets a cursor — the same arrow as the user's own cursor, tinted in the agent's session color (matching its shimmer) — that glides between the elements it touches, with a name tag. Agents name themselves after the task at hand (e.g. "Meditation App", streamed via the same mechanism as chat titles), falling back to a stable per-session name like "Nova" or "Pixel" until the name arrives. With "Show Agent Thinking" enabled (sub-setting, on by default), the name tag extends into a small card where the agent's live commentary types out word-by-word at reading pace, subtitle-style (up to four scrolling lines); element references appear as clickable chips that select and zoom to the element. The cursor waits for its caption to finish before moving on, and if a response ends naturally the caption plays out before the cursor fades — stopping the chat removes both immediately. **Clicking an agent's cursor, name, or card opens its chat session** (the pointer shows a click cursor over it, and clicks never affect canvas content beneath). Optionally (sub-setting "Show Your Cursor Name", off by default) the user's own pointer carries a blue name tag baked into the native arrow cursor (zero lag); the name defaults to the local part of the activation email and can be changed in Settings → General → Agent Cursors → Displayed Name. All of these settings persist across restarts.
+**Agent cursors** (on by default; toggle via the command palette "Toggle Agent Cursors" or Settings → General → Agent Cursors; persisted across restarts) adds multiplayer-style named cursors. Each AI agent working on the canvas gets a cursor (the same arrow as the user's own cursor, tinted in the agent's session color, matching its shimmer) that glides between the elements it touches, with a name tag. Agents name themselves after the task at hand (e.g. "Meditation App", streamed via the same mechanism as chat titles), falling back to a stable per-session name like "Nova" or "Pixel" until the name arrives. With "Show Agent Thinking" enabled (sub-setting, on by default), the name tag extends into a small card where the agent's live commentary types out word-by-word at reading pace, subtitle-style (up to four scrolling lines); element references appear as clickable chips that select and zoom to the element. The cursor waits for its caption to finish before moving on, and if a response ends naturally the caption plays out before the cursor fades; stopping the chat removes both immediately. **Clicking an agent's cursor, name, or card opens its chat session** (the pointer shows a click cursor over it, and clicks never affect canvas content beneath). Optionally (sub-setting "Show Your Cursor Name", off by default) the user's own pointer carries a blue name tag baked into the native arrow cursor (zero lag); the name defaults to the local part of the activation email and can be changed in Settings → General → Agent Cursors → Displayed Name. All of these settings persist across restarts.
 
 If the window cannot be seen, press Ctrl+F: as a global hotkey it forces a return to studio mode and restores the saved window geometry.
 
@@ -342,8 +344,8 @@ A 1-pixel grid overlay for pixel-perfect work at high zoom levels.
 - **Fades in smoothly** between 400% and 600% zoom
 - **Adaptive contrast:** each line reads the content beneath it and shifts its
   luminance away from the local backdrop (darker on light content, lighter on
-  dark), so the grid stays visible on any background — including photos and
-  gradients — and never dominates. It is not a flat theme color.
+  dark), so the grid stays visible on any background, including photos and
+  gradients, and never dominates. It is not a flat theme color.
 - Shown on all platforms (macOS, Windows, Linux).
 
 ### Toggle

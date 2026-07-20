@@ -137,9 +137,9 @@ The design tokens, canvas colors, and recent colors sections remain visible belo
 | **Fill** (default) | Image covers the entire element, excess clipped. Aspect ratio preserved |
 | **Fit** | Image fits entirely within the element, letterboxed if needed. Aspect ratio preserved |
 | **Crop** | Custom positioning with interactive crop editor (see [crop.md](./crop.md)) |
-| **Repeat** | Image tiles at natural pixel size relative to the element |
+| **Repeat** | Image tiles relative to the element. Tile size defaults to the image's natural pixel size |
 
-Change the scale mode in the right toolbar under the image fill section.
+Change the scale mode in the right toolbar under the image fill section. When Repeat is selected, a **Tile Scale** field appears beside the scale mode dropdown: percent of the image's natural size (1%–800%, default 100%), with 25 / 50 / 100 / 200 / 400 presets.
 
 ### Shader Fills
 
@@ -205,16 +205,18 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 
 **Thickness:** Adjust via right toolbar, or use the number keys 0-9 to set the size level (Shift+= to increase, `-` to decrease). These size shortcuts are context-dependent: they set stroke width for shapes, but font size for text elements (or when the text tool is active).
 
-**Dash pattern:** Dashed strokes are NOT available on element strokes. The only dashed rendering in Brilliant is for UI overlays (selection, snap guides). SVG / Sketch import keeps a dash pattern internally, but it is not editable in the inspector.
+**Per-side widths** (rectangles and frames): the width field sits at the bottom of the stroke configuration (below dash style and corner join) and shows the value shape: "4" when all sides match, "4, 8" when top/bottom and right/left pair up (first number is top/bottom, second is right/left), "1, 2, 3, 4" when all four differ (top, right, bottom, left). Type any of those shapes directly into the field: "6" sets all sides, "4, 8" sets the pairs, "1, 2, 3, 4" sets each side. The two buttons at the right of the row only change which editors are shown, never the stroke itself: the first opens a pairs editor (top/bottom + right/left), the second opens four per-side fields (T, R, B, L), each with the same preset dropdown as the main width field: pick a stroke-width token there to bind that side (or pair) to it, exactly like the uniform width. A side set to 0 draws no border on that side, so a single bottom border is 0, 0, 1, 0. Making all sides equal (in any editor) returns the stroke to a plain uniform width; if the equal sides share one token, the uniform width keeps that binding. On rounded corners each side's border continues through the whole corner arc, ending where the neighboring side's straight edge begins (adjacent sides share the corner arc), like Figma. Per-side borders have no corner-join concept, so the join control disappears while a stroke is per-side.
+
+**Dash pattern:** solid / dashed / dotted presets with dash length, gap length, and dash cap fields in the expanded stroke row.
 
 **Caps** are not a stroke property: they belong to the geometry, so they appear only for open shapes:
 - **Vector paths:** each open endpoint (a path that does not close on itself) gets a cap. Options: None (butt), Round (default), Square, Arrow, Circle (filled dot marker). Set per endpoint.
 - **Circles:** start cap and end cap (default Round). These controls appear in the stroke section only when the circle's arc sweep is less than 100% (any arc, including ring sectors).
 - **Rectangles** and other closed shapes have no caps.
 
-**Join:** Stroke joins (miter / bevel / round) are not user-configurable.
+**Join:** miter / round (default) / bevel, set in the expanded stroke row.
 
-**What a stroke holds:** thickness (supports design tokens), a paint style (its fill type), position (inside/center/outside), and a blend mode. No cap, join, or dash settings live on the stroke itself.
+**What a stroke holds:** thickness (supports design tokens), optional per-side weights (rect/frame), a paint style (its fill type), position (inside/center/outside), join, dash pattern + dash cap, and a blend mode. Endpoint caps do not live on the stroke (they belong to the geometry, below).
 
 ### Stroke Style Types
 
@@ -247,7 +249,17 @@ Blend modes control how elements, fills, strokes, and effects composite against 
 
 **Element-level** wraps the entire element (fills + strokes + effects) as a unit, then blends against the canvas. **Fill/stroke-level** blends each individual fill or stroke independently.
 
-Blend modes are preserved across copy/paste, undo/redo, and all export formats (PNG, SVG, PDF).
+### Groups and frames: Pass through vs Normal
+
+Containers (groups, frames, auto layout) work like Figma. Their blend dropdown has one extra entry, **Pass through**, and it is the default:
+
+- **Pass through** (default): the container does not flatten. A child with Multiply blends against everything beneath the container, and container opacity fades the composited result without breaking that interaction.
+- **Normal**: the container is isolated. Its own fill plus all children flatten into one layer first, then that layer composites once against the canvas. A Multiply child only sees content inside the container.
+- **Any other mode** (Multiply, Screen, ...): also isolated. The flattened container blends with the backdrop using that mode.
+
+In the Blueprint DSL, the bare `isolate` flag on a `fr`/`gr`/`al()` line sets Normal (isolated); `no-isolate` returns to Pass through. An explicit `blend(mode)` on a container isolates it implicitly, exactly like Figma.
+
+Blend modes are preserved across copy/paste, undo/redo, and all export formats (PNG, SVG, PDF). Copy to Figma and Figma import both keep the Pass through / Normal / blend-mode state of every container.
 
 ## Opacity
 
@@ -285,6 +297,10 @@ The corner radius row has two toggle buttons for expanding into per-corner editi
 ### Parent Corner Radius
 
 All parent types support corner radius. With the **Clip content** toggle enabled (off by default for all parent types), children are clipped to the rounded bounds.
+
+### Corner Smoothing (Squircle)
+
+A **Smoothing** field (0–100%) rounds corners with a continuous curve instead of a plain circular arc, the squircle look of iOS app icons. It is behind a toggle button (app-icon glyph) that appears in the corner radius row, left of the top/bottom corners button, only when the radius is nonzero; toggling it reveals the smoothing field on its own row. The preset dropdown offers 0%, 30%, 50%, **iOS · 60%**, 80%, 100%. It applies to rectangles and frames, is a single value for all four corners, and has no effect at radius 0. Drag or type a percent to set it.
 
 ## Circle Arc & Ratio
 
@@ -331,7 +347,7 @@ These live in the fills list (not the effects list), so they sit in z-order alon
 
 Inner effects are in the fill type dropdown under the **Static** group (alongside Image). Inner effect fills can be interleaved with other fill types.
 
-**Liquid Glass** is engine-rendered: the native canvas refracts the backdrop through a physically-modeled glass slab. It appears in raster (PNG/JPEG/WebP) and video exports, and embeds as a rasterized image in SVG/PDF. HTML/React export omits it (no CSS equivalent). It applies to rectangles, circles, vectors, frames, and text (glyph refraction). Parameters (with defaults): **Thickness** 64 (glass slab thickness, 0–64px, how far the refracted ray travels; 0 = plain backdrop blur), **Bevel** 60 (rim band width where the surface rises), **IOR** 3.0 (index of refraction, 1.0–3.0; higher bends light more), **Chroma** 0.8 (chromatic dispersion, 0–3; >1 = extreme fringing), **Glow** 0 (additive rim glow, 0–1), **Edge** 0 (specular rim highlight, 0–1), **Angle** 2.3561945 rad / 135° (light direction, top-left), **Saturation** 1.05 (backdrop saturation remix, 0–2), **Blur** 0 (backdrop blur sigma). All values are plain numbers (not token-bindable).
+**Liquid Glass** is engine-rendered: the native canvas refracts the backdrop through a physically-modeled glass slab. It appears in raster (PNG/JPEG/WebP) and video exports, and embeds as a rasterized image in SVG/PDF. HTML/React export omits it (no CSS equivalent). It applies to rectangles, circles, vectors, frames, and text (glyph refraction). Parameters (with defaults): **Thickness** 64 (glass slab thickness, 0–64px, how far the refracted ray travels; 0 = plain backdrop blur), **Bevel** 60 (rim band width where the surface rises), **IOR** 3.0 (index of refraction, 1.0–3.0; higher bends light more), **Chroma** 0.8 (chromatic dispersion, 0–3; >1 = extreme fringing), **Glow** 0 (additive rim glow, 0–1), **Edge** 0 (specular rim highlight, 0–1), **Angle** 2.3561945 rad / 135° (light direction, top-left), **Saturation** 1.05 (backdrop saturation remix, 0–2), **Blur** 0 (backdrop blur sigma). Two more parameters exist in the Blueprint DSL only (no inspector sliders): **Gathering** 1.0 (0–1, how much exterior content the rim lens pulls in; 0 = interior-only refraction, which is how Figma-imported glass arrives) and **Magnification** 1.0 (0–2, multiplies the rim's lateral displacement). All values are plain numbers (not token-bindable).
 
 The color row for a glass fill is the material **Tint** (labeled "Tint" in the inspector), not an opaque fill, its alpha is the tint strength (0 alpha = clear glass). The glass section opens with a **Presets** dropdown that applies a full parameter bundle in one undoable step (a reset button restores defaults). Five presets ship (rim glow and specular rim are held at or below 0.1 on every preset): **Clear** (max-depth clear slab, maximum thickness and refraction, no glow), **Frosted** (heavy frost over a thick slab with a whisper of white tint), **Deep** (full thickness pulled into the widest bevel, near-zero rim), **Chromatic** (maximum refraction and dispersion with a vivid, double-saturated backdrop), **Smoke** (half-strength black tint, blurred desaturated backdrop). Editing any slider or the tint after applying a preset is fine, presets are just starting-point bundles, not a locked mode.
 
