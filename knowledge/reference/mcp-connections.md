@@ -13,8 +13,11 @@ designs from *their own* tool. Brilliant is BYOK-only; nothing routes through
 Brilliant servers.
 
 The server is a local HTTP endpoint, normally `http://127.0.0.1:3333/mcp`
-(falls back to 3334/3335 if the port is busy). It supports multiple clients at
-once. **Brilliant must be running for a connected tool to reach it.**
+(falls back to 3334/3335 at startup if the port is busy). It supports multiple
+clients at once. **Brilliant must be running for a connected tool to reach
+it.** Once bound, the port is stable for the app's lifetime: if the listener
+ever drops (e.g. across sleep/wake), Brilliant rebinds the same port
+automatically, so a configured client URL stays valid.
 
 Supported clients include Claude Code, Cursor, VS Code (Copilot), Windsurf, Zed,
 Codex CLI, Gemini CLI, Antigravity, and OpenCode (opencode.ai). The roster keeps

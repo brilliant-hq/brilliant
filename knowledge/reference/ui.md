@@ -47,7 +47,7 @@ Contains the **File Explorer** (top) and **Layers Explorer** (bottom) in a verti
 
 The header is right-aligned. Order, left to right: reset-position button, toggle-toolbar button, then either a team chip (when user belongs to a team; admins can click to open `https://brilliant.design/team/<slug>`) or a "free" plan chip when applicable, then a copy-link button (link icon), then a live-collaboration participants cluster, then the account avatar (hover opens a menu with email, plan, "Switch Account", "Open Settings -> Account", and — for a cloud project — "Project settings").
 
-- **Copy link** (link icon, "Copy Link" tooltip): for a cloud project, copies a shareable link to the current canvas straight to the clipboard (a toast confirms). If elements are selected, the link deep-links to that selection. Appears only in the web app, alongside the same action in the top-toolbar breadcrumb and the canvas right-click menu.
+- **Copy link** (link icon, "Copy Link" tooltip): for a published project, copies a shareable link to the current canvas straight to the clipboard (a toast confirms). If elements are selected, the link deep-links to that selection. In the web app it's always available; on desktop it appears once the folder is a published project (and, for an unpublished folder with an account, it opens Settings -> Sharing at the publish flow instead of copying — it never publishes by itself). The same action is in the top-toolbar breadcrumb and the canvas right-click menu.
 - **Participants cluster:** in a live collaboration session, the other people on the project appear as overlapping avatars just left of your own avatar — up to three, then a "+N" bubble for the rest. Each shows the person's photo (or a colored initial) and their name on hover; colors match their live cursors. Absent when you are working solo.
 - **Sign in:** in a cloud/web project where you are signed out, the avatar slot shows a compact "Sign in" button; signing in swaps it for your account avatar.
 
@@ -204,7 +204,7 @@ While agents are running, one small activity bar per processing session appears 
 
 ## Command Palette
 
-A single floating, draggable, search-driven palette with multiple content modes: global search, commands, canvas (file) selection, font family, layer search, color selector, settings, project settings, updates, keyboard shortcuts, and combos. The list-based modes all use the same search field with a left-side filter dropdown. The category-specific shortcuts (command search, canvas search, font selector, layer search) open the same global-search palette pre-filtered to that category; chat search is just a `chats` filter on the same palette (no dedicated mode).
+A single floating, draggable, search-driven palette with multiple content modes: global search, commands, canvas (file) selection, font family, layer search, color selector, settings, updates, keyboard shortcuts, and combos. The list-based modes all use the same search field with a left-side filter dropdown. The category-specific shortcuts (command search, canvas search, font selector, layer search) open the same global-search palette pre-filtered to that category; chat search is just a `chats` filter on the same palette (no dedicated mode).
 
 | Mode | Shortcut |
 |------|----------|
@@ -226,15 +226,19 @@ All search modes support: type to search, Up/Down to navigate, Enter to execute,
 
 **Unified Global Search** (Cmd+K): Shows commands + files + layers + fonts + chats in one list, each section capped by the layout. The filter dropdown switches to a single category (All, Commands, Files, Layers, Fonts, Chats). The category-specific shortcuts (Cmd+Shift+P, Cmd+P, Cmd+L, Cmd+Shift+F, Cmd+Shift+I) open the same palette pre-filtered. In "all" mode, layers only run when the query is 2+ characters (otherwise the first 5 elements show as a stub) and fonts are skipped (too many entries).
 
-### Project Settings
+### Sharing (Settings tab)
 
-A project-scoped page (titled with the project name), opened from the **Project Settings** command, the account-avatar menu's "Project settings" row, or the copy-link button. Available for cloud projects. Rows:
+The project-scoped sharing surface is the **last tab in Settings, named "Sharing"** (Cmd+, then Sharing). It shows the active project's name inside the tab. It only appears when a project context exists (a published project, or an unpublished desktop folder with a signed-in identity). Opened directly from the **Sharing** command, the account-avatar menu's "Project settings" row, or the copy-link button when the folder isn't published yet. Rows:
 
-- **Status:** "Published — public" or "Published — private". Cloud projects are published by default.
+- **Status:** "Published — public", "Published — private", or (a desktop folder not yet published) "Unpublished".
 - **Visibility** (project owner only): a toggle between public and private. Private is a paid feature — if the account isn't on a paid plan, the server declines and the page shows a "Paid" badge with an Upgrade link. Flipping to private stops any outstanding share links from working (private means private).
-- **Danger zone** (owner only): **Unpublish project** removes it from the web. It requires typing the project name to confirm. Links stop working immediately; the project is recoverable by support for a grace period before permanent deletion.
+- **Danger zone** (owner only): **Unpublish project** removes it from the web. It requires typing the project name to confirm. Links stop working immediately; the project is recoverable by support for a grace period before permanent deletion. On desktop, unpublishing leaves your local files untouched — only the cloud copy is removed, so the folder simply returns to Unpublished.
 
 Viewers and editors see only the status line.
+
+**Publishing a desktop folder.** When a design folder isn't published yet, the Sharing tab shows the publish flow instead: (1) claim a handle if you don't have one (availability checks live as you type; handles shorter than 6 characters are a paid tier); (2) name the project (prefilled from the folder name); (3) a consent block naming exactly what will ship — every `.design` and `.styles` file plus the image assets your canvases actually reference, with an expandable full file list (private-looking files like `.env` are flagged, never blocked). Publishing uploads that set to `brilliant.design/@handle/project`, creates the first checkpoint, copies the link, and the folder becomes Published. Only design files and referenced assets ship — never your `.brilliant` folder, git history, or unreferenced files. Visitors see your latest work live; a Pro option (later) can limit them to checkpoints.
+
+**Copying the link when published.** Once published, the copy-link button copies a shareable deep link to the current canvas (selection-aware). If you've edited locally since the last publish, the toast says the link doesn't include your latest changes yet and offers **Publish latest** to push them. On desktop the **Checkpoint** button also pushes the latest work to the public copy (rather than making a local git commit) once the folder is a published project.
 
 ### Keyboard Shortcuts View (Shift+?)
 

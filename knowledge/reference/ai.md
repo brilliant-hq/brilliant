@@ -141,7 +141,7 @@ Once a session is running, the model can create and modify designs and call tool
 - **Run app commands:** the AI can invoke Brilliant commands (align, distribute, flip, corner radius, opacity, blend mode, tool changes, frame and component operations, and more, over 100 in all). Each runs through the same path as a button or shortcut, with full undo.
 - **Use selection and search:** read the current selection and look up elements by name, text, type, color, or component.
 - **Export:** render selected elements to PNG, JPEG, WebP, SVG, PDF, or HTML/React markup.
-- **Read and write files / run shell commands / search the web:** when working in a real project workspace (these are most capable in the Claude CLI path).
+- **Read and write files / run shell commands / search the web:** when working in a real project workspace (these are most capable in the Claude CLI path). In the web app (browser) there are no shell or file tools and no external MCP servers; `web_fetch` and every canvas tool work normally, and exports return images inline.
 - **Generate images and vectors:** see the sections below.
 - **Spawn sub-agents:** for large tasks, the main session can launch parallel helper agents that each return a summary, shown as collapsible cards.
 

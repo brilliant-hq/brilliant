@@ -18,6 +18,21 @@ refraction). Engine-rendered: it appears in raster and video exports, and
 embeds (pre-rasterized) in SVG / PDF. HTML / React export omits it (no CSS
 equivalent).
 
+**The lens auto-fits the shape.** `thickness`/`bevel` resolve against the
+element's size the way corner radius does: on a small control (a button, a
+chip) the lens scales down to fit, so bare `glass` is safe at any size — no
+need to hand-shrink params for small elements.
+
+**Glass text wants display sizes.** Glyph refraction is all rim — thin stems
+have no interior — so glass text reads beautifully at hero sizes (≥ ~64px)
+and fades to near-invisible below ~28px. For small text on glass, put a
+solid-fill text child on a glass container instead.
+
+**`blend()` on a glass element blends the whole pane.** `blend(multiply)`
+composites the refracted pane against the backdrop with that mode — the
+result reads as a solid tinted slab, not clearer glass. For a darker pane,
+prefer a dark `tint(...)` inside the glass fill.
+
 ## Recipes
 
 Copyable `glass(...)` fills (the five built-in looks, matching the app's

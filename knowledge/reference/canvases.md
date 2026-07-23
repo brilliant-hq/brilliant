@@ -295,18 +295,23 @@ Within a workspace, Brilliant keeps two recency lists, both persisted across res
 
 ## Collaboration & Sharing
 
-Brilliant is a single-user desktop app. There is no real-time multiplayer, share links, or cloud sync.
+A workspace is local by default. Once **published** (a project bound to the cloud, marked by `.brilliant/cloud.json`), the folder stays continuously synced with its cloud project.
 
 | Goal | How |
 |------|-----|
 | Share for viewing | Export PNG/SVG/PDF and send the file ([export.md](./export.md)) |
 | Share an editable design | Send the `.design` file; the recipient needs Brilliant |
 | Share a full workspace | Share the workspace folder (canvases, Assets, `Styles/`) |
+| Share a live link | Publish the project, then copy its link |
 | Developer handoff | Right-click → Copy As → CSS/SVG/PNG, or Alt+hover for measurements |
+
+### Published-folder cloud sync
+
+In a published folder the design projection (`.design` + `.styles` + referenced assets) syncs both ways automatically: edits made in the app OR by an agent editing the files on disk push to the cloud (debounced), and changes made elsewhere are fetched and applied. It never stomps an unsaved local file — a genuine conflict checkpoints the server version and keeps your local version live, with a notification. This sync is separate from git: **the app folder never runs git**, so an agent may use git in the folder normally (the git/GitHub lane is independent).
 
 ### Version control with Git
 
-`.design` files are deterministic YAML, producing clean diffs. Open the folder as a workspace (Cmd+O); each canvas is a separate file, and `Assets/` images are referenced by canvases. Commit, branch, and merge as with any code project. Include `.brilliant/` for consistent settings.
+`.design` files are deterministic YAML, producing clean diffs. Open the folder as a workspace (Cmd+O); each canvas is a separate file, and `Assets/` images are referenced by canvases. Commit, branch, and merge as with any code project. Include `.brilliant/settings.json` for consistent settings (but not `.brilliant/trash/` or `.brilliant/sync-state.json`, which are local-only).
 
 There is no version-history panel: undo is per-canvas and within-session only. For persistent history use Git or an OS backup (Time Machine).
 

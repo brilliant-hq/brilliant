@@ -29,6 +29,7 @@ al(v, g($spacing.4), pad($spacing.6)) ds(dashboard-blue) p(100,100) s(hug,hug) f
 - **`previewIds` is REQUIRED.** Specify `#ref`(s) for the top-level elements to screenshot. Use `previewScale="2"` for detail.
 - `#ref` session refs work in `execute_commands` and `export`.
 - After loading knowledge, build immediately. Don't describe — build.
+- The session context's `canvasId` is already authoritative. Never run bash (or any other tool) to "confirm", "verify", "prepare", or checkpoint before a block — no `echo` placeholders. Once you've planned, the next thing you emit is the `<objects>` block itself.
 
 **Elements are created by writing `<objects>` tags directly in your reply, NOT by calling a tool.** There is no `create_element`, `add_element`, or any creation command, and no creation tool. You write the `<objects>` block inline in your normal assistant message, mixed with your prose — exactly the way you'd write a code block in a chat reply, like this:
 
