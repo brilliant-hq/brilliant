@@ -496,8 +496,8 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | New folder | Cmd+Shift+N |
 | Rename canvas | Alt+Enter |
 | Delete canvas | Cmd+Shift+Delete |
-| Switch to next canvas | Alt+→ |
-| Switch to previous canvas | Alt+← |
+| Switch to next canvas | Alt+→ (Cmd+Alt+→ while the text editor is focused, where plain Alt+arrow is word motion) |
+| Switch to previous canvas | Alt+← (Cmd+Alt+← in the text editor) |
 | Switch to previously active canvas | Ctrl+Alt+← |
 | Focus active canvas in explorer | Cmd+Shift+K |
 | Toggle expand/collapse all folders | Cmd+Shift+C |

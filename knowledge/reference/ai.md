@@ -62,7 +62,7 @@ Tabs can be dragged to reorder. The toolbar scrolls horizontally when tabs overf
 - **Rename:** double-click the topic name in the header, or use `/rename`.
 - **Resize:** drag the panel edges (width and height) or the divider between sessions.
 - **Queue a follow-up:** sending while the model is still working queues the message; it sends automatically when the current response finishes.
-- **Edit and resend:** click the edit icon on one of your messages to revise and resend it.
+- **Edit and resend:** click the edit icon on one of your messages to revise and resend it. Editing rewinds the conversation to that message losslessly: later messages are dropped, everything up to it is kept. On a local Claude CLI or Codex session, which cannot rewind its own transcript, the session instead rebuilds context and replays the prior conversation, marked by a "context rebuilt" card.
 - **Copy chat:** the header copy button exports the whole conversation as Markdown (with metadata: model, date, project, canvas, tokens, turns).
 - **Chat explorer:** toggle with **Cmd+Shift+A** to browse, search, and manage all sessions; drag its divider to resize or collapse it.
 
@@ -75,6 +75,7 @@ Built-in chat providers: **Claude CLI** (local `claude` binary), **Codex** (loca
 - The exact model lineup changes between releases. Read the live list in the model selector rather than assuming specific model names.
 - Context-window size varies per model. The session's context-usage indicator reflects the real per-model window.
 - Some OpenRouter-only models are text-only (no image/vision support); attaching an image to those will not work.
+- If a provider serves a response from a different model than the one selected (for example a usage-limit fallback), a card announces the switch and the context-usage indicator follows the model actually used. The selector still shows your choice.
 
 ### Switching models
 

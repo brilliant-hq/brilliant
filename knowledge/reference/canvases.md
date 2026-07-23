@@ -25,8 +25,8 @@ Cmd+N inside the file explorer creates the canvas inside the focused folder; oth
 
 | Action | Shortcut |
 |--------|----------|
-| Next file (canvas, image, or text) | Alt+Right |
-| Previous file | Alt+Left |
+| Next file (canvas, image, or text) | Alt+Right (Cmd+Alt+Right while the text editor is focused; plain Alt+arrow is word motion there) |
+| Previous file | Alt+Left (Cmd+Alt+Left in the text editor) |
 | Previously active canvas | Ctrl+Alt+Left |
 | Reveal/focus active canvas in explorer | Cmd+Shift+K |
 | Search and switch canvas | Cmd+P |
@@ -110,7 +110,7 @@ Clicking a non-canvas file in the explorer (or navigating to it with Alt+Arrow) 
 | Text/code (JS, TS, JSX, TSX, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Go, Swift, SQL, Shell/Bash/Zsh, XML, TOML, INI, plain text, `.styles`, `.gen.yaml`, `.svg`) | Built-in code editor |
 | Unknown types | Sniffed: text shows in the editor, binary shows an unsupported placeholder |
 
-File previews fully replace the canvas view and never disturb it: the canvas viewport (zoom and pan) is exactly where you left it when you switch back.
+File previews fully replace the canvas view and never disturb it: the canvas viewport (zoom and pan) is exactly where you left it when you switch back. While a preview is open, the right toolbar (property inspector) and the drawing-tool cluster hide, leaving the AI input available.
 
 `.svg` opens in the code editor as XML text, not as an image. To use an SVG as a design element, import it (Cmd+Shift+O) or paste it on the canvas; both convert it into native editable vector elements.
 
@@ -118,9 +118,11 @@ The code editor replaces the canvas while a text file is active. Features:
 - Syntax highlighting (dark/light theme auto-matched to Brilliant's brightness)
 - Vim mode; auto-loads config from `~/.config/nvim/init.vim`, `~/.config/nvim/init.lua`, or `~/.vimrc`. A mode indicator (Normal/Insert/Visual) appears in the top toolbar when active.
 - Cmd+F search and replace; side-by-side diff/merge view
-- Alt+Right/Left switches files; Ctrl+Alt+Left jumps to the previously active file
+- Alt+Right/Left switches files (Cmd+Alt+Right/Left from inside the focused text editor, where plain Alt+arrow is word motion); Ctrl+Alt+Left jumps to the previously active file
 
-Text files larger than 5 MB load read-only. Design-system source files (`*.styles` under `Styles/`) open with DSL highlighting; generated `*.gen.yaml` under `Styles/.gen/` open with YAML highlighting and should be treated as read-only (they regenerate from the source). For editing design tokens, see [design-systems.md](./design-systems.md).
+Text files larger than 5 MB open read-only, showing the first 5 MB behind a banner. If a file open in the editor changes on disk (for example an agent rewrites it), Brilliant reconciles it rather than losing work: with no unsaved edits it reloads and shows a passive notice; with unsaved edits it cancels the pending autosave and raises an actionable notice (Reload / Keep mine) so your edits are never silently overwritten.
+
+Design-system source files (`*.styles` under `Styles/`) open with DSL highlighting; generated `*.gen.yaml` under `Styles/.gen/` open with YAML highlighting and should be treated as read-only (they regenerate from the source). For editing design tokens, see [design-systems.md](./design-systems.md).
 
 ## Asset Management
 

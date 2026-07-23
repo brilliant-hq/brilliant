@@ -41,6 +41,8 @@ In passthrough mode (overlay only), mouse clicks pass through Brilliant to the a
 
 The overlay-mode toggle is a global hotkey only when the opt-in is on, so it works even when Brilliant is not the focused application. Reassigning the keybinding re-registers the global hotkey. Passthrough is a regular in-app shortcut gated to overlay mode (its WhenClause requires `!isStudioMode`, so the overlay window must be active). Toggle desktop icons is a plain in-app shortcut on `BaseCommand.defaultWhen` (not overlay-gated); it fires in either window mode and is a macOS-only operation (the command hard-returns off macOS).
 
+**UI density.** Settings (Cmd+,) → General → "UI density" under Appearance: Normal (default, roomier text and spacing) or Compact (fits more on screen). Applies to all app chrome instantly; canvas content is unaffected. Persists across launches (SharedPreferences key `ChromeDensityMode`). This is app-chrome density, distinct from the design system's density mode axis in the inspector's Design System section.
+
 ## Left Toolbar
 
 Contains the **File Explorer** (top) and **Layers Explorer** (bottom) in a vertically split layout. Drag the divider between them to resize each panel's share of the toolbar height. Drag the right edge to resize the toolbar width. Collapses to a 20 px rail when toggled off; hovering the rail re-expands it.
@@ -281,14 +283,20 @@ Toggles the eyedropper / color-pick mode. Cursor follows the pointer with a magn
 
 When opening a non-design file (`.md`, `.dart`, `.json`, `.txt`, etc.) from the file explorer, a CodeMirror 6 text editor replaces the canvas. The breadcrumb's last segment is the editable file name.
 
-- Syntax highlighting for common languages.
+- Syntax highlighting for common languages, including SCSS/Sass, Less, Vue, Svelte, and PHP. `.styles` design-system files highlight with a dedicated DSL grammar (comments, tokens, `$refs`, generator calls). Extensionless Makefile, Dockerfile, LICENSE, and README open as text with a sensible mapping.
 - Vim mode (no default shortcut) is toggleable and reads vimrc-style mappings from disk; the active vim mode (NORMAL / INSERT / VISUAL) shows in the top toolbar.
-- Find / replace uses standard CodeMirror keybindings.
+- Find / replace uses standard CodeMirror keybindings (Cmd+F inside the editor); the "Find in File" palette command focuses the editor and opens the search panel.
+- Font size: Cmd+= / Cmd+- / Cmd+0 inside the editor grow / shrink / reset (range 9 to 32, persisted). While the editor is focused, Cmd+0 is font reset rather than the chat-session shortcut.
+- Line wrap: on by default; the "Toggle Line Wrap" palette command turns wrapping off/on (persisted).
 - Dirty state shows by dimming the last breadcrumb (60% opacity); auto-save persists to disk.
 - HTML preview mode is available for `.html` files.
-- File switching is via the file explorer or canvas/file navigation shortcuts.
+- File switching is via the file explorer or canvas/file navigation shortcuts. While the editor is focused, plain Alt+Left/Right is word motion; Cmd+Alt+Left/Right switches files.
+- Copy / cut / paste (Cmd+C/X/V), Tab indent, and Cmd+K global search all work inside the editor.
+- Escape defocuses the editor back to the file (in vim mode only from NORMAL mode; INSERT/VISUAL keep Esc for the mode exit). Clicking the margin around the editor card does the same.
 
-When the code editor is focused, undo/redo is captured by the editor, not by the canvas undo history.
+When the code editor is focused, undo/redo (keyboard and Edit menu) is captured by the editor, not by the canvas undo history. Each file keeps its own undo history, caret position, and scroll offset across file switches.
+
+If the open file changes on disk while you have unsaved edits, a conflict notice offers Reload (take disk), Keep mine, or Review changes. Review opens a side-by-side diff (disk on the left, your edits on the right, editable for manual merging) with Accept disk / Keep mine on the pinned notice; switching files resolves as Keep mine.
 
 ## AI Chat Panel
 
