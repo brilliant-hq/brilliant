@@ -7,9 +7,9 @@ Assumes: `blueprint/paint`
 
 **Liquid glass is a real refractive fill (`glass`), not a blur+shadow stack.**
 The native engine refracts the backdrop through a physically-modeled glass
-slab — rim magnification, chromatic fringing, specular highlights. Bare
+slab, rim magnification, chromatic fringing, specular highlights. Bare
 `glass` is the tuned Apple-like clear look; add params to taste. It reads
-only over a **rich backdrop** (shader, gradient, mesh, image) — over a flat
+only over a **rich backdrop** (shader, gradient, mesh, image), over a flat
 fill it collapses to a near-invisible pane. Use on one or two elevated
 elements, never every panel.
 
@@ -20,16 +20,16 @@ equivalent).
 
 **The lens auto-fits the shape.** `thickness`/`bevel` resolve against the
 element's size the way corner radius does: on a small control (a button, a
-chip) the lens scales down to fit, so bare `glass` is safe at any size — no
+chip) the lens scales down to fit, so bare `glass` is safe at any size, no
 need to hand-shrink params for small elements.
 
-**Glass text wants display sizes.** Glyph refraction is all rim — thin stems
-have no interior — so glass text reads beautifully at hero sizes (≥ ~64px)
+**Glass text wants display sizes.** Glyph refraction is all rim, thin stems
+have no interior, so glass text reads beautifully at hero sizes (≥ ~64px)
 and fades to near-invisible below ~28px. For small text on glass, put a
 solid-fill text child on a glass container instead.
 
 **`blend()` on a glass element blends the whole pane.** `blend(multiply)`
-composites the refracted pane against the backdrop with that mode — the
+composites the refracted pane against the backdrop with that mode, the
 result reads as a solid tinted slab, not clearer glass. For a darker pane,
 prefer a dark `tint(...)` inside the glass fill.
 
@@ -40,15 +40,15 @@ presets). Only non-default params are listed; bare `glass` = Clear (the
 creation default).
 
 ```
-f[(glass)]                                                    Clear — max-depth clear slab, strong refraction
-f[(glass(frost(24),thickness(64),bevel(80),chroma(0.35),edge(0.05),sat(1.1),tint(#FFFFFF,o(0.05))))]   Frosted — heavy frost, whisper of white
-f[(glass(frost(4),thickness(64),bevel(120),chroma(0.4),glow(0.01),edge(0.01)))]   Deep — full pull into the widest bevel
-f[(glass(thickness(64),bevel(120),ior(3),chroma(0.5),glow(0.02),edge(0.01),sat(2)))]   Chromatic — max dispersion, vivid backdrop
-f[(glass(frost(10),bevel(120),chroma(0.25),glow(0.01),edge(0.01),sat(0.9),tint(#000000,o(0.5))))]   Smoke — dark smoked glass
+f[(glass)]                                                    Clear, max-depth clear slab, strong refraction
+f[(glass(frost(24),thickness(64),bevel(80),chroma(0.35),edge(0.05),sat(1.1),tint(#FFFFFF,o(0.05))))]   Frosted, heavy frost, whisper of white
+f[(glass(frost(4),thickness(64),bevel(120),chroma(0.4),glow(0.01),edge(0.01)))]   Deep, full pull into the widest bevel
+f[(glass(thickness(64),bevel(120),ior(3),chroma(0.5),glow(0.02),edge(0.01),sat(2)))]   Chromatic, max dispersion, vivid backdrop
+f[(glass(frost(10),bevel(120),chroma(0.25),glow(0.01),edge(0.01),sat(0.9),tint(#000000,o(0.5))))]   Smoke, dark smoked glass
 ```
 
 Tint takes a `$token` (resolved at create time) or `#hex`, with opacity as a
-`$visibility.*` token — its alpha is the tint strength (clear by default):
+`$visibility.*` token, its alpha is the tint strength (clear by default):
 
 ```
 f[(glass(tint($color.surface,o($visibility.soft)),frost(12)))]   light frosted tint
@@ -69,10 +69,10 @@ f[(glass(tint($color.surface,o($visibility.soft)),frost(12)))]   light frosted t
 | `edge` | 0 | 0..1 | specular rim highlight |
 | `angle` | 135 | degrees | light direction (135 = top-left) |
 | `sat` | 1.05 | 0..2 | backdrop saturation remix (vibrancy) |
-| `tint` | clear | — | `$token`/`#hex` + `o($visibility.*)` |
+| `tint` | clear | - | `$token`/`#hex` + `o($visibility.*)` |
 
 Out-of-range values clamp with a diagnostic; unknown params are dropped and
-surfaced. Glass is fill-only — `glass` in `st[...]` is an error.
+surfaced. Glass is fill-only, `glass` in `st[...]` is an error.
 
 ## Scene
 

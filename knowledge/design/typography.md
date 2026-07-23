@@ -27,14 +27,14 @@ Jump rule: heading = 150-200% of body.
 
 ## Font Families
 
-Use the active DS's font tokens — `$font.family` (workhorse sans) and `$font.family.serif` (editorial accent, when the DS provides one). Most designs need only these: same-family pairing is safest; `$font.family.serif` as a single editorial heading + `$font.family` body is the high-contrast move.
+Use the active DS's font tokens, `$font.family` (workhorse sans) and `$font.family.serif` (editorial accent, when the DS provides one). Most designs need only these: same-family pairing is safest; `$font.family.serif` as a single editorial heading + `$font.family` body is the high-contrast move.
 
-Specific Google Fonts override the DS — `t("...",Playfair Display,...)` works inline and auto-loads. Reach for this only when the active DS doesn't fit the mood; switching DS is usually the better move (see `design-systems/core`).
+Specific Google Fonts override the DS, `t("...",Playfair Display,...)` works inline and auto-loads. Reach for this only when the active DS doesn't fit the mood; switching DS is usually the better move (see `design-systems/core`).
 
 ## Hierarchy
 
-Use 2-3 levers simultaneously: **Size** + **Weight** + **Color**. Pair heavy headings (`$font.weight.bold` or `.strong`) with `.soft` or `.faint` body. Use semantic text aliases — `$color.text.primary`, `$color.text.secondary`, `$color.text.disabled` — so the hierarchy auto-flips in dark mode. Max 2 font families. Tighter tracking on large type (24px+), open tracking on small-caps or labels below 13px.
+Use 2-3 levers simultaneously: **Size** + **Weight** + **Color**. Pair heavy headings (`$font.weight.bold` or `.strong`) with `.soft` or `.faint` body. Use semantic text aliases, `$color.text.primary`, `$color.text.secondary`, `$color.text.disabled`, so the hierarchy auto-flips in dark mode. Max 2 font families. Tighter tracking on large type (24px+), open tracking on small-caps or labels below 13px.
 
 ## Anchor Principle
 
-Every screen has ONE focal element sized 2-3x body — hero headline, primary metric, key callout. Don't equally weight multiple "biggest things" — one dominates, the rest support.
+Every screen has ONE focal element sized 2-3x body, hero headline, primary metric, key callout. Don't equally weight multiple "biggest things", one dominates, the rest support.

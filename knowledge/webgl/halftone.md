@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Halftone — WebGL
+# Halftone: WebGL
 
 Halftone dot pattern filter with standard (luminance-based) and CMYK modes. Supports circle, diamond, and line dot shapes on square or hex grids. Colors are specified as individual R/G/B float uniforms; alpha values are packed into a single float.
 
@@ -20,7 +20,7 @@ Halftone dot pattern filter with standard (luminance-based) and CMYK modes. Supp
 | Softness | `uSoftness` | 0 .. 1 | 0 | Dot edge softness |
 | Gain | `uGain` | 0 .. 2 | 1 | Dot radius multiplier (>1 = overflow) |
 | Min Dot | `uMinDot` | 0 .. 0.5 | 0 | Minimum dot size in light areas |
-| Packed Alphas | `uAlphas` | float | — | Packed alpha encoding (see below) |
+| Packed Alphas | `uAlphas` | float | - | Packed alpha encoding (see below) |
 | BG Color R | `uColorBackR` | 0 .. 1 | 1 | Background red |
 | BG Color G | `uColorBackG` | 0 .. 1 | 1 | Background green |
 | BG Color B | `uColorBackB` | 0 .. 1 | 1 | Background blue |
@@ -40,8 +40,8 @@ Halftone dot pattern filter with standard (luminance-based) and CMYK modes. Supp
 
 ### Alpha Packing
 
-- **Standard mode:** `floor(bgAlpha * 100) * 101 + floor(fgAlpha * 100)` — 1% precision for 2 alphas
-- **CMYK mode:** `round(cA*31)*32768 + round(mA*31)*1024 + round(yA*31)*32 + round(kA*31)` — ~3% precision for 4 alphas
+- **Standard mode:** `floor(bgAlpha * 100) * 101 + floor(fgAlpha * 100)`, 1% precision for 2 alphas
+- **CMYK mode:** `round(cA*31)*32768 + round(mA*31)*1024 + round(yA*31)*32 + round(kA*31)`, ~3% precision for 4 alphas
 
 ## Fragment Shader
 

@@ -117,7 +117,7 @@ function brilliantFilter(canvas, sourceEl, fragSrc, cfg={}) {
 
 ## API Reference
 
-### `brilliantShader(canvas, fragSrc, config)` — Procedural shader fills
+### `brilliantShader(canvas, fragSrc, config)`: Procedural shader fills
 
 | Config Key | Type | Default | Description |
 |------------|------|---------|-------------|
@@ -135,7 +135,7 @@ function brilliantFilter(canvas, sourceEl, fragSrc, cfg={}) {
 
 **Returns:** `{ play(), pause(), setParam(name, value), setColors(hexArray), destroy() }`
 
-### `brilliantFilter(canvas, sourceEl, fragSrc, config)` — Image filters
+### `brilliantFilter(canvas, sourceEl, fragSrc, config)`: Image filters
 
 | Config Key | Type | Default | Description |
 |------------|------|---------|-------------|

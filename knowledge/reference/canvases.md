@@ -307,7 +307,7 @@ A workspace is local by default. Once **published** (a project bound to the clou
 
 ### Published-folder cloud sync
 
-In a published folder the design projection (`.design` + `.styles` + referenced assets) syncs both ways automatically: edits made in the app OR by an agent editing the files on disk push to the cloud (debounced), and changes made elsewhere are fetched and applied. It never stomps an unsaved local file — a genuine conflict checkpoints the server version and keeps your local version live, with a notification. This sync is separate from git: **the app folder never runs git**, so an agent may use git in the folder normally (the git/GitHub lane is independent).
+In a published folder the design projection (`.design` + `.styles` + referenced assets) syncs both ways automatically: edits made in the app OR by an agent editing the files on disk push to the cloud (debounced), and changes made elsewhere are fetched and applied. It never stomps an unsaved local file, a genuine conflict checkpoints the server version and keeps your local version live, with a notification. This sync is separate from git: **the app folder never runs git**, so an agent may use git in the folder normally (the git/GitHub lane is independent).
 
 ### Version control with Git
 

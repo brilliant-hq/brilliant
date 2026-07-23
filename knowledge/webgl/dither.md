@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Dither — WebGL
+# Dither: WebGL
 
 Ordered and noise dithering filter with Bayer matrix (2x2, 4x4, 8x8), white noise, and blue noise (Interleaved Gradient Noise) patterns. Supports two-color mode with custom palette or original image color preservation.
 

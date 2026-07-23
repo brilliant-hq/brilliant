@@ -31,7 +31,7 @@ When exporting Brilliant designs to HTML, elements with shader fills or image fi
 
 Always load `webgl/setup` first (auto-loaded via `assumes`).
 
-## Export Pattern — Procedural Shaders
+## Export Pattern: Procedural Shaders
 
 ```html
 <div style="width:360px;height:220px;border-radius:16px;overflow:hidden;position:relative;">
@@ -53,7 +53,7 @@ brilliantShader('hero', FRAG, {
 </script>
 ```
 
-## Export Pattern — Image Filters
+## Export Pattern: Image Filters
 
 ```html
 <div style="width:360px;height:220px;position:relative;">

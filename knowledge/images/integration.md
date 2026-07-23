@@ -39,7 +39,7 @@ fr s(fill,500) f[(img(Assets/hero.png)),(f2,solid($neutral.intense,o($visibility
 
 ## Parallel Generation
 
-Call `generate_image` for ALL images in the same turn — tool executor runs concurrently. 10 parallel = same time as 1 sequential.
+Call `generate_image` for ALL images in the same turn, tool executor runs concurrently. 10 parallel = same time as 1 sequential.
 
 ## Reference Images
 

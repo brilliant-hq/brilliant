@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Pixelate — WebGL
+# Pixelate: WebGL
 
 Pixelation filter with 5 cell shapes: square, hexagonal, diamond, circle (pointillism), and triangle. Supports rotation, horizontal stretch, edge smoothing, and cell outlines.
 

@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Posterize — WebGL
+# Posterize: WebGL
 
 Reduces color levels per channel to create flat, poster-like images. Three modes: RGB (quantize each channel independently), Luminosity (quantize brightness while preserving hue), and HSL (quantize hue, saturation, lightness independently).
 

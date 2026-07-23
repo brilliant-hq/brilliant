@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Noise Grain — WebGL
+# Noise Grain: WebGL
 
 Film grain overlay effect with configurable grain size, distribution, roughness, and midtone bias. Supports monochrome and color noise with uniform or Gaussian distribution.
 

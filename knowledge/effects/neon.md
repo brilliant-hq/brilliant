@@ -24,7 +24,7 @@ Two outer shadows at different spreads create halo.
 
 ## Accent Glow Card Border
 
-Colored shadow replaces stroke — much more alive than `st[($emerald.mid,w($stroke.width.subtle))]`:
+Colored shadow replaces stroke, much more alive than `st[($emerald.mid,w($stroke.width.subtle))]`:
 
 ```
 al(v,g($spacing.md),pad($spacing.lg)) ds(, theme(dark)) s(340,hug) f[($color.surface)] rd($radius.md) shadow($brand.mid,o($visibility.subtle),y(0),blur(1),sp(1)) shadow($brand.mid,o($visibility.subtle),y(0),blur(16)) #glow_card

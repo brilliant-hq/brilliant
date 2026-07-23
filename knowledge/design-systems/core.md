@@ -14,7 +14,7 @@ Stops follow two vocabularies:
 - **T-shirt scale** (`$spacing`, `$radius`, `$font.size`):
   `xs sm md lg xl 2xl…Nxl`, plus `none`.
 
-Explicit mode halts on bare values in tokenizable slots: `g() pad() rd() o() w() lh() ls()`, `t()` size positional, and any color (`f[]`, `st[]`, gradient stops, shader colors, effect colors). Use a `$token`. `s()` sizing accepts bare numerics. Bare color seeds (`$primary` → `.mid`) are the one numeric-scale exception; primitive stops like `$primary.500` or `$spacing.4` halt — use role names. None mode inverts this: no design system, so use bare values and never `$token` (tokens halt).
+Explicit mode halts on bare values in tokenizable slots: `g() pad() rd() o() w() lh() ls()`, `t()` size positional, and any color (`f[]`, `st[]`, gradient stops, shader colors, effect colors). Use a `$token`. `s()` sizing accepts bare numerics. Bare color seeds (`$primary` → `.mid`) are the one numeric-scale exception; primitive stops like `$primary.500` or `$spacing.4` halt, use role names. None mode inverts this: no design system, so use bare values and never `$token` (tokens halt).
 
 A card, dark-themed, annotated:
 
@@ -31,7 +31,7 @@ al(v,g($spacing.md),pad($spacing.lg)) ds(, theme(dark)) s(280,hug) f[($color.sur
 ```
 
 `hint…intense` is a presence scale: loudness against the surface, not
-brightness, so it inverts per mode — `$neutral.intense` is near-black in
+brightness, so it inverts per mode, `$neutral.intense` is near-black in
 light mode but near-*white* in dark, so it is never a dark background; reach
 for `$color.surface` for chrome. Don't fake dark mode with `firm…intense`
 stops in `theme(light)`; switch to `theme(dark)` and the same low stops

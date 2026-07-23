@@ -6,8 +6,8 @@
 |----------|---------|---------------------|
 | Hero photo, product shot, portrait, food | Yes | Only if user explicitly wants placeholder |
 | Texture, pattern fill | Yes | Simple geometric → use gradients |
-| Icon or logo | No — use `svg(icon:name)` | Always vector |
-| Abstract geometric | No — build with shapes | Blueprint shapes are sharper |
+| Icon or logo | No, use `svg(icon:name)` | Always vector |
+| Abstract geometric | No, build with shapes | Blueprint shapes are sharper |
 
 ## Core Structure
 
@@ -44,5 +44,5 @@ GOOD: "A minimalist product photo of a matte black ceramic coffee mug
 
 - Keyword prompts → generic results. Write paragraphs.
 - Don't generate what you can build (icons, UI, shapes)
-- Text in images unreliable — overlay as blueprint text element
+- Text in images unreliable, overlay as blueprint text element
 - One change per reference edit

@@ -7,7 +7,7 @@ For gradient syntax, see `blueprint/paint` and `blueprint/gradients/*`.
 
 ## When to Use
 
-Gradient CTAs = **never** (solid only — gradient CTAs are the #1 AI tell). Hero bg = maybe (subtle tonal shift). Card accent bar = maybe (small surface). Sparkline fill = yes (fading to transparent). Every surface = no (modern design = solid + whitespace).
+Gradient CTAs = **never** (solid only, gradient CTAs are the #1 AI tell). Hero bg = maybe (subtle tonal shift). Card accent bar = maybe (small surface). Sparkline fill = yes (fading to transparent). Every surface = no (modern design = solid + whitespace).
 
 ## Direction = Mood
 
@@ -15,7 +15,7 @@ Gradient CTAs = **never** (solid only — gradient CTAs are the #1 AI tell). Her
 
 ## Multi-Stop Knee
 
-Two stops feel flat. Three create depth — the middle stop shifts character.
+Two stops feel flat. Three create depth, the middle stop shifts character.
 Use design tokens so the gradient follows brand + mode switches:
 ```
 f[(linear(180,stop($zinc.intense,0),stop($zinc.intense,0.6),stop($indigo.intense,1)))]
@@ -23,7 +23,7 @@ f[(linear(180,stop($zinc.intense,0),stop($zinc.intense,0.6),stop($indigo.intense
 
 ## Gradient + Effect Stacking
 
-Gradient base + low-opacity shader for organic texture. Stops are tokens like every other slot — see `design-systems/core` "Modes":
+Gradient base + low-opacity shader for organic texture. Stops are tokens like every other slot, see `design-systems/core` "Modes":
 ```
 f[(linear(135,$pink.intense,$rose.intense)),(f2,metaballs($rose.intense,$pink.bold,opacity(0.15),speed(0.2)))]
 ```

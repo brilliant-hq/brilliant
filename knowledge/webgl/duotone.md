@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Duotone — WebGL
+# Duotone: WebGL
 
 Maps image luminance to a 2-color or 3-color gradient. Supports duotone (2 stops: dark/light) and tritone (3 stops: dark/mid/light, activated when color 3 alpha > 0). Per-color alpha controls tint strength, not output transparency.
 

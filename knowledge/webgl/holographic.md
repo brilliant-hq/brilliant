@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Holographic — WebGL
+# Holographic: WebGL
 
 ## Parameters
 
@@ -20,9 +20,9 @@ assumes: webgl/setup
 ## Colors
 
 3 colors:
-- **uColor0** — Primary tint (e.g. pink/magenta)
-- **uColor1** — Secondary tint (e.g. teal/cyan)
-- **uColor2** — Accent/shadow (e.g. gold or dark)
+- **uColor0**: Primary tint (e.g. pink/magenta)
+- **uColor1**: Secondary tint (e.g. teal/cyan)
+- **uColor2**: Accent/shadow (e.g. gold or dark)
 
 ## Fragment Shader
 
@@ -308,7 +308,7 @@ void main() {
     float foldDensity = 4.0 + spread * 10.0;
 
     // ═══════════════════════════════════════════════════════
-    // 1. SHAPE SYSTEM — mask and edge field
+    // 1. SHAPE SYSTEM, mask and edge field
     // ═══════════════════════════════════════════════════════
 
     float shapeMask = getShapeMask(uv, rawUV, shape, t * 6.0);

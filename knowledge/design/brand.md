@@ -2,7 +2,7 @@
 
 ## Logo Variety
 
-Default AI logo — icon in solid box — is generic. Break the pattern:
+Default AI logo, icon in solid box, is generic. Break the pattern:
 
 | Logo Style | Best for |
 |---|---|

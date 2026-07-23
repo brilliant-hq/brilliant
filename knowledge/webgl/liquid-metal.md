@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Liquid Metal — WebGL
+# Liquid Metal: WebGL
 
 ## Parameters
 
@@ -22,8 +22,8 @@ assumes: webgl/setup
 ## Colors
 
 2 colors:
-- **uColor0** — Tint color (color-burned onto metallic base)
-- **uColor1** — Highlight/accent color
+- **uColor0**: Tint color (color-burned onto metallic base)
+- **uColor1**: Highlight/accent color
 
 ## Fragment Shader
 
@@ -141,7 +141,7 @@ float elementSDF(vec2 uv) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SDF Shape System — generates edge field for each shape
+// SDF Shape System, generates edge field for each shape
 // Returns 0 inside shape, 1 at boundary, >1 outside
 // ═══════════════════════════════════════════════════════════════════
 
@@ -204,7 +204,7 @@ float getEdgeField(vec2 uv, float elemD, int shape, float t, float softEdge) {
     return max(shapeField, elemField);
 }
 
-// Shape opacity mask — 1 inside shape, 0 outside
+// Shape opacity mask, 1 inside shape, 0 outside
 float getShapeMask(vec2 uv, vec2 rawUV, int shape, float t) {
     if (shape == 0 || shape == 2) return 1.0;
 
@@ -221,7 +221,7 @@ float getShapeMask(vec2 uv, vec2 rawUV, int shape, float t) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// 3-Band Stripe — bump-modulated color banding
+// 3-Band Stripe, bump-modulated color banding
 // ═══════════════════════════════════════════════════════════════════
 
 float getColorChanges(float x, float softness, float bump) {

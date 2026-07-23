@@ -5,7 +5,7 @@ assumes: blueprint/effects
 
 Assumes: `blueprint/effects`
 
-2025-2026 evolution of neumorphism — saturated pastels, high corner radius, dual inner shadows, outer drop shadows. Soft, molded-clay objects that feel touchable.
+2025-2026 evolution of neumorphism, saturated pastels, high corner radius, dual inner shadows, outer drop shadows. Soft, molded-clay objects that feel touchable.
 
 ## Clay Card
 
@@ -19,16 +19,16 @@ Dark inner shadow (bottom-right) + white inner shadow (top-left) = molded 3D loo
 
 ## Key Principles
 
-- Fill MUST be saturated pastel — `$blue.faint`, `$green.faint`, `$violet.soft`, `$red.subtle`, `$amber.subtle` (or any catalog `<color>.{100..200}` stop)
-- Corner radius 16-24px — higher than normal
+- Fill MUST be saturated pastel, `$blue.faint`, `$green.faint`, `$violet.soft`, `$red.subtle`, `$amber.subtle` (or any catalog `<color>.{100..200}` stop)
+- Corner radius 16-24px, higher than normal
 - Always TWO inner shadows: dark bottom-right + white top-left
 - Always outer drop shadow for lift
 - Text dark, high-contrast against pastel
-- Works best on light tinted backgrounds — not pure white
+- Works best on light tinted backgrounds, not pure white
 
 ## Smaller Elements
 
-Same technique at smaller scale for buttons/icon boxes — reduce inner shadow offsets to 1-2px:
+Same technique at smaller scale for buttons/icon boxes, reduce inner shadow offsets to 1-2px:
 
 ```
 al(h,x(c),y(c),g($spacing.none),pad($spacing.md,$spacing.md)) s(hug,hug) f[($green.faint),(f2,inner($neutral.intense,o($visibility.faint),x(1),y(1),blur(3))),(f3,inner($neutral.hint,o($visibility.mid),x(-1),y(-1),blur(2)))] rd($radius.md) shadow($neutral.intense,o($visibility.faint),y(1),blur(3)) #clay_btn

@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Reactive Grid — WebGL
+# Reactive Grid: WebGL
 
 ## Parameters
 
@@ -171,7 +171,7 @@ float snoise(vec2 v) {
 void main() {
     vec2 fragCoord = vec2(gl_FragCoord.x, uResolutionY - gl_FragCoord.y);
 
-    // rawUV = untransformed UV (for SDF — element boundary is fixed in screen space)
+    // rawUV = untransformed UV (for SDF, element boundary is fixed in screen space)
     vec2 rawUV = (fragCoord - vec2(uOffsetX, uOffsetY)) / vec2(uResolutionX, uResolutionY);
 
     // uv = transformed UV (for pattern generation)

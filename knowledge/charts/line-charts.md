@@ -4,17 +4,17 @@ assumes: blueprint/vectors, blueprint/text, blueprint/components
 # Data Viz: Line Charts
 
 Frame Overlay: gridlines, axis labels, and data curves overlap inside an
-un-clipped frame. The body is `fr` — `clip` is only required for closed
+un-clipped frame. The body is `fr`, `clip` is only required for closed
 area fills, never stroke-only curves (`clip` + `mi` nodes guarantees a
 C405 overshoot warning because bezier handles bulge past node coords).
 
 **Y positions:** `y = chart_height × (1 - value / max_value)`. Gridline
-y sits at the LABEL'S BASELINE, not its top — `gridline.y ≈ label.y + 8`
+y sits at the LABEL'S BASELINE, not its top, `gridline.y ≈ label.y + 8`
 for a 12px-tall `$font.size.xs` label, so the gridline slides under the
 glyph rather than through it.
 
 ```
--- Simple — stroke-only curve. Body is fr (no clip). Y labels in a left
+-- Simple, stroke-only curve. Body is fr (no clip). Y labels in a left
 -- gutter at x=0..40; gridlines start at x=48 so they don't cross labels.
 fr s(420,200) "Body"
   t("$30K",$font.family,$font.size.xs,m,align(r)) abs p(0,0) s(40,16) f[($color.text.secondary)]
@@ -25,7 +25,7 @@ fr s(420,200) "Body"
   r abs p(48,168) s(372,1) f[($color.outline.variant)]
   v(nodes[(0,0,140,mi),(1,93,100,mi),(2,186,72,mi),(3,279,48,mi),(4,372,12,mi)]) abs p(48,8) s(372,160) st[($primary.mid,w($stroke.width.mid))]
 
--- Complex — area fill under a comparison stroke line. ONLY the area fill
+-- Complex, area fill under a comparison stroke line. ONLY the area fill
 -- needs a clip wrapper (to mask the closing bottom edge); the comparison
 -- line stays absolute alongside it.
 fr s(420,200) "Body2"
@@ -39,9 +39,9 @@ fr s(420,200) "Body2"
 
 **Three rules:**
 
-1. **No `clip` on the body** — only on the area-fill wrapper. Stroke-only
+1. **No `clip` on the body**: only on the area-fill wrapper. Stroke-only
    curves don't need masking.
-2. **Area-fill top pad ≥ stroke width + handle bulge** — `$spacing.lg`
+2. **Area-fill top pad ≥ stroke width + handle bulge**: `$spacing.lg`
    covers most rises; raise it when consecutive nodes drop steeply
    (the curve bulges above the first node by ~30% of that drop).
 3. **Gridline y = label baseline**, not label top. Labels read cleanly

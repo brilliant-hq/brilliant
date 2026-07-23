@@ -3,7 +3,7 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 ---
 # Recreation: From Website
 
-**Make it look exactly like the live site.** You have HTML, CSS, and assets — extract exact values instead of guessing.
+**Make it look exactly like the live site.** You have HTML, CSS, and assets, extract exact values instead of guessing.
 
 ## Step 0: Fetch and Analyze (BEFORE building)
 
@@ -37,8 +37,8 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 
 1. Fetch and analyze (Step 0)
 2. Root container + background
-3. Navbar — real logo, links, CTAs. Export, compare.
-4. Hero — real headline, images. Export, compare.
+3. Navbar, real logo, links, CTAs. Export, compare.
+4. Hero, real headline, images. Export, compare.
 5. Each section. Export, compare.
 6. Footer. Export, compare.
 7. Final full export pass.

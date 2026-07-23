@@ -5,7 +5,7 @@ dsl: [ds_file, unset, designSystem, brand, modes]
 
 `ds_file("name")` authors or extends a brand: a top-level statement,
 body is indentation-based DSL. It inherits the project `default` (the
-catalog shown in your init context), so declare ONLY what differs — a
+catalog shown in your init context), so declare ONLY what differs, a
 real brand is usually a few lines. Output merges into
 `<canvas-folder>/Styles/<name>.styles` and runs before element rows, so
 later rows can `ds(name)` it. Kebab-case; name the visual direction
@@ -23,7 +23,7 @@ ds_file("fintech-warm")
   font.lineHeight: looseness(number([1,1.25,1.5]))     // 6 steps none…loose
   font.family:     "Noto Serif"                        // multi-word names need quotes; single-word fonts (Manrope, Inter) can stay bare
 
-  // Color roles need boldness(color(...)) — a bare hex is one frozen value,
+  // Color roles need boldness(color(...)), a bare hex is one frozen value,
   // no light/dark flip, no hover/container steps. Outside-catalog hue gets
   // its own primitive first:
   success:       boldness(color(#1AAB7A))
@@ -43,4 +43,4 @@ ds_file("fintech-warm")
 After `ds_file()`, the brand becomes the session default and unstamped
 frames auto-stamp it. `inherits: none` makes a brand standalone (rare);
 `root: true` stops the parent-folder cascade. Comments are preserved
-into `.styles` and carry to future sessions — use them for design intent.
+into `.styles` and carry to future sessions, use them for design intent.

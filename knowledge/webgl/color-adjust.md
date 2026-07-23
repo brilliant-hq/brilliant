@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Color Adjust — WebGL
+# Color Adjust: WebGL
 
 Comprehensive image adjustment filter: exposure, contrast, saturation, temperature, tint, highlights, shadows, brilliance, hue rotation, vibrance, inversion, sepia, whites, blacks, clarity, sharpness, and vignette.
 

@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Dithering — WebGL
+# Dithering: WebGL
 
 ## Parameters
 
@@ -61,7 +61,7 @@ uniform float uSpeed;      // 0-3: animation speed
 out vec4 fragColor;
 
 // ═══════════════════════════════════════════════════════════════════
-// Simplex Noise (standard 2D simplex — Gustavson algorithm)
+// Simplex Noise (standard 2D simplex, Gustavson algorithm)
 // ═══════════════════════════════════════════════════════════════════
 
 vec3 mod289v3(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -152,13 +152,13 @@ float getDitherThreshold(vec2 pixelPos, int ditherType) {
 // Pattern Functions (all return 0.0 to 1.0)
 // ═══════════════════════════════════════════════════════════════════
 
-// 0: Simplex — animated noise field
+// 0: Simplex, animated noise field
 float patternSimplex(vec2 uv, float t) {
     float n = snoise(uv * 3.0 + vec2(t * 0.3, t * 0.2));
     return n * 0.5 + 0.5;
 }
 
-// 1: Warp — domain-warped noise for organic flowing patterns
+// 1: Warp, domain-warped noise for organic flowing patterns
 float patternWarp(vec2 uv, float t) {
     float n1 = snoise(uv * 2.0 + vec2(t * 0.2));
     float n2 = snoise(uv * 2.0 + vec2(n1 * 1.5, t * 0.15 + 10.0));
@@ -166,7 +166,7 @@ float patternWarp(vec2 uv, float t) {
     return n3 * 0.5 + 0.5;
 }
 
-// 2: Dots — regular grid with animated radius
+// 2: Dots, regular grid with animated radius
 float patternDots(vec2 uv, float t) {
     float freq = 6.0;
     vec2 cell = fract(uv * freq) - 0.5;
@@ -175,7 +175,7 @@ float patternDots(vec2 uv, float t) {
     return smoothstep(radius + 0.05, radius - 0.05, d);
 }
 
-// 3: Wave — sinusoidal wave pattern
+// 3: Wave, sinusoidal wave pattern
 float patternWave(vec2 uv, float t) {
     float wave = sin(uv.x * 12.0 + t * 1.2) * 0.3;
     wave += sin(uv.y * 8.0 - t * 0.9) * 0.2;
@@ -183,7 +183,7 @@ float patternWave(vec2 uv, float t) {
     return wave + 0.5;
 }
 
-// 4: Ripple — concentric rings expanding from center
+// 4: Ripple, concentric rings expanding from center
 float patternRipple(vec2 uv, float t) {
     vec2 centered = uv - 0.5;
     centered.x *= uRefAspect;
@@ -192,7 +192,7 @@ float patternRipple(vec2 uv, float t) {
     return ripple;
 }
 
-// 5: Swirl — spiraling pattern
+// 5: Swirl, spiraling pattern
 float patternSwirl(vec2 uv, float t) {
     vec2 centered = uv - 0.5;
     centered.x *= uRefAspect;
@@ -204,7 +204,7 @@ float patternSwirl(vec2 uv, float t) {
     return mix(spiral, n * 0.5 + 0.5, 0.25);
 }
 
-// 6: Sphere — 3D sphere with animated lighting
+// 6: Sphere, 3D sphere with animated lighting
 float patternSphere(vec2 uv, float t) {
     vec2 centered = uv - 0.5;
     centered.x *= uRefAspect;

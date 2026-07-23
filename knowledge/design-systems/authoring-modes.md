@@ -13,7 +13,7 @@ font.weight:     boldness(number([100,200,300,400,500,600,700,800,900]))  // acc
 spacing:         tshirt(number([4,8,16,24,32]), min: { none: 0 })          // density.compact: shift(-1), accessibility.large-text: shift(+1)
 font.lineHeight: looseness(number([1,1.25,1.5]))     // accessibility.large-text: shift(+1)
 
-// Override REPLACES defaults — list every entry you want kept. Keys
+// Override REPLACES defaults, list every entry you want kept. Keys
 // axis-qualified (`theme.dark`, never bare `dark`).
 font.size: tshirt(number([12,14,16,20,24,32,40,48,64]),
                   transforms: { accessibility.large-text: shift(+1) })   // skip default compact
@@ -33,8 +33,8 @@ radius: tshirt(number([4,8,12,16,24]), transforms: none)
 
 ## Ops
 
-Every op transforms the role's stop index — works on any generator. Out-of-range clamps.
+Every op transforms the role's stop index, works on any generator. Out-of-range clamps.
 
-- `shift(N)` — offset; **sums** across active modes
-- `mirror` — reflect around the middle stop
-- `outward(N)` — push N away from middle toward nearer terminal
+- `shift(N)`: offset; **sums** across active modes
+- `mirror`: reflect around the middle stop
+- `outward(N)`: push N away from middle toward nearer terminal

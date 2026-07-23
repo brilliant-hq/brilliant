@@ -9,11 +9,11 @@ Assumes: `blueprint/core`, `blueprint/layout`, `blueprint/paint`
 spaceBetween row `pad($spacing.md,$spacing.xl) s(SCREEN_W,hug)` `$color.surface` fill. Three groups: Logo (H-row: icon + brand text(18,b)), Nav (H-row `g($spacing.xs)`: links `pad($spacing.sm,$spacing.md)` text(14,m)), Right (H-row: text link + CTA). 1px bottom stroke or shadow.
 
 ## Sidebar
-V-stack `y(sb),x(c) pad($spacing.md,0) s(64-240,fill)`. For a dark sidebar in a light app, wrap in a frame with `ds(, theme(dark))` and use `$color.surface` — don't hand-paint `$neutral.intense` over a light DS. Top(logo + divider + nav V-stack `g($spacing.xs)`) + Bottom(settings/profile). Nav item: H-row `x(s/c),y(c) g($spacing.sm) pad($spacing.sm) s(fill,hug) rd($radius.sm)`. Selected: `$color.surface.selected` fill + `$color.on-surface.selected` for icon and label (bold weight too). Hovered: `$color.surface.hover` fill. Default: no fill + `$color.text.secondary` icon + `$color.text.primary` label. Disabled: muted icon and label via `$color.text.disabled`, no fill. **Sidebar MUST have fixed height for spaceBetween.**
+V-stack `y(sb),x(c) pad($spacing.md,0) s(64-240,fill)`. For a dark sidebar in a light app, wrap in a frame with `ds(, theme(dark))` and use `$color.surface`, don't hand-paint `$neutral.intense` over a light DS. Top(logo + divider + nav V-stack `g($spacing.xs)`) + Bottom(settings/profile). Nav item: H-row `x(s/c),y(c) g($spacing.sm) pad($spacing.sm) s(fill,hug) rd($radius.sm)`. Selected: `$color.surface.selected` fill + `$color.on-surface.selected` for icon and label (bold weight too). Hovered: `$color.surface.hover` fill. Default: no fill + `$color.text.secondary` icon + `$color.text.primary` label. Disabled: muted icon and label via `$color.text.disabled`, no fill. **Sidebar MUST have fixed height for spaceBetween.**
 
 ## Tabs (Underline)
 
-Define a `Tab` set to the side with a `state[active,inactive]` axis — the variant
+Define a `Tab` set to the side with a `state[active,inactive]` axis, the variant
 carries the state (active = filled indicator + bold tinted label; inactive = muted
 label, no indicator). Compose the bar from instances: pick the variant, override
 only the label text. No per-tab style overrides:

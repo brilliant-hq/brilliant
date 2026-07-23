@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Liquid Stainless Steel — WebGL
+# Liquid Stainless Steel: WebGL
 
 ## Parameters
 
@@ -20,8 +20,8 @@ assumes: webgl/setup
 ## Colors
 
 2 colors:
-- **uColor0** — Base metal tint
-- **uColor1** — Highlight color
+- **uColor0**: Base metal tint
+- **uColor1**: Highlight color
 
 ## Fragment Shader
 
@@ -203,7 +203,7 @@ float getShapeMask(vec2 uv, vec2 rawUV, int shape, float t) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// Flowing height field — thick undulating chrome waves
+// Flowing height field, thick undulating chrome waves
 // ═══════════════════════════════════════════════════════════════════
 
 float metalHeight(vec2 p, float t, float ca, float sa, float flow, float distort) {
@@ -270,7 +270,7 @@ void main() {
     vec3 highlightColor = uColor1.rgb;
 
     // ═══════════════════════════════════════════════════════
-    // SHAPE SYSTEM — edge field & mask
+    // SHAPE SYSTEM, edge field & mask
     // ═══════════════════════════════════════════════════════
 
     float edgeField;
@@ -283,7 +283,7 @@ void main() {
     float shapeMask = getShapeMask(uv, rawUV, shape, t * 6.0);
 
     // ═══════════════════════════════════════════════════════
-    // 1. HEIGHT FIELD — flowing metallic surface
+    // 1. HEIGHT FIELD, flowing metallic surface
     // ═══════════════════════════════════════════════════════
 
     vec2 centerPt = vec2(uRefAspect * 0.5, 0.5);
@@ -306,22 +306,22 @@ void main() {
     float gradLen = length(grad);
 
     // ═══════════════════════════════════════════════════════
-    // 2. LIGHTING — multi-source for rich chrome reflections
+    // 2. LIGHTING, multi-source for rich chrome reflections
     // ═══════════════════════════════════════════════════════
 
     vec2 normalDir = (gradLen > 0.001) ? grad / gradLen : vec2(0.0, -1.0);
 
-    // Primary light — top-left
+    // Primary light, top-left
     vec2 lightDir1 = normalize(vec2(0.5, -0.7));
     float diff1 = dot(normalDir, lightDir1) * 0.5 + 0.5;
     diff1 = smoothstep(0.0, 1.0, diff1);
 
-    // Secondary light — bottom-right (fill)
+    // Secondary light, bottom-right (fill)
     vec2 lightDir2 = normalize(vec2(-0.4, 0.6));
     float diff2 = dot(normalDir, lightDir2) * 0.5 + 0.5;
     diff2 = smoothstep(0.0, 1.0, diff2) * 0.3;
 
-    // Third light — side (rim)
+    // Third light, side (rim)
     vec2 lightDir3 = normalize(vec2(0.8, 0.1));
     float diff3 = dot(normalDir, lightDir3) * 0.5 + 0.5;
     diff3 = smoothstep(0.0, 1.0, diff3) * 0.15;
@@ -342,7 +342,7 @@ void main() {
     float totalSpec = spec1 + spec2;
 
     // ═══════════════════════════════════════════════════════
-    // 3. ENVIRONMENT REFLECTION — chrome-like
+    // 3. ENVIRONMENT REFLECTION, chrome-like
     // ═══════════════════════════════════════════════════════
 
     vec2 reflectUV = normalDir * 0.3 + uvAspect * 0.1;

@@ -25,14 +25,14 @@ Write 3-5 sentences describing: overall color scheme, major sections, text/brand
 
 7. **Export and compare after each section.** List specific differences, fix them.
 
-8. **Only build what you see.** No colors, icons, or elements not in the image. When unsure, use neutral gray — never default to blue.
+8. **Only build what you see.** No colors, icons, or elements not in the image. When unsure, use neutral gray, never default to blue.
 
 ## Build Order
 
 1. Describe what you see (Step 0)
 2. Root container with correct dimensions
 3. Top-level section structure
-4. First section — all content. Export, compare.
+4. First section, all content. Export, compare.
 5. Next section. Export, compare.
 6. Continue until complete.
 7. Final full export comparison.

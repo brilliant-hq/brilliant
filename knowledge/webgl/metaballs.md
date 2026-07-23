@@ -1,7 +1,7 @@
 ---
 assumes: webgl/setup
 ---
-# Metaballs — WebGL
+# Metaballs: WebGL
 
 ## Parameters
 
