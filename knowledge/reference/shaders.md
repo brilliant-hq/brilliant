@@ -110,11 +110,11 @@ Every shader fill or stroke has a **Transform** section that adjusts how the pat
 
 ## Interactive Shaders (Reactive Grid)
 
-Reactive Grid is grouped under **Interactive** in the type dropdown, but on the canvas it renders its **ambient animated layer only**. The native engine (the canvas renderer) receives static, zero mouse state for interactive shaders (`native_scene_exporter.dart` `_convertShaderFill`: `floats.addAll(const [0.0, 0.0, 0.0, 0.0])` when `def.isInteractive`), so the grid animates but does not track or react to the cursor on placed elements.
+Reactive Grid is grouped under **Interactive** in the type dropdown, but on the canvas it renders its **ambient animated layer only**: the grid animates but does not track or react to the cursor on placed elements.
 
-The live mouse machinery still exists but feeds a narrow case: `ShaderInteractionState` (gated by `content_view.dart` `_isShaderIdleHoverMode`, which is true only when not dragging and not in vector, crop, text, or frame-label edit) updates a cursor position that is consumed only by the **text-editing body** (a shader-filled text element while it is actively being edited).
+There is one narrow exception: a shader-filled **text element reacts to the cursor while it is actively being edited**. Outside that text-editing case, cursor interaction does not render.
 
-Practical guidance: treat Reactive Grid as an animated grid pattern. Do not promise live cursor-following, click ripples, or proximity glow on ordinary canvas elements; those effects do not render outside the text-editing path.
+Practical guidance: treat Reactive Grid as an animated grid pattern. Do not promise live cursor-following, click ripples, or proximity glow on ordinary canvas elements.
 
 ## Combining with Other Fills
 
@@ -126,7 +126,7 @@ Shader fills stack with other fill types (solid, gradient, image, inner shadow, 
 |--------|---------------|
 | **PNG / JPEG / WebP** | Rendered at full quality, capturing the current animation frame. |
 | **PDF** | Rasterized faithfully (the shaded element is embedded as a raster image), capturing the current frame. |
-| **SVG** | **Pre-rasterized.** SVG cannot express fragment shaders, so an element carrying a shader fill or stroke is rasterized (`needsRasterizationForExport` -> `hasNonNativeVectorFills`) and embedded as a base64 image capturing the current frame. Only if rasterization data is unavailable does the serializer fall back to a flat solid fill (the shader's `primaryColor`). Export to PNG if you need the procedural look at higher fidelity. |
+| **SVG** | **Pre-rasterized.** SVG cannot express fragment shaders, so an element carrying a shader fill or stroke is rasterized and embedded as a base64 image capturing the current frame. Only if rasterization data is unavailable does the export fall back to a flat solid fill (the shader's first color). Export to PNG if you need the procedural look at higher fidelity. |
 | **MP4 / MOV** | Shader animation is captured frame by frame across the video. |
 
 For export details across all formats see [export](./export.md).
