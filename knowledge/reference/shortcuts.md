@@ -540,6 +540,27 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Check for updates | Cmd+Shift+U |
 | Toggle Vim mode (code editor) | (no default, id `toggle_vim_mode`) |
 
+## Code Editor
+
+Editing commands for the text editor (open any non-design file). Active only while the editor is focused; each is a real command: rebindable in the shortcuts UI and runnable from the command palette. Rebinding applies inside the editor immediately.
+
+| Action | Shortcut |
+|--------|----------|
+| Move line up / down | Alt+Up / Alt+Down |
+| Copy line up / down | Shift+Alt+Up / Shift+Alt+Down |
+| Delete line | Cmd+Shift+K |
+| Insert line below / above | Cmd+Enter / Cmd+Shift+Enter |
+| Toggle comment | Cmd+/ (language aware, including `//` in `.styles`) |
+| Select next occurrence | Cmd+D |
+| Select all occurrences | Cmd+Shift+L |
+| Add cursor above / below | Cmd+Alt+Up / Cmd+Alt+Down |
+| Add cursor at click | Option+Click |
+| Find in file | Cmd+F inside the editor (palette id `find_in_file`) |
+| Go to line | Ctrl+G inside the editor (palette id `go_to_line`) |
+| Toggle line wrap | (no default, id `toggle_line_wrap`) |
+
+Outside the editor, the shared chords keep their app meaning: Cmd+Enter flattens the selection, Cmd+D duplicates, Cmd+/ toggles inspector sections, Cmd+Shift+K focuses the active file.
+
 ## Chat Sessions
 
 | Action | Shortcut |

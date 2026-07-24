@@ -72,13 +72,13 @@ The file explorer lives in the **left toolbar**. Focus it with **Cmd+Shift+E**. 
 | Up/Down, J/K | Move navigation focus |
 | Left/Right, H/L | Collapse / expand folder |
 | Space, O | Open / switch to the focused item |
-| Enter | Start inline rename |
+| Enter, F2 | Start inline rename |
 | Escape | Clear focus, or cancel a rename / cut-paste |
 | Cmd+A | Select all visible items |
 | Tab | Move focus to the layers explorer |
 | gg | Jump to top (press G twice within 500ms) |
 | Shift+G | Jump to bottom |
-| Cmd+Backspace / Cmd+Delete | Delete selected canvas/folder/asset |
+| Cmd+Backspace / Cmd+Delete | Delete selected canvas/folder/asset (multi-select deletes are one undo entry) |
 | Cmd+N / Cmd+Shift+N | New canvas / folder inside the focused folder |
 | Cmd+C / Cmd+X / Cmd+V | Copy / cut / paste canvases or folders |
 | Ctrl+N / Ctrl+P | Move focus down / up (vim/emacs style) |
@@ -137,7 +137,8 @@ Right-click an asset in the explorer for:
 Other behavior:
 - `Assets/` folders show in the explorer even when empty (if the directory exists on disk)
 - **Clean Up Unused Assets** (command palette) removes images not referenced by any canvas; undoable
-- A file watcher detects external changes: drop a new image into `Assets/` from Finder and it appears in the explorer
+- A file watcher keeps the explorer live against external changes: an agent or git creating, deleting, renaming, or moving `.design` files, folders, or assets on disk shows up within about a second, no repo reopen needed. Bursts (a `git checkout` touching many files) apply as one batch. Regaining app focus also runs a quick rescan as a safety net.
+- If the OPEN canvas's `.design` file changes on disk, it reconciles like the text editor: with no unsaved edits the canvas reloads (selection and camera preserved) and shows a passive notice; with unsaved edits auto-save pauses for that canvas and an actionable notice offers Reload / Keep mine, so neither side is silently overwritten. If the open canvas's file is deleted externally, Brilliant lands on a surviving canvas.
 
 ## Import & Export
 

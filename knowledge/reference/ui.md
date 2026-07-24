@@ -35,13 +35,15 @@ Brilliant runs in two window modes, switched on a single window:
 | Toggle passthrough (overlay only) | Ctrl+A |
 | Toggle desktop icons (macOS-only; works in either window mode) | Ctrl+I |
 
+**Pan and zoom speed are adjustable.** Settings (Cmd+,) → General → "Trackpad and Mouse" has two fields, "Pan speed" and "Zoom speed" (percent, 100% default, dropdown steps 50 to 200, typed entry 25 to 400). Pan speed scales two-finger scroll panning (and the momentum it throws); zoom speed scales pinch and modifier+scroll zooming. Middle-mouse and space-drag panning stay 1:1 with the cursor, and keyboard zoom steps are unaffected. Applies immediately and persists across launches.
+
 **Overlay mode is macOS-only and opt-in.** The whole feature (transparent window + global hotkey) is gated on `Platform.isMacOS`; the toggle and its actions are not shown on Windows, and `toggle_overlay_mode` / `toggle_pass_through` are in the Windows-disabled keybinding set. The "Overlay Mode" toggle lives in Settings (Cmd+,) → General, off by default. The Ctrl+F global hotkey is only registered while that toggle is on; with it off, Ctrl+F does nothing. Turning it off while in overlay auto-exits to studio. The setting persists across launches (SharedPreferences key `OverlayModeEnabled`). Settings → General also exposes an "Open Accessibility Settings" action: accessibility access is required for the global hotkey to summon Brilliant from other apps.
 
 In passthrough mode (overlay only), mouse clicks pass through Brilliant to the apps below. Studio window state (position, size, fullscreen, maximized) is saved before entering overlay and restored on exit. The bottom toolbar sits slightly higher off the bottom edge while in overlay mode than in studio.
 
 The overlay-mode toggle is a global hotkey only when the opt-in is on, so it works even when Brilliant is not the focused application. Reassigning the keybinding re-registers the global hotkey. Passthrough is a regular in-app shortcut gated to overlay mode (its WhenClause requires `!isStudioMode`, so the overlay window must be active). Toggle desktop icons is a plain in-app shortcut on `BaseCommand.defaultWhen` (not overlay-gated); it fires in either window mode and is a macOS-only operation (the command hard-returns off macOS).
 
-**UI density.** Settings (Cmd+,) → General → "UI density" under Appearance: Normal (default, roomier text and spacing) or Compact (fits more on screen). Applies to all app chrome instantly; canvas content is unaffected. Persists across launches (SharedPreferences key `ChromeDensityMode`). This is app-chrome density, distinct from the design system's density mode axis in the inspector's Design System section.
+**UI density.** Settings (Cmd+,) → General → "UI density" under Appearance: Normal (default, roomier text and spacing) or Compact (fits more on screen). Also available as commands in the command palette: "UI Density: Normal", "UI Density: Compact", and "Toggle UI Density" (all unbound by default; assign a shortcut in Keyboard Shortcuts). Applies to all app chrome instantly; canvas content is unaffected. Persists across launches (SharedPreferences key `ChromeDensityMode`). This is app-chrome density, distinct from the design system's density mode axis in the inspector's Design System section.
 
 ## Left Toolbar
 
@@ -62,6 +64,8 @@ The header is right-aligned. Order, left to right: reset-position button, toggle
 ### File Explorer
 
 Tree of all canvases, folders, and asset files in the workspace. Features: folder expand/collapse, multi-selection (Cmd/Shift+Click), right-click context menu, drag/drop reorder and reparent, inline renaming (double-click or Cmd+R), keyboard navigation, type-to-filter. Hidden files (`.foo`) are gated by the Show Hidden Files command.
+
+Canvas files (`.bl`) and design-system files (`.ds`) display **without** their extension (e.g. `rip figma`, `default`), the way Finder and Figma hide known design-file extensions. Asset files keep their extension (`hero.png`, `notes.md`). This is display-only: the real filename still carries the extension, so renaming edits the full name (the extension is preserved) and all paths/ids are unchanged.
 
 Within the file explorer, undo/redo (Cmd+Z / Cmd+Shift+Z) operates on canvas/folder lifecycle (create, delete, rename, move) via a separate explorer-scoped undo history. Outside the file explorer, undo/redo applies to the active canvas.
 
@@ -256,6 +260,21 @@ A floating palette mode for viewing and customizing every command's keybinding.
 
 See `shortcuts.md` -> "Customizing Shortcuts" for activation-context details and conflict resolution.
 
+## Web Platform (brilliant.design)
+
+Published projects live at `brilliant.design/{handle}/{project}`. Profiles (`brilliant.design/{handle}`) and the web editor share one persistent GitHub-style shell:
+
+- **Site navbar** (always on top): brand, search (Cmd+K command palette), the New menu, and the account menu. It stays mounted while you browse profiles and open, create, or switch projects.
+- **Profile tab bar** under the navbar: the OWNER's Overview / Projects / Drops / Bookmarks tabs. Viewing `/{handle}/{project}` shows `{handle}`'s tabs (no tab highlighted while the editor is open); clicking a tab goes to that owner's profile view. Leaving for a profile tab keeps the editor loaded in the background, so returning to the project is instant.
+- **The content area** below shows either the profile view or the editor. Canvas deep links (`/{handle}/{project}/{canvasName}`, plus `?sel=` for a selection) open that canvas directly, and the address bar follows as you switch canvases.
+
+**The New menu** (the "+" in the navbar, signed in only) is one panel with two actions:
+
+- **New project**: a single click instantly creates an empty project named `untitled` (then `untitled-2`, `untitled-3`, ... when taken) and opens it in the editor. No name prompt; rename later from project settings.
+- **Create from Figma**: paste a Figma file link into the inline field and press the button. It creates a project named after the file and imports the whole file (every page becomes a canvas). If your Figma account isn't connected yet, the same button routes through Figma sign-in first and returns you to the menu with the link preserved.
+
+A profile page's empty-state "Create your first project" card is the same single click: it instantly creates `untitled` and opens the editor (no dialog).
+
 ## Color Picker
 
 Open by clicking any color swatch or pressing **Ctrl+C**.
@@ -285,14 +304,22 @@ When opening a non-design file (`.md`, `.dart`, `.json`, `.txt`, etc.) from the 
 
 - Syntax highlighting for common languages, including SCSS/Sass, Less, Vue, Svelte, and PHP. `.styles` design-system files highlight with a dedicated DSL grammar (comments, tokens, `$refs`, generator calls). Extensionless Makefile, Dockerfile, LICENSE, and README open as text with a sensible mapping.
 - Vim mode (no default shortcut) is toggleable and reads vimrc-style mappings from disk; the active vim mode (NORMAL / INSERT / VISUAL) shows in the top toolbar.
-- Find / replace uses standard CodeMirror keybindings (Cmd+F inside the editor); the "Find in File" palette command focuses the editor and opens the search panel.
+- Find / replace uses standard CodeMirror keybindings (Cmd+F inside the editor); the "Find in File" palette command focuses the editor and opens the search panel. Read-only files (over 5 MB, view-only) show find without replace.
 - Font size: Cmd+= / Cmd+- / Cmd+0 inside the editor grow / shrink / reset (range 9 to 32, persisted). While the editor is focused, Cmd+0 is font reset rather than the chat-session shortcut.
 - Line wrap: on by default; the "Toggle Line Wrap" palette command turns wrapping off/on (persisted).
+- Line editing: move line up/down (Alt+Up/Down), copy line up/down (Shift+Alt+Up/Down), delete line (Cmd+Shift+K), insert line below/above (Cmd+Enter / Cmd+Shift+Enter), toggle comment (Cmd+/, language aware: `//` in `.styles`, `/* */` in CSS). All are real commands: rebindable in the shortcuts UI, runnable from the palette while a text file is open.
+- Multi-cursor: select next occurrence (Cmd+D), select all occurrences (Cmd+Shift+L), add cursor above/below (Cmd+Alt+Up/Down), Option+Click adds a cursor, Option+drag makes a column selection.
+- Occurrence highlights: selecting a word subtly highlights its other occurrences in the file.
+- Color swatches: in `.styles` and CSS/SCSS/Sass/Less files, a small color chip renders before each hex color (`#rgb`, `#rrggbb`, `#rrggbbaa`).
 - Dirty state shows by dimming the last breadcrumb (60% opacity); auto-save persists to disk.
 - HTML preview mode is available for `.html` files.
 - File switching is via the file explorer or canvas/file navigation shortcuts. While the editor is focused, plain Alt+Left/Right is word motion; Cmd+Alt+Left/Right switches files.
-- Copy / cut / paste (Cmd+C/X/V), Tab indent, and Cmd+K global search all work inside the editor.
+- Copy / cut / paste (Cmd+C/X/V), select all (Cmd+A, also Edit > Select All), Tab indent, and Cmd+K global search all work inside the editor. Standard macOS text chords work too: Cmd+arrows (line/document boundaries, Shift extends), Option+Delete (word delete), Cmd+Delete (delete to line start), double-click word / triple-click line selection.
+- Right-click opens a context menu: Cut / Copy / Paste / Select All plus Find in File and Go to Line. Items follow editor state (no selection disables Copy/Cut; read-only files disable Cut/Paste).
+- Go to line: Ctrl+G inside the editor (or the "Go to Line" palette command) opens the line-jump panel.
 - Escape defocuses the editor back to the file (in vim mode only from NORMAL mode; INSERT/VISUAL keep Esc for the mode exit). Clicking the margin around the editor card does the same.
+- With the command palette open, Escape or a click anywhere on the editor closes the palette and returns typing focus to the editor (same as clicking the canvas closes the palette).
+- While a text or image file is open, the left toolbar shows only the file explorer (the layers panel returns when a canvas is active).
 
 When the code editor is focused, undo/redo (keyboard and Edit menu) is captured by the editor, not by the canvas undo history. Each file keeps its own undo history, caret position, and scroll offset across file switches.
 
