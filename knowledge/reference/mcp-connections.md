@@ -12,6 +12,9 @@ integrated BYOK chat (that runs a provider *inside* Brilliant); here the user
 designs from *their own* tool. Brilliant is BYOK-only; nothing routes through
 Brilliant servers.
 
+Looking for the other direction (using external MCP servers *inside*
+Brilliant's own chat)? See `mcp-external-servers.md`.
+
 The server is a local HTTP endpoint, normally `http://127.0.0.1:3333/mcp`
 (falls back to 3334/3335 at startup if the port is busy). It supports multiple
 clients at once. **Brilliant must be running for a connected tool to reach

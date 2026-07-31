@@ -128,6 +128,17 @@ PDF is the one format with a multi-page mode (Export panel only). Use the inline
 
 Multi-page is a per-config-row setting, so a single batch click can ship a single-page and a multi-page PDF together.
 
+## Separate files (multi-selection, PNG/JPEG/WebP/SVG)
+
+When you select **two or more frames** (or other top-level elements) and export a raster format (PNG/JPEG/WebP) or SVG, Brilliant exports **one file per selected element by default** rather than merging them into a single image, the same behavior as Figma.
+
+- A **Files** dropdown appears (Separate files / Single file) whenever a raster or SVG export has 2+ export targets. For SVG it sits inline next to the format pill; for raster it's the first row inside the settings panel (gear button). It defaults to **Separate files**.
+- Pick **Single file** to go back to the old behavior: the whole selection rendered into one merged image.
+- **Desktop:** exporting separate files asks for one destination **folder** (a single pick for the whole batch); each element is written into it. Files with the same name get `-2`, `-3`, … suffixes.
+- **Web:** the files are bundled into a single **zip** download.
+- Nesting: a selected element inside another selected frame is exported as part of that frame, not as its own file. Only "selection roots" (selected elements with no selected ancestor) become files.
+- SVG and PDF are separate concerns: PDF uses its multi-page mode; raster/SVG use this separate-files mode.
+
 ## Copy to clipboard (Copy as)
 
 Copy the selection to the clipboard in several representations. Useful for pasting into code editors, docs, other design tools, or chat. Reach these from the command palette or the right-click `Copy as` submenu.
@@ -142,10 +153,9 @@ Copy the selection to the clipboard in several representations. Useful for pasti
 | Copy as HTML (flex) | HTML where auto-layout frames emit `display:flex` + gap + padding |
 | Copy as React | React JSX snippet (camelCase style object and SVG attrs) |
 | Copy as CSS | CSS properties (size, position, colors, border, radius, rotation, text) |
-| Copy as YAML | Full element serialization including hierarchy |
-| Copy as Blueprint | Brilliant's native element format; pasteable back into Brilliant or shared with AI tools |
+| Copy as Blueprint | Brilliant's native element format, lossless with full hierarchy; pasteable back into Brilliant or shared with AI tools |
 
-The right-click `Copy as` submenu contains: PNG, PNG @2x, PNG @4x, WebP, SVG, HTML, React, CSS, YAML, Blueprint. The @2x / @4x entries multiply the PNG scale for higher-resolution clipboard output.
+The right-click `Copy as` submenu contains: PNG, PNG @2x, PNG @4x, WebP, SVG, HTML, React, CSS, Blueprint. The @2x / @4x entries multiply the PNG scale for higher-resolution clipboard output.
 
 Clipboard notes:
 - **PNG** copies at device pixel ratio so what you see on screen matches what you paste (WYSIWYG). @2x / @4x multiply that.
@@ -184,7 +194,7 @@ Known gap: component boolean, text, and instance-swap properties do not transfer
 
 | Action | How |
 |--------|-----|
-| Import file | **Cmd+Shift+O** or command palette "Import" (images, SVG, and .design files) |
+| Import file | **Cmd+Shift+O** or command palette "Import" (images, SVG, and `.bl` design files) |
 | Paste from clipboard | **Cmd+V** with an image on the clipboard |
 | Drag and drop | Drag image files onto the canvas |
 | Import from Figma | Command palette "Import from Figma" (opens the import section in the right toolbar; paste a Figma URL) |
@@ -204,9 +214,9 @@ SVG import creates native Brilliant elements: rectangles become rectangles, circ
 
 Command palette "Import Sketch File" opens the Sketch import section in the right toolbar where you browse for a `.sketch` file. After parsing, a page selection UI lets you pick which pages to import. Each chosen page becomes a separate canvas with its elements converted to native Brilliant elements.
 
-### .design files
+### Design files (`.bl`)
 
-**Cmd+Shift+O** and selecting a `.design` file imports it. Native YAML `.design` files are copied (with their referenced images) into an `Imports/` folder in the current workspace, registered as a new canvas, and switched to. Legacy compressed-JSON Save As files are decompressed and imported the same way. Both require an open workspace.
+**Cmd+Shift+O** and selecting a `.bl` file (or legacy `.design`) imports it. Native design files are copied (with their referenced images) into an `Imports/` folder in the current workspace, registered as a new canvas, and switched to. Legacy compressed-JSON Save As files are decompressed and imported the same way. Both require an open workspace.
 
 ### Paste behavior
 

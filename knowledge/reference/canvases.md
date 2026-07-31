@@ -5,7 +5,7 @@ description: "Canvas and folder management, the file explorer, workspaces, impor
 
 # Canvases
 
-A Brilliant workspace is a folder on disk. Each canvas is a single `.design` file inside it; folders are real directories. There is no separate project index. The directory tree is the project tree.
+A Brilliant workspace is a folder on disk. Each canvas is a single `.bl` file inside it; folders are real directories. There is no separate project index. The directory tree is the project tree.
 
 ## Managing Canvases
 
@@ -37,7 +37,7 @@ Cmd+N inside the file explorer creates the canvas inside the focused folder; oth
 
 Switching canvases is instant and not undoable. Each canvas keeps its own independent undo history; Cmd+Z on a canvas undoes that canvas's last action. When the file explorer is focused, Cmd+Z routes to a separate explorer undo stack covering rename, create, delete, move, and reorder of canvases and folders.
 
-Per-canvas state saved into the `.design` file: element data, hierarchy, fills/strokes/effects, components, design-system bindings, background settings, ruler guides, zoom, and pan position. Selection and undo history live only for the session.
+Per-canvas state saved into the `.bl` file: element data, hierarchy, fills/strokes/effects, components, design-system bindings, background settings, ruler guides, zoom, and pan position. Selection and undo history live only for the session.
 
 ### Folders
 
@@ -52,7 +52,7 @@ Right-click a folder in the file explorer for: Rename, Delete, Duplicate, Cut, C
 
 ## File Explorer
 
-The file explorer lives in the **left toolbar**. Focus it with **Cmd+Shift+E**. The Layers explorer (the active canvas's element tree) sits below it; focus it with **Cmd+Shift+R**. Toggle the whole left toolbar with **Cmd+Shift+Left**. The explorer shows all canvases (`.design`), folders, image assets, and other text/code files in the workspace as a tree.
+The file explorer lives in the **left toolbar**. Focus it with **Cmd+Shift+E**. The Layers explorer (the active canvas's element tree) sits below it; focus it with **Cmd+Shift+R**. Toggle the whole left toolbar with **Cmd+Shift+Left**. The explorer shows all canvases (`.bl`), folders, image assets, and other text/code files in the workspace as a tree. Canvas (`.bl`) and design-system (`.ds`) names display without their extension.
 
 **Layout (top to bottom):**
 1. "Files" header with right-aligned buttons: Toggle All Folders (expand/collapse all), New Folder, New Canvas, Toggle Canvas Search
@@ -107,7 +107,7 @@ Clicking a non-canvas file in the explorer (or navigating to it with Alt+Arrow) 
 | File type | Preview |
 |-----------|---------|
 | Image (PNG, JPG, JPEG, GIF, BMP, WebP; on macOS also TIFF/TIF, HEIC, HEIF, AVIF) | Centered image at natural size (large images scale down to fit) on an opaque viewer surface |
-| Text/code (JS, TS, JSX, TSX, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Go, Swift, SQL, Shell/Bash/Zsh, XML, TOML, INI, plain text, `.styles`, `.gen.yaml`, `.svg`) | Built-in code editor |
+| Text/code (JS, TS, JSX, TSX, Python, Dart, HTML, CSS, JSON, YAML, Markdown, Rust, C/C++, Java, Kotlin, Go, Swift, SQL, Shell/Bash/Zsh, XML, TOML, INI, plain text, `.ds`, `.gen.yaml`, `.svg`) | Built-in code editor |
 | Unknown types | Sniffed: text shows in the editor, binary shows an unsupported placeholder |
 
 File previews fully replace the canvas view and never disturb it: the canvas viewport (zoom and pan) is exactly where you left it when you switch back. While a preview is open, the right toolbar (property inspector) and the drawing-tool cluster hide, leaving the AI input available.
@@ -122,14 +122,14 @@ The code editor replaces the canvas while a text file is active. Features:
 
 Text files larger than 5 MB open read-only, showing the first 5 MB behind a banner. If a file open in the editor changes on disk (for example an agent rewrites it), Brilliant reconciles it rather than losing work: with no unsaved edits it reloads and shows a passive notice; with unsaved edits it cancels the pending autosave and raises an actionable notice (Reload / Keep mine) so your edits are never silently overwritten.
 
-Design-system source files (`*.styles` under `Styles/`) open with DSL highlighting; generated `*.gen.yaml` under `Styles/.gen/` open with YAML highlighting and should be treated as read-only (they regenerate from the source). For editing design tokens, see [design-systems.md](./design-systems.md).
+Design-system source files (`*.ds` under `Styles/`) open with DSL highlighting; generated `*.gen.yaml` under `Styles/.gen/` open with YAML highlighting and should be treated as read-only (they regenerate from the source). For editing design tokens, see [design-systems.md](./design-systems.md).
 
 ## Asset Management
 
 Image files live in `Assets/` folders next to canvases. Each folder level can have its own `Assets/` directory.
 
 Right-click an asset in the explorer for:
-- **Rename**: automatically updates every reference to the asset across all `.design` files
+- **Rename**: automatically updates every reference to the asset across all `.bl` files
 - **Delete**: warns first if the image is used by any canvas, then moves it to `.brilliant/trash/` (recoverable via undo)
 - **Reveal in Finder**
 - **Copy Filename**
@@ -137,8 +137,8 @@ Right-click an asset in the explorer for:
 Other behavior:
 - `Assets/` folders show in the explorer even when empty (if the directory exists on disk)
 - **Clean Up Unused Assets** (command palette) removes images not referenced by any canvas; undoable
-- A file watcher keeps the explorer live against external changes: an agent or git creating, deleting, renaming, or moving `.design` files, folders, or assets on disk shows up within about a second, no repo reopen needed. Bursts (a `git checkout` touching many files) apply as one batch. Regaining app focus also runs a quick rescan as a safety net.
-- If the OPEN canvas's `.design` file changes on disk, it reconciles like the text editor: with no unsaved edits the canvas reloads (selection and camera preserved) and shows a passive notice; with unsaved edits auto-save pauses for that canvas and an actionable notice offers Reload / Keep mine, so neither side is silently overwritten. If the open canvas's file is deleted externally, Brilliant lands on a surviving canvas.
+- A file watcher keeps the explorer live against external changes: an agent or git creating, deleting, renaming, or moving `.bl` files, folders, or assets on disk shows up within about a second, no repo reopen needed. Bursts (a `git checkout` touching many files) apply as one batch. Regaining app focus also runs a quick rescan as a safety net.
+- If the OPEN canvas's `.bl` file changes on disk, it reconciles like the text editor: with no unsaved edits the canvas reloads (selection and camera preserved) and shows a passive notice; with unsaved edits auto-save pauses for that canvas and an actionable notice offers Reload / Keep mine, so neither side is silently overwritten. If the open canvas's file is deleted externally, Brilliant lands on a surviving canvas.
 
 ## Import & Export
 
@@ -150,10 +150,10 @@ Other behavior:
 | Paste from clipboard | Cmd+V |
 | Drag and drop | Drag image files onto the canvas |
 
-Cmd+Shift+O opens a picker that accepts images, SVG files, and `.design` files:
+Cmd+Shift+O opens a picker that accepts images, SVG files, and design files (`.bl`, plus legacy `.design`):
 - **Images** (PNG, JPG, JPEG, GIF, BMP, WebP; on macOS also TIFF, HEIC, HEIF, AVIF) become rectangle elements with an image fill
 - **SVG** imports as native editable vector elements
-- **`.design`** files are imported into an `Imports/` folder
+- **Design files** (`.bl`, legacy `.design`) are imported into an `Imports/` folder
 
 ### Importing from Figma
 
@@ -167,7 +167,9 @@ Brilliant imports from Figma files via the Figma API, supporting whole files, sp
 
 Or run "Import from Figma" from the command palette.
 
-Multi-page files create a folder named after the Figma file with one canvas per page. Single-page files import onto the current canvas (if empty) or a new top-level canvas. If you are not signed in to Figma, the import opens a browser for OAuth sign-in; cancelling returns an error, so retry after signing in.
+Multi-page files create a folder named after the Figma file with one canvas per page. Single-page files import onto the current canvas (if empty) or a new top-level canvas.
+
+The section works the same in the desktop app and in the browser editor on any project you can edit. Connecting Figma differs only in where sign-in happens: the desktop app opens a browser and continues the import when you return; the browser editor shows a Connect Figma button that signs you in and brings you back to the same project with the pasted link still there. Cancelling leaves the canvas untouched, so you can retry any time.
 
 **What comes across:** frames, groups, and auto layout (including wrap and its cross-axis row gap); components and instances; vectors and shapes; text with case, decoration (underline, strikethrough), and vertical alignment; fills and strokes including per-side widths, dashes, join, and miter; masks and boolean shapes; tiled and cropped images with their color adjustments. Missing fonts warn and fall back to a bundled font, so the text still lands.
 
@@ -215,32 +217,33 @@ Full export reference: [export.md](./export.md).
 
 Export the focused canvas or folder as a `.sketch` file via the command palette ("Save as Sketch File"). Exports elements, fills, strokes, gradients, text, and images; components and effects may flatten.
 
-### Save As / sharing a `.design` package
+### Save As / sharing a `.bl` package
 
 | Action | Shortcut | What it does |
 |--------|----------|--------------|
-| Save As... | Cmd+Shift+S | Export the focused canvas or folder as a portable `.design` package |
+| Save As... | Cmd+Shift+S | Export the focused canvas or folder as a portable `.bl` package |
 | Open folder | Cmd+O | Open a folder as a workspace |
 
-Save As writes the native YAML `.design` file plus a sibling `Assets/` folder with all referenced images; image paths are rewritten to relative `Assets/filename` references so the package is portable. When a folder is focused, Save As exports the entire folder hierarchy. This is for sharing/archiving and does not replace auto-save.
+Save As writes the native `.bl` file plus a sibling `Assets/` folder with all referenced images; image paths are rewritten to relative `Assets/filename` references so the package is portable. When a folder is focused, Save As exports the entire folder hierarchy. This is for sharing/archiving and does not replace auto-save.
 
 ## Auto-Save
 
 Brilliant auto-saves continuously. There is no Cmd+S and you never need to save manually for normal use.
 
-- **Repository mode** (a folder opened with Cmd+O): `.design` files are written directly into the workspace folder, mirroring the explorer hierarchy on disk
+- **Repository mode** (a folder opened with Cmd+O): `.bl` files are written directly into the workspace folder, mirroring the explorer hierarchy on disk
 - **Scratch mode** (no folder open): work is auto-saved to `~/.config/brilliant/scratch/`
 
 Behavior:
 - Shortly after you stop editing, the active canvas is written in the background so saves never block interaction
 - The save captures element state, hierarchy, fills/strokes/effects, components, design-system bindings, ruler guides, zoom, pan, and background settings
 - The dirty indicator is the canvas name's opacity in the top toolbar breadcrumb
-- On quit and on workspace switch, all dirty canvases are flushed first
-- If a `.design` file fails to load (corrupt YAML, schema mismatch), saves on that canvas are blocked so good data is never overwritten with empty state
+- If a save fails (permissions, a full disk, a cloud project offline), the canvas stays queued and Brilliant keeps retrying on a widening interval, the dirty indicator stays on, and a held notice says the edits have not reached disk yet. Work is never dropped or shown as saved when it is not
+- On quit and on workspace switch, all dirty canvases are flushed first, including any whose earlier save failed
+- If a `.bl` file fails to load (corrupt content, schema mismatch), saves on that canvas are blocked so good data is never overwritten with empty state
 
 ## Workspaces
 
-A workspace is a folder on disk Brilliant uses as a design repository: `.design` files (canvases), subfolders, and assets.
+A workspace is a folder on disk Brilliant uses as a design repository: `.bl` files (canvases), subfolders, and assets.
 
 ```
 my-workspace/
@@ -248,14 +251,14 @@ my-workspace/
 │   ├── settings.json       # Per-workspace configuration
 │   └── trash/              # Undo recovery for deleted canvases/folders/assets
 ├── Assets/                 # Root-level images
-├── Homepage.design         # Canvas files (YAML)
+├── Homepage.bl             # Canvas files (Blueprint)
 ├── Components/
 │   ├── Assets/             # Folder-level images
-│   ├── Button.design
-│   └── Card.design
+│   ├── Button.bl
+│   └── Card.bl
 └── Pages/
-    ├── Dashboard.design
-    └── Settings.design
+    ├── Dashboard.bl
+    └── Settings.bl
 ```
 
 | Mode | Description |
@@ -265,9 +268,9 @@ my-workspace/
 
 Cmd+O opens a folder as a workspace. Brilliant remembers the last workspace and reopens it on startup. It tracks up to 20 recent workspaces (scratch excluded).
 
-### `.design` files
+### `.bl` files
 
-Each canvas is a YAML-based `.design` file. A canvas's identity is its path within the workspace (without `.design`), so renaming or moving a canvas changes its identity, and references update accordingly. Files are written deterministically (stable key order, inline coordinate arrays, hex colors) for clean version-control diffs. Older files migrate transparently on load.
+Each canvas is a `.bl` file: a Blueprint (`bp:v1`) document with a small YAML header for canvas settings (background, ruler guides, design-system binding). A canvas's identity is its path within the workspace (without `.bl`), so renaming or moving a canvas changes its identity, and references update accordingly. Files are written deterministically for clean version-control diffs. Legacy files still open: YAML-format content migrates to Blueprint on its next save, and legacy `.design` / `.styles` extensions are renamed to `.bl` / `.ds` when the workspace opens (originals preserved under `.archive/`).
 
 ### Assets
 
@@ -300,23 +303,31 @@ Within a workspace, Brilliant keeps two recency lists, both persisted across res
 
 A workspace is local by default. Once **published** (a project bound to the cloud, marked by `.brilliant/cloud.json`), the folder stays continuously synced with its cloud project.
 
+A project can also be **cloud-only**: it lives entirely on the server with no folder on this machine. Opening one you can edit gives an ordinary project tab that edits and saves exactly like a local workspace, except nothing is written to disk (no `.bl` files, no assets). Because there is no folder, the disk-coupled affordances are absent: reveal-in-Finder, drag-and-drop moves, and opening the folder in git. Everything else (canvases, explorer, editing, checkpoints, sharing) behaves the same.
+
+A cloud-only tab is **live**: it joins the project's realtime session like the browser editor does. Collaborators' edits, cursors, and selections appear as they happen, canvases created, renamed, or deleted elsewhere show up in the explorer, and if the canvas you are on is deleted remotely the tab lands on another canvas with a notice. When the connection drops, editing continues and saves go directly to the cloud; live sync resumes on its own. If the project is deleted or your access ends, the tab says so plainly and stops syncing — close it when you are done reading.
+
+Pasting or importing an **image** into a cloud project uploads it in the background, treated as a first-class save: a large upload shows an "Uploading images" progress notification, the save indicator stays dim until every image reaches the cloud, and a failed upload surfaces as a sync error naming the file (never silently dropped or shown as synced). On desktop, an image still uploading when you quit finishes on the next open; on the web, closing the tab warns you while an upload is in progress (a tab has no local copy to resume from).
+
+**Opening a cloud project you cannot edit.** If you open a cloud project you do not have edit access to (someone else's public project, or one shared with you as a viewer), the tab is **view-only**: the canvas opens normally and you can pan, zoom, select, and inspect everything, but nothing can be changed. The first time you try to edit, a **View-only** notice offers two ways forward: **Sign in** (or **Switch account**, when you are already signed in on an account without access) in case you already have edit access on another account, or **Download a copy**. Downloading gives you a local copy you can edit freely; publishing that copy as your own project later asks you to sign in. Signing in (or switching to an account that can edit) turns the same tab editable in place, right where you are, with nothing reloaded.
+
 | Goal | How |
 |------|-----|
 | Share for viewing | Export PNG/SVG/PDF and send the file ([export.md](./export.md)) |
-| Share an editable design | Send the `.design` file; the recipient needs Brilliant |
+| Share an editable design | Send the `.bl` file; the recipient needs Brilliant |
 | Share a full workspace | Share the workspace folder (canvases, Assets, `Styles/`) |
 | Share a live link | Publish the project, then copy its link |
 | Developer handoff | Right-click → Copy As → CSS/SVG/PNG, or Alt+hover for measurements |
 
 ### Published-folder cloud sync
 
-In a published folder the design projection (`.design` + `.styles` + referenced assets) syncs both ways automatically: edits made in the app OR by an agent editing the files on disk push to the cloud (debounced), and changes made elsewhere are fetched and applied. It never stomps an unsaved local file, a genuine conflict checkpoints the server version and keeps your local version live, with a notification. This sync is separate from git: **the app folder never runs git**, so an agent may use git in the folder normally (the git/GitHub lane is independent).
+In a published folder the design projection (`.bl` + `.ds` + referenced assets) syncs both ways automatically: edits made in the app OR by an agent editing the files on disk push to the cloud (debounced), and changes made elsewhere are fetched and applied. It never stomps an unsaved local file. When both sides changed the same canvas, the app merges element by element so both sides' work is kept (the previous cloud version is preserved as a checkpoint and a notification reports the merge); when a merge is not possible it keeps your local version live and checkpoints the server version, with a notification. This sync is separate from git: **the app folder never runs git**, so an agent may use git in the folder normally (the git/GitHub lane is independent).
 
 ### Version control with Git
 
-`.design` files are deterministic YAML, producing clean diffs. Open the folder as a workspace (Cmd+O); each canvas is a separate file, and `Assets/` images are referenced by canvases. Commit, branch, and merge as with any code project. Include `.brilliant/settings.json` for consistent settings (but not `.brilliant/trash/` or `.brilliant/sync-state.json`, which are local-only).
+`.bl` files are deterministic text, producing clean diffs. Open the folder as a workspace (Cmd+O); each canvas is a separate file, and `Assets/` images are referenced by canvases. Commit, branch, and merge as with any code project. Include `.brilliant/settings.json` for consistent settings (but not `.brilliant/trash/` or `.brilliant/sync-state.json`, which are local-only).
 
-There is no version-history panel: undo is per-canvas and within-session only. For persistent history use Git or an OS backup (Time Machine).
+A **published** project has a version-history panel on the web: its **History** page (`brilliant.design/{handle}/{project}/history`) lists every checkpoint (named and automatic) and lets the owner restore any of them, whole-project or a single canvas. A **local, unpublished** folder has no such panel: undo there is per-canvas and within-session only, so use Git or an OS backup (Time Machine) for persistent local history.
 
 ## Related
 

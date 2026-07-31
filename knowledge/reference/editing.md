@@ -349,6 +349,8 @@ Copies the selected elements to an **internal clipboard** (in-memory) and writes
 - Styling (fills, strokes, corner radius, opacity, layout behavior, effects, component data)
 - When the selection is exactly one image element with no strokes, zero corner radius, full opacity, and no active crop, the raw image bytes are written to the system clipboard instead of a re-rendered PNG (preserves original quality)
 
+**Copying between projects:** A copy carries the real, editable elements to any other Brilliant project, not just a flat image. Paste it into another canvas tab, into a second app window, into the same project after relaunching the app, or into the web editor, and the elements come back fully intact: components (with their masters and overrides), images, brand tokens, and fonts all travel with the copy. Copying between the desktop app and the web editor works in Chromium-based browsers (for example Chrome).
+
 ### Cut
 
 Same as Copy plus removes the selected elements from the canvas. In vector edit mode, Cut copies and deletes the selected vector nodes only (not the whole element). Undoable.
@@ -368,11 +370,43 @@ If the system clipboard is unchanged since the last copy, paste uses the faster 
 |--------|----------|
 | Image (PNG, JPEG, etc.) | Creates a rectangle element with the image as a fill |
 | SVG markup | Imports as native vector elements (auto-wraps fragments) |
-| Figma data | Imports Figma-formatted element data |
+| Figma | Copy in Figma, paste here, and the design lands as native editable elements (see **Paste from Figma** below). Also handles data sent by the Figma plugin. |
 | HTML | Imports HTML with inline CSS (e.g., from the Brilliant Capture browser extension) |
 | Plain text | Creates a text element |
 
 Brilliant's native design data and blueprint text also paste back in as elements with remapped IDs.
+
+#### Paste from Figma
+
+Copy anything in Figma (Cmd+C), switch to Brilliant, and paste (Cmd+V). No plugin, no file link, no account connection: the design arrives as real Brilliant elements you can edit by hand, dropped at the cursor.
+
+What comes across:
+
+- **Layout and frames**, positioned exactly as they looked in Figma.
+- **Text**, with its content, font, size, weight, and alignment.
+- **Fills, colors, gradients, strokes, and corner radii.**
+- **Icons and vector shapes**, as editable vector paths.
+- **The resolved content of components**: the real labels and amounts, the rows that were shown or hidden, and the content dropped into each slot, exactly as you saw it, not the blank template underneath.
+
+Honest limits:
+
+- **Raster images** (photos, or exported bitmaps used as image fills) arrive as plain gray placeholders. Bring those over separately by dragging the file in or pasting the image on its own.
+- **Components** paste as plain frames for now. They look right, but they are not linked to a master, so they are not live instances yet.
+- Available in the **desktop app today** (macOS). Pasting from Figma in the browser editor is coming later.
+
+### Paste in another project
+
+Pasting a Brilliant copy into a **different** project recreates the real elements (fresh IDs, full hierarchy), just like an in-project paste, and brings along everything those elements depend on:
+
+- **Components** arrive with their masters; instances stay linked to the master and keep their overrides.
+- **Images** come with their pixels, and are never silently swapped for a same-named image that already lives in the destination.
+- **Brand tokens** travel too. Where a token name already exists in the destination, the destination's definition wins, and any hard-coded colors keep their exact appearance.
+- **Fonts** used by the copied text are carried across, so a cloud project's viewers see the real typeface rather than a fallback.
+
+Two limits worth knowing:
+
+- On **Linux**, copying between two separate app windows is not supported yet. Copying between tabs of the same window works, and the other platforms cover every case.
+- Pasting a Brilliant selection into a **non-Brilliant app** (a document, a chat, an image editor) gives a PNG image, same as before. The editable-element paste only lands when you paste back inside Brilliant.
 
 ### Duplicate
 

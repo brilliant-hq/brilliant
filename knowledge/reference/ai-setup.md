@@ -11,9 +11,15 @@ Nothing routes through Brilliant servers, and there is no hosted/managed Brillia
 AI to offer. The user pays their provider directly.
 
 Keys are stored locally in the OS credential store (macOS Keychain, Windows
-Credential Manager) and sent only to that provider's own API endpoint. Brilliant
-also reads provider environment variables as a fallback: `ANTHROPIC_API_KEY`,
-`OPENAI_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`.
+Credential Manager; in the web editor, that browser's local storage) and sent
+only to that provider's own API endpoint. Brilliant also reads provider
+environment variables as a fallback: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
+`GOOGLE_API_KEY`, `OPENROUTER_API_KEY`.
+
+In the **web editor** (brilliant.design), Anthropic, Google, and OpenRouter
+work; direct OpenAI is refused honestly (its API blocks browser requests —
+OpenAI models run there via OpenRouter), and Claude Code / Codex / MCP
+connections need the desktop app.
 
 ## Adding a key (Settings → AI Providers)
 
@@ -32,8 +38,12 @@ On the AI Providers list:
 - **Google** can alternatively sign in with Google (a localhost OAuth flow)
   instead of a raw key.
 - **Claude Code** leads the list and has no key field: install the `claude` CLI
-  and Brilliant detects it on launch. If the CLI is not signed in, run `/login`
-  in the chat input.
+  and Brilliant detects it automatically — on launch, when the AI Providers pane
+  opens, and on the in-chat setup's "check again" — with no app restart needed
+  after installing. If the CLI is not signed in, run `claude auth login` in a
+  terminal. If the row reads "Installed · login unverified, chat still works",
+  only the sign-in check was inconclusive: the CLI is detected and chat runs
+  normally. The circular-arrow button re-checks.
 - **Codex** follows Claude Code and likewise has no key field: it signs in with
   a ChatGPT subscription, not an API key. Install with `npm install -g
   @openai/codex`, run `codex login` once, and Brilliant detects it on launch. Its
@@ -78,9 +88,14 @@ Two ways to leave demo mode:
 2. **Once a provider exists**, just send a real prompt; the demo session is
    swapped for a live one and the prompt fires as the first real turn.
 
-A **Playground** toggle in Settings → AI Providers forces demo mode on or off
-independent of whether a key is connected (it is forced on when no provider
-exists).
+A **Playground** toggle in Settings → AI Providers puts a user who already has
+a provider back into demo mode. With no provider it reads on and disabled,
+since there is nothing else to chat with.
+
+The **web editor** works the same way in any project the user can edit: no
+provider means demo mode, and replays land real, undoable elements on the open
+project canvas and save normally. View-only visitors never get demo mode. The
+`/playground` page is the separate guided demo for visitors.
 
 ## Setting up from inside chat
 
@@ -93,7 +108,13 @@ OpenAI-compatible** path (pick a preset, optionally paste a key, pick a model),
 tool such as Cursor, Claude Code, Codex, or Antigravity, see
 [mcp-connections.md](./mcp-connections.md)), and an **"I don't know"** option that
 recommends a path in plain language. A pasted key never appears in the transcript
-or prompt history.
+or prompt history. Question options are clickable — clicking one sends its
+number, same as typing it.
+
+In the web editor the same conversation stays honest about the browser: OpenAI,
+Claude Code, Codex, and MCP are still listed, but picking one explains why it
+needs the desktop app and reroutes to the closest working path (OpenAI/Codex →
+an OpenRouter key; Claude Code → an Anthropic key).
 
 ## When a key is rejected
 

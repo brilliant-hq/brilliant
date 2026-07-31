@@ -29,6 +29,10 @@ The input lives in the bottom toolbar, to the right of the drawing-tool buttons.
 
 Sending creates a new chat session (topic auto-derived from the prompt) and routes it to the currently selected model. The chat panel opens above the bottom toolbar so the response streams in. While a session is processing, the input shows a spinner and a stop button; clicking stop cancels the active run.
 
+**Sign in to chat.** Sending a real message to a model requires signing in to Brilliant. The first send while signed out opens a sign-in panel (Google or an emailed code); once signed in, your message goes through, and if you dismiss the panel your prompt is kept in the input so nothing is lost. The demo (playground) that plays when no provider is connected, and driving Brilliant from an external tool over MCP, both need no account.
+
+**Free plan message cap.** On the Free plan the built-in chat allows 10 messages a day. This counts each message you send, even when your own API key pays for the tokens (BYOK stays true: no chat token routes through Brilliant, so this is a limit on the app feature, not "10 free AI messages"). The count is tracked on Brilliant's servers and resets at the start of the next UTC day, shown in your local time. At the wall you can **Upgrade** or **Continue via MCP**; a message blocked at the cap is held and auto-sends the instant the plan flips to paid. Any paid plan removes the cap. Playground replays and external MCP agents never count against it, and external agents stay unlimited on every plan.
+
 ### Input helpers
 
 - **Placeholder hints:** the field cycles through starter-prompt suggestions and, while a session runs, rotates keyboard and feature tips.
@@ -62,6 +66,7 @@ Tabs can be dragged to reorder. The toolbar scrolls horizontally when tabs overf
 - **Rename:** double-click the topic name in the header, or use `/rename`.
 - **Resize:** drag the panel edges (width and height) or the divider between sessions.
 - **Queue a follow-up:** sending while the model is still working queues the message; it sends automatically when the current response finishes.
+- **Answer a question:** when the AI (or the in-chat provider setup) asks a multiple-choice question, click an option or type its number; both send the number through the same lane. Free-text answers work too.
 - **Edit and resend:** click the edit icon on one of your messages to revise and resend it. Editing rewinds the conversation to that message losslessly: later messages are dropped, everything up to it is kept. On a local Claude CLI or Codex session, which cannot rewind its own transcript, the session instead rebuilds context and replays the prior conversation, marked by a "context rebuilt" card.
 - **Copy chat:** the header copy button exports the whole conversation as Markdown (with metadata: model, date, project, canvas, tokens, turns).
 - **Chat explorer:** toggle with **Cmd+Shift+A** to browse, search, and manage all sessions; drag its divider to resize or collapse it.
@@ -119,7 +124,7 @@ Outbound chat traffic is **explicit-consent only**. Brilliant does not auto-atta
 
 Context that can travel with a message:
 
-1. **Canvas context (first message of a session):** the first message carries a *text* snapshot of the canvas: an adaptive-depth Blueprint of the element structure, the design-system state, the component catalog, and the element count / current selection. This is text, not an image; no screenshot of the canvas or screen is captured for the initial context. Later messages send only changed state. To send a prompt with no canvas context, start the chat in an empty workspace.
+1. **Canvas context (a text outline):** the message carries a *text* snapshot of the canvas: a depth-limited Blueprint of the element structure (a large canvas collapses to a short summary table, not the full tree), the design-system token catalog, the component catalog, and the element count. For API-key providers (Anthropic, OpenAI, Google, OpenRouter) this rides with *every* message, refreshed each send; for the local Claude CLI and Codex it goes with the first message only (later messages add just a one-line note when the user switches canvases). This is text, not an image; no screenshot of the canvas or screen is captured for this context. Your current *selection* is not included here; send it explicitly with an `@` element attachment or via the `get_selection` tool. To send a prompt with no canvas context, start the chat in an empty workspace.
 2. **Per-message attachments (opt-in):** each shows as a chip above the input with an X to remove before sending. Nothing attaches unless you add it. An **element** attachment (via `@` or paste) sends that element's Blueprint plus a PNG render of just that element; **image / file** attachments send what you added.
 3. **Automatic self-review screenshot (after edits):** once the AI applies a block of changes, Brilliant renders a screenshot of *those changed elements* and sends it back to the model so it can check its own work (spacing, contrast, alignment, clipping). It is a render of the design content only, never the screen or other apps. Text-only models never receive it, and it is suppressed for the rest of a session once an endpoint rejects image input.
 
@@ -145,6 +150,8 @@ Once a session is running, the model can create and modify designs and call tool
 - **Read and write files / run shell commands / search the web:** when working in a real project workspace (these are most capable in the Claude CLI path). In the web app (browser) there are no shell or file tools and no external MCP servers; `web_fetch` and every canvas tool work normally, and exports return images inline.
 - **Generate images and vectors:** see the sections below.
 - **Spawn sub-agents:** for large tasks, the main session can launch parallel helper agents that each return a summary, shown as collapsible cards.
+
+On a **view-only project** (a cloud project opened without edit access, or one being viewed while signed out), the canvas-changing tools are refused with a message to sign in; reading, searching, inspecting the selection, and exporting keep working. Signing in with an account that can edit, or downloading a copy to work on locally, makes the tools available again.
 
 The full canvas-authoring grammar (Blueprint DSL) and the command/tool catalog are documented for the AI in the blueprint and mcp-tools knowledge files; users do not author that syntax by hand.
 

@@ -473,7 +473,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 |--------|----------|
 | Toggle overlay mode | Ctrl+F on macOS, an OS-level global hotkey that fires even when Brilliant is unfocused; switches between studio and overlay. Requires overlay mode enabled in settings. Unbound by default on Windows. |
 | Toggle passthrough (overlay only) | Ctrl+A on macOS (global hotkey while in overlay; makes the window click-through to apps below). Unbound by default on Windows. |
-| Show/hide UI | Cmd+\\ (toggles toolbars in both window modes; in overlay creates a clean transparent drawing surface) |
+| Show/hide UI | Cmd+\\ (hides the left, right, and bottom toolbars; the top strip — home / tabs / breadcrumb — and the command palette stay visible. Both window modes.) |
 | Expand/collapse all right-toolbar sections | Cmd+/ (id `toggle_sections`) |
 | Toggle blackboard | Cmd+Shift+B |
 | Toggle whiteboard | Cmd+Shift+W |
@@ -508,11 +508,11 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Action | Shortcut |
 |--------|----------|
 | Open design folder (workspace) | Cmd+O (id `open_design_folder`) |
-| Import (images, SVGs, Figma URL, Sketch files, .design folders) | Cmd+Shift+O (id `import`) |
+| Import (images, SVGs, Figma URL, Sketch files, `.bl` design files) | Cmd+Shift+O (id `import`) |
 | Save as | Cmd+Shift+S |
 | Export selection to PNG | Cmd+E (id `export_to_png`) |
 | Export selection to JPEG / WebP / SVG / PDF / Replay (mp4/mov) | (no defaults, ids `export_to_jpeg`, `export_to_webp`, `export_to_svg`, `export_to_pdf`, `export_to_replay`) |
-| Copy as PNG / WebP / SVG / CSS / YAML / Blueprint | (no defaults, ids `copy_as_png`, `copy_as_webp`, `copy_as_svg`, `copy_as_css`, `copy_as_yaml`, `copy_as_blueprint`) |
+| Copy as PNG / WebP / SVG / CSS / Blueprint | (no defaults, ids `copy_as_png`, `copy_as_webp`, `copy_as_svg`, `copy_as_css`, `copy_as_blueprint`) |
 | Insert image / Import image | (no defaults, ids `insert_image`, `import_image`) |
 | Clean up unused assets | (no default, id `clean_up_unused_assets`) |
 
@@ -550,7 +550,7 @@ Editing commands for the text editor (open any non-design file). Active only whi
 | Copy line up / down | Shift+Alt+Up / Shift+Alt+Down |
 | Delete line | Cmd+Shift+K |
 | Insert line below / above | Cmd+Enter / Cmd+Shift+Enter |
-| Toggle comment | Cmd+/ (language aware, including `//` in `.styles`) |
+| Toggle comment | Cmd+/ (language aware, including `//` in `.ds`) |
 | Select next occurrence | Cmd+D |
 | Select all occurrences | Cmd+Shift+L |
 | Add cursor above / below | Cmd+Alt+Up / Cmd+Alt+Down |
@@ -617,7 +617,7 @@ Keybindings can be queried and batch-updated via commands:
 - **`list_keybindings`**: returns all commands with current/default keybinding, `isCustom` flag, and command groups. Optional `group` param to filter by command group, optional `search` param for case-insensitive regex matching against id/name/description (e.g. `"align|distribute"`).
 - **`set_keybinding`**: batch set keybindings. Params: `{ "bindings": [{ "commandId": "...", "key": "L", "modifiers": ["shift"] }] }`. Omit key/modifiers to clear. Returns conflicts if any.
 
-Modifier names: `command` (Cmd/Ctrl), `shift`, `alt` (Option), `control`, `fn`. Changes persist to `~/.config/brilliant/keybindings.json`.
+Modifier names: `command` (Cmd/Ctrl), `shift`, `alt` (Option), `control`, `fn`. Changes persist to `~/.config/brilliant/keybindings.json`, and when signed in they sync across devices (desktop and web) through the account — the most recent change wins.
 
 ---
 

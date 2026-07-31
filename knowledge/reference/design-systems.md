@@ -7,7 +7,7 @@ description: "Design tokens in Brilliant: what they are, how to bind, switch bra
 
 Brilliant projects carry a design system: a named set of tokens (colors, spacing, radius, typography, shadows, stroke widths, opacity, font settings) that elements reference instead of hardcoding values. Change a token and every element bound to it updates. Switch a brand or a mode and the whole canvas re-resolves.
 
-This file is the product reference: what the feature does, where the controls live, and how a user operates it by hand. The token authoring grammar (the `.styles` DSL) is not covered here. For authoring or editing a design system's tokens, see the `design-systems/*` knowledge files. For referencing tokens in blueprint markup, see the `blueprint/*` knowledge files.
+This file is the product reference: what the feature does, where the controls live, and how a user operates it by hand. The token authoring grammar (the `.ds` DSL) is not covered here. For authoring or editing a design system's tokens, see the `design-systems/*` knowledge files. For referencing tokens in blueprint markup, see the `blueprint/*` knowledge files.
 
 ## Core Concepts
 
@@ -18,9 +18,9 @@ This file is the product reference: what the feature does, where the controls li
 
 ## Where the System Lives
 
-A project's design system is stored as files in a `Styles/` folder at the repo root (`Styles/default.styles` is the baseline, plus optional brand files like `Styles/corporate-blue.styles`). The user does not need to touch these to *use* tokens; they only matter when authoring or editing the system. Sub-folders can carry their own `Styles/default.styles` that overrides the parent for canvases in that folder.
+A project's design system is stored as files in a `Styles/` folder at the repo root (`Styles/default.ds` is the baseline, plus optional brand files like `Styles/corporate-blue.ds`). The user does not need to touch these to *use* tokens; they only matter when authoring or editing the system. Sub-folders can carry their own `Styles/default.ds` that overrides the parent for canvases in that folder.
 
-To open the source file for editing, run the **Open Design System File** command (command palette). It opens the nearest `.styles` file in the built-in code editor.
+To open the source file for editing, run the **Open Design System File** command (command palette). It opens the nearest `.ds` file in the built-in code editor.
 
 ## The Design System Inspector Section
 
@@ -91,9 +91,10 @@ Can:
 - Apply composite typography and shadow tokens via commands.
 - Visualize the system with the Design System Viewer element.
 - Generate, on save, a `Styles/.gen/<name>.gen.yaml` artifact of fully resolved values for external tools (Style Dictionary, Tokens Studio, custom build scripts). These `.gen` files are git-ignored and must never be hand-edited.
+- Survive a `.ds` file with a syntax error: the design keeps rendering against the last version of that file that parsed, and a notification names the file and the first error (it stays until dismissed, and clears itself when the file parses again). While a file is broken, brand and mode switches on it are declined rather than rewriting the file over your unfinished edit. A deleted `.ds` is not an error, it simply stops contributing.
 
 Cannot:
-- There is **no standalone variables / token editor panel**. Token authoring (new tokens, renames, deletes, scale tweaks, mode overrides) is done by editing the `.styles` source, not through inspector buttons. There are no in-app rename or delete buttons for tokens.
+- There is **no standalone variables / token editor panel**. Token authoring (new tokens, renames, deletes, scale tweaks, mode overrides) is done by editing the `.ds` source, not through inspector buttons. There are no in-app rename or delete buttons for tokens.
 - There is **no default keyboard shortcut** for switching brand or mode; use the inspector dropdowns.
 - There is **no export to CSS variables or Tailwind config** from the UI; external tools consume the `.gen.yaml` artifact.
 
@@ -109,15 +110,15 @@ Most are in the command palette under the design-system group. The two exception
 | Apply Shadow Token | Apply a `shadow.*` composite to selected element(s) |
 | Unbind Tokens | Replace all token bindings on the selection with literal values and drop the binding |
 | Create Design System Viewer | Insert an 800x600 viewer element visualizing the active system |
-| Open Design System File | Open the nearest `.styles` source in the code editor |
-| Regenerate Design System | Rebuild all `.gen.yaml` files from their `.styles` sources |
+| Open Design System File | Open the nearest `.ds` source in the code editor |
+| Regenerate Design System | Rebuild all `.gen.yaml` files from their `.ds` sources |
 | Reset Design System | Wipe the design system source to an empty default, discarding all authored tokens (undoable) |
 
 Note: the **Reset Design System** command wipes the *source file* to an empty default, discarding every authored token (it does not restore Brilliant's seed tokens). The **Reset design system** button in the inspector is a different action: it clears brand/mode overrides at the inspected scope without touching the source.
 
 ## Related Knowledge
 
-- Authoring or editing the system's tokens (the `.styles` DSL, brands, modes, composites): `design-systems/core`, `design-systems/authoring`, `design-systems/authoring-modes`.
+- Authoring or editing the system's tokens (the `.ds` DSL, brands, modes, composites): `design-systems/core`, `design-systems/authoring`, `design-systems/authoring-modes`.
 - Referencing tokens in blueprint markup: `blueprint/core` and the other `blueprint/*` files.
 - Colors, fills, strokes, opacity, corner radius in the UI: `reference/styling`.
 - Effects (shadows, glows, blurs): `reference/effects`.
