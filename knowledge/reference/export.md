@@ -226,6 +226,7 @@ Command palette "Import Sketch File" opens the Sketch import section in the righ
 
 - `Cmd+E` runs PNG export with a save dialog (the only export shortcut).
 - `Copy as PNG` copies at device pixel ratio for WYSIWYG paste; use `Copy as → PNG @2x / @4x` for higher resolution.
+- Copied images contain the design only — never selection handles, guides, labels, or presence cursors. If a copy can't produce the image (e.g. the renderer is momentarily unavailable), a warning says the system clipboard was not updated — whatever you paste then is your previous clipboard content, not this copy.
 - For pixel-clean UI mockups, prefer PNG over WebP: the by-hand UI exports lossy q=90 WebP, which bands on rounded corners and gradients.
 - `Copy as SVG` is good for pasting vector art into web projects or other design tools.
 - The `+` button in the Export panel batches multiple configs (PNG @1x, PNG @2x, SVG) into one click.
