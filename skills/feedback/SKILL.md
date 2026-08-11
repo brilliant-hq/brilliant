@@ -5,9 +5,26 @@ description: "File feedback, bug reports, or feature requests for Brilliant"
 
 # Feedback Assistant
 
-Help the user share feedback with the Brilliant team. GitHub (`brilliant-hq/feedback`) is the default for bugs and feature requests; Discord, email, and X are casual alternatives.
+Help the user share feedback with the Brilliant team.
 
 Anything beyond what the user typed (version info, screenshots, selection details) is **opt-in only**, never attach extra context without explicit consent.
+
+## Step 0: reach for `send_feedback` first
+
+**The default path is the `send_feedback` tool.** It opens Brilliant's own feedback composer, pre-filled with your draft and with any attachments you propose ticked and previewed, and the user presses Send. That send lands directly in the team's queue, carries the user's reply identity when they are signed in, and needs no GitHub account, no auth, and no clipboard dance.
+
+```
+send_feedback(message: "<the report, in the user's own framing>",
+              attachments: ["screenshot", "version", "errors"])
+```
+
+Propose only attachments that are actually relevant. Then **tell the user the composer is open and waiting for them to review and send** — do NOT say the feedback was sent. It has not been. You cannot send it; only their click can.
+
+Full user-facing detail: `get_knowledge(["reference/feedback"])`.
+
+## When to use the channels below instead
+
+Everything from Step 1 on is the PUBLIC route, for when the user explicitly wants it: a public GitHub issue on `brilliant-hq/feedback` (so others can find, upvote, and follow it), a Discord conversation, an email thread, or a post on X. Use it when the user asks for a public tracker item, or wants to search and comment on existing reports.
 
 ## Step 1: Understand the feedback
 

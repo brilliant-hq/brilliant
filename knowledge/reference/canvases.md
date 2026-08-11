@@ -16,7 +16,7 @@ A Brilliant workspace is a folder on disk. Each canvas is a single `.bl` file in
 | New canvas | Cmd+N |
 | Duplicate current canvas | Cmd+Ctrl+N |
 | New folder | Cmd+Shift+N |
-| Delete active canvas | Cmd+Shift+Delete |
+| Delete active canvas | Cmd+Shift+Del (the forward-delete key / Fn+Delete on Mac keyboards without a dedicated Del; Cmd+Shift+Backspace does not trigger it) |
 | Rename active canvas | Alt+Enter |
 
 Cmd+N inside the file explorer creates the canvas inside the focused folder; otherwise it goes to the workspace root. Same for Cmd+Shift+N (new folder).
@@ -94,6 +94,8 @@ The file explorer lives in the **left toolbar**. Focus it with **Cmd+Shift+E**. 
 ## Top Toolbar (Workspace + Save Status)
 
 Centered in the window, the top toolbar shows the active file's location as breadcrumbs: `Workspace / Folder / Subfolder / CanvasName`.
+
+The top strip (the "island") also carries a **home** slot and one **tab** per open project to the left of the breadcrumb; the breadcrumb here belongs to the active project's tab. See `ui.md` for the home surface and project tabs.
 
 - Double-click the canvas-name segment to rename inline
 - Hover the breadcrumb to reveal a Copy Path button that copies the absolute path of the active file
@@ -305,7 +307,9 @@ A workspace is local by default. Once **published** (a project bound to the clou
 
 A project can also be **cloud-only**: it lives entirely on the server with no folder on this machine. Opening one you can edit gives an ordinary project tab that edits and saves exactly like a local workspace, except nothing is written to disk (no `.bl` files, no assets). Because there is no folder, the disk-coupled affordances are absent: reveal-in-Finder, drag-and-drop moves, and opening the folder in git. Everything else (canvases, explorer, editing, checkpoints, sharing) behaves the same.
 
-A cloud-only tab is **live**: it joins the project's realtime session like the browser editor does. Collaborators' edits, cursors, and selections appear as they happen, canvases created, renamed, or deleted elsewhere show up in the explorer, and if the canvas you are on is deleted remotely the tab lands on another canvas with a notice. When the connection drops, editing continues and saves go directly to the cloud; live sync resumes on its own. If the project is deleted or your access ends, the tab says so plainly and stops syncing — close it when you are done reading.
+A cloud-only tab is **live**: it joins the project's realtime session like the browser editor does. Collaborators' edits, cursors, and selections appear as they happen, canvases created, renamed, or deleted elsewhere show up in the explorer, and if the canvas you are on is deleted remotely the tab lands on another canvas with a notice. When the connection drops, editing continues and saves go directly to the cloud; live sync resumes on its own. If the project is deleted or your access ends, the tab says so plainly and stops syncing; close it when you are done reading.
+
+**Live cursors in a busy room.** A single project shows up to 25 people's cursors live at once. If you join past that, you still have full edit rights and you still see everyone, but your own cursor is hidden for the others for now, and a small notice tells you so ("This room is at its presence limit, so your cursor is hidden for now. You can still edit and you still see everyone."). As soon as a slot frees, your cursor comes back on its own. This applies wherever you are live, a cloud-only tab or a published folder open on your machine.
 
 Pasting or importing an **image** into a cloud project uploads it in the background, treated as a first-class save: a large upload shows an "Uploading images" progress notification, the save indicator stays dim until every image reaches the cloud, and a failed upload surfaces as a sync error naming the file (never silently dropped or shown as synced). On desktop, an image still uploading when you quit finishes on the next open; on the web, closing the tab warns you while an upload is in progress (a tab has no local copy to resume from).
 
@@ -323,11 +327,15 @@ Pasting or importing an **image** into a cloud project uploads it in the backgro
 
 In a published folder the design projection (`.bl` + `.ds` + referenced assets) syncs both ways automatically: edits made in the app OR by an agent editing the files on disk push to the cloud (debounced), and changes made elsewhere are fetched and applied. It never stomps an unsaved local file. When both sides changed the same canvas, the app merges element by element so both sides' work is kept (the previous cloud version is preserved as a checkpoint and a notification reports the merge); when a merge is not possible it keeps your local version live and checkpoints the server version, with a notification. This sync is separate from git: **the app folder never runs git**, so an agent may use git in the folder normally (the git/GitHub lane is independent).
 
+**When both sides are you.** A conflict notice and a preserved checkpoint mean someone else's work was in the mix. If both sides are your own account (your second machine, or the desktop app and the web editor signed in as you), the two surfaces converge quietly: your work is combined with no conflict warning and no extra checkpoint. The findable checkpoint and the notice are reserved for when another person's content is involved, so a solo person working across two of their own surfaces no longer sees conflict noise or a pile of automatic checkpoints.
+
 ### Version control with Git
 
 `.bl` files are deterministic text, producing clean diffs. Open the folder as a workspace (Cmd+O); each canvas is a separate file, and `Assets/` images are referenced by canvases. Commit, branch, and merge as with any code project. Include `.brilliant/settings.json` for consistent settings (but not `.brilliant/trash/` or `.brilliant/sync-state.json`, which are local-only).
 
 A **published** project has a version-history panel on the web: its **History** page (`brilliant.design/{handle}/{project}/history`) lists every checkpoint (named and automatic) and lets the owner restore any of them, whole-project or a single canvas. A **local, unpublished** folder has no such panel: undo there is per-canvas and within-session only, so use Git or an OS backup (Time Machine) for persistent local history.
+
+**A restore wins at engage.** Restoring a checkpoint is a deliberate rewind, so it takes precedence over unsynced local edits. If you restore a project on the web and then open (or already have open) that project's synced folder on your machine with local work that never reached the cloud, the restore takes over on disk and your local version is kept safely in the folder's sync trash (`.brilliant/trash/sync/`). A notice says exactly what happened, for example "A cloud restore replaced Home.bl. Your local version was kept in this folder's sync trash." Nothing is silently discarded: the restore wins the tie, and your earlier local bytes stay on that machine if you want them back.
 
 ## Related
 

@@ -15,8 +15,10 @@ elements, never every panel.
 
 Works on **rectangles, circles, vectors, frames, and text** (glyph
 refraction). Engine-rendered: it appears in raster and video exports, and
-embeds (pre-rasterized) in SVG / PDF. HTML / React export omits it (no CSS
-equivalent).
+embeds (pre-rasterized) in SVG / PDF. HTML / React export renders it as a
+**live glass pane**: a frosted backdrop-blur tier that upgrades to an SVG
+displacement filter (real refraction) in browsers that support it, so the pane
+stays live instead of baked to an image.
 
 **The lens auto-fits the shape.** `thickness`/`bevel` resolve against the
 element's size the way corner radius does: on a small control (a button, a
@@ -41,10 +43,10 @@ creation default).
 
 ```
 f[(glass)]                                                    Clear, max-depth clear slab, strong refraction
-f[(glass(frost(24),thickness(64),bevel(80),chroma(0.35),edge(0.05),sat(1.1),tint(#FFFFFF,o(0.05))))]   Frosted, heavy frost, whisper of white
-f[(glass(frost(4),thickness(64),bevel(120),chroma(0.4),glow(0.01),edge(0.01)))]   Deep, full pull into the widest bevel
+f[(glass(frost(24),thickness(64),bevel(80),ior(2),chroma(0.35),glow(0.05),edge(0.05),sat(1.1),tint(#FFFFFF,o(0.05))))]   Frosted, heavy frost, whisper of white
+f[(glass(frost(4),thickness(64),bevel(120),ior(2),chroma(0.4),glow(0.01),edge(0.01)))]   Deep, full pull into the widest bevel
 f[(glass(thickness(64),bevel(120),ior(3),chroma(0.5),glow(0.02),edge(0.01),sat(2)))]   Chromatic, max dispersion, vivid backdrop
-f[(glass(frost(10),bevel(120),chroma(0.25),glow(0.01),edge(0.01),sat(0.9),tint(#000000,o(0.5))))]   Smoke, dark smoked glass
+f[(glass(frost(10),thickness(48),bevel(120),ior(2),chroma(0.25),glow(0.01),edge(0.01),sat(0.9),tint(#000000,o(0.5))))]   Smoke, dark smoked glass
 ```
 
 Tint takes a `$token` (resolved at create time) or `#hex`, with opacity as a
@@ -91,6 +93,10 @@ fr s(640,400) clip f[(metaballs($violet.mid,$pink.mid,$amber.mid,$primary.mid))]
 
 - **Backdrop matters.** More texture and contrast under the glass = more
   visible refraction. Add `shadow(...)` under the card to float it.
+- **Glass wants a backdrop.** Over a transparent or empty canvas there is
+  nothing to refract, so the pane renders near-invisible (correct physics,
+  surprising if you expected a visible slab): put it over a filled parent,
+  shader, gradient, or image.
 - **Dark scenes:** use `$color.glow` (mode-immune near-white) for the edge
   stroke and text; a low-opacity dark `tint` deepens the smoke look.
 - **Clear vs frosted:** `frost(0)` keeps the backdrop sharp through the lens;

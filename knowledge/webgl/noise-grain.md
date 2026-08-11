@@ -13,7 +13,7 @@ Film grain overlay effect with configurable grain size, distribution, roughness,
 | Size | `uSize` | 0.5 .. 8 | 1.5 | Grain size in logical pixels |
 | Monochrome | `uMonochrome` | 0 or 1 | 1 | 0=color noise, 1=mono noise |
 | Distribution | `uDistribution` | 0 or 1 | 0 | 0=uniform, 1=gaussian |
-| Roughness | `uRoughness` | 0 .. 1 | 0.5 | 0=structured, 1=organic film-like |
+| Roughness | `uRoughness` | 0 .. 1 | 0 | 0=structured, 1=organic film-like |
 | Midtone Bias | `uMidtoneBias` | 0 .. 1 | 0 | Concentrate noise in midtones |
 
 ## Fragment Shader

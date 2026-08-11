@@ -9,13 +9,13 @@ Ordered and noise dithering filter with Bayer matrix (2x2, 4x4, 8x8), white nois
 
 | Param | Uniform | Range | Default | Description |
 |-------|---------|-------|---------|-------------|
-| Levels | `uLevels` | 2 .. 16 | 2 | Output color levels |
+| Levels | `uLevels` | 2 .. 16 | 4 | Output color levels |
 | Pattern Size | `uPatternSize` | 2, 4, 8 | 4 | Bayer matrix size (ignored for noise patterns) |
 | Pattern | `uPattern` | 0, 1, 2 | 0 | 0=Bayer, 1=White Noise, 2=Blue Noise (IGN) |
 | Pixel Size | `uPixelSize` | 1 .. 50 | 1 | Upscale dither dots |
 | Contrast | `uContrast` | 0 .. 1 | 0.5 | Threshold contrast strength |
 | Brightness | `uBrightness` | -1 .. 1 | 0 | Luminance offset |
-| Original Colors | `uOriginalColors` | 0 or 1 | 0 | 0=custom 2-color, 1=dither original colors |
+| Original Colors | `uOriginalColors` | 0 or 1 | 1 | 0=custom 2-color, 1=dither original colors |
 | BG Color R | `uColorBackR` | 0 .. 1 | 0 | Background color red |
 | BG Color G | `uColorBackG` | 0 .. 1 | 0 | Background color green |
 | BG Color B | `uColorBackB` | 0 .. 1 | 0 | Background color blue |

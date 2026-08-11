@@ -31,7 +31,7 @@ To edit an existing vector element's nodes:
 
 Vector edit mode auto-converts shapes (rectangles with corner radii, circles/ellipses, lines) into editable Bezier vectors on entry, and reverts to the original shape type on exit if the geometry is unchanged. Paths that drop below 2 nodes are deleted entirely (undo restores).
 
-Pencil-drawn elements are already vectors and need no conversion. Text cannot enter vector edit mode directly: use **Outline Text** (Cmd+Ctrl+O) or **Flatten Text** (Cmd+Alt+O) first to convert it to vector geometry (see "Outline Text and Flatten Text" below).
+Pencil-drawn elements are already vectors and need no conversion. Text cannot enter vector edit mode directly: use **Outline Text** (Cmd+Ctrl+O) or **Flatten Text** (command palette; no default shortcut) first to convert it to vector geometry (see "Outline Text and Flatten Text" below).
 
 ---
 
@@ -146,7 +146,7 @@ Each node has a **point type** controlling how its Bezier handles behave. Select
 | **Asymmetric** | Handles stay co-linear (same angle through the node) but lengths are independent. |
 | **Disconnected** | Each handle is fully independent. |
 
-Click the point type button in the right toolbar to change it. The four commands (**Set Point Type: Straight**, **Set Point Type: Mirrored**, **Set Point Type: Asymmetric**, **Set Point Type: Disconnected**) are also in the command palette and Shortcuts panel. None have default keybindings; assign one via **Shift+?** if needed.
+Click the point type button in the right toolbar to change it. The four commands (**Set Point Type to Straight**, **Set Point Type to Mirrored**, **Set Point Type to Asymmetric**, **Set Point Type to Disconnected**) are also in the command palette and Shortcuts panel. None have default keybindings; assign one via **Shift+?** if needed.
 
 **Nodes with 3+ edges:** the point type row is grayed out. Mirrored/Asymmetric constraints only apply to 2-edge nodes (where there is a single "opposite" handle).
 
@@ -271,7 +271,7 @@ Use Flatten to commit a boolean result, convert a primitive into editable vector
 These convert a selected text element into vector geometry (macOS and Windows; on other platforms the commands exist but do nothing):
 
 - **Outline Text** (`Cmd+Ctrl+O`) converts text into a **group of per-character vector outlines**: each glyph becomes its own editable vector inside a group. On Windows the chord collides with another command, so reach it via the menu, command palette, or context menu.
-- **Flatten Text** (`Cmd+Alt+O`) converts text into a **single compound vector element** (all glyphs merged into one path).
+- **Flatten Text** (command palette; no default keyboard shortcut) converts text into a **single compound vector element** (all glyphs merged into one path).
 
 Each converted glyph is a **single clean outline** with its counters (the holes in letters like e, o, a) preserved as holes, so a stroke or effect traces the letter's silhouette with no seams inside it. Curves stay true beziers, so outlined text scales without going polygonal.
 
@@ -300,7 +300,7 @@ Arrow caps scale with stroke width automatically. This makes arrows out of a lin
 
 | Visual Element | Use |
 |----------------|-----|
-| Icons | Built-in SVG icons (6000+ bundled), not hand-drawn vectors |
+| Icons | Built-in SVG icons (~1,515 names, each in two weights: regular and fill, so ~3,000 SVGs), not hand-drawn vectors |
 | Sparklines, trend lines | Vector with a stroke and smooth curves |
 | Area charts (filled region under a curve) | A closed vector path with both fill and stroke |
 | Straight or diagonal arrows | A line with an arrow stroke cap |

@@ -7,7 +7,7 @@ assumes: webgl/setup
 
 | Param | Uniform | Range | Default | Description |
 |-------|---------|-------|---------|-------------|
-| Count | uCount | 2–30 | 10 | Number of metaballs |
+| Count | uCount | 1–30 | 10 | Number of metaballs |
 | Size | uSize | 0.05–1.0 | 0.3 | Base radius of each ball |
 | Speed | uSpeed | 0–3 | 1.0 | Animation speed multiplier |
 
@@ -58,6 +58,8 @@ uniform float uColorCount;
 uniform float uCount;   // 1-30, default 10.0
 uniform float uSize;    // 0.05-1.0, default 0.3
 uniform float uSpeed;   // 0-3, default 1.0
+
+uniform float uPixelRatio;
 
 out vec4 fragColor;
 
@@ -132,7 +134,11 @@ float ballRadius(int idx, float baseSize) {
 // ═══════════════════════════════════════════════════════════════════
 
 void main() {
-    vec2 fragCoord = vec2(gl_FragCoord.x, uResolutionY - gl_FragCoord.y);
+    // gl_FragCoord is in physical (backing-store) pixels; the pattern is
+    // defined in logical element pixels (engine parity). Legacy runtimes
+    // that never set uPixelRatio leave it 0 -> treated as 1.
+    float pxRatio = max(uPixelRatio, 1.0);
+    vec2 fragCoord = vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio);
     vec2 rawUV = (fragCoord - vec2(uOffsetX, uOffsetY)) / vec2(uResolutionX, uResolutionY);
     vec2 uv = rawUV - 0.5;
     float cosR = cos(uRotation);

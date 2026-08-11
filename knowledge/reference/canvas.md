@@ -132,8 +132,8 @@ Selection handles auto-hide when they would dwarf a small selection; multi-paren
 
 Drag on empty canvas to draw a selection rectangle. Rules:
 - Nested elements are selected as soon as the marquee touches them (intersection test)
-- Top-level frames are selected only when fully contained by the marquee; otherwise the marquee selects the frame's children that intersect it
-- Holding Cmd during marquee ignores frame containment and selects children directly
+- Top-level frames **with children** are selected only when fully contained by the marquee; otherwise the marquee selects the frame's children that intersect it (a childless top-level frame is selected on intersection, like any element)
+- Holding Cmd during marquee ignores fills: elements are matched by their shape even where they have no fill, so a hollow or unfilled shape the rectangle crosses still gets selected
 
 ### Selection navigation (keyboard)
 
@@ -142,7 +142,7 @@ Drag on empty canvas to draw a selection rectangle. Rules:
 | Tab | Select previous sibling (within the current parent's children, wrapping around). With nothing selected, selects the first top-level element. |
 | Shift+Tab | Select next sibling (within the current parent's children, wrapping around). With nothing selected, selects the last top-level element. |
 | Shift+Enter | Select parent of the current selection (Enter dives into a parent) |
-| Cmd+A | Select all (within the focused parent context) |
+| Cmd+A | Select all top-level elements |
 | Escape | Clear selection (when no other Escape target consumes the event first) |
 
 ### Nudge (arrow keys)
@@ -174,7 +174,6 @@ Both nudge variants register undo and respect per-parent constraints.
 - Snap guides: solid alignment lines and dashed spacing/distribution/size labels
 - Measurement overlays: Alt+hover shows pixel distances and frame padding
 - Frame labels: above top-level frames; click selects the frame
-- Layout grids: per-frame in the right toolbar Layout Guides section
 
 ## Blend Modes
 
@@ -308,7 +307,7 @@ Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and 
 | Toggle left toolbar | Cmd+Shift+Left | |
 | Toggle right toolbar | Cmd+Shift+Right | |
 | Toggle bottom toolbar | Cmd+Shift+Down | |
-| Toggle desktop icons | Ctrl+I | macOS-only; reserved, currently does nothing |
+| Toggle desktop icons | Ctrl+I | Hides/shows the macOS desktop icons (a real Finder toggle). macOS only: the command hard-returns off macOS, and the Ctrl+I chord is disabled on Windows (freed for Italic) |
 | Clear all elements | C | Removes all elements from the active canvas (undoable) |
 
 Passthrough mode is overlay-only. Cmd+\ hides the working toolbars (left / right / bottom) in both window modes and keeps the top strip; the top strip's tabs are already suppressed in overlay, so an overlay drawing surface stays nearly clear.
@@ -356,7 +355,7 @@ The pixel grid state persists across app restarts.
 
 ## Layout Grids
 
-Layout grids are visual guides that help you align content within frames. They appear as overlays on the canvas but are not part of the final design.
+Layout grids are per-frame **snap targets** that help you align content within frames. They are inspector configuration and snap guides only: they do not render on the canvas and never appear in exports. Full detail: [layout-guides.md](./layout-guides.md).
 
 ### Toggle Visibility
 
@@ -381,7 +380,7 @@ Layout grids are visual guides that help you align content within frames. They a
 4. Change the type via the dropdown in the grid row header (Grid, Columns, Rows)
 5. Click the settings icon on a row to expand configuration options
 
-Shift+G toggles all layout-grid visibility. The command palette exposes "Add Layout Grid", "Add Columns", "Add Rows", and "Add Grid".
+Shift+G enables/disables all layout-grid snapping. The command palette exposes one command, **"Add Layout Grid"** (it adds a Grid-type guide; change the type on the row afterwards). There is no separate "Add Columns", "Add Rows", or "Add Grid" command.
 
 ### Grid Options
 

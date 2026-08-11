@@ -10,11 +10,11 @@ assumes: webgl/setup
 | Shape | uShape | 0-2 | 0 | 0=Element, 1=Metaballs, 2=None |
 | Flow | uFlow | 0-1 | 0.5 | Wave intensity |
 | Roughness | uRoughness | 0-1 | 0.3 | Surface roughness |
-| Distortion | uDistortion | 0-1 | 0.3 | Organic warp |
-| Depth | uDepth | 0-1 | 0.5 | Valley/peak contrast |
+| Distortion | uDistortion | 0-1 | 1.0 | Organic warp |
+| Depth | uDepth | 0-1 | 1.0 | Valley/peak contrast |
 | Angle | uAngle | 0-360 | 45.0 | Flow direction (degrees) |
-| Speed | uSpeed | 0-3 | 1.0 | Animation speed |
-| Metaball Count | uMetaballCount | 2-30 | 8 | Number of metaballs (shape=1) |
+| Speed | uSpeed | 0-3 | 2.0 | Animation speed |
+| Metaball Count | uMetaballCount | 2-30 | 5 | Number of metaballs (shape=1) |
 | Metaball Size | uMetaballSize | 0.1-3.0 | 1.0 | Metaball size multiplier (shape=1) |
 
 ## Colors
@@ -68,6 +68,8 @@ uniform float uAngle;
 uniform float uSpeed;
 uniform float uMetaballCount;
 uniform float uMetaballSize;
+
+uniform float uPixelRatio;
 
 out vec4 fragColor;
 
@@ -236,7 +238,11 @@ vec3 dither(vec3 color, vec2 fc) {
 // ═══════════════════════════════════════════════════════════════════
 
 void main() {
-    vec2 fragCoord = vec2(gl_FragCoord.x, uResolutionY - gl_FragCoord.y);
+    // gl_FragCoord is in physical (backing-store) pixels; the pattern is
+    // defined in logical element pixels (engine parity). Legacy runtimes
+    // that never set uPixelRatio leave it 0 -> treated as 1.
+    float pxRatio = max(uPixelRatio, 1.0);
+    vec2 fragCoord = vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio);
 
     // ─── UV computation ───
     vec2 resolution = vec2(uResolutionX, uResolutionY);

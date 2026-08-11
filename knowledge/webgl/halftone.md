@@ -19,7 +19,7 @@ Halftone dot pattern filter with standard (luminance-based) and CMYK modes. Supp
 | Original Colors | `uOriginalColors` | 0 or 1 | 0 | 0=custom colors, 1=source image colors |
 | Softness | `uSoftness` | 0 .. 1 | 0 | Dot edge softness |
 | Gain | `uGain` | 0 .. 2 | 1 | Dot radius multiplier (>1 = overflow) |
-| Min Dot | `uMinDot` | 0 .. 0.5 | 0 | Minimum dot size in light areas |
+| Min Dot | `uMinDot` | 0 .. 0.5 | 0.15 | Minimum dot size in light areas |
 | Packed Alphas | `uAlphas` | float | - | Packed alpha encoding (see below) |
 | BG Color R | `uColorBackR` | 0 .. 1 | 1 | Background red |
 | BG Color G | `uColorBackG` | 0 .. 1 | 1 | Background green |

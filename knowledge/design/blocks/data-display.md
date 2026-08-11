@@ -30,8 +30,8 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 
 - **Badge / pill**: `al(h,x(c),y(c),pad($spacing.xs,$spacing.sm))`
   `s(hug,hug)` `rd($radius.full)`, text `$font.size.xs`. Pair a
-  `.container` fill with its text role (`$color.success.container` +
-  `$color.text.success`; same for warning / error / info). A floating
+  `.container` fill with its solid role text (`$color.success.container` +
+  `$color.success`; same for warning / error / info). A floating
   "New" badge sits `abs` on a card corner in `$color.secondary`.
 - **Three-state pipeline**: for three peer states (Todo / Doing / Done),
   use the brand triplet, not success/warning/error: each state a pill in
@@ -41,8 +41,8 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 ## Tiles & misc
 
 - **Stat tile**: v-stack of label (`$font.size.xs`, m, secondary), value
-  (`$font.size.2xl`, b), delta row (arrow + %, `$color.text.success` or
-  `.error`). Stamp 3-4 as a `comp`/`inst` row.
+  (`$font.size.2xl`, b), delta row (arrow + %, `$color.success` or
+  `$color.error`). Stamp 3-4 as a `comp`/`inst` row.
 - **Progress ring**: `arc()` + `ratio()` on a `c`; see `blueprint/arcs`.
 - **Rating**: `al(h)` of star `svg`s, filled `$color.warning`, empty
   `$color.outline.variant`.

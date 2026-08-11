@@ -180,9 +180,9 @@ When you ungroup a component frame, the component links are automatically cleane
 When you have an instance selected:
 
 1. Use the **Go to Master Component** command (via command palette, or right-click and choose **Component → Go to Master**)
-2. The master component is selected on the canvas
+2. The master component is selected and the camera moves to center it
 
-This works when the master is on the same canvas. The selection jumps to the master element.
+If the master lives on a different canvas, Brilliant switches to that canvas first, then selects and centers the master. The camera stays put when the master is already comfortably in view (so it won't jump when the master sits right next to the instance), and it never zooms in past 100% just to fill the screen with a small master (a large master zooms out enough to fit).
 
 ## Cross-Canvas Components
 
@@ -193,7 +193,7 @@ How it works:
 - An instance remembers which canvas its master lives on
 - When you open the instance's canvas, Brilliant finds the master and syncs the instance to the latest master values
 - Editing a master updates instances on every canvas you currently have open; instances on canvases you haven't opened pick up the latest values the next time you open them
-- **Push Overrides to Master** and **Go to Master Component** only work when the master is on the canvas you're currently viewing. Switch to the master's canvas first to push to it or jump to it.
+- **Go to Master Component** works across canvases: it switches to the master's canvas when needed, then selects and centers the master. **Push Overrides to Master** only works when the master is on the canvas you're currently viewing, so switch to the master's canvas first to push to it.
 - Pasting a master into a different canvas creates an instance that points back to the original master (the master is not duplicated)
 
 **Caveats:**
@@ -241,7 +241,7 @@ Brilliant components are a master/instance system with property overrides, slots
 | Blend mode change on master not reaching instances | Blend mode stays independent per instance by design | Set blend mode on each instance individually, or detach if you need it managed separately |
 | Cannot create component | No element selected, or the element is part of someone else's instance | Select elements outside any component instance, or select the instance root itself (it CAN be wrapped). Non-frames are auto-wrapped. |
 | Cross-canvas instance lost its component link after reopening | The instance's canvas was opened before its master's canvas in this session | Open the master's canvas first, then the canvas that uses it |
-| Push Overrides / Go to Master grayed out | Master is on a different canvas than the instance | Switch to the master's canvas before invoking the command |
+| Push Overrides to Master does nothing | Master is on a different canvas than the instance | Switch to the master's canvas before invoking the command (Go to Master switches canvases for you) |
 | Instance child not syncing | Child is a slot | Slots are owned by the instance; edit them directly |
 | Cannot drop element into component instance | Instances can't take new children | Drop into a slot, or detach the instance first |
 

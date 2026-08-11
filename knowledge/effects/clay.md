@@ -19,7 +19,7 @@ Dark inner shadow (bottom-right) + white inner shadow (top-left) = molded 3D loo
 
 ## Key Principles
 
-- Fill MUST be saturated pastel, `$blue.faint`, `$green.faint`, `$violet.soft`, `$red.subtle`, `$amber.subtle` (or any catalog `<color>.{100..200}` stop)
+- Fill MUST be saturated pastel, `$blue.faint`, `$green.faint`, `$violet.soft`, `$red.subtle`, `$amber.subtle` (presence stops like `.faint`/`.subtle`; the primitive numeric stops `<color>.100`..`.200` are author-only and halt in element rows)
 - Corner radius 16-24px, higher than normal
 - Always TWO inner shadows: dark bottom-right + white top-left
 - Always outer drop shadow for lift

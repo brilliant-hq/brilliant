@@ -19,7 +19,7 @@ If you're new to Brilliant, learn these first:
 | **Must know** | / | AI input (natural language commands) |
 | **Must know** | Shift+? | Shortcuts reference (this panel) |
 | **Core drawing** | R, O, T, F, L, P | Rectangle, Circle, Text, Frame, Line, Pen |
-| **Core editing** | Cmd+D, Cmd+G, Cmd+Shift+G, Cmd+F, Backspace | Duplicate, Group, Ungroup, Frame Selection, Delete |
+| **Core editing** | Cmd+D, Cmd+G, Cmd+Shift+G, Cmd+F, Backspace / Del | Duplicate, Group, Ungroup, Frame Selection, Delete |
 | **Navigation** | Enter / Escape | Enter frame / Exit to parent |
 | **Navigation** | Tab / Shift+Tab | Previous / Next sibling |
 | **Layout** | Shift+A | Add auto layout |
@@ -74,6 +74,7 @@ On Windows several macOS defaults are unbound, because their Cmd-based chords co
 | Center on selection (`Cmd+Ctrl+C`) | Collapses onto Copy (Ctrl+C); Alt+C is used by the color selector on Windows. Use Zoom to selection (Alt+Z) or the command palette. |
 | All quick colors (Ctrl+R/G/B/Y/O/P/W/K) and gradient colors (Ctrl+D/L) | Collide with Cmd→Ctrl editing commands (Bold, Group, Rename, etc.); set color via the inspector or command palette. |
 | Blue / green / red highlighter combos (Ctrl+Shift+B/G/R) | Collide with Blackboard / Ungroup / Focus Layers. The yellow highlighter combo stays bound. |
+| Scale levels 0–9 (Alt+0–9) | Alt+digit is the chat-session switcher on Windows, and every alternative digit chord is taken (Ctrl+Shift+digit is transparency, Alt+Shift+digit is rotation, Ctrl+digit jumps tabs, Ctrl+Alt+digit is AltGr). Use Scale up/down (Alt+Shift+= / Alt+-), scale mode (K), or the command palette. |
 
 ### Windows-remapped defaults
 
@@ -90,6 +91,7 @@ On Windows some macOS defaults are moved to free chords (their macOS chord colla
 | Increase size | Shift+= | = (bare) |
 | Increase / decrease rotation | Cmd+Ctrl+Shift+= / Cmd+Ctrl+- | Shift+= / Shift+- |
 | Rotation levels 0–9 | Cmd+Ctrl+0–9 | Alt+Shift+0–9 |
+| Focus chat session 1–9 / 10 | Cmd+1–9 / Cmd+0 | Alt+1–9 / Alt+0 |
 
 ## Tools
 
@@ -143,7 +145,7 @@ On Windows some macOS defaults are moved to free chords (their macOS chord colla
 | Exit / cancel (context-aware: clears selection, exits vector mode, exits crop, etc.) | Escape |
 | Select parent frame | Shift+Enter |
 | Rename selected layer | Cmd+R |
-| Delete selected | Backspace |
+| Delete selected | Backspace or Del (ids `delete_command` / `delete_command_forward` — one action, two keys; Del is Fn+Delete on macOS) |
 | Hide / show selection | Cmd+Shift+H (id `toggle_visibility`; Figma parity. Plain Shift+H is flip-horizontally) |
 
 ### Escape Behavior (Context-Aware)
@@ -158,8 +160,10 @@ A single Escape press picks one of these targets, in priority order:
 6. Exit vector edit mode (second press) or pen tool
 7. Exit boolean group edit mode
 8. Exit mask edit mode
-9. Blur the AI input
-10. Clear the canvas selection
+9. Finish editing text on the canvas (the text stays, the element stays selected)
+10. Exit file preview mode (return to the canvas)
+11. Blur the AI input
+12. Clear the canvas selection
 
 ## Movement
 
@@ -213,7 +217,7 @@ A single Escape press picks one of these targets, in priority order:
 | Cut | Cmd+X |
 | Paste | Cmd+V |
 | Duplicate | Cmd+D |
-| Delete | Backspace |
+| Delete | Backspace or Del |
 
 In vector edit mode, Cmd+C / Cmd+V copy and paste the selected nodes (and their connecting edges) inside the same vector path.
 
@@ -309,7 +313,7 @@ These shortcuts apply only while a vector path is open for editing.
 | Enter vector edit mode | Enter (with vector selected) or double-click |
 | Exit vector edit mode | Escape (twice if a node/handle is selected) |
 | Select all nodes and handles | Cmd+A |
-| Delete selected nodes / handles | Backspace |
+| Delete selected nodes / handles | Backspace or Del |
 | Toggle node handles (smooth ↔ corner) | Cmd+Click on node |
 | Remove a single handle | Cmd+Click on handle |
 | Delete an edge | Shift+Click on edge |
@@ -343,7 +347,7 @@ See [vectors.md](./vectors.md) for full pen / pencil / vector editing reference.
 | Set font weight | (no default, id `set_font_weight`; dropdown in Typography section) |
 | Apply font family | (no default, id `apply_font_family`; via font selector Cmd+Shift+F) |
 | Outline text (text -> vector path) | Cmd+Ctrl+O |
-| Flatten text (text -> single compound vector) | Cmd+Alt+O (id `flatten_text`; macOS/Windows only) |
+| Flatten text (text -> single compound vector) | (no default; id `flatten_text`; command palette only) |
 
 ## Quick Colors
 
@@ -432,7 +436,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 
 | Action | Shortcut |
 |--------|----------|
-| Scale level 0–9 | Alt+0 through Alt+9 |
+| Scale level 0–9 | Alt+0 through Alt+9 (macOS/Linux; unbound on Windows — Alt+digit switches chat sessions there) |
 | Scale up | Alt+Shift+= |
 | Scale down | Alt+- |
 
@@ -484,8 +488,9 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Toggle render profiler | Cmd+Shift+Alt+P (id `toggle_render_profiler`) |
 | Toggle search profiler | (no default, id `toggle_search_profiler`) |
 | Toggle top-left indicator | (no default, id `toggle_indicator`) |
-| Quit application | (no default, id `quit_app`; macOS provides Cmd+Q) |
-| Hide application / Hide others | (no defaults, ids `hide_app`, `hide_others`; macOS provides Cmd+H, Cmd+Alt+H) |
+| Quit application | Cmd+Q (id `quit_app`; on macOS the system menu provides it). On Windows, Ctrl+Q / menu Quit run the same clean close as the window's ✕ — auto-save flush and unsaved-work guard included. |
+| Hide application | Cmd+H (id `hide_app`; on macOS the system menu provides it). On Windows, Ctrl+H **minimizes** the window — the platform's hide convention. |
+| Hide others | (no default, id `hide_others`; macOS provides Cmd+Alt+H. macOS-only concept.) |
 
 ## Canvas Management
 
@@ -495,13 +500,26 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Duplicate canvas | Cmd+Ctrl+N |
 | New folder | Cmd+Shift+N |
 | Rename canvas | Alt+Enter |
-| Delete canvas | Cmd+Shift+Delete |
+| Delete canvas | Cmd+Shift+Del (the forward-delete key / Fn+Delete; Cmd+Shift+Backspace does not trigger it) |
 | Switch to next canvas | Alt+→ (Cmd+Alt+→ while the text editor is focused, where plain Alt+arrow is word motion) |
 | Switch to previous canvas | Alt+← (Cmd+Alt+← in the text editor) |
 | Switch to previously active canvas | Ctrl+Alt+← |
 | Focus active canvas in explorer | Cmd+Shift+K |
 | Toggle expand/collapse all folders | Cmd+Shift+C |
 | Toggle hidden files | (no default) |
+
+## Tabs & Home
+
+| Action | Shortcut |
+|--------|----------|
+| Next project tab | Ctrl+Tab (id `next_tab`) |
+| Previous project tab | Ctrl+Shift+Tab (id `previous_tab`) |
+| Jump to home | Cmd+Ctrl+0 (id `jump_to_tab_0`) |
+| Jump to project tab 1 to 9 | Cmd+Ctrl+1 to Cmd+Ctrl+9 (ids `jump_to_tab_1` to `jump_to_tab_9`) |
+| Go home | (no default, id `go_home`) |
+| Toggle project search | (no default, id `toggle_project_search`) |
+
+The Cmd+Ctrl+0-9 jumps share their chord with the rotation levels via WhenClause: the jumps fire when nothing is selected, rotation when a selection is present.
 
 ## File Operations
 
@@ -511,8 +529,8 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Import (images, SVGs, Figma URL, Sketch files, `.bl` design files) | Cmd+Shift+O (id `import`) |
 | Save as | Cmd+Shift+S |
 | Export selection to PNG | Cmd+E (id `export_to_png`) |
-| Export selection to JPEG / WebP / SVG / PDF / Replay (mp4/mov) | (no defaults, ids `export_to_jpeg`, `export_to_webp`, `export_to_svg`, `export_to_pdf`, `export_to_replay`) |
-| Copy as PNG / WebP / SVG / CSS / Blueprint | (no defaults, ids `copy_as_png`, `copy_as_webp`, `copy_as_svg`, `copy_as_css`, `copy_as_blueprint`) |
+| Export selection to JPEG / WebP / SVG / PDF / HTML / React / Replay (mp4/mov) | (no defaults, ids `export_to_jpeg`, `export_to_webp`, `export_to_svg`, `export_to_pdf`, `export_to_html`, `export_to_react`, `export_to_replay`) |
+| Copy as PNG / WebP / SVG / CSS / HTML / HTML Document / HTML Flex / React / Blueprint | (no defaults, ids `copy_as_png`, `copy_as_webp`, `copy_as_svg`, `copy_as_css`, `copy_as_html`, `copy_as_html_document`, `copy_as_html_flex`, `copy_as_react`, `copy_as_blueprint`) |
 | Insert image / Import image | (no defaults, ids `insert_image`, `import_image`) |
 | Clean up unused assets | (no default, id `clean_up_unused_assets`) |
 
@@ -533,6 +551,9 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Toggle left toolbar | Cmd+Shift+← |
 | Toggle right toolbar | Cmd+Shift+→ |
 | Toggle bottom toolbar | Cmd+Shift+↓ |
+
+While you are typing (any text field, or editing text on the canvas), these three chords belong to the **text**: Ctrl+Shift+←/→ extends the selection by word on Windows/Linux (Cmd+Shift+←/→ selects to the line boundary on macOS). The toolbar toggles apply whenever you are not typing.
+
 | Focus file (canvas) explorer | Cmd+Shift+E (id `focus_canvas_explorer`) |
 | Focus layers explorer | Cmd+Shift+R (id `focus_layers_explorer`) |
 | Toggle layers section in left toolbar | (no default, id `toggle_layers`) |
@@ -558,6 +579,7 @@ Editing commands for the text editor (open any non-design file). Active only whi
 | Find in file | Cmd+F inside the editor (palette id `find_in_file`) |
 | Go to line | Ctrl+G inside the editor (palette id `go_to_line`) |
 | Toggle line wrap | (no default, id `toggle_line_wrap`) |
+| Toggle markdown preview | Cmd+Shift+V (id `toggle_markdown_preview`; while a text/markdown file is open) |
 
 Outside the editor, the shared chords keep their app meaning: Cmd+Enter flattens the selection, Cmd+D duplicates, Cmd+/ toggles inspector sections, Cmd+Shift+K focuses the active file.
 
@@ -567,6 +589,8 @@ Outside the editor, the shared chords keep their app meaning: Cmd+Enter flattens
 |--------|----------|
 | Focus chat session 1–9 | Cmd+1 through Cmd+9 |
 | Focus chat session 10 | Cmd+0 |
+
+**Windows exception to the Cmd→Ctrl mapping:** chat sessions are **Alt+1..9 / Alt+0** on Windows. Ctrl+digit belongs to Jump-to-tab there (the platform tab standard, as in Chrome and VS Code), and Ctrl+Alt+digit is AltGr on European layouts, so the switcher uses plain Alt. The scale-level chords (Alt+digit on macOS/Linux) are unbound on Windows so the switcher owns the chord outright.
 | Focus next chat | Cmd+Shift+] |
 | Focus previous chat | Cmd+Shift+[ |
 | Close AI chat | Cmd+W (when chat is focused) |
@@ -598,6 +622,7 @@ These shortcuts focus (and expand if minimized) the AI chat session assigned to 
 | Apply dark theme / Apply light theme | (no defaults, ids `apply_dark_theme`, `apply_light_theme`. Note: Ctrl+D and Ctrl+L are bound to the "Gradient (dark)" / "Gradient (light)" color commands, NOT to these theme commands) |
 | Apply typography / shadow token to selection | (no defaults, ids `apply_typography_token`, `apply_shadow_token`) |
 | Set design token on selected element property | (no default, id `set_design_token`) |
+| Unbind design tokens from selection | (no default, id `unbind_tokens`) |
 | Regenerate / reset / open design system file | (no defaults, ids `regenerate_design_system`, `reset_design_system`, `open_design_system_file`) |
 | Create a design system viewer canvas | (no default, id `create_design_system_viewer`) |
 | Switch active design system | (no default, id `set_design_system`) |
@@ -647,7 +672,7 @@ While hovering a command row:
 
 If your new shortcut conflicts with an existing command:
 - A **warning triangle** appears next to the keybinding
-- A **context picker** dropdown appears automatically, letting you set when each command is active
+- The row's **activation context** is shown read-only via its info (i) button (see "Activation Contexts" below): it tells you which command should win, but there is no control to re-scope a command's activation from the UI
 - The **"Show conflicts"** filter button (warning triangle in the search bar) highlights all conflicting commands so you can resolve them
 
 Hover the warning triangle to see which commands conflict.
@@ -658,7 +683,7 @@ Each command has an activation context that controls when it responds to its sho
 
 Two commands can share the same shortcut if their contexts don't overlap. For example, `Cmd+B` can mean "Bold" during text editing and something else on the canvas.
 
-Available context presets in the picker:
+Activation contexts you may see in a command's "Active when" info (read-only; these are the app's own labels):
 
 | Context | Meaning |
 |---------|---------|
@@ -667,11 +692,11 @@ Available context presets in the picker:
 | Has Selection | Requires at least one element selected |
 | Multiple Selected | Requires 2+ elements selected |
 | Auto Layout Selected | Requires an auto layout frame selected |
-| Parent Selected | Requires a frame/group selected |
-| Component Instance | Requires a component instance selected |
-| Text Editing | Active only while editing text |
+| Frame Selected | Requires a frame/group selected |
+| Component Instance Selected | Requires a component instance selected |
+| Editing Text | Active only while editing text |
 | AI Input | Active only while the AI input is focused |
-| Vector Mode | Active only in vector editing mode with nodes selected |
+| Vector Edit Mode | Active only in vector editing mode with nodes selected |
 | Code Editor | Active only while the code editor is focused |
 
 ### Executing Commands from the Shortcuts View

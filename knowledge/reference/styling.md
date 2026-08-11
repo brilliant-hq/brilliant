@@ -22,6 +22,8 @@ description: "Colors, fills, strokes, opacity, and corner radius in Brilliant."
 | Dark gradient | Ctrl+D |
 | Light gradient | Ctrl+L |
 
+These quick color chords are macOS-only. On Windows they are disabled: the Ctrl chords collide with the standard editing commands (Ctrl+B Bold, Ctrl+G Group, Ctrl+R Rename, and so on), so set color via the inspector or the command palette instead.
+
 ### Color Picker
 
 Open by clicking any color swatch (the small **color rectangle** on the left of any fill / stroke / effect / text-range / layout-grid row) in the right toolbar. The picker opens anchored to the right, focused on that target. There is also a global toggle: **Ctrl+C** (remapped to **Alt+C on Windows**) opens / closes the color selector for the current selection's fill or stroke.
@@ -36,7 +38,7 @@ Components (top to bottom):
 
 In shader mode, the rectangle/hue/opacity controls edit one shader-color slot at a time. To pick which slot, click the individual color swatches in the right toolbar's expanded shader fill row before opening the picker.
 
-The picker has no separate Solid / Gradient / Image / Shader tabs. Fill type is selected from the type dropdown on the fill row in the right toolbar (not in the picker). The picker reflows its top section based on the current fill type.
+The picker has no separate Solid / Gradient / Image / Shader **tabs**, but a **Type chips** row at the top does select fill type: a horizontal row of categories (Solid, Gradient, Static, Animated, Interactive, Filters), where Solid applies on click and each other chip opens that category's dropdown. Fill type can also be set from the type dropdown on the fill row in the right toolbar. The picker reflows its top section based on the current fill type. (The chips row is hidden for solid-only targets: canvas background, layout guides, effect colors, text selections.)
 
 ### Color Formats
 

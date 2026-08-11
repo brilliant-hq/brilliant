@@ -31,7 +31,7 @@ pass `canvasId`. The response returns `elementIds` for follow-up
   keeps the reference's feel, not its exact shapes.
 - **Token sync**: after generating, apply `$color.*` tokens to the new
   SVG's fills via `execute_commands` so the icons re-tint with the DS.
-- **Icon rows**: generate the SVGs, then `group_into_auto_layout` them
+- **Icon rows**: generate the SVGs, then `add_auto_layout` them
   via `execute_commands`.
 - **After `vectorize_image`**: the source raster is left intact for
   comparison; delete it via `execute_commands` if only the vector is wanted.

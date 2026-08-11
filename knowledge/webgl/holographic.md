@@ -9,12 +9,12 @@ assumes: webgl/setup
 |-------|---------|-------|---------|-------------|
 | Shape | uShape | 0-2 | 0 | 0=Element, 1=Metaballs, 2=None |
 | Intensity | uIntensity | 0-1 | 0.7 | Iridescence strength |
-| Spread | uSpread | 0-1 | 0.5 | Fold density |
-| Angle | uAngle | 0-360 | 45.0 | Fold direction (degrees) |
-| Noise | uNoise | 0-1 | 0.5 | Fold complexity |
-| Metallic | uMetallic | 0-1 | 0.5 | Reflectivity/shininess |
-| Speed | uSpeed | 0-3 | 1.0 | Animation speed |
-| Metaball Count | uMetaballCount | 2-15 | 8 | Number of metaballs (shape=1) |
+| Spread | uSpread | 0-1 | 0.7 | Fold density |
+| Angle | uAngle | 0-360 | 10.0 | Fold direction (degrees) |
+| Noise | uNoise | 0-1 | 0.75 | Fold complexity |
+| Metallic | uMetallic | 0-1 | 0.9 | Reflectivity/shininess |
+| Speed | uSpeed | 0-3 | 0.2 | Animation speed |
+| Metaball Count | uMetaballCount | 2-30 | 5 | Number of metaballs (shape=1) |
 | Metaball Size | uMetaballSize | 0.1-3.0 | 1.0 | Metaball size multiplier (shape=1) |
 
 ## Colors
@@ -70,6 +70,8 @@ uniform float uMetallic;
 uniform float uSpeed;
 uniform float uMetaballCount;
 uniform float uMetaballSize;
+
+uniform float uPixelRatio;
 
 out vec4 fragColor;
 
@@ -271,7 +273,11 @@ vec3 dither(vec3 color, vec2 fc) {
 // ═══════════════════════════════════════════════════════════════════
 
 void main() {
-    vec2 fragCoord = vec2(gl_FragCoord.x, uResolutionY - gl_FragCoord.y);
+    // gl_FragCoord is in physical (backing-store) pixels; the pattern is
+    // defined in logical element pixels (engine parity). Legacy runtimes
+    // that never set uPixelRatio leave it 0 -> treated as 1.
+    float pxRatio = max(uPixelRatio, 1.0);
+    vec2 fragCoord = vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio);
 
     // ─── UV computation ───
     vec2 resolution = vec2(uResolutionX, uResolutionY);

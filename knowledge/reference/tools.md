@@ -34,7 +34,7 @@ Bottom toolbar layout (left to right): Move/Scale/Hand dropdown, Shape dropdown 
 - After creating an element, the active tool persists (Pen, Pencil, shape tools, Frame all stay sticky)
 - Snip and Text auto-revert to Move after creation
 - V returns to Move from any tool
-- Switching to any tool other than Move clears Scale mode automatically
+- Switching tools clears Scale mode automatically (this includes selecting the Move tool with V; only K turns Scale mode on)
 - Escape cancels the current contextual action, chosen based on context:
   - Vector edit mode: first Escape clears node/handle selection, second exits vector edit and returns to Move
   - Pen tool active but not in vector edit mode: Escape switches to Move
@@ -78,7 +78,7 @@ Scale is a flag layered on the Move tool, not a separate tool. K switches to Mov
 - K from any tool: switches to Move and enables Scale mode
 - K while in Move with Scale off: enables Scale mode
 - K while Scale mode is on: disables it (returns to regular Move)
-- Switching to any other tool clears Scale mode
+- Switching to any tool clears Scale mode (including Move via V); only K re-enables it
 
 The Move/Hand bottom-toolbar dropdown lists Move, Scale, and Hand.
 
@@ -186,7 +186,7 @@ The fill/stroke variant shortcuts (R vs Shift+R, O vs Shift+O) set the active cr
 
 Combine selected vector/shape elements into a single boolean parent. Operations are non-destructive: the boolean parent stores the operands and re-renders on every change. Double-click a boolean element to enter boolean edit mode; Escape exits.
 
-Discovery: right-click context menu, Boolean submenu (Union, Subtract, Intersect, Exclude), shown only with 2+ elements selected. The shortcuts likewise require 2+ selected. Running a boolean op on a single existing boolean/mask parent switches that parent's type in place instead of creating a new one.
+Discovery: right-click context menu, Boolean submenu (Union, Subtract, Intersect, Exclude), shown with 2+ elements selected. The shortcuts fire on a 2+ selection or on a single parent (frame, group, boolean, or mask): running a boolean op on a single existing boolean/mask parent switches that parent's type in place instead of creating a new one.
 
 | Operation | Shortcut | Effect |
 |-----------|----------|--------|
@@ -205,8 +205,8 @@ Use a vector or shape as a mask for sibling elements. The topmost element (last 
 | Use as mask | Cmd+Ctrl+M | Wraps selection so the topmost element (last in z-order) clips the others below |
 | Mask edit mode | Double-click mask | Edit the mask shape; Escape exits |
 
-Mask types are configurable per-mask in the right toolbar: vector (default), alpha, luminance.
+Masks clip by vector geometry (the default). The data model also defines alpha and luminance mask types, but the right toolbar has no picker to switch among them yet.
 
 ## Outline Text
 
-**Outline Text** converts a selected text element into a **group** containing one vector element per glyph (each character becomes its own editable vector inside the group). Shortcut Cmd+Ctrl+O on macOS; on Windows the chord is disabled (it collides), so reach it via the menu, command palette, or context menu. Discovery: right-click context menu, "Outline Text", shown when the selection contains text. To get a single compound vector instead, use **Flatten Text** (Cmd+Alt+O, no context-menu entry) or **Flatten** (Cmd+Enter). Outline/Flatten Text work on both macOS and Windows.
+**Outline Text** converts a selected text element into a **group** containing one vector element per glyph (each character becomes its own editable vector inside the group). Shortcut Cmd+Ctrl+O on macOS; on Windows the chord is disabled (it collides), so reach it via the menu, command palette, or context menu. Discovery: right-click context menu, "Outline Text", shown when the selection contains text. To get a single compound vector instead, use **Flatten Text** (command palette; no default keyboard shortcut, no context-menu entry) or **Flatten** (Cmd+Enter). Outline/Flatten Text work on both macOS and Windows.

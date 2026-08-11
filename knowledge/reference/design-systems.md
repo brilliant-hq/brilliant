@@ -112,9 +112,9 @@ Most are in the command palette under the design-system group. The two exception
 | Create Design System Viewer | Insert an 800x600 viewer element visualizing the active system |
 | Open Design System File | Open the nearest `.ds` source in the code editor |
 | Regenerate Design System | Rebuild all `.gen.yaml` files from their `.ds` sources |
-| Reset Design System | Wipe the design system source to an empty default, discarding all authored tokens (undoable) |
+| Reset Design System | Rewrite the design system source with Brilliant's built-in seed template, replacing the current tokens (undoable) |
 
-Note: the **Reset Design System** command wipes the *source file* to an empty default, discarding every authored token (it does not restore Brilliant's seed tokens). The **Reset design system** button in the inspector is a different action: it clears brand/mode overrides at the inspected scope without touching the source.
+Note: the **Reset Design System** command rewrites the *source file* with Brilliant's built-in seed template (the same defaults a fresh project starts with), replacing every authored token; Cmd+Z restores what was there before. The **Reset design system** button in the inspector is a different action: it clears brand/mode overrides at the inspected scope without touching the source.
 
 ## Related Knowledge
 

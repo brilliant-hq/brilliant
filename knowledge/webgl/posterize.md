@@ -9,7 +9,7 @@ Reduces color levels per channel to create flat, poster-like images. Three modes
 
 | Param | Uniform | Range | Default | Description |
 |-------|---------|-------|---------|-------------|
-| Levels | `uLevels` | 2 .. 32 | 6 | Color levels per channel |
+| Levels | `uLevels` | 2 .. 32 | 4 | Color levels per channel |
 | Mode | `uMode` | 0, 1, 2 | 0 | 0=RGB, 1=Luminosity, 2=HSL |
 | Smoothing | `uSmoothing` | 0 .. 1 | 0 | Smooth transitions between levels |
 | Intensity | `uIntensity` | 0 .. 1 | 1 | Blend with original (1=full posterize) |

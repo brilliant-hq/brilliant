@@ -206,6 +206,8 @@ Scaling uniformly resizes the selection and scales its content (font sizes, stro
 | Scale up | Alt+Shift+= | +1 step (height-based) |
 | Scale down | Alt+- | -1 step |
 
+**Windows:** the scale-level chords (Alt+0..9) are unbound — Alt+digit switches chat sessions there. Use Scale up / Scale down, scale mode (**K**), or the command palette (Set Scale - Level N).
+
 To scale to a precise size by hand, enable scale mode (**K** or hold **Ctrl**) and drag a corner handle, which scales all content proportionally.
 
 ## Skewing
@@ -284,7 +286,7 @@ To bake a boolean parent into a single uneditable vector, use **Flatten** (Cmd+E
 
 Select 2+ elements. The topmost element becomes the clip shape, and the elements below are clipped to it. The result is a mask parent. Applying a boolean command to a mask parent switches its type to that boolean (e.g., mask → intersect); applying Mask to a boolean parent switches it back to a mask. Children of a mask cannot be dragged out: they stay clipped.
 
-Mask parents support three mask types, selectable in the right toolbar: vector (default geometric clip), alpha, and luminance.
+Mask parents clip by vector geometry (the default geometric clip). The data model also defines alpha and luminance mask types, but the right toolbar has no picker to switch among them yet.
 
 ## Flatten
 
@@ -493,3 +495,13 @@ All element operations are undoable:
 - Add / remove / swap fill or stroke
 
 Rapid arrow-key nudges are combined into a single undo entry after 1 second of inactivity.
+
+## Repair Fill Layout
+
+`repair_fill_layout` (command palette or `execute_commands`) re-runs auto
+layout on every frame that has a fill-sized child and heals any stale
+geometry, on either axis, as ONE undoable step. Use it when fill children
+render at the wrong size after opening an older file (for example, a divider
+that should span its row). A canvas with nothing to heal reports zero and
+changes nothing. Saves also announce lingering fill inconsistencies in the
+background; they never block saving.

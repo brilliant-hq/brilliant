@@ -26,7 +26,7 @@ Items that respond to a cursor, sidebar rows, menu items, list rows, selectable 
 
 - `$color.surface.hover` (neutral.faint): "cursor is here" feedback.
 - `$color.surface.pressed` (neutral.subtle): the moment of click, slightly deeper.
-- `$color.surface.selected` (primary.subtle) + `$color.on-surface.selected` (primary.bold), the current row in a nav/menu/list. Brand-tinted bg plus brand-tinted icon and bold label.
+- `$color.surface.selected` (primary.hint) + `$color.on-surface.selected` (primary.bold), the current row in a nav/menu/list. Brand-tinted bg plus brand-tinted icon and bold label.
 - Disabled, leave the surface at rest and mute the label + icon with `$color.text.disabled`. No dedicated surface token; the muted foreground does the work.
 
 For primary/secondary buttons, hover and pressed are usually expressed through shadow + brand-fill shifts rather than surface tokens, see `design/blocks/actions`.

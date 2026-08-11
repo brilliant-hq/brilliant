@@ -28,8 +28,8 @@ There are three by-hand entry points:
 | **WebP** | Raster | Transparency supported. Native libwebp on macOS and Windows; Linux falls back to PNG bytes. UI exports lossy q=90 (see "WebP quality" below) |
 | **SVG** | Vector | Native filters for drop shadow, outer glow, layer blur. Shader fills, inner shadow/glow, background blur, color-adjust, and image-filter fills are embedded as rasterized PNG. Angular (sweep) gradients are approximated as linear |
 | **PDF** | Vector | Embedded fonts (Google Fonts cache + system, Helvetica fallback). Any element with an enabled effect is rasterized whole. Supports single-page or multi-page |
-| **HTML** | Markup | HTML + inline CSS. Three variants: snippet, full document (with Google Fonts link), and flex (auto-layout frames become `display:flex`). Command palette / Copy as only |
-| **React (JSX)** | Markup | Same DOM as HTML, JSX style objects, camelCase attrs. Pasteable into a `.tsx` file. Command palette / Copy as only |
+| **HTML** | Markup | HTML + inline CSS. Three variants: snippet, full document (with Google Fonts link), and flex (auto-layout frames become `display:flex`). Shader fills on rectangles, full circles, and frames export as LIVE animated WebGL `<canvas>` elements (one appended `<script>` carries the runtime + shader sources; `reactiveGrid` stays mouse-interactive). Shader fills on vectors, text, or strokes are embedded as rasterized PNG. Command palette / Copy as only |
+| **React (JSX)** | Markup | Same DOM as HTML, JSX style objects, camelCase attrs. Pasteable into a `.tsx` file. Shader fills are embedded as rasterized PNG (a bare JSX snippet has no script slot). Command palette / Copy as only |
 | **MP4** | Video | No alpha. macOS: H.264 or HEVC (VideoToolbox). Windows: H.264 only (Media Foundation). Not available on Linux. Export panel only |
 | **MOV** | Video | HEVC (with alpha) or ProRes 4444. macOS only (Windows has no QuickTime writer; Linux has no video export), supports transparent background. Export panel only |
 | **Replay** | Video | Animated reveal: elements fade in one after another with a shimmer pass. Defaults to MP4 (macOS and Windows); MOV is selectable on macOS (required for a transparent background). Has a command and a context-menu entry |
@@ -164,7 +164,11 @@ Clipboard notes:
 
 ## MCP export tool (for AI agents)
 
-AI agents can export programmatically via the MCP `export` tool (image and markup formats only: MP4/MOV/Replay are commands/UI only). For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. The full parameter schema is delivered with the tool itself.
+AI agents can export programmatically via the MCP `export` tool. It handles raster (PNG, JPEG, WebP), vector (SVG, PDF), HTML/React markup, and video (MP4, MOV: use `duration`, up to 30s, and `fps`). Only **Replay** is UI/command only (it needs an interactive recording session, so the tool returns a clear error). For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. The full parameter schema is delivered with the tool itself.
+
+## When rendering has stopped
+
+Every export renders through the canvas engine, so if the engine stops for the session (the canvas shows the "Something went wrong rendering the canvas" panel), exports refuse instead of producing files. You get a clear message naming the state, and the fix is the panel's own **Restart rendering** button. Once the canvas is back, export again. This applies to every format, to Copy as PNG/WebP, to video and replay, and to the MCP `export` tool, which answers with the same reason. Retrying the export without restarting rendering will keep refusing, by design: it prevents empty or half-drawn files that look like real output.
 
 ## Other application formats
 

@@ -16,7 +16,7 @@ Two tools power this. If they are not in your available tools, this feature is n
 
 1. Call `list_stagers` first to discover the component ids and read each `stateSchema`. Never guess the schema.
 2. Compose the `state` for the component you want, weaving in the user's own context from the conversation: their chat titles, their fill colors, the exact message text they are asking about. That is what makes the walkthrough THEIRS.
-3. Call `render_ui` with an absolute `outputPath` in a temp directory (for example `/tmp/brilliant-walkthrough-1.webp`). Then show the image inline (see "Showing the image" below).
+3. Call `render_ui` with an absolute `outputPath` in a writable temp directory. On macOS/Linux `/tmp/brilliant-walkthrough-1.webp` works; on Windows `/tmp` does not exist and the write is refused, so use a real Windows temp path (for example one under `%TEMP%`) or another absolute path inside your writable working area. Then show the image inline (see "Showing the image" below).
 4. One concept per image. If you are explaining three things, render three focused images rather than one busy one.
 
 ## render_ui arguments

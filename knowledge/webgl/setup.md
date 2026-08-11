@@ -39,14 +39,23 @@ function brilliantShader(canvas, fragSrc, cfg={}) {
     canvas.addEventListener('mouseup',()=>{md=0;});
   }
 
-  function resize(){const r=canvas.getBoundingClientRect(),d=devicePixelRatio||1;canvas.width=r.width*d;canvas.height=r.height*d;gl.viewport(0,0,canvas.width,canvas.height);}
+  // Layout (offset*) size, NOT getBoundingClientRect: a rotated/skewed host
+  // (CSS transform) inflates the rect to the transformed AABB, which would
+  // render the pattern at the wrong size/aspect. The pattern lives in the
+  // element's local box; the CSS transform maps it onto the page.
+  function resize(){const w=canvas.offsetWidth||canvas.getBoundingClientRect().width,h=canvas.offsetHeight||canvas.getBoundingClientRect().height,d=devicePixelRatio||1;canvas.width=w*d;canvas.height=h*d;gl.viewport(0,0,canvas.width,canvas.height);}
   const ro=new ResizeObserver(resize);ro.observe(canvas);resize();
 
   function render(now){
-    const t=anim?(now/1000-t0):tp, w=canvas.width, h=canvas.height;
+    // Uniforms are LOGICAL (CSS) pixels — patterns are defined in element
+    // pixels, matching the app's canvas. The shader divides gl_FragCoord
+    // (physical) by uPixelRatio.
+    const t=anim?(now/1000-t0):tp, d=devicePixelRatio||1,
+      w=canvas.width/d, h=canvas.height/d;
     gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
     // Standard uniforms
-    const S=[[u.uResolutionX,w],[u.uResolutionY,h],[u.uTime,t],[u.uOffsetX,0],[u.uOffsetY,0],
+    const S=[[u.uResolutionX,w],[u.uResolutionY,h],[u.uPixelRatio,d],
+      [u.uTime,t],[u.uOffsetX,0],[u.uOffsetY,0],
       [u.uScale,uvS],[u.uUVOffsetX,uvOX],[u.uUVOffsetY,uvOY],[u.uRotation,uvR],
       [u.uShapeType,shape],[u.uCornerTL,cr[0]],[u.uCornerTR,cr[1]],[u.uCornerBL,cr[2]],[u.uCornerBR,cr[3]],
       [u.uRefAspect,cfg.refAspect??(w/h)],[u.uColorCount,colors.length]];
@@ -88,7 +97,8 @@ function brilliantFilter(canvas, sourceEl, fragSrc, cfg={}) {
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
 
-  function resize(){const r=canvas.getBoundingClientRect(),d=devicePixelRatio||1;canvas.width=r.width*d;canvas.height=r.height*d;gl.viewport(0,0,canvas.width,canvas.height);}
+  // Layout size, not the transformed AABB — see the shader resize note.
+  function resize(){const w=canvas.offsetWidth||canvas.getBoundingClientRect().width,h=canvas.offsetHeight||canvas.getBoundingClientRect().height,d=devicePixelRatio||1;canvas.width=w*d;canvas.height=h*d;gl.viewport(0,0,canvas.width,canvas.height);}
   const ro=new ResizeObserver(resize);ro.observe(canvas);resize();
 
   function render(){
@@ -151,8 +161,8 @@ function brilliantFilter(canvas, sourceEl, fragSrc, cfg={}) {
 All Brilliant shaders are ported from SkSL (Flutter GLSL 460) to GLSL ES 3.0 (WebGL 2). Changes:
 
 1. `#version 300 es` + `precision highp float;` header
-2. `FlutterFragCoord()` replaced with `vec4(gl_FragCoord.x, uResolutionY - gl_FragCoord.y, 0, 0)` (Y-flip for top-left origin)
+2. `FlutterFragCoord()` replaced with `vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio)` where `pxRatio = max(uPixelRatio, 1.0)` (Y-flip for top-left origin; the division maps physical backing-store pixels to the logical element pixels patterns are defined in — the runtime passes `uResolutionX/Y` as logical size and `uPixelRatio` as `devicePixelRatio`)
 3. `layout(location=N)` removed from uniforms (WebGL binds by name)
 4. `uniform sampler2D uSDFTexture/uEdgeData` removed (web uses rect/circle shapes only)
 5. `elementSDF()` simplified to rect + circle analytical paths (no vector SDF textures)
-6. Shader body logic is **identical** to the Flutter version
+6. Shader body logic is **identical** to the in-app `.frag` source (the native engine renders these on canvas; SkSL survives only in the text-editing body and inspector previews)

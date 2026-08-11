@@ -474,7 +474,7 @@ Drag elements over a parent to auto-reparent:
 
 ## Layout Guides
 
-Frames support column, row, and grid overlays. See [layout-guides.md](./layout-guides.md).
+Frames support column, row, and grid layout guides. These are snap targets and inspector configuration only; they do not render on the canvas or in exports. See [layout-guides.md](./layout-guides.md).
 
 - **Shift+G** toggles global visibility of all layout guides
 - Add guides via the Layout Guides section's **+** button (default type: Grid)

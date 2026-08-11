@@ -67,6 +67,8 @@ uniform float uMouseX;       // element-local UV [0,1]
 uniform float uMouseY;       // element-local UV [0,1]
 uniform float uMouseDown;    // 0.0 or 1.0
 
+uniform float uPixelRatio;
+
 out vec4 fragColor;
 
 // ═══════════════════════════════════════════════════════════════════
@@ -105,17 +107,18 @@ vec2 rotate2D(vec2 p, float angle) {
 }
 
 // Anti-aliased grid lines using fwidth (available in WebGL 2, not in SkSL)
-float gridPattern(vec2 p) {
-    vec2 grid = abs(fract(p - 0.5) - 0.5);
-    vec2 fw = fwidth(p);
-    return min(grid.x / max(fw.x, 0.001), grid.y / max(fw.y, 0.001));
+// Same pixelSize-normalized distance as the app shader (which cannot use
+// fwidth under SkSL) — byte-for-byte line weight parity with the canvas.
+float gridPattern(vec2 p, float pixelSize) {
+    vec2 grid = abs(fract(p - 0.5) - 0.5) / max(pixelSize * 2.0, 0.001);
+    return min(grid.x, grid.y);
 }
 
-float isoGrid(vec2 p, float density) {
+float isoGrid(vec2 p, float density, float pixelSize) {
     p = rotate2D(p, 3.14159 / 4.0);
     vec2 grid1 = p;
     vec2 grid2 = rotate2D(p, 3.14159 / 3.0);
-    return min(gridPattern(grid1 * density), gridPattern(grid2 * density));
+    return min(gridPattern(grid1 * density, pixelSize), gridPattern(grid2 * density, pixelSize));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -169,7 +172,11 @@ float snoise(vec2 v) {
 // ═══════════════════════════════════════════════════════════════════
 
 void main() {
-    vec2 fragCoord = vec2(gl_FragCoord.x, uResolutionY - gl_FragCoord.y);
+    // gl_FragCoord is in physical (backing-store) pixels; the pattern is
+    // defined in logical element pixels (engine parity). Legacy runtimes
+    // that never set uPixelRatio leave it 0 -> treated as 1.
+    float pxRatio = max(uPixelRatio, 1.0);
+    vec2 fragCoord = vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio);
 
     // rawUV = untransformed UV (for SDF, element boundary is fixed in screen space)
     vec2 rawUV = (fragCoord - vec2(uOffsetX, uOffsetY)) / vec2(uResolutionX, uResolutionY);
@@ -186,6 +193,9 @@ void main() {
     // Aspect correction for pattern coordinates
     float aspect = uResolutionX / max(uResolutionY, 1.0);
     vec2 uvAspect = (uv - 0.5) * vec2(aspect, 1.0) + 0.5;
+
+    // Pixel size in logical element pixels (line-weight normalization)
+    float pixelSize = 1.0 / min(uResolutionX, uResolutionY);
 
     // Time with speed control
     float time = uTime * uSpeed;
@@ -218,7 +228,7 @@ void main() {
     }
 
     // ─── Grid pattern ───
-    float grid = isoGrid(distortedUV + time * 0.1, uDensity);
+    float grid = isoGrid(distortedUV + time * 0.1, uDensity, pixelSize);
 
     // ─── Ambient noise for subtle grid modulation ───
     float noise = snoise(uvAspect * 3.0 + time * 0.05) * 0.15;

@@ -13,10 +13,10 @@ assumes: webgl/setup
 | Shift Red | uShiftRed | -1 to 1 | 0.3 | Red channel chromatic shift |
 | Shift Blue | uShiftBlue | -1 to 1 | 0.3 | Blue channel chromatic shift |
 | Distortion | uDistortion | 0-1 | 0.07 | Organic warp intensity |
-| Contour | uContour | 0-1 | 0.4 | Edge contour compression |
+| Contour | uContour | 0-3 | 0.4 | Edge contour compression |
 | Angle | uAngle | 0-360 | 70.0 | Stripe direction (degrees) |
 | Speed | uSpeed | 0-3 | 1.0 | Animation speed |
-| Metaball Count | uMetaballCount | 2-15 | 8 | Number of metaballs (shape=1) |
+| Metaball Count | uMetaballCount | 2-30 | 5 | Number of metaballs (shape=1) |
 | Metaball Size | uMetaballSize | 0.1-3.0 | 1.0 | Metaball size multiplier (shape=1) |
 
 ## Colors
@@ -72,6 +72,8 @@ uniform float uAngle;
 uniform float uSpeed;
 uniform float uMetaballCount;
 uniform float uMetaballSize;
+
+uniform float uPixelRatio;
 
 out vec4 fragColor;
 
@@ -269,7 +271,11 @@ vec3 dither(vec3 color, vec2 fc) {
 // ═══════════════════════════════════════════════════════════════════
 
 void main() {
-    vec2 fragCoord = vec2(gl_FragCoord.x, uResolutionY - gl_FragCoord.y);
+    // gl_FragCoord is in physical (backing-store) pixels; the pattern is
+    // defined in logical element pixels (engine parity). Legacy runtimes
+    // that never set uPixelRatio leave it 0 -> treated as 1.
+    float pxRatio = max(uPixelRatio, 1.0);
+    vec2 fragCoord = vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio);
 
     // ─── UV computation ───
     vec2 resolution = vec2(uResolutionX, uResolutionY);
@@ -396,7 +402,7 @@ void main() {
 
     // ─── Depth shadow in dark valleys ───
     float avgBand = (bandR + bandG + bandB) / 3.0;
-    float shadow = smoothstep(0.3, 0.0, avgBand);
+    float shadow = 1.0 - smoothstep(0.0, 0.3, avgBand);
     col *= 1.0 - shadow * 0.15;
 
     // ─── Dither ───

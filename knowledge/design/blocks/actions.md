@@ -16,12 +16,12 @@ Declare the segment as a `comp` master with the active styling baked in (Daily i
 al(h,pad($spacing.xs),g($spacing.none)) s(hug,hug) f[($color.surface.container)] rd($radius.sm) "Segmented" #segmented
   al(h,x(c),y(c),pad($spacing.sm,$spacing.md)) comp s(hug,hug) f[($color.surface)] shadow($neutral.intense,o($visibility.faint),y(1),blur(2)) rd($radius.sm) "Daily" #seg
     t("Daily",$font.family,$font.size.sm,sb) f[($color.text.primary)] #seg_label
-  inst(#seg) f[(unstyled)] shadow(unstyled) "Weekly"
+  inst(#seg) f[] shadow(off) "Weekly"
     override(#seg_label) t("Weekly",$font.family,$font.size.sm,m) f[($color.text.secondary)]
-  inst(#seg) f[(unstyled)] shadow(unstyled) "Monthly"
+  inst(#seg) f[] shadow(off) "Monthly"
     override(#seg_label) t("Monthly",$font.family,$font.size.sm,m) f[($color.text.secondary)]
 ```
-Properties on the `inst()` line apply to that instance frame: `f[(unstyled)] shadow(unstyled)` clears the active styling so the inactive segments visually subordinate. For the flip-in-the-inspector set form, see `blueprint/components`.
+Properties on the `inst()` line apply to that instance frame: `f[]` (explicit empty fills) plus `shadow(off)` (a disabled shadow) clears the active styling so the inactive segments visually subordinate. For the flip-in-the-inspector set form, see `blueprint/components`.
 
 ## Toggle Switch
 Knob via alignment, `x(e),y(c)` for on, `x(s),y(c)` for off:

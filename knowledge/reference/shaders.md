@@ -62,7 +62,7 @@ Liquid Metal, Iridescent, and Liquid Stainless Steel have a **Shape** dropdown:
 
 | Shape | Effect |
 |-------|--------|
-| **Element** | The pattern's contours follow the actual element boundary (corner radii, circles, vector outlines, text). |
+| **Element** | The pattern's contours follow the element's rectangle boundary (including corner radii) or its circle/arc boundary. Shader fills render on rectangle and circle elements only, so the Element shape does not trace arbitrary vector outlines. |
 | **Metaballs** | The pattern is masked by an internal metaball shape (Ball Count and Ball Size sliders appear). |
 | **None** | No shape masking; the pattern fills the bounds flat. |
 
@@ -77,7 +77,7 @@ Most shaders include named presets in a **Presets** dropdown at the top of the e
 | **Iridescent** | Rainbow Foil, Soft Opal, Oil Slick, Aurora, Prismatic, Candy, Ice Crystal, Nebula, Pearl, Tropical |
 | **Liquid Stainless Steel** | Mirror Polish, Brushed Steel, Dark Chrome, Rose Gold, Turbulent, Satin, Copper, Blue Steel, Titanium, Liquid Silver |
 | **Reactive Grid** | Neon Circuit, Sunset Mesh, Blueprint, Laser Grid, Emerald Web, Retro Arcade, Frost, Lava Flow |
-| **Dithering** | (no named presets) |
+| **Dithering** | Electric Sphere, Ember, Sine Tide, Phosphor, Amber CRT, Pocket Green, Voyage, Newsprint, Riso Pink, Deep Current, Violet Drift, Acid Swirl, White Noise, Ghost Grain |
 
 ## Colors
 
@@ -97,7 +97,7 @@ Every shader fill or stroke has a **Transform** section that adjusts how the pat
 | **Offset Y** | -1.0–1.0 | 0.0 | Pan the pattern vertically |
 | **Rotation** | 0–360° | 0° | Rotate the pattern |
 
-**Where Rotation appears:** every shader has Scale, Offset, and Rotation. Rotation lives in the Transform section, except for the shape-bearing shaders (Liquid Metal, Iridescent, Liquid Stainless Steel), where it appears among the parameter sliders instead.
+**Where Rotation appears:** every shader has Scale, Offset, and Rotation. Rotation lives in the Transform section, except for the shape-bearing shaders (Liquid Metal, Iridescent, Liquid Stainless Steel, and Dithering, all of which carry a Shape parameter), where it appears among the parameter sliders instead.
 
 **Cmd-resize / Ctrl-resize compensation:** when you resize an element while holding Command (macOS) or Ctrl (Windows), the shader pattern stays fixed in world space. The element boundary reveals more or less of the pattern instead of stretching it, mirroring image crop compensation. During a normal resize the pattern distorts with the element.
 

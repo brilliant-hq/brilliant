@@ -3,13 +3,12 @@ assumes: webgl/setup
 ---
 # WebGL Shader Export Overview
 
-When exporting Brilliant designs to HTML, elements with shader fills or image filters need WebGL to render live (animated, interactive). Without WebGL, shaders export as static PNG snapshots.
+HTML export from Brilliant **already emits live WebGL automatically** for the six procedural shader fills, drawing them as animated `<canvas>` elements. No manual wiring is needed when you export from the app. The runtime and per-shader GLSL below are exactly what the exporter injects (it reads them from these same docs); wire them by hand only when authoring HTML outside Brilliant's exporter.
 
-## When to Use WebGL Export
+## What Exports Live vs Static
 
-- Element has a **shader fill**: `metaballs`, `liquidMetal`, `holographic`, `liquidStainlessSteel`, `dithering`, `reactiveGrid`
-- Element has an **image filter**: `noiseGrain`, `halftone`, `pixelate`, `duotone`, `posterize`, `dither`, `colorAdjust`
-- The design calls for **animation** or **interactivity** in the web output
+- **Live WebGL (automatic):** the six procedural **shader fills** (`metaballs`, `liquidMetal`, `holographic`, `liquidStainlessSteel`, `dithering`, `reactiveGrid`) on a rectangle, frame, or full circle.
+- **Pre-rasterized (static image):** every **image filter** (`noiseGrain`, `halftone`, `pixelate`, `duotone`, `posterize`, `dither`, `colorAdjust`) always bakes to a static image; so does a shader fill on any other element shape.
 
 ## Which Knowledge to Load
 
@@ -77,7 +76,7 @@ brilliantFilter('filtered', 'photo', FRAG, {
 
 **UV Transform:** Blueprint `scale(2),uvrot(45)` → `scale: 2, rotation: 45`
 
-**Shape:** Blueprint `shape(element)` → `shape: 'rect'` (with corner radius from the frame). Blueprint `shape(none)` → shape doesn't matter, set `shape: 'rect', cornerRadius: [0,0,0,0]`.
+**Shape:** Blueprint `shape(0)` (Element) → `shape: 'rect'` (with corner radius from the frame). Blueprint `shape(2)` (None) → shape doesn't matter, set `shape: 'rect', cornerRadius: [0,0,0,0]`.
 
 **Corner radius:** Normalize to 0-1 range: `cornerRadius / min(width, height) * 2`. For example, `rd(16)` on a 200x100 element → `16 / 100 * 2 = 0.32` → `cornerRadius: [0.32, 0.32, 0.32, 0.32]`.
 

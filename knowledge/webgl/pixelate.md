@@ -9,7 +9,7 @@ Pixelation filter with 5 cell shapes: square, hexagonal, diamond, circle (pointi
 
 | Param | Uniform | Range | Default | Description |
 |-------|---------|-------|---------|-------------|
-| Cell Size | `uCellSize` | 2 .. 300 | 16 | Cell size in logical pixels |
+| Cell Size | `uCellSize` | 2 .. 300 | 10 | Cell size in logical pixels |
 | Shape | `uShape` | 0..4 | 0 | 0=square, 1=hex, 2=diamond, 3=circle, 4=triangle |
 | Angle | `uAngle` | 0 .. 360 | 0 | Grid rotation (degrees) |
 | Stretch | `uStretch` | 0.5 .. 2.0 | 1 | Horizontal cell stretch |

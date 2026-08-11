@@ -8,8 +8,8 @@ assumes: webgl/setup
 | Param | Uniform | Range | Default | Description |
 |-------|---------|-------|---------|-------------|
 | Shape | uShape | 0–6 | 0 | Pattern type: 0=simplex, 1=warp, 2=dots, 3=wave, 4=ripple, 5=swirl, 6=sphere |
-| Dither Type | uDitherType | 0–3 | 3 | Dither algorithm: 0=random, 1=bayer 2x2, 2=bayer 4x4, 3=bayer 8x8 |
-| Size | uSize | 1–20 | 5 | Dither grid cell size in pixels |
+| Dither Type | uDitherType | 0–3 | 2 | Dither algorithm: 0=random, 1=bayer 2x2, 2=bayer 4x4, 3=bayer 8x8 |
+| Size | uSize | 1–20 | 4 | Dither grid cell size in pixels |
 | Speed | uSpeed | 0–3 | 1.0 | Animation speed multiplier |
 
 ## Colors
@@ -57,6 +57,8 @@ uniform float uShape;      // 0-6: pattern shape
 uniform float uDitherType; // 0-3: dither algorithm
 uniform float uSize;       // 1-20: dither grid size
 uniform float uSpeed;      // 0-3: animation speed
+
+uniform float uPixelRatio;
 
 out vec4 fragColor;
 
@@ -234,7 +236,11 @@ float getPattern(vec2 uv, float t, int shape) {
 // ═══════════════════════════════════════════════════════════════════
 
 void main() {
-    vec2 fragCoord = vec2(gl_FragCoord.x, uResolutionY - gl_FragCoord.y);
+    // gl_FragCoord is in physical (backing-store) pixels; the pattern is
+    // defined in logical element pixels (engine parity). Legacy runtimes
+    // that never set uPixelRatio leave it 0 -> treated as 1.
+    float pxRatio = max(uPixelRatio, 1.0);
+    vec2 fragCoord = vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio);
 
     // ─── UV computation ───
     vec2 resolution = vec2(uResolutionX, uResolutionY);

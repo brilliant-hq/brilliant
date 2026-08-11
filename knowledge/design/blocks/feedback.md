@@ -6,8 +6,8 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 ## Inline messages
 
 - **Alert / banner**: h-row, a status icon plus a title/message v-stack,
-  optional dismiss `x`. Pair a `.container` fill with its text role:
-  `$color.success.container` + `$color.text.success`, and likewise
+  optional dismiss `x`. Pair a `.container` fill with its solid role text:
+  `$color.success.container` + `$color.success`, and likewise
   warning / error / info. Stamp all four as a `comp`/`inst` set.
 - **Toast**: the same row at a fixed `s(320-400,hug)` plus a shadow,
   pinned top-right or bottom-center.
@@ -23,7 +23,7 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
   an upward shadow (`y(-4)`); a small centered grab handle on top.
 - **Dropdown menu**: a `$color.surface` v-stack, `pad($spacing.xs)`, high
   shadow + stroke; items are `rd($radius.sm)` h-rows, destructive ones in
-  `$color.text.error`.
+  `$color.error`.
 - **Tooltip**: a compact one-line dark chip, `$color.shadow` fill with
   light text.
 

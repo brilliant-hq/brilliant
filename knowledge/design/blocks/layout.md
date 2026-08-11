@@ -24,4 +24,4 @@ V-stack `g(0) s(fill,hug)`. Items separated by 1px dividers. Header: spaceBetwee
 Clip frame with slides. Dot indicators: H-row `x(c),y(c) g($spacing.sm)`, active `c s(8,8)` `$color.primary`, inactive `$color.outline.variant`.
 
 ## Form
-V-stack `g($spacing.md) pad($spacing.lg) s(fill or 400-500, hug)`. Sequential fields (Text Input, Select, etc.). Error text(`$font.size.sm`, `$color.text.error`) below invalid. Submit button at bottom.
+V-stack `g($spacing.md) pad($spacing.lg) s(fill or 400-500, hug)`. Sequential fields (Text Input, Select, etc.). Error text(`$font.size.sm`, `$color.error`) below invalid. Submit button at bottom.

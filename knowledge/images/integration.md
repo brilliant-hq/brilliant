@@ -7,20 +7,27 @@ Assumes: `images/prompts`
 
 ## Parameters
 
-| Scenario | imageSize | aspectRatio |
-|----------|-----------|-------------|
-| Draft / iteration | `"1K"` | Match placement |
-| Card thumbnail | `"1K"` | `"4:3"` |
-| Avatar | `"1K"` | `"1:1"` |
-| Hero background | `"2K"` | `"16:9"` or `"21:9"` |
-| Product hero | `"2K"` | `"1:1"` or `"4:3"` |
-| Final marketing | `"4K"` | Varies |
+`imageSize`: `"512px"` | `"1K"` (default) | `"2K"` | `"4K"`. There is no
+`aspectRatio` parameter: the generated image lands as a fill on your
+target element, so its proportions follow the element you created.
 
-**Supported ratios:** 1:1, 1:4, 1:8, 2:3, 3:2, 3:4, 4:1, 4:3, 4:5, 5:4, 8:1, 9:16, 16:9, 21:9
+| Scenario | imageSize |
+|----------|-----------|
+| Draft / iteration | `"512px"` or `"1K"` |
+| Card thumbnail | `"1K"` |
+| Avatar | `"1K"` |
+| Hero background | `"2K"` |
+| Product hero | `"2K"` |
+| Final marketing | `"4K"` |
 
 ## Workflow
 
-`generate_image` returns element ID + asset path. Image auto-placed on canvas. Reposition after.
+Create the **target element first** (an `<objects>` block, or
+`create_modify_elements` for sub-agents / external clients), then call
+`generate_image` with that element's id or `#ref`. The image lands as a
+**fill** on that element; `generate_image` does NOT auto-place a new
+element (it only falls back to creating one if the target can't be
+resolved). It returns the element id + asset path.
 
 ## Image in Layout
 
@@ -44,7 +51,3 @@ Call `generate_image` for ALL images in the same turn, tool executor runs concur
 ## Reference Images
 
 Pass `referenceElementIds` to maintain style across generations.
-
-## Match Aspect Ratio
-
-A 1:1 image stretched to 16:9 looks bad. Set `aspectRatio` to match target frame proportions.

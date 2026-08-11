@@ -37,6 +37,8 @@ Because these are fills, you can interleave them with other fills, for example p
 
 **Color Adjust** is also a fill type (photo-style adjustments applied to everything beneath it). See the Color Adjust section below. Image filters (noise/grain, halftone, pixelate, duotone, posterize, dither) are likewise fill types; see [image-filters.md](./image-filters.md).
 
+**Liquid Glass** is also a fill (and stroke) type: a real refractive glass pane rendered by the engine (not a blur + shadow stack). It lives in the fill/stroke type dropdown under **Static** (labeled "Glass"), with its own preset chooser (Clear, Frosted, Deep, Chromatic, Smoke) and a Tint control. For the full recipe and params, see the `effects/glass` knowledge file.
+
 ## Adding Effects
 
 ### Drop Shadow, Outer Glow, Element Blur
@@ -185,7 +187,7 @@ The per-element layer stack, top to bottom:
 1. Element opacity / blend-mode layer (if element opacity < 100% or blend mode is not Normal)
 2. Element Blur wrap (if an Element Blur effect is enabled)
 3. Drop shadows and outer glows (behind the body, in Effects section order)
-4. Fills in z-order: solid, gradient, image, shaders, inner shadow, inner glow, image filters, color adjust
+4. Fills in z-order: solid, gradient, image, shaders, liquid glass, inner shadow, inner glow, image filters, color adjust
 5. Strokes (same supported types as fills)
 
 **Background blur** is not part of this canvas stack: it samples and blurs the canvas content showing through the element. This is why it has no color, opacity, or blend mode.

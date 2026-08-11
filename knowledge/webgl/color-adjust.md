@@ -110,7 +110,7 @@ void main() {
         if (uBrilliance > 0.0) {
             protection = smoothstep(0.5, 1.0, brillLum) * uBrilliance * 0.7;
         } else {
-            protection = smoothstep(0.5, 0.0, brillLum) * (-uBrilliance) * 0.4;
+            protection = (1.0 - smoothstep(0.0, 0.5, brillLum)) * (-uBrilliance) * 0.4;
         }
         float newLum = mix(curved, brillLum, protection);
 
@@ -154,7 +154,7 @@ void main() {
         if (abs(uClarity) > 0.001) {
             float localAvgLum = dot((cN + cS + cW + cE) * 0.25, LUM);
             float centerLum = dot(color, LUM);
-            float midtoneMask = smoothstep(0.0, 0.3, centerLum) * smoothstep(1.0, 0.7, centerLum);
+            float midtoneMask = smoothstep(0.0, 0.3, centerLum) * (1.0 - smoothstep(0.7, 1.0, centerLum));
             float detail = (centerLum - localAvgLum) * uClarity * 0.6 * midtoneMask;
             color += detail;
         }

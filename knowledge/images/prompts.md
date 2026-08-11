@@ -6,7 +6,8 @@
 |----------|---------|---------------------|
 | Hero photo, product shot, portrait, food | Yes | Only if user explicitly wants placeholder |
 | Texture, pattern fill | Yes | Simple geometric → use gradients |
-| Icon or logo | No, use `svg(icon:name)` | Always vector |
+| Catalog icon (Phosphor set) | No, use `svg(icon:name)` | Always vector |
+| Custom icon / logo | Use `generate_svg` (not `generate_image`) | Simple mark → build with shapes |
 | Abstract geometric | No, build with shapes | Blueprint shapes are sharper |
 
 ## Core Structure

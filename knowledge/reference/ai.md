@@ -146,14 +146,14 @@ Once a session is running, the model can create and modify designs and call tool
 - **Edit existing work:** inspect the current design, change properties, reparent, rename, delete, and reorder elements.
 - **Run app commands:** the AI can invoke Brilliant commands (align, distribute, flip, corner radius, opacity, blend mode, tool changes, frame and component operations, and more, over 100 in all). Each runs through the same path as a button or shortcut, with full undo.
 - **Use selection and search:** read the current selection and look up elements by name, text, type, color, or component.
-- **Export:** render selected elements to PNG, JPEG, WebP, SVG, PDF, or HTML/React markup.
-- **Read and write files / run shell commands / search the web:** when working in a real project workspace (these are most capable in the Claude CLI path). In the web app (browser) there are no shell or file tools and no external MCP servers; `web_fetch` and every canvas tool work normally, and exports return images inline.
+- **Export:** render selected elements to raster (PNG, JPEG, WebP), vector (SVG, PDF), HTML/React markup, or video (MP4, MOV). Raster comes back as an inline image, SVG/HTML/React as text, and PDF as base64; video (and any `outputPath`) writes a file and returns its path. Replay is the one export the tool cannot do (it needs an interactive recording session), so it is UI-only.
+- **Read and write files / run shell commands / search the web:** when working in a real project workspace (these are most capable in the Claude CLI path). In the web app (browser) there are no shell or file tools and no external MCP servers; `web_fetch` and every canvas tool work normally, and exports come back inline (raster as an image, SVG/HTML/React/PDF as text); video export is unavailable in the browser (it needs the native desktop encoder).
 - **Generate images and vectors:** see the sections below.
-- **Spawn sub-agents:** for large tasks, the main session can launch parallel helper agents that each return a summary, shown as collapsible cards.
+- **Spawn sub-agents:** for large tasks, the main session can launch parallel helper agents that each return a summary, shown as collapsible cards. Sub-agents are not available on the Codex backend.
 
 On a **view-only project** (a cloud project opened without edit access, or one being viewed while signed out), the canvas-changing tools are refused with a message to sign in; reading, searching, inspecting the selection, and exporting keep working. Signing in with an account that can edit, or downloading a copy to work on locally, makes the tools available again.
 
-The full canvas-authoring grammar (Blueprint DSL) and the command/tool catalog are documented for the AI in the blueprint and mcp-tools knowledge files; users do not author that syntax by hand.
+The full canvas-authoring grammar (Blueprint DSL) and the command/tool catalog are documented for the AI in the blueprint knowledge files (`blueprint/*`, including `blueprint/commands` for the command catalog); users do not author that syntax by hand.
 
 ---
 
@@ -196,7 +196,7 @@ Type these in the chat input. Some are provider-specific and only appear when re
 | `/usage` | Show account usage |
 | `/cost` | Show cost and usage for this session (Claude CLI and Anthropic only) |
 | `/compact` | Compact (summarize) conversation history |
-| `/feedback` | File feedback or report an issue |
+| `/feedback` | Classify the feedback (bug, feature request, question, or praise) on a quick card, then the agent routes it to the Brilliant team (it loads the playbook and picks the best channel) |
 | `/archive` | Archive the current chat |
 | `/new` (`/clear`) | Start a new chat |
 | `/model` | Change the model (provider-then-model picker) |
@@ -223,8 +223,8 @@ Exporting a session as a video replay is not a slash command: it is an action on
 | Action | Shortcut |
 |--------|----------|
 | Focus AI input in bottom toolbar | / |
-| Focus chat session 1-9 | Cmd+1 - Cmd+9 |
-| Focus chat session 10 | Cmd+0 |
+| Focus chat session 1-9 | Cmd+1 - Cmd+9 (Windows: Alt+1 - Alt+9) |
+| Focus chat session 10 | Cmd+0 (Windows: Alt+0) |
 | Focus next chat session | Cmd+Shift+] |
 | Focus previous chat session | Cmd+Shift+[ |
 | New chat (when AI input focused) | Cmd+N |

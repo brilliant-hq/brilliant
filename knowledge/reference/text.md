@@ -14,7 +14,7 @@ Text is a regular element type. A text element is its bounding box plus a text p
 | Activate Text tool | Press **T**, or pick the Text tool in the bottom toolbar |
 | Place a text element | With the Text tool active, click on the canvas; the caret lands and editing starts immediately |
 
-New text starts empty with the current font family (default "System Font") and current font size (default 24px). These defaults carry forward from the last text you styled. A fresh text element hugs its content in both axes (Auto Size), so it grows as you type until you resize it or change its sizing mode.
+New text starts empty with the current font family (default Inter) and current font size (default 24px). These defaults carry forward from the last text you styled. A fresh text element hugs its content in both axes (Auto Size), so it grows as you type until you resize it or change its sizing mode.
 
 The Text tool is click-to-place only. Dragging does not create a fixed-width box; to get a fixed width, resize the element after creating it (which switches it to a fixed sizing mode).
 
@@ -83,11 +83,19 @@ Typography commands applied to a selected frame (not in edit mode) cascade to al
 
 Recently used fonts appear at the top when the search box is empty.
 
-**Available fonts:** about 300 curated Google Fonts plus all system fonts installed on your OS. Google Fonts load on demand (first use triggers a fetch, then cached). There is no in-app custom font upload; to use a font not in the list, install it as a system font and it appears in the picker. The "System Font" entry maps to the platform default font.
+**Available fonts:** about 300 curated Google Fonts plus all system fonts installed on your OS. Google Fonts load on demand (first use triggers a fetch, then cached). There is no in-app custom font upload; to use a font not in the list, install it as a system font and it appears in the picker. Text with no explicit family is Inter, which ships with the app: there is no separate "System Font" entry, and your platform's UI font (SF Pro Display on macOS, Segoe UI on Windows) is just another pickable family.
 
 ### Font weight
 
 Set via the weight dropdown in the Typography section, which lists only the weights the current font actually provides. Standard scale: Thin (100), Extra Light (200), Light (300), Regular (400, default), Medium (500), Semibold (600), Bold (700), Extra Bold (800), Black (900).
+
+### Italic
+
+Toggle with the Italic button in the Typography section or **Cmd+I**. When the font family ships a real italic face at the weight you are using, that face is used. When it does not (many display and trial fonts ship upright faces only, and plenty of classic families ship an italic at regular weight but no bold italic), Brilliant slants the upright face by 14 degrees instead of ignoring the request, the same way browsers, Word and Figma-adjacent tools do. Slanting never changes spacing, so the text box, line breaks and the caret land exactly where they would upright.
+
+**An italic toggle never changes weight.** Bold text stays bold when you italicize it. Where a family has no bold italic, you get the bold face slanted rather than the family's regular-weight italic: keeping the weight you chose matters more than using a hand-drawn slant one weight too light.
+
+The slant is the same whatever else you do to the text: skewing it, adding a stroke, or filling it with liquid glass never straightens it back out.
 
 ### Font size
 

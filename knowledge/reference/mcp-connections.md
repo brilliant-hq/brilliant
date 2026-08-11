@@ -15,12 +15,17 @@ Brilliant servers.
 Looking for the other direction (using external MCP servers *inside*
 Brilliant's own chat)? See `mcp-external-servers.md`.
 
-The server is a local HTTP endpoint, normally `http://127.0.0.1:3333/mcp`
-(falls back to 3334/3335 at startup if the port is busy). It supports multiple
+The server is a local HTTP endpoint, normally `http://127.0.0.1:3333/mcp`. At
+startup it takes the first free port of 3333, 3334, 3335. It supports multiple
 clients at once. **Brilliant must be running for a connected tool to reach
-it.** Once bound, the port is stable for the app's lifetime: if the listener
-ever drops (e.g. across sleep/wake), Brilliant rebinds the same port
-automatically, so a configured client URL stays valid.
+it.** Within one run the port is stable: if the listener drops (for example
+across sleep/wake), Brilliant rebinds the **same** port rather than walking to a
+neighbor. Two caveats: (1) the port pool is shared with any OTHER running
+Brilliant instance, so if a second instance already holds 3333 this one lands on
+3334/3335, and a client hardcoded to 3333 reaches whichever instance owns 3333,
+not necessarily the one you are looking at; (2) if all three ports are taken,
+the server cannot bind at all and shows a port-unavailable notice with a Retry,
+so the configured URL is not live until it binds.
 
 Supported clients include Claude Code, Cursor, VS Code (Copilot), Windsurf, Zed,
 Codex CLI, Gemini CLI, Antigravity, and OpenCode (opencode.ai). The roster keeps
@@ -67,8 +72,8 @@ preserved.
 | Cursor | `~/.cursor/mcp.json` | |
 | VS Code (Copilot) | `.../Code/User/mcp.json` | comments preserved |
 | Windsurf | `~/.codeium/windsurf/mcp_config.json` | |
-| Zed | `~/.config/zed/settings.json` | comments preserved |
-| Codex CLI | `~/.codex/config.toml` | Brilliant also auto-adds this on launch |
+| Zed | `~/.config/zed/settings.json` (Windows: `%APPDATA%\Zed\settings.json`) | comments preserved |
+| Codex CLI | `~/.codex/config.toml` | Brilliant also auto-adds this on launch, but only when `~/.codex/` already exists (Codex installed); skipped otherwise so a non-Codex home is not touched |
 | Gemini CLI | `~/.gemini/settings.json` | |
 | Antigravity | `~/.gemini/antigravity/mcp_config.json` | |
 | OpenCode | `~/.config/opencode/opencode.json` | comments preserved |
