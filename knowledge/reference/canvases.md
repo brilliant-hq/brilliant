@@ -37,6 +37,8 @@ Cmd+N inside the file explorer creates the canvas inside the focused folder; oth
 
 Switching canvases is instant and not undoable. Each canvas keeps its own independent undo history; Cmd+Z on a canvas undoes that canvas's last action. When the file explorer is focused, Cmd+Z routes to a separate explorer undo stack covering rename, create, delete, move, and reorder of canvases and folders.
 
+Switching announces itself when the new canvas is still loading: if content does not appear almost immediately (a heavy canvas, a slow first paint), the canvas area briefly dims with a subtle shimmer rather than leaving the old canvas showing, and clears the instant the new content is on screen. Fast switches (the normal case) never flash it.
+
 Per-canvas state saved into the `.bl` file: element data, hierarchy, fills/strokes/effects, components, design-system bindings, background settings, ruler guides, zoom, and pan position. Selection and undo history live only for the session.
 
 ### Folders
@@ -186,6 +188,8 @@ The section works the same in the desktop app and in the browser editor on any p
 **What comes across:** frames, groups, and auto layout (including wrap and its cross-axis row gap); components and instances; vectors and shapes; text with case, decoration (underline, strikethrough), and vertical alignment; fills and strokes including per-side widths, dashes, join, and miter; masks and boolean shapes; tiled and cropped images with their color adjustments. Missing fonts warn and fall back to a bundled font, so the text still lands.
 
 **Known gaps for URL import (REST API):** design-system tokens and liquid-glass parameters do not come across. Colors and spacing import as literal values rather than links to tokens, and glass is not exposed over Figma's REST API. To bring design-system variables and glass across, use the Brilliant Figma plugin instead: copy in Figma with the plugin, then paste (Cmd+V) into Brilliant.
+
+**The design system comes with it (plugin path):** a plugin paste brings the file's design system across as a real Brilliant system, not flattened literals. Variables keep their Figma names, each multi-mode collection becomes a mode axis (a light/dark collection drives the theme toggle), and shared styles become tokens; bound nodes come in referencing those tokens instead of baked values, and any losses are named in the import warnings. See `reference/design-systems` ("Importing a Design System from Figma") for the full story.
 
 ### Importing SVG files
 
