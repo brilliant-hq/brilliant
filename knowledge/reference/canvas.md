@@ -339,8 +339,8 @@ A 1-pixel grid overlay for pixel-perfect work at high zoom levels.
 
 ### Visibility
 
-- **Appears at 400%+ zoom** (4x and above)
-- **Fades in smoothly** between 400% and 600% zoom
+- **Appears from 5000% zoom** (50x and above)
+- **Fades in smoothly** between 5000% and 6000% zoom (fully faded in by 6000%)
 - **Adaptive contrast:** each line reads the content beneath it and shifts its
   luminance away from the local backdrop (darker on light content, lighter on
   dark), so the grid stays visible on any background, including photos and

@@ -103,15 +103,17 @@ Click the fill color swatch in the right toolbar to open the color picker. Use C
 2. Or change the fill type to Linear / Radial / Angular via the type dropdown on the fill row in the right toolbar
 3. Click color stops to edit, add stops by clicking the gradient bar in the color picker, drag to reposition
 
-Three gradient types are supported: **Linear**, **Radial** (elliptical), and **Angular** (sweep / conic). Diamond, mesh, and multi-axis conic gradients are NOT available. Select the gradient type from the fill type dropdown in the right toolbar's "Colors" group.
+Four gradient types are supported: **Linear**, **Radial** (elliptical), **Angular** (sweep / conic), and **Diamond** (a four-point rhombus). Mesh and multi-axis conic gradients are NOT available. Select the gradient type from the fill type dropdown in the right toolbar's "Colors" group.
 
 Gradient handles render on the canvas while the color picker is open for that element's fill or stroke.
 
-**Linear gradients** are defined by start/end points: edit on canvas by dragging the gradient handles (start handle, end handle), or click the gradient line to add a color stop.
+**Linear gradients** are defined by start/end points plus a width (shear) handle: drag the start and end handles to set direction, drag the width handle to shear the color bands off perpendicular (leave it where it sits for a plain perpendicular gradient), or click the gradient line to add a color stop.
 
 **Radial gradients** are defined by center, radius, and width handles: drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to make the gradient elliptical.
 
 **Angular gradients** (sweep/conic) rotate color stops around a center point: drag the center to reposition, drag the angle handle to rotate the gradient start direction. The angular sweep covers a full 360 degrees with wrap-around interpolation across the seam.
+
+**Diamond gradients** radiate along a four-point rhombus and use the same center, radius, and width handles as radial: drag the center to reposition, drag the radius handle to resize and rotate, drag the width handle to stretch or skew the rhombus (both axes stay adjustable).
 
 Add / remove / reposition color stops directly on the gradient bar in the color picker, or by clicking the canvas gradient line. Hovering a stop shows the position percentage and color hex, dragging shows just the percentage.
 
@@ -222,7 +224,7 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 
 ### Stroke Style Types
 
-Strokes support the same fill-type set as fills (the same type dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular), **Static** (Image, Inner Shadow, Inner Glow, Background Blur, Liquid Glass), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). 22 types total. Inner Shadow / Inner Glow as a stroke render over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
+Strokes support the same fill-type set as fills (the same type dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular, Diamond), **Static** (Image, Inner Shadow, Inner Glow, Background Blur, Liquid Glass), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). 23 types total. Inner Shadow / Inner Glow as a stroke render over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
 
 Text ranges only support Solid.
 

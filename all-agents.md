@@ -43,7 +43,7 @@ RIGHT:  get_knowledge(keys: ["design-systems/core", "design/foundations", "desig
 
 - design-systems/{core, authoring, authoring-modes}
 - blueprint/{core, layout, layout-patterns, paint, text, styled-ranges, effects, vectors, components, libraries (multi-canvas projects: masters on one canvas consumed on another), lines (straight lines, arrows, flowchart/dependency arrows, callouts), arcs (progress rings, donut/pie charts, activity meters, partial circles), images, commands, directives}
-- blueprint/gradients/{linear, radial, angular}
+- blueprint/gradients/{linear, radial, angular, diamond}
 - blueprint/shaders/{overview, metaballs, metal, irid, steel}
 - design/{foundations, colors, typography, shadows, backgrounds, gradients, brand}
 - design/blocks/{actions, inputs, navigation, data-display, feedback, layout, patterns}

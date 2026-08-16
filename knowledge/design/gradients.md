@@ -9,6 +9,16 @@ For gradient syntax, see `blueprint/paint` and `blueprint/gradients/*`.
 
 Gradient CTAs = **never** (solid only, gradient CTAs are the #1 AI tell). Hero bg = maybe (subtle tonal shift). Card accent bar = maybe (small surface). Sparkline fill = yes (fading to transparent). Every surface = no (modern design = solid + whitespace).
 
+## The Four Kinds
+
+Linear is the default and the safe one. The other three are for specific moods; reach for them sparingly. Syntax for each is in `blueprint/gradients/*`.
+
+- **Radial**: a point-source glow (spotlight, orb, focal gravity). Off-center by default.
+- **Angular** (sweep): progress rings, gauges, and metallic/holographic sheen on round shapes.
+- **Diamond**: a hard-edged, four-point rhombus falloff for a faceted, gem-like radiate where a radial reads too soft. A crystal, a jewel badge, a sparkle. A first-class kind now, so it survives Figma import and round-trips losslessly (no more silent flattening to a solid color).
+
+**Linear shear.** Linear carries an optional third handle (`w(wx,wy)`) that skews the color bands off perpendicular. Rare in original work, but it imports faithfully from Figma now (a sheared linear no longer straightens on the way in). Use it only to match a source, or for a deliberate skew on a large surface.
+
 ## Direction = Mood
 
 `180` grounding · `135` energizing · `0` uplifting · `90` progressive
