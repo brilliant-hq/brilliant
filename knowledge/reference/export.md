@@ -170,6 +170,8 @@ AI agents can export programmatically via the MCP `export` tool. It handles rast
 
 Every export renders through the canvas engine, so if the engine stops for the session (the canvas shows the "Something went wrong rendering the canvas" panel), exports refuse instead of producing files. You get a clear message naming the state, and the fix is the panel's own **Restart rendering** button. Once the canvas is back, export again. This applies to every format, to Copy as PNG/WebP, to video and replay, and to the MCP `export` tool, which answers with the same reason. Retrying the export without restarting rendering will keep refusing, by design: it prevents empty or half-drawn files that look like real output.
 
+On some machines rendering can't start at all because the computer's graphics hardware isn't supported or its graphics driver is out of date. The canvas then shows a distinct panel ("Brilliant can't render on this graphics hardware") rather than the transient one, and **Restart rendering** won't bring it back until the driver is updated (or the file is opened on a machine with a supported GPU). Exports refuse the same way in that state, so there's nothing productive to retry until the underlying graphics issue is resolved. The panel's **Report** button copies a diagnostic signature (the failure detail, the graphics backend, and the OS) to share in a support conversation.
+
 ## Other application formats
 
 | Format | Import | Export | Notes |

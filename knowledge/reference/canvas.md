@@ -173,7 +173,7 @@ Both nudge variants register undo and respect per-parent constraints.
 - Selection rectangles: one per parent with selected children, plus resize/rotate handles
 - Snap guides: solid alignment lines and dashed spacing/distribution/size labels
 - Measurement overlays: Alt+hover shows pixel distances and frame padding
-- Frame labels: above top-level frames; click selects the frame
+- Frame labels: above top-level frames; click selects the frame. At low zoom labels declutter: frames too small on screen drop their label, and colliding labels keep only the widest frame's name (hovered or selected frames always keep theirs)
 
 ## Blend Modes
 
@@ -302,7 +302,7 @@ Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and 
 | Toggle passthrough | Ctrl+A | Overlay only: pointer events pass through to apps below |
 | Toggle presentation mode | Alt+P | Hides UI panels for a clean view |
 | Toggle agent cursors | (none) | Named cursors for the user and AI agents (command palette: "Toggle Agent Cursors"; Settings → General) |
-| Toggle UI (panels) | Cmd+\ | Hide/show the left, right, and bottom toolbars. The top strip (home / tabs / breadcrumb) and the command palette stay visible. |
+| Toggle UI (all chrome) | Cmd+\ | Hide/show ALL app chrome: the left, right, and bottom toolbars AND the top strip (home / tabs / breadcrumb, plus the phantom title bar). Summoned surfaces stay reachable (command palette, tooltips, notifications), and pressing Cmd+\ again brings everything back, so nothing is unreachable. |
 | Toggle inspector sections | Cmd+/ | Collapse/expand all collapsible toolbar sections (the right-toolbar inspector groups) |
 | Toggle left toolbar | Cmd+Shift+Left | |
 | Toggle right toolbar | Cmd+Shift+Right | |
@@ -310,7 +310,7 @@ Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and 
 | Toggle desktop icons | Ctrl+I | Hides/shows the macOS desktop icons (a real Finder toggle). macOS only: the command hard-returns off macOS, and the Ctrl+I chord is disabled on Windows (freed for Italic) |
 | Clear all elements | C | Removes all elements from the active canvas (undoable) |
 
-Passthrough mode is overlay-only. Cmd+\ hides the working toolbars (left / right / bottom) in both window modes and keeps the top strip; the top strip's tabs are already suppressed in overlay, so an overlay drawing surface stays nearly clear.
+Passthrough mode is overlay-only. Cmd+\ hides ALL app chrome (the left / right / bottom toolbars plus the top strip) in both window modes; press it again to bring everything back. In overlay the top strip's tabs are already suppressed, so an overlay drawing surface stays clear. The hidden state is not remembered across launches: a reboot always restores the chrome.
 
 **Agent cursors** (on by default; toggle via the command palette "Toggle Agent Cursors" or Settings → General → Agent Cursors; persisted across restarts) adds multiplayer-style named cursors. Each AI agent working on the canvas gets a cursor (the same arrow as the user's own cursor, tinted in the agent's session color, matching its shimmer) that glides between the elements it touches, with a name tag. The cursor is present for the WHOLE turn, not just during edits: it appears (slightly dimmed) the moment the agent starts thinking — before its first edit — sits quietly near its last work (or mid-viewport on a first turn), and lifts to full strength when the agent edits or narrates. External agents driving Brilliant over MCP (e.g. Claude Code terminals) stay visibly present across their tool calls the same way. If you switch to another canvas, the cursor stays with its work and reappears there when you switch back. Agents name themselves after the task at hand (e.g. "Meditation App", streamed via the same mechanism as chat titles), falling back to a stable per-session name like "Nova" or "Pixel" until the name arrives. With "Show Agent Thinking" enabled (sub-setting, on by default), the name tag extends into a small card where the agent's live commentary types out word-by-word at reading pace, subtitle-style (up to four scrolling lines); element references appear as clickable chips that select and zoom to the element. The cursor waits for its caption to finish before moving on, and if a response ends naturally the caption plays out before the cursor fades; stopping the chat removes both immediately. **Clicking an agent's cursor, name, or card opens its chat session** (the pointer shows a click cursor over it, and clicks never affect canvas content beneath). Optionally (sub-setting "Show Your Cursor Name", off by default) the user's own pointer carries a blue name tag baked into the native arrow cursor (zero lag); the name defaults to the local part of the activation email and can be changed in Settings → General → Agent Cursors → Displayed Name. All of these settings persist across restarts.
 

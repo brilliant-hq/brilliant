@@ -502,6 +502,15 @@ Rapid arrow-key nudges are combined into a single undo entry after 1 second of i
 layout on every frame that has a fill-sized child and heals any stale
 geometry, on either axis, as ONE undoable step. Use it when fill children
 render at the wrong size after opening an older file (for example, a divider
-that should span its row). A canvas with nothing to heal reports zero and
-changes nothing. Saves also announce lingering fill inconsistencies in the
-background; they never block saving.
+that should span its row). If everything is already laid out correctly, it
+makes no changes and adds nothing to undo; the number it reports counts the
+elements it repaired, so a clean file reports zero. Saving also flags
+lingering fill problems in the background: that save-time check only looks at
+cross-axis sizes and never blocks saving.
+
+It also unfreezes component instance children on the same canvas whose
+fill/hug geometry was mistakenly frozen against their master: a frozen mark is
+released only on positive proof that the geometry is a pure layout result, and
+any genuinely placed override (a move, resize, rotation, or flip, however
+small) keeps its mark. Instances whose master lives on another canvas are out
+of scope. This is folded into the same single undo step.

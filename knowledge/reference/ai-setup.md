@@ -47,9 +47,23 @@ On the AI Providers list:
 - **Codex** follows Claude Code and likewise has no key field: it signs in with
   a ChatGPT subscription, not an API key. Install with `npm install -g
   @openai/codex`, run `codex login` once, and Brilliant detects it on launch. Its
-  GPT-5.6-family and GPT-5.5 models then appear in the model selector.
+  GPT-5.6-family and GPT-5.5 models then appear in the model selector. Detection
+  searches the usual install locations (Homebrew, npm, pnpm, Volta, Bun, and the
+  nvm/fnm/asdf/mise node-version dirs). If your codex lives somewhere unusual, or
+  a slow shell startup outruns detection, set the `BRILLIANT_CODEX_PATH`
+  environment variable to the codex binary and Brilliant will use it directly.
 - **Quiver** powers AI vector generation and vectorization, not chat. It is set
   the same way but is not a chat provider.
+
+**Model-setting tip:** design iteration in Brilliant tends to reward fast
+feedback over deep deliberation. Running models with extended thinking OFF
+usually costs nothing in result quality here and gets more iterations out of
+the same tokens and time, since each round-trip is shorter. This works because
+mistakes cannot pass silently: a wrong tool call halts with clear diagnostics,
+and the canvas feedback flags clipping elements, unreadable text, and similar
+issues visually, so the model corrects on the fly instead of needing to reason
+everything out up front. Worth trying as the default; switch thinking on for
+genuinely gnarly one-shot asks.
 
 ## Custom and self-hosted providers
 

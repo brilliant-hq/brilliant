@@ -48,6 +48,16 @@ Per-canvas state saved into the `.bl` file: element data, hierarchy, fills/strok
 
 Right-click a folder in the file explorer for: Rename, Delete, Duplicate, Cut, Copy, Paste, New Canvas, New Folder (inside this folder), Expand/Collapse/Expand All/Collapse All, Reveal in Finder, Copy Relative Path, Copy Absolute Path. Folders can be nested, and canvases can be dragged between them (multi-select supported).
 
+### Copy and paste between projects
+
+The explorer clipboard travels across projects: copy (or cut) canvases, folders, or asset files in one project, switch to another project's tab, and paste.
+
+- **Canvases** arrive with their content. Image assets they use are copied into the destination (renamed on a name clash, never overwriting a destination file), and referenced brand `.ds` files come along; if the destination already defines a brand with that name, the destination's definition wins.
+- **Folders** travel as a whole tree: canvases, subfolders, assets, and other files keep their layout, and references inside the copied tree keep working. Anything the tree referenced from outside it (say a root-level asset) is copied in too.
+- **Cut** moves: once the paste lands, the originals go to the source project's trash (recoverable, like any delete).
+- Name clashes always keep both; the pasted copy gets a numbered name.
+- Works between local (on-disk) projects today. Copying files into or out of a cloud-only project via the explorer isn't supported yet; the app tells you instead of doing nothing.
+
 **Color tags:** append a color suffix to a folder or canvas name to color its icon and breadcrumb. Supported suffixes: `.red`, `.green`, `.yellow`, `.orange`, `.purple`, `.pink`, `.gray` (or `.grey`). Without a suffix the icon is blue. Example: naming a folder `Components.purple` shows a purple icon. The suffix is hidden from the displayed name and preserved through renames.
 
 ## File Explorer
