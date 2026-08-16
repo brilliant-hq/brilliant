@@ -188,7 +188,7 @@ Brilliant supports blend modes at four scopes: element, fill, stroke, and effect
 
 Element-level blend mode wraps the whole element in a single composite layer so its fills, strokes and effects composite normally with each other first, then the unit blends against the canvas. Fill, stroke, and effect modes are independent and apply only to their own render pass.
 
-Supported modes (16): Normal, Darken, Multiply, Color Burn, Lighten, Screen, Color Dodge, Overlay, Soft Light, Hard Light, Difference, Exclusion, Hue, Saturation, Color, Luminosity. The same set exports cleanly to SVG (`mix-blend-mode`) and PDF.
+Supported modes (18): Normal, Darken, Multiply, Color Burn, Plus Darker, Lighten, Screen, Color Dodge, Plus Lighter, Overlay, Soft Light, Hard Light, Difference, Exclusion, Hue, Saturation, Color, Luminosity. Plus Darker (Figma's Linear Burn) and Plus Lighter (Linear Dodge) are the additive/subtractive pair, grouped with the darken and lighten families. In the Blueprint DSL they are `blend(plusDarker)` / `blend(plusLighter)`. All 16 classic modes export cleanly to SVG (`mix-blend-mode`) and PDF; Plus Lighter/Plus Darker have no portable SVG/PDF equivalent and fall back to Normal in those exports (the canvas and PNG/JPEG/WebP raster export render them faithfully).
 
 ## Rendering Performance
 

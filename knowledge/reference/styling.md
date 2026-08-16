@@ -247,7 +247,7 @@ Blend modes control how elements, fills, strokes, and effects composite against 
 | **Stroke** | Right toolbar, per-stroke row (expanded config) | Normal |
 | **Effect** | Right toolbar, per-effect row (expanded config) | Normal (Screen for glow) |
 
-**16 blend modes:** Normal, Darken, Multiply, Color Burn, Lighten, Screen, Color Dodge, Overlay, Soft Light, Hard Light, Difference, Exclusion, Hue, Saturation, Color, Luminosity.
+**18 blend modes:** Normal, Darken, Multiply, Color Burn, Plus Darker, Lighten, Screen, Color Dodge, Plus Lighter, Overlay, Soft Light, Hard Light, Difference, Exclusion, Hue, Saturation, Color, Luminosity. Plus Darker (Figma's Linear Burn) and Plus Lighter (Linear Dodge) sit with the darken/lighten families; in the Blueprint DSL they are `blend(plusDarker)` / `blend(plusLighter)`.
 
 **Element-level** wraps the entire element (fills + strokes + effects) as a unit, then blends against the canvas. **Fill/stroke-level** blends each individual fill or stroke independently.
 

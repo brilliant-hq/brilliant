@@ -50,9 +50,13 @@ Three equivalent paths:
    (`open_mcp_connections_settings`). Every supported tool also has its own
    always-available command, e.g. "Toggle Cursor MCP Connection"
    (`toggle_<client>_mcp`).
-3. **First-run / demo chat.** The setup Q&A offers **"Drive Brilliant via MCP"**
-   (subtitle "Cursor, Claude Code, Codex, Antigravity, and more"); picking it
-   lists every supported tool as one flat list, and choosing one connects it.
+3. **First-run / demo chat.** The in-chat setup's first question offers
+   **"Connect a coding agent (MCP)"** (and the guided wizard's coding-agent
+   option leads to the same place); picking it lists every supported tool as one
+   flat list, and choosing one connects it. On desktop, connecting shows a
+   numbered checklist (Brilliant writes the config, then restart the tool and
+   start a session). In the web editor it shows the exact command to copy and
+   checks off automatically once the agent connects.
 
 After connecting, **the tool must be restarted** to pick up the new server
 (the UI shows a restart note). Then, inside that tool, the user asks it to

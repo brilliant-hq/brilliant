@@ -143,6 +143,18 @@ Dragging past an anchor flips the element; the resize continues smoothly past ze
 
 Resizing a child in auto layout converts that axis to **fixed** sizing with the new dimension. The parent recalculates layout immediately. Hug/fill ancestors propagate the size change up the tree.
 
+### Container Resize (Child Pins)
+
+Resizing a Frame, Component, Instance, or non-hug Group moves and stretches its children according to each child's **pin constraints** (set in the Element section's pin row; see [frames.md](./frames.md#pin-constraints)). Per axis, independently:
+
+- **Left / Top** (the default): the child keeps its parent-local position. This is identical to the behavior before pins existed, so a design that never sets a non-default pin resizes exactly as it used to.
+- **Right / Bottom**: the child keeps its offset from the container's trailing edge and rides the right/bottom edge.
+- **Center**: the child keeps its center's offset from the container center.
+- **Left and right / Top and bottom** (stretch): the child keeps both edge offsets, growing and shrinking with the container.
+- **Scale**: both edges move proportionally, scaling the child with the container.
+
+Resizing a **hug Group** converts it to a fixed-size group and activates its children's pins (dormant while the group hugs). Auto layout flow children are positioned by the flow, not by pins; an absolute-positioned auto layout child pins within its frame.
+
 ### Precise Dimensions
 
 The right toolbar shows W and H fields with an aspect-ratio lock icon. All numeric fields support math expressions and natural language (e.g., `* 2/3`, `double`, `50%`, `round 8`). See [ui.md](./ui.md#interactive-fields).

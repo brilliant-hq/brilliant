@@ -19,7 +19,7 @@ In Brilliant, every container element is a **parent**. Parents come in 8 sub-typ
 | Component | Component | Masters and instances. See [components.md](./components.md) |
 | Artboard | Canvas (separate page) or Frame (bounded area) | |
 | **Mask** (Cmd+Option+M) | Mask (**Ctrl+Cmd+M**) | macOS reserves Cmd+Option+M for "Minimize All Windows" |
-| Constraints (pin to edges) | Not available | Use auto layout with hug/fill/fixed |
+| Constraints (pin to edges) | Constraints (pin row in the Element section) | Map 1:1. Imported verbatim from Figma; see [Pin Constraints](#pin-constraints) |
 | Absolute position | Pin button in the Element section position row | Same concept |
 | Boolean ops | Boolean parents | Each op produces a re-editable parent (double-click to edit) |
 
@@ -330,6 +330,24 @@ How they behave:
 | Fixed | The size clamps to the min/max range. Manually resizing a constrained element snaps to the bound live during the drag |
 
 If min is set above max, min wins. Constraints survive manual resize and rotation (only the sizing mode converts to Fixed, as usual). Blueprint: `min(w,h)` and `max(w,h)` after `s()`, empty slot skips an axis. Constraints round-trip through Figma import and Send to Figma.
+
+#### Pin Constraints
+
+A child of a container whose box does not follow its children (a Frame, Component, Instance, or non-hug Group) holds its place when that container is resized according to its **pin constraints** (Figma parity). The **pin row** in the right toolbar's Element section (below the W/H sizing row) pairs Figma's nine-nub widget on the left (click a nub to pin that edge, opposite nubs to stretch, the center nub to center) with two dropdowns on the right: horizontal (Left, Right, Center, Left and right, Scale) and vertical (Top, Bottom, Center, Top and bottom, Scale). The default is Left / Top.
+
+Per axis, five kinds:
+
+| Kind | On container resize |
+|------|---------------------|
+| Left / Top (default) | Keep the leading offset (distance from the left/top edge). This is the pre-constraint behavior: parent-local position is preserved |
+| Right / Bottom | Keep the trailing offset (distance from the right/bottom edge), so the child rides that edge |
+| Center | Keep the child center's offset from the container center |
+| Left and right / Top and bottom | Keep both edge offsets, so the child grows and shrinks with the container |
+| Scale | Interpolate both edges proportionally to the size change |
+
+**Where the row shows:** children of Frames, Components, Instances, and non-hug Groups. It is **hidden** wherever pins are dormant, with no gray-out state. An auto layout flow child shows sizing / flex instead; toggle **Absolute Position** to restore its pins, which then hold it within the auto layout frame. A hug Group's children hide the row entirely (their pins wake only once the group is resized to a fixed size). Top-level elements have no pins.
+
+Blueprint: `pin(H,V)`, H in `l/r/c/lr/scale`, V in `t/b/c/tb/scale`, absent = `pin(l,t)` (for example `r p(260,12) s(20,20) pin(r,t)` pins a close button to the top-right corner). Constraints import verbatim from Figma (LEFT_RIGHT to stretch, SCALE to scale, CENTER to center, RIGHT / BOTTOM to max) and round-trip through Send to Figma.
 
 #### Flex Factor
 

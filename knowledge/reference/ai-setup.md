@@ -16,10 +16,10 @@ only to that provider's own API endpoint. Brilliant also reads provider
 environment variables as a fallback: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
 `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`.
 
-In the **web editor** (brilliant.design), Anthropic, Google, and OpenRouter
-work; direct OpenAI is refused honestly (its API blocks browser requests —
-OpenAI models run there via OpenRouter), and Claude Code / Codex / MCP
-connections need the desktop app.
+In the **web editor** (brilliant.design), Anthropic, OpenAI, Google, and
+OpenRouter all work with a pasted API key (the key lives in that browser's
+local storage and requests go straight to the provider). Claude Code / Codex /
+MCP connections need the desktop app.
 
 ## Adding a key (Settings → AI Providers)
 
@@ -38,8 +38,8 @@ On the AI Providers list:
 - **Google** can alternatively sign in with Google (a localhost OAuth flow)
   instead of a raw key.
 - **Claude Code** leads the list and has no key field: install the `claude` CLI
-  and Brilliant detects it automatically — on launch, when the AI Providers pane
-  opens, and on the in-chat setup's "check again" — with no app restart needed
+  and Brilliant detects it automatically (on launch, when the AI Providers pane
+  opens, and on the in-chat setup's "check again") with no app restart needed
   after installing. If the CLI is not signed in, run `claude auth login` in a
   terminal. If the row reads "Installed · login unverified, chat still works",
   only the sign-in check was inconclusive: the CLI is detected and chat runs
@@ -115,20 +115,36 @@ project canvas and save normally. View-only visitors never get demo mode. The
 
 Sending a free-form prompt with no provider connected starts a short in-chat
 setup conversation (the typed prompt is stashed and sent for real once a provider
-is live). It offers to **set it up here** or **open Settings**, then a provider
-picker: Anthropic / OpenAI / Google / OpenRouter (paste a key), a **custom
-OpenAI-compatible** path (pick a preset, optionally paste a key, pick a model),
-**Claude Code** (install steps), **Drive Brilliant via MCP** (connect an external
-tool such as Cursor, Claude Code, Codex, or Antigravity, see
-[mcp-connections.md](./mcp-connections.md)), and an **"I don't know"** option that
-recommends a path in plain language. A pasted key never appears in the transcript
-or prompt history. Question options are clickable — clicking one sends its
-number, same as typing it.
+is live). The first question is **"How do you want to use AI with Brilliant?"**
+with three choices:
 
-In the web editor the same conversation stays honest about the browser: OpenAI,
-Claude Code, Codex, and MCP are still listed, but picking one explains why it
-needs the desktop app and reroutes to the closest working path (OpenAI/Codex →
-an OpenRouter key; Claude Code → an Anthropic key).
+- **Set it up with me** starts a quick guided wizard. It asks **"Which of these
+  do you already have?"** with four options: a coding agent (Claude Code, Cursor,
+  and more), a Claude or ChatGPT subscription, an AI API key, or "none of these,
+  or I'm not sure". Each routes to the matching setup: the coding-agent option
+  connects an external tool; the subscription option sets up Claude Code or Codex
+  (or, in the browser, a key instead); the API-key option opens the provider
+  picker (Anthropic / OpenAI / Google / OpenRouter, a custom OpenAI-compatible
+  endpoint, or help choosing, then paste a key); and "not sure" recommends the
+  cheapest sensible way to start with concrete next steps. Nothing dead-ends.
+- **Connect a coding agent (MCP)** is the fast lane to driving Brilliant from an
+  external tool such as Claude Code, Cursor, or Codex (see
+  [mcp-connections.md](./mcp-connections.md)).
+- **Open Settings** jumps to the AI Providers pane.
+
+Steps that involve out-of-app actions (installing a CLI, creating an API key, or
+connecting a coding agent) show as a **numbered checklist** with the current step
+highlighted, checking off as you go. The connect-a-coding-agent checklist shows
+the exact command to copy and checks off on its own once your agent connects. A
+pasted key never appears in the transcript or prompt history. Question options
+are clickable: clicking one sends its number, same as typing it. Choosing "Start
+over" always returns to that first question.
+
+In the web editor the same conversation stays honest about the browser:
+Anthropic, OpenAI, Google, and OpenRouter keys all work here. Claude Code,
+Codex, and connecting a coding agent are still offered, but picking one explains
+why it needs the desktop app and reroutes to the closest working path (Codex to
+an OpenRouter key, Claude Code to an Anthropic key).
 
 ## When a key is rejected
 
