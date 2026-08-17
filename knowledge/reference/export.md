@@ -42,12 +42,16 @@ The Export panel and the `Copy as WebP` command both produce lossy WebP at quali
 
 ### Text ranges: hyperlinks and gradients
 
-Two per-range text features carry unevenly across formats:
+**Text stays text everywhere possible.** Non-gradient text ranges export as real text in every lane.
 
-- **A hyperlink on a text range** exports as a real anchor in **HTML** (`<a href>`) and **SVG** (`<a xlink:href>`). **PDF** and the raster formats (**PNG/JPEG/WebP**) cannot carry a clickable link, so linked text exports as ordinary styled text.
-- **A gradient on a text range** renders in the raster formats (**PNG/JPEG/WebP**, which read back the live canvas) exactly as on screen. The vector and markup lanes (**SVG**, **PDF**, **HTML/React**) do not carry a per-range gradient: that range falls back to its base text color.
+- **A gradient on a text range** now carries in every format.
+  - **PNG/JPEG/WebP** read back the live canvas exactly as on screen.
+  - **SVG** and **PDF** outline just the gradient-filled glyphs to vector paths filled with the gradient (Figma's own move), keeping every other character as real text.
+  - **HTML/React** paint the span with `background-clip:text` (a real, selectable text span; exact and resolution-independent).
+  There is no longer a silent fall to the base text color: if a lane cannot carry a range gradient (e.g. a web SVG export with no glyph geometry, or an exotic font in PDF) it still emits the gradient the best way it can and says so loudly in the export result (enumerated, never silent).
+- **A hyperlink on a text range** exports as a real anchor in **HTML** (`<a href>`) and **SVG** (`<a xlink:href>`). **PDF** and the raster formats (**PNG/JPEG/WebP**) do not carry a clickable link (the PDF exporter draws glyphs, not link annotations), so linked text exports as ordinary styled text (a named, reported boundary).
 
-So for a design that leans on gradient-filled or linked text, PNG keeps the gradients and HTML/SVG keep the links; no single non-canvas format carries both.
+So gradient-filled text now survives every export lane; HTML and SVG additionally keep the links.
 
 ## Export commands
 

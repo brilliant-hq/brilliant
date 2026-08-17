@@ -177,7 +177,7 @@ Apply different styles to portions of a single text element:
 
 Per-range overrides supported: font weight, italic, underline, strikethrough, font size, font family, text color (solid or gradient), letter spacing, and a hyperlink. Each override is independent; anywhere a range leaves a property unset, it inherits the element's base style.
 
-Not available per-range: line height, alignment, text direction, text case, OpenType features, max-lines, and design-token bindings (those are whole-element only). Per-range color can be a solid or a gradient; shader and image fills are not available on a substring.
+Not available per-range: line height, alignment, text direction, text case, OpenType features, and max-lines (those are whole-element only). Per-range color can be a solid or a gradient; shader and image fills are not available on a substring. Design-token bindings on a range exist for text color, opacity, and font family (a token-bound color or font applied to a range keeps following the design system's mode and brand); font size, weight, and line height token bindings stay whole-element.
 
 Ranges are non-overlapping. Editing the surrounding text shifts range offsets automatically, and a range whose overrides all match the base style is dropped.
 
@@ -187,7 +187,7 @@ A text range (or a whole text element) can carry a hyperlink. The **link field**
 
 **Cmd+click** a linked range on the canvas to open its URL in your default browser (an ordinary Cmd+click still deep-selects on unlinked text). A link is pure data: it does not restyle the glyphs, so style the linked range yourself (underline, color) if you want it to read as a link.
 
-Links survive export as real anchors in HTML and SVG; PDF and the raster formats (PNG/JPEG/WebP) cannot carry them, so linked text exports as ordinary styled text. See [export.md](./export.md).
+Links survive export as real anchors in HTML and SVG; PDF and the raster formats (PNG/JPEG/WebP) do not carry them, so linked text exports as ordinary styled text. See [export.md](./export.md).
 
 ## Text and Design Tokens
 
@@ -252,7 +252,7 @@ Do not promise these:
 - A justify button in the UI (justify is available via Blueprint `align(j)` only).
 - Text-on-path (text following a curve).
 - Find and replace within or across text elements.
-- Per-range line height, alignment, direction, case, OpenType features, max-lines, or token bindings.
+- Per-range line height, alignment, direction, case, OpenType features, or max-lines. (Per-range token bindings DO exist for color, opacity, and font family; size, weight, and line height bindings stay whole-element.)
 - Per-range shader or image fills (a shader or image color on a substring). Per-range gradients ARE supported.
 - Custom font upload (install as a system font instead).
 - Auto-shrink-to-fit (no automatic font scaling to fit a fixed box; truncation only clips with an ellipsis).

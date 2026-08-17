@@ -71,7 +71,7 @@ The color picker includes additional sections below the main controls:
 - **Canvas** (heading text: "Canvas"): unique colors used by elements on the active canvas, collected automatically. Sorted solids first then gradients, then by hue.
 - **Recent** (heading text: "Recent"): recently used colors across sessions (up to 24). Hover a swatch to see its value in the active format.
 
-In contexts that only support solid colors (canvas background, layout grid color, effect color, text-range color, AI-input callback editing), gradients and shader fills are filtered out of all three sections.
+In contexts that only support solid colors (canvas background, layout grid color, effect color, AI-input callback editing), gradients and shader fills are filtered out of all three sections. A text-range color is not one of these: a range takes a solid or a gradient (its handles sit on the whole text box, the same as a fill gradient), only shader and image fills stay whole-element.
 
 ### Token Bindings
 

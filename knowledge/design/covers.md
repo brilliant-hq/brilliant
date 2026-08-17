@@ -10,9 +10,14 @@ artifact, not a screenshot. You design it as a normal frame and then set it as t
 
 ## The flow
 
-1. Work on a canvas named **Cover** at the project root. Create it if it does not exist;
-   reuse it on later runs (edit the existing cover frame or build a new variant beside it so
-   the user can compare). Never scatter cover frames across the user's working canvases.
+1. Work on a canvas named **Cover** at the project root. Create it if it does not exist —
+   creation is a deliberate act, not a side effect: call `execute_commands` with
+   `{commandId: "create_canvas", params: {fullPath: "Cover"}}` first, then target the new
+   canvas (element-creation tools refuse a canvas that does not exist). If canvas creation
+   is refused or unavailable, build the cover frame on the current canvas instead of
+   stopping. Reuse the Cover canvas on later runs (edit the existing cover frame or build a
+   new variant beside it so the user can compare). Never scatter cover frames across the
+   user's working canvases.
 2. Build the cover as a single frame, **1920×1080**. Surfaces crop covers from the center to
    fit their cards, so keep everything that matters well away from the edges: compose
    center-safe, and let backgrounds extend to the borders so any crop still looks composed.

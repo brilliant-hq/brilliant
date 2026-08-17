@@ -54,7 +54,7 @@ Right-click a folder in the file explorer for: Rename, Delete, Duplicate, Cut, C
 
 The explorer clipboard travels across projects: copy (or cut) canvases, folders, or asset files in one project, switch to another project's tab, and paste.
 
-- **Canvases** arrive with their content. Image assets they use are copied into the destination (renamed on a name clash, never overwriting a destination file), and referenced brand `.ds` files come along; if the destination already defines a brand with that name, the destination's definition wins.
+- **Canvases** arrive with their content. Image assets they use are copied into the destination (renamed on a name clash, never overwriting a destination file). Referenced brand `.ds` files come along on pastes between local projects; if the destination already defines a brand with that name, the destination's definition wins. When a cloud project is on either side, the brand file cannot travel yet: the canvas arrives with default styles and a note says so.
 - **Folders** travel as a whole tree: canvases, subfolders, assets, and other files keep their layout, and references inside the copied tree keep working. Anything the tree referenced from outside it (say a root-level asset) is copied in too.
 - **Cut** moves: once the paste lands, the originals go to the source project's trash (recoverable, like any delete).
 - Name clashes always keep both; the pasted copy gets a numbered name.
@@ -258,6 +258,19 @@ Behavior:
 - If a save fails (permissions, a full disk, a cloud project offline), the canvas stays queued and Brilliant keeps retrying on a widening interval, the dirty indicator stays on, and a held notice says the edits have not reached disk yet. Work is never dropped or shown as saved when it is not
 - On quit and on workspace switch, all dirty canvases are flushed first, including any whose earlier save failed
 - If a `.bl` file fails to load (corrupt content, schema mismatch), saves on that canvas are blocked so good data is never overwritten with empty state
+
+### Recovered files (a few damaged lines)
+
+If a `.bl` file has a small number of damaged lines (for example, an incomplete write or an edit that left one row unreadable), Brilliant now opens the rest of the file instead of failing the whole canvas. The damaged lines, and anything nested under them, are left out, and a banner tells you how many lines could not be read and which ones.
+
+While a file is in this recovered state:
+
+- **Auto-save is paused for it.** The original file on disk is never changed, so nothing is lost while you decide what to do.
+- The banner offers two choices:
+  - **Save repaired copy**: writes a new file next to the original ("Name (repaired)") containing everything that loaded, without the damaged lines, and switches you to it. The original file is left exactly as it was.
+  - **Dismiss**: keeps the file open in the recovered state (auto-save stays paused). You can still copy work out of it manually.
+
+If a file is damaged beyond a few lines (most of it is unreadable), Brilliant treats it as it does any unreadable file: it blocks saves so the original is preserved, rather than opening a mostly-empty canvas.
 
 ## Workspaces
 
