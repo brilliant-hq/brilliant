@@ -392,20 +392,23 @@ Brilliant's native design data and blueprint text also paste back in as elements
 
 #### Paste from Figma
 
-Copy anything in Figma (Cmd+C), switch to Brilliant, and paste (Cmd+V). No plugin, no file link, no account connection: the design arrives as real Brilliant elements you can edit by hand, dropped at the cursor.
+Copy anything in Figma (Cmd+C), switch to Brilliant, and paste (Cmd+V). No plugin and no file link: the design arrives as real Brilliant elements you can edit by hand, dropped at the cursor.
 
 What comes across:
 
-- **Layout and frames**, positioned exactly as they looked in Figma.
-- **Text**, with its content, font, size, weight, and alignment.
-- **Fills, colors, gradients, strokes, and corner radii.**
+- **Live components.** Components arrive as real instances linked to a master, showing the labels, amounts, shown-or-hidden rows, and slot content exactly as you saw them, not the blank template underneath. You can swap variants and reconfigure them like any Brilliant component. Paste the same design again, even after restarting the app, and the paste reuses the matching masters already on your canvas instead of adding duplicates.
+- **Your variables, as a design system.** The variables the design uses arrive as a real design system with its modes, and elements stay bound to those tokens, so switching a mode re-themes them.
+- **Reflowing auto layout.** Frames that used Figma auto layout arrive as real auto-layout frames, positioned exactly as they looked, that reflow when you resize or edit them.
+- **Text**, with its content, font, size, weight, alignment, per-range styling, lists, letter case, line-limit truncation, and OpenType features like stylistic sets and small caps.
+- **Fills, colors, gradients, strokes, corner radii, and effects**, including shadows, blurs, and liquid glass.
 - **Icons and vector shapes**, as editable vector paths.
-- **The resolved content of components**: the real labels and amounts, the rows that were shown or hidden, and the content dropped into each slot, exactly as you saw it, not the blank template underneath.
+- **Images**, brought in for real when you are connected to Figma (see the limits below).
 
 Honest limits:
 
-- **Raster images** (photos, or exported bitmaps used as image fills) arrive as plain gray placeholders. Bring those over separately by dragging the file in or pasting the image on its own.
-- **Components** paste as plain frames for now. They look right, but they are not linked to a master, so they are not live instances yet.
+- **Images need the Figma connection.** Photos and exported bitmaps used as image fills come across as real images only when Brilliant is connected to your Figma account. Without the connection they arrive as a labeled placeholder you can replace: drag the file in or paste the image on its own.
+- **An edited master is never silently overwritten or adopted.** If you changed a pasted component's fills, text, or structure and then paste the same design again, the paste adds a fresh master under a new name (with a note) instead of merging with your edited one.
+- **Rounded stars and polygons arrive with sharp corners.** The star or polygon shape itself comes across exactly; Figma's corner rounding on those shapes does not, and a labeled note tells you when that happened. Boolean shapes arrive as real boolean groups with live operands.
 - Available in the **desktop app today** (macOS). Pasting from Figma in the browser editor is coming later.
 
 ### Paste in another project
