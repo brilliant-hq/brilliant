@@ -46,6 +46,10 @@ The brand dropdown lists **Inherit** (clears the scope's override), **default** 
 
 Each axis the active system declares gets its own dropdown (theme, density, accessibility, or any custom axis the system author defined). Options are **Inherit** plus that axis's declared values. Hover previews, click commits, Cmd+Z undoes. There is no default keyboard shortcut for switching modes, and no command-palette entry: the inspector axis dropdowns are the only way to change a mode.
 
+#### Pinned-brand modes on a selection
+
+When you select elements that carry a design system pinned on the element itself (typically from a Figma import: a brand plus per-node mode overrides that never became the folder's active brand), that brand can declare mode axes the folder does not. Those axes now appear as an extra block below the normal axis rows, labeled with the brand's name and "pinned modes", with one dropdown per axis. Each shows the selection's current pinned value (or "Mixed" when the selected elements differ), and picking a value writes it as the pin on the selected elements while keeping their pinned brand. This is the only place those pinned modes are visible and switchable by hand; it appears only with an element selection, not when editing the whole canvas.
+
 ### Reset and Viewer buttons
 
 - **Reset design system**: clears every brand/mode override at the current scope (canvas-level if nothing is selected, or on each selected element). It only appears when there is something to reset, and disappears after the click. Undoable.

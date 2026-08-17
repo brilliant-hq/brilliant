@@ -68,7 +68,7 @@ For auto layout sizing behavior in general, see [frames.md](./frames.md). For bl
 
 ## Typography Controls
 
-All controls are in the right toolbar's Typography section while a text element is selected. Rows, top to bottom: (1) font family + font size + text-direction (RTL) toggle; (2) line height + letter spacing + OpenType features button; (3) font weight dropdown + sizing-mode dropdown + Auto Size button; (4) horizontal alignment trio + Italic + Underline + Strikethrough + a "..." expander. Behind the "..." expander: a buttons row (vertical alignment trio on the left, bulleted and numbered list toggles on the right), then paragraph indent + list spacing, then case + truncation dropdowns, then paragraph spacing last.
+All controls are in the right toolbar's Typography section while a text element is selected. Rows, top to bottom: (1) font family + font size + text-direction (RTL) toggle; (2) line height + letter spacing + OpenType features button; (3) font weight dropdown + sizing-mode dropdown + Auto Size button; (4) horizontal alignment trio + Italic + Underline + Strikethrough + a "..." expander; (5) a hyperlink field for the selected range or element (see [Hyperlinks](#hyperlinks)). Behind the "..." expander: a buttons row (vertical alignment trio on the left, bulleted and numbered list toggles on the right), then paragraph indent + list spacing, then case + truncation dropdowns, then paragraph spacing last.
 
 When the selection mixes text elements with **different** values for a property, the field shows **Mixed**; typing a value applies it to the whole selection.
 
@@ -175,11 +175,19 @@ Apply different styles to portions of a single text element:
 2. Select a range of text (drag, or Shift+Arrow).
 3. Apply a style change (Cmd+B, Cmd+I, Cmd+U, a font/size/weight/color change, etc.).
 
-Per-range overrides supported: font weight, italic, underline, strikethrough, font size, font family, text color, letter spacing. Each override is independent; anywhere a range leaves a property unset, it inherits the element's base style.
+Per-range overrides supported: font weight, italic, underline, strikethrough, font size, font family, text color (solid or gradient), letter spacing, and a hyperlink. Each override is independent; anywhere a range leaves a property unset, it inherits the element's base style.
 
-Not available per-range: line height, alignment, text direction, text case, OpenType features, max-lines, and design-token bindings (those are whole-element only). Per-range color is solid color only (no gradient, shader, or image fill on a substring).
+Not available per-range: line height, alignment, text direction, text case, OpenType features, max-lines, and design-token bindings (those are whole-element only). Per-range color can be a solid or a gradient; shader and image fills are not available on a substring.
 
 Ranges are non-overlapping. Editing the surrounding text shifts range offsets automatically, and a range whose overrides all match the base style is dropped.
+
+### Hyperlinks
+
+A text range (or a whole text element) can carry a hyperlink. The **link field** at the bottom of the Typography section sets or clears it: with a range selected while editing, it links that range; with a text element selected (not editing), it links the whole string. Commit with Enter or by clicking away; clearing the field removes the link.
+
+**Cmd+click** a linked range on the canvas to open its URL in your default browser (an ordinary Cmd+click still deep-selects on unlinked text). A link is pure data: it does not restyle the glyphs, so style the linked range yourself (underline, color) if you want it to read as a link.
+
+Links survive export as real anchors in HTML and SVG; PDF and the raster formats (PNG/JPEG/WebP) cannot carry them, so linked text exports as ordinary styled text. See [export.md](./export.md).
 
 ## Text and Design Tokens
 
@@ -214,7 +222,7 @@ Both convert a text element to vector geometry, and both are one-way (the result
 | Command | Default shortcut | Result | Use for |
 |---------|------------------|--------|---------|
 | Outline Text | **Cmd+Ctrl+O** (macOS/Windows) | A group of per-character vector outlines (each glyph is its own editable vector) | Editing individual characters, per-character coloring, character-level boolean ops |
-| Flatten Text | **Cmd+Alt+O** | A single compound vector (all glyphs merged into one path) | Masking, boolean ops against other shapes, exporting as one path |
+| Flatten Text | (command palette only; no default shortcut) | A single compound vector (all glyphs merged into one path) | Masking, boolean ops against other shapes, exporting as one path |
 | Flatten | **Cmd+Enter** | Same single compound vector for a text-only selection; the generic flatten for any selection | Flattening text together with other shapes |
 
 **Platform:** glyph extraction is macOS and Windows only (Linux has no glyph-outline backend), so Outline Text and Flatten Text are hidden on Linux. On Windows the Cmd+Ctrl+O chord for Outline Text is unbound (collision); run it from the right-click/context menu or command palette. The generic Flatten (Cmd+Enter) applies to any selection on all platforms; on text it routes through the same glyph extraction, so text flattening also needs macOS or Windows.
@@ -245,7 +253,7 @@ Do not promise these:
 - Text-on-path (text following a curve).
 - Find and replace within or across text elements.
 - Per-range line height, alignment, direction, case, OpenType features, max-lines, or token bindings.
-- Per-range non-solid fills (gradient/shader/image color on a substring).
+- Per-range shader or image fills (a shader or image color on a substring). Per-range gradients ARE supported.
 - Custom font upload (install as a system font instead).
 - Auto-shrink-to-fit (no automatic font scaling to fit a fixed box; truncation only clips with an ellipsis).
 - Vector edit mode directly on text (run Outline Text or Flatten first).

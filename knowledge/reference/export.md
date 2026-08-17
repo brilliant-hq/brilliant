@@ -40,6 +40,15 @@ MP4 export runs on macOS (VideoToolbox, H.264/HEVC) and Windows (Media Foundatio
 
 The Export panel and the `Copy as WebP` command both produce lossy WebP at quality 90. For UI mockups (cards, panels, gradients, rounded corners), lossy q=90 leaves visible gray banding on rounded edges and color ramps. For pixel-clean UI mockups, prefer **PNG**. Lossless WebP is not exposed in the by-hand UI in this build (it is only reachable programmatically via the MCP `export` tool with `webpLossless: true`).
 
+### Text ranges: hyperlinks and gradients
+
+Two per-range text features carry unevenly across formats:
+
+- **A hyperlink on a text range** exports as a real anchor in **HTML** (`<a href>`) and **SVG** (`<a xlink:href>`). **PDF** and the raster formats (**PNG/JPEG/WebP**) cannot carry a clickable link, so linked text exports as ordinary styled text.
+- **A gradient on a text range** renders in the raster formats (**PNG/JPEG/WebP**, which read back the live canvas) exactly as on screen. The vector and markup lanes (**SVG**, **PDF**, **HTML/React**) do not carry a per-range gradient: that range falls back to its base text color.
+
+So for a design that leans on gradient-filled or linked text, PNG keeps the gradients and HTML/SVG keep the links; no single non-canvas format carries both.
+
 ## Export commands
 
 | Command | Shortcut |

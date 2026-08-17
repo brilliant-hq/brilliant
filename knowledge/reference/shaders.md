@@ -1,11 +1,11 @@
 ---
 name: "knowledge-shaders"
-description: "Shader fills and strokes: animated, GPU-rendered procedural effects (metaballs, liquid metal, iridescent, dithering, reactive grid) applied to elements in Brilliant."
+description: "Shader fills and strokes: animated, GPU-rendered procedural effects (metaballs, liquid metal, iridescent, dithering) applied to elements in Brilliant."
 ---
 
 # Shader Fills & Strokes
 
-Shaders are animated, GPU-rendered procedural effects applied to any element as a **fill or stroke**. They produce looks like organic blob merging, liquid metal, holographic iridescence, brushed steel, retro dithering, and an interactive grid that reacts to the cursor.
+Shaders are animated, GPU-rendered procedural effects applied to any element as a **fill or stroke**. They produce looks like organic blob merging, liquid metal, holographic iridescence, brushed steel, and retro dithering.
 
 Shaders live in the same "type" slot as solid colors, gradients, and image fills: any fill or stroke row can be switched to a shader type. Multiple shaders can run independently on different elements.
 
@@ -18,7 +18,7 @@ Both fills and strokes are configured in the right toolbar (property inspector) 
 **As a fill:**
 1. Select an element.
 2. In the Fills section, click "+" to add a fill (or select an existing fill row).
-3. Open the fill's type dropdown and pick a shader from the **Animated** or **Interactive** category.
+3. Open the fill's type dropdown and pick a shader from the **Animated** category.
 
 **As a stroke:**
 1. Select an element.
@@ -36,7 +36,6 @@ You can switch any fill or stroke between types freely (solid, gradient, image, 
 | **Iridescent** | Animated | up to 3 | Folded, oil-slick iridescence with a metallic finish |
 | **Liquid Stainless Steel** | Animated | up to 2 | Flowing chrome with specular highlights and environment reflections |
 | **Dithering** | Animated | up to 2 | Procedural noise rendered as retro two-tone dithered output |
-| **Reactive Grid** | Interactive | up to 5 (default 3) | A grid that distorts around the cursor with click ripples |
 
 ## Shader Parameters
 
@@ -51,8 +50,6 @@ Each shader exposes its own set of sliders in the expanded fill/stroke view (cli
 **Liquid Stainless Steel:** Shape (Element / Metaballs / None), Flow, Roughness, Distortion, Depth, Angle (light angle), Speed. When Shape is Metaballs: Ball Count and Ball Size.
 
 **Dithering:** Shape (the noise pattern: Simplex, Warp, Dots, Wave, Ripple, Swirl, Sphere), Dither (the dither algorithm: Random, 2x2, 4x4, 8x8), Size (dither pixel grid size), Speed.
-
-**Reactive Grid:** Density, Distortion (cursor-driven), Radius (cursor interaction radius), Speed.
 
 Sliders are dragged or typed into directly, like other property fields in the inspector.
 
@@ -76,7 +73,6 @@ Most shaders include named presets in a **Presets** dropdown at the top of the e
 | **Liquid Metal** | Mercury, Molten Gold, Rose Chrome, Obsidian, Prism, Copper, Platinum, Emerald, Midnight, Molten Lava |
 | **Iridescent** | Rainbow Foil, Soft Opal, Oil Slick, Aurora, Prismatic, Candy, Ice Crystal, Nebula, Pearl, Tropical |
 | **Liquid Stainless Steel** | Mirror Polish, Brushed Steel, Dark Chrome, Rose Gold, Turbulent, Satin, Copper, Blue Steel, Titanium, Liquid Silver |
-| **Reactive Grid** | Neon Circuit, Sunset Mesh, Blueprint, Laser Grid, Emerald Web, Retro Arcade, Frost, Lava Flow |
 | **Dithering** | Electric Sphere, Ember, Sine Tide, Phosphor, Amber CRT, Pocket Green, Voyage, Newsprint, Riso Pink, Deep Current, Violet Drift, Acid Swirl, White Noise, Ghost Grain |
 
 ## Colors
@@ -107,14 +103,6 @@ Every shader fill or stroke has a **Transform** section that adjusts how the pat
 - Toggle animation for a single fill with the play/pause button in its expanded view (this is the per-element "Toggle Shader Animation" command).
 - The **Speed** slider controls the rate (0 = frozen in place, not reset).
 - To globally pause or resume *all* shader animations across the canvas, run **"Toggle Shader Animations"** from the command palette. Neither toggle has a default keyboard shortcut.
-
-## Interactive Shaders (Reactive Grid)
-
-Reactive Grid is grouped under **Interactive** in the type dropdown, but on the canvas it renders its **ambient animated layer only**: the grid animates but does not track or react to the cursor on placed elements.
-
-There is one narrow exception: a shader-filled **text element reacts to the cursor while it is actively being edited**. Outside that text-editing case, cursor interaction does not render.
-
-Practical guidance: treat Reactive Grid as an animated grid pattern. Do not promise live cursor-following, click ripples, or proximity glow on ordinary canvas elements.
 
 ## Combining with Other Fills
 

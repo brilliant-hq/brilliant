@@ -147,10 +147,9 @@ Change the scale mode in the right toolbar under the image fill section. When Re
 
 ### Shader Fills
 
-Animated, GPU-rendered procedural patterns. 6 shader types total:
+Animated, GPU-rendered procedural patterns. 5 shader types total:
 
 - **Animated group** (5): Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering
-- **Interactive group** (1): Reactive Grid (cursor-reactive)
 
 See [shaders.md](./shaders.md) for full parameter reference.
 
@@ -224,7 +223,7 @@ Per-character color is supported via styled ranges: enter edit mode, select a ch
 
 ### Stroke Style Types
 
-Strokes support the same fill-type set as fills (the same type dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular, Diamond), **Static** (Image, Inner Shadow, Inner Glow, Background Blur, Liquid Glass), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Interactive** (Reactive Grid), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). 23 types total. Inner Shadow / Inner Glow as a stroke render over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
+Strokes support the same fill-type set as fills (the same type dropdown is reused). Dropdown groups in order: **Colors** (Solid, Linear, Radial, Angular, Diamond), **Static** (Image, Inner Shadow, Inner Glow, Background Blur, Liquid Glass), **Animated** (Metaballs, Liquid Metal, Iridescent, Liquid Stainless Steel, Dithering), **Filters** (Color Adjust, Noise / Grain, Halftone, Pixelate, Duotone, Posterize, Dither). 22 types total. Inner Shadow / Inner Glow as a stroke render over the stroke band, not over the element interior. Background Blur as a stroke produces a frosted-glass band along the stroke path.
 
 Text ranges only support Solid.
 

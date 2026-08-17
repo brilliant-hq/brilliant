@@ -326,7 +326,7 @@ Flattening that involves **text outlining** requires native glyph extraction (Co
 | Action | Shortcut |
 |--------|----------|
 | Outline Text | Ctrl+Cmd+O |
-| Flatten Text | Cmd+Alt+O |
+| Flatten Text | (command palette only; no default shortcut) |
 
 Both commands convert text into vector paths and are available on macOS and Windows (native glyph extraction), not on Linux. On Windows, Outline Text has no default keyboard shortcut because its chord collides with another command; reach it via the command palette, menu, or context menu.
 
