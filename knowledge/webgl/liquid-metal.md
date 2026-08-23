@@ -8,13 +8,13 @@ assumes: webgl/setup
 | Param | Uniform | Range | Default | Description |
 |-------|---------|-------|---------|-------------|
 | Shape | uShape | 0-2 | 0 | 0=Element, 1=Metaballs, 2=None |
-| Softness | uSoftness | 0-1 | 0.1 | Stripe transition softness |
-| Repetition | uRepetition | 1-10 | 2.0 | Stripe density |
-| Shift Red | uShiftRed | -1 to 1 | 0.3 | Red channel chromatic shift |
-| Shift Blue | uShiftBlue | -1 to 1 | 0.3 | Blue channel chromatic shift |
-| Distortion | uDistortion | 0-1 | 0.07 | Organic warp intensity |
-| Contour | uContour | 0-3 | 0.4 | Edge contour compression |
-| Angle | uAngle | 0-360 | 70.0 | Stripe direction (degrees) |
+| Softness | uSoftness | 0-1 | 0.22 | Stripe transition softness |
+| Repetition | uRepetition | 1-10 | 3.8 | Stripe density |
+| Shift Red | uShiftRed | -1 to 1 | 0.35 | Red channel chromatic shift |
+| Shift Blue | uShiftBlue | -1 to 1 | 0.25 | Blue channel chromatic shift |
+| Distortion | uDistortion | 0-1 | 0.16 | Organic warp intensity |
+| Contour | uContour | 0-3 | 0.5 | Edge contour compression |
+| Angle | uAngle | 0-360 | 65.0 | Stripe direction (degrees) |
 | Speed | uSpeed | 0-3 | 1.0 | Animation speed |
 | Metaball Count | uMetaballCount | 2-30 | 5 | Number of metaballs (shape=1) |
 | Metaball Size | uMetaballSize | 0.1-3.0 | 1.0 | Metaball size multiplier (shape=1) |
@@ -223,38 +223,48 @@ float getShapeMask(vec2 uv, vec2 rawUV, int shape, float t) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// 3-Band Stripe, bump-modulated color banding
+// Metal band profile, repeating bright strips over a graded valley
 // ═══════════════════════════════════════════════════════════════════
 
-float getColorChanges(float x, float softness, float bump) {
-    float f = fract(x);
+float metalBands(float phase, float softness, float bump) {
+    float f = fract(phase);
 
-    float strip1 = 0.12 * (1.0 - 0.4 * bump);
-    float strip2 = strip1 + 0.07 * (1.0 + 0.4 * bump);
+    // Signed distance to the nearest strip center (anchored at 0.2 of the
+    // cycle), wrapped across the period boundary so strips stay continuous.
+    float d = f - 0.2;
+    d -= floor(d + 0.5);
+    float ad = abs(d);
 
-    float edgeWidth = mix(0.002, 0.12, softness);
+    // Strip geometry driven by the uniforms.
+    float core     = 0.05 + 0.05 * bump;          // bright plateau half-width
+    float shoulder = mix(0.018, 0.16, softness);  // soft falloff distance
 
-    float ramp0 = smoothstep(strip1 - edgeWidth, strip1 + edgeWidth, f);
-    float ramp1 = smoothstep(strip2 - edgeWidth, strip2 + edgeWidth, f);
-    float wrapDown = smoothstep(1.0 - edgeWidth * 2.0, 1.0, f);
+    // Bright plateau easing to 0 across the shoulder.
+    float strip = 1.0 - smoothstep(core, core + shoulder, ad);
 
-    float bright = ramp0 * (1.0 - ramp1 * 0.5);
-    float gradientPhase = clamp((f - strip2) / max(1.0 - strip2, 0.001), 0.0, 1.0);
-    float gradientValue = 0.55 - 0.35 * gradientPhase;
+    // Trailing sheen: brightest just past the strip, decaying toward the next.
+    float trail = fract(f - 0.2);
+    float sheen = max(0.5 - 0.4 * trail, 0.0) * (1.0 - strip);
 
-    float result = mix(bright, gradientValue, ramp1 * (1.0 - wrapDown));
-    result = mix(result, 0.0, wrapDown);
-
-    return result;
+    return clamp(strip + sheen, 0.0, 1.0);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// Per-Channel Color Burn
+// Tint burn, recolor the metallic base toward the user tint (color-burn)
 // ═══════════════════════════════════════════════════════════════════
 
-float colorBurnChannel(float ch, float tint, float tintAlpha) {
-    float burned = 1.0 - min(1.0, (1.0 - ch) / max(tint, 0.0001));
-    return mix(ch, burned, tintAlpha);
+float burnChannel(float base, float tint) {
+    if (tint <= 0.0) return 0.0;
+    return 1.0 - min(1.0, (1.0 - base) / tint);
+}
+
+vec3 burnTowardTint(vec3 base, vec3 tint, float amount) {
+    vec3 burned = vec3(
+        burnChannel(base.r, tint.r),
+        burnChannel(base.g, tint.g),
+        burnChannel(base.b, tint.b)
+    );
+    return mix(base, burned, amount);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -349,21 +359,24 @@ void main() {
     float warpNY = snoise(uvAspect * 2.5 + vec2(t * 0.23 + 5.0, t * 0.31 + 8.0));
     direction += (warpNX + warpNY) * distortion * 0.5;
 
-    // ─── Chromatic aberration ───
-    float dispersionBase = 0.08;
-    float spatialDispersion = mix(1.0, 0.3, bump) * (0.5 + edge * 0.5);
-    float noiseDispersion = abs(turbNoise) * 0.3;
-    float dispersionR = shiftRed * (dispersionBase + noiseDispersion) * spatialDispersion;
-    float dispersionB = shiftBlue * (dispersionBase + noiseDispersion) * spatialDispersion;
+    // ─── Chromatic dispersion: split the band phase per channel ───
+    // Red advances, blue retards; the split widens near the edges and with
+    // turbulence, and tightens under the specular highlight.
+    float split = (0.08 + 0.3 * abs(turbNoise))
+                * (0.5 + 0.5 * edge)
+                * mix(1.0, 0.32, bump);
 
-    float stripeR = fract(direction + dispersionR);
+    float phaseR = direction + shiftRed * split;
+    float phaseB = direction - shiftBlue * split;
+
+    float stripeR = fract(phaseR);
     float stripeG = fract(direction);
-    float stripeB = fract(direction - dispersionB);
+    float stripeB = fract(phaseB);
 
-    // ─── 3-band pattern per channel with bump modulation ───
-    float bandR = getColorChanges(stripeR, softness, bump);
-    float bandG = getColorChanges(stripeG, softness, bump);
-    float bandB = getColorChanges(stripeB, softness, bump);
+    // ─── Band profile per channel with bump modulation ───
+    float bandR = metalBands(stripeR, softness, bump);
+    float bandG = metalBands(stripeG, softness, bump);
+    float bandB = metalBands(stripeB, softness, bump);
 
     // ─── Metallic base ───
     vec3 darkMetal  = vec3(0.04, 0.04, 0.06);
@@ -375,16 +388,9 @@ void main() {
         mix(darkMetal.b, brightMetal.b, bandB)
     );
 
-    // ─── Per-channel color burn with tint ───
-    vec3 tintColor = color0.rgb;
-    vec3 boostedTint = mix(tintColor, vec3(1.0), 0.15);
-    float tintAlpha = color0.a;
-
-    vec3 col = vec3(
-        colorBurnChannel(metallic.r, boostedTint.r, tintAlpha),
-        colorBurnChannel(metallic.g, boostedTint.g, tintAlpha),
-        colorBurnChannel(metallic.b, boostedTint.b, tintAlpha)
-    );
+    // ─── Recolor the metallic base toward the tint ───
+    vec3 boostedTint = mix(color0.rgb, vec3(1.0), 0.15);
+    vec3 col = burnTowardTint(metallic, boostedTint, color0.a);
 
     // ─── Highlight / accent ───
     float highlightMask = bandG * bandG;
@@ -438,13 +444,13 @@ brilliantShader('c', FRAG, {
   colors: ['#c0392b', '#f1c40f'],
   params: {
     uShape: 0,
-    uSoftness: 0.1,
-    uRepetition: 2.0,
-    uShiftRed: 0.3,
-    uShiftBlue: 0.3,
-    uDistortion: 0.07,
-    uContour: 0.4,
-    uAngle: 70.0,
+    uSoftness: 0.22,
+    uRepetition: 3.8,
+    uShiftRed: 0.35,
+    uShiftBlue: 0.25,
+    uDistortion: 0.16,
+    uContour: 0.5,
+    uAngle: 65.0,
     uSpeed: 1.0,
     uMetaballCount: 8.0,
     uMetaballSize: 1.0

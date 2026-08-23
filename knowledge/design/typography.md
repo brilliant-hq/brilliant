@@ -31,6 +31,8 @@ Use the active DS's font tokens, `$font.family` (workhorse sans) and `$font.fami
 
 Specific Google Fonts override the DS, `t("...",Playfair Display,...)` works inline and auto-loads. Reach for this only when the active DS doesn't fit the mood; switching DS is usually the better move (see `design-systems/core`).
 
+Importing from Figma: a commercial font that isn't bundled, on Google Fonts, or installed on your machine can't be served, so its text imports as pixel-true glyph outlines (not editable text) and the migration report lists it under Missing fonts. To get editable text back, install the `.ttf`/`.otf` with the Install Font Files command, then re-import the file from the Figma plugin. Brilliant never downloads commercial fonts for you.
+
 ## Hierarchy
 
 Use 2-3 levers simultaneously: **Size** + **Weight** + **Color**. Pair heavy headings (`$font.weight.bold` or `.strong`) with `.soft` or `.faint` body. Use semantic text aliases, `$color.text.primary`, `$color.text.secondary`, `$color.text.disabled`, so the hierarchy auto-flips in dark mode. Max 2 font families. Tighter tracking on large type (24px+), open tracking on small-caps or labels below 13px.

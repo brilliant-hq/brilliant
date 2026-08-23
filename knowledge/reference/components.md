@@ -186,7 +186,7 @@ If the master lives on a different canvas, Brilliant switches to that canvas fir
 
 ## Cross-Canvas Components
 
-A master component can live on a different canvas than its instance. This lets you keep masters on a dedicated "components" canvas and use instances throughout the rest of your project.
+A master component can live on a different canvas than its instance. This lets you keep masters on a dedicated "components" canvas and use instances throughout the rest of your project. (A master can also live in a different **project** entirely: a library your project depends on at a pinned version. Library instances behave like any other instance, with a few extra states of their own; see [libraries.md](./libraries.md).)
 
 How it works:
 
@@ -222,7 +222,7 @@ Brilliant components are a master/instance system with property overrides, slots
 - **Components panel / page.** There is no left-toolbar Components panel and no separate "Components" canvas type. Masters live as regular frames on a canvas; you can keep them on a dedicated canvas by convention and reference them across canvases. (A contextual Component section does appear in the right inspector when a component, set, variant, or instance is selected.)
 - **Per-property override badges.** There is no chip or label that flags which individual property is overridden on an instance. The Component section shows property dropdowns for sets and instances, but it does not mark which properties you've overridden; the visible component chrome is the purple frame label and the diamond icon (filled = master, outline = instance).
 - **Component descriptions or metadata** (no description field, no documentation popovers)
-- **Component publishing / library export** (no separate library file format; masters live on canvases inside your project)
+- **A separate component file format.** Masters live on canvases inside a project. Sharing components ACROSS projects is done by publishing the whole project as a **library** and depending on it at a released version; see [libraries.md](./libraries.md).
 - **Component diff view** (no side-by-side master vs instance comparison UI)
 - **Nested overrides exposed as instance properties** (overriding a nested instance child works, but there is no "exposed property" surface on the parent instance)
 
@@ -251,3 +251,4 @@ Components, instances, sets, variants, slots, and per-instance overrides can als
 
 > **See also:** [frames.md](./frames.md) for parent types, auto layout, and nesting
 > **See also:** [editing.md](./editing.md) for selection and navigation within component hierarchies
+> **See also:** [libraries.md](./libraries.md) for consuming components from other projects (libraries), and the Assets view

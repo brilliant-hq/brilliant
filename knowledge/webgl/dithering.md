@@ -138,10 +138,13 @@ float bayer8(vec2 pos) {
     return coarse + fine / 16.0;
 }
 
-// Get dither threshold based on type (0=random, 1=2x2, 2=4x4, 3=8x8)
+// Get dither threshold based on type (0=random, 1=2x2, 2=4x4, 3=8x8).
+// pixelPos is in element-local logical-pixel cells: the Bayer helpers floor()
+// internally, and Random floors here too, so every algorithm keys one
+// threshold per lattice CELL (matches the engine dithering.frag + dither.frag).
 float getDitherThreshold(vec2 pixelPos, int ditherType) {
     if (ditherType == 0) {
-        return hash21(pixelPos);
+        return hash21(floor(pixelPos));
     } else if (ditherType == 1) {
         return bayer2(pixelPos);
     } else if (ditherType == 2) {
@@ -270,8 +273,13 @@ void main() {
     float pattern = getPattern(uv, t, shape);
     pattern = clamp(pattern, 0.0, 1.0);
 
-    // ─── Dither: quantize pixel position to grid, get threshold ───
-    vec2 pixelPos = fragCoord / gridSize;
+    // ─── Dither lattice (element-anchored) ───
+    // Key the cell grid to element-local LOGICAL pixels via the SAME
+    // transformed `uv` the pattern rides, so the lattice scales/rotates with
+    // the element and its UV transform like every other shader. `uv*resolution`
+    // equals `fragCoord` at the identity UV transform, so `size` keeps meaning
+    // "cells of N logical px".
+    vec2 pixelPos = uv * vec2(uResolutionX, uResolutionY) / gridSize;
     float threshold = getDitherThreshold(pixelPos, ditherType);
 
     // Center threshold for balanced dithering

@@ -10,7 +10,7 @@ Use this to SHOW the user a piece of Brilliant's real UI in an exact state, mid-
 Two tools power this. If they are not in your available tools, this feature is not enabled for your session; describe the UI in words instead, or reference a saved file path.
 
 - `list_stagers` (no arguments): returns the renderable components, each as `{component, defaultSize: [w, h], stateSchema}`. The `stateSchema` is the source of truth for what `state` each component accepts.
-- `render_ui`: renders one component into an exact declarative state and writes an image file offscreen, without touching the live app. It is app-level, so do NOT pass a canvasId.
+- `render_ui`: renders one component into an exact declarative state and writes an image file offscreen, without touching the live app. It is app-level, so do NOT pass a canvasId. Desktop app only: in the web editor there is no local filesystem to write the image to, so the tool refuses there.
 
 ## The pattern
 

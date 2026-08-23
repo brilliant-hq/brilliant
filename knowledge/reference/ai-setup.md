@@ -1,6 +1,6 @@
 ---
 name: "knowledge-ai-setup"
-description: "Connecting an AI provider to Brilliant's integrated chat: BYOK API keys (Anthropic, OpenAI, Google, OpenRouter), the Claude Code CLI, the OpenAI Codex CLI (ChatGPT-subscription auth), custom and self-hosted OpenAI-compatible endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more), choosing or adding extra models, where keys are stored, the demo (playground) mode and its two exits, the in-chat setup conversation, and what to do when a key is rejected. Setup and how-it-works, not the chat UI (see ai.md) or driving Brilliant from another tool (see mcp-connections.md)."
+description: "Connecting an AI provider to Brilliant's integrated chat: BYOK API keys (Anthropic, OpenAI, Google, OpenRouter), the Claude Code CLI, the OpenAI Codex CLI (ChatGPT-subscription auth), the Cursor CLI (cursor-agent, Cursor-account auth), custom and self-hosted OpenAI-compatible endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more), choosing or adding extra models, where keys are stored, the demo (playground) mode and its two exits, the in-chat setup conversation, and what to do when a key is rejected. Setup and how-it-works, not the chat UI (see ai.md) or driving Brilliant from another tool (see mcp-connections.md)."
 ---
 
 # Connecting an AI provider (BYOK setup)
@@ -43,7 +43,11 @@ On the AI Providers list:
   after installing. If the CLI is not signed in, run `claude auth login` in a
   terminal. If the row reads "Installed · login unverified, chat still works",
   only the sign-in check was inconclusive: the CLI is detected and chat runs
-  normally. The circular-arrow button re-checks.
+  normally. The circular-arrow button re-checks. Claude Code needs a paid Claude
+  plan (Pro, Max, Team, or Enterprise); if the CLI is signed in on a plan that
+  cannot run it, the row reads "Signed in · plan not eligible" (or "Signed in ·
+  plan unverified" when no plan could be read) rather than "Not connected",
+  since detection and sign-in both worked and only the plan disqualifies it.
 - **Codex** follows Claude Code and likewise has no key field: it signs in with
   a ChatGPT subscription, not an API key. Install with `npm install -g
   @openai/codex`, run `codex login` once, and Brilliant detects it on launch. Its
@@ -52,6 +56,15 @@ On the AI Providers list:
   nvm/fnm/asdf/mise node-version dirs). If your codex lives somewhere unusual, or
   a slow shell startup outruns detection, set the `BRILLIANT_CODEX_PATH`
   environment variable to the codex binary and Brilliant will use it directly.
+- **Cursor** also has no key field: it signs in with your Cursor account, not an
+  API key. Install the Cursor CLI (`cursor-agent`), run `cursor-agent login` once
+  (or set a `CURSOR_API_KEY`), and Brilliant detects it on launch. A single
+  **Cursor Agent** model then appears in the selector; it auto-routes to the best
+  model for the task, the way `cursor-agent` does on its own. The settings row
+  reads "Not signed in" when the CLI is found but not logged in yet; run
+  `cursor-agent login` in your terminal, then the circular-arrow button
+  re-checks. If your `cursor-agent` lives somewhere unusual, set the
+  `BRILLIANT_CURSOR_AGENT_PATH` environment variable to its path.
 - **Quiver** powers AI vector generation and vectorization, not chat. It is set
   the same way but is not a chat provider.
 

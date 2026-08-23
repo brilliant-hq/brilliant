@@ -207,6 +207,10 @@ Flipping is a per-element property toggle, not a geometry rebuild. Children of f
 
 Hidden elements disappear from the canvas but stay in the document. Each layer in the Layers explorer (left toolbar) also has an eye toggle you can click to hide or show that element.
 
+## Lock / Unlock
+
+Lock an element from its layer row's hover **lock button** (next to the eye), the right-click context menu, or the **Toggle Lock** palette command (no default shortcut). A locked element, and everything inside it, stops responding on the canvas: clicks pass through to whatever sits beneath, and drags cannot select or move it. A locked frame is also never a landing spot: dragging, pasting, or duplicating something over it falls through to the next unlocked parent (or the canvas itself), and its auto layout never previews a gap for the drop. The lock button stays visible on the layer row while locked, so you can unlock it there any time; unlocking restores everything exactly as it was.
+
 ## Scaling
 
 Scaling uniformly resizes the selection and scales its content (font sizes, stroke thickness, corner radii, effects, descendants). This differs from setting W/H in the right toolbar, which resizes the bounding box on one axis without scaling content.
@@ -288,7 +292,7 @@ To bake a boolean parent into a single uneditable vector, use **Flatten** (Cmd+E
 | Group | Cmd+G | Wraps the selection in a group (hug sizing on both axes). Groups are structural only: not a reparent target, children cannot be dragged out. If the selection spans multiple parents, one group is created per parent. |
 | Frame Selection | Cmd+F | Wraps the selection in a frame container (hug-sized initially, a valid reparent target). Sizing can be switched to fixed/fill afterward in the right toolbar. |
 | Ungroup | Cmd+Shift+G | Removes the wrapping group/frame and moves children up to the parent |
-| Add Auto Layout | Shift+A | Wraps the selection in an auto-layout frame, inferring direction and spacing from existing positions |
+| Add Auto Layout | Shift+A | Wraps the selection in an auto-layout frame with zero layout shift: direction, order, gap (negative for overlaps), and alignment are inferred so elements keep their exact canvas positions |
 
 ## Mask
 

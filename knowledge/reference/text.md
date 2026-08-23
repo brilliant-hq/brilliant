@@ -36,7 +36,7 @@ The Text tool is click-to-place only. Dragging does not create a fixed-width box
 ### Exiting edit mode
 
 - **Enter** finishes editing and exits.
-- **Escape** cancels and exits (reverts an in-progress edit).
+- **Escape** finishes editing and exits, committing what you typed (same as Enter; there is no revert-on-escape). To undo the edit, use Cmd+Z after exiting.
 - Click outside the element to commit and exit.
 - **Shift+Enter** inserts a newline instead of exiting.
 

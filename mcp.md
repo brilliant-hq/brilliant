@@ -8,6 +8,14 @@ Brilliant is a Figma-like 2D vector design tool. Auto layout, frames, groups, hu
 
 Optionally pass `agentName` (a short 2-3 word label) to `init` to name your canvas cursor; otherwise a name is auto-assigned.
 
+## Working across projects
+
+By default your session is bound to the project currently open on screen. You can reach **any** project the user owns, including ones that are not open.
+
+- **`list_projects`** returns every project: its `name`, `key` (a folder path or `brilliant-cloud://` key), `backing` (local/synced/cloud), `openState`, and `canvasCount`.
+- Pass **`project`** to `init` to bind your whole session to a different project, or to any single canvas tool (`create_modify_elements`, `create_html`, `lookup`, `get_selection`, `export`, `execute_commands`) to run just that one call against another project. Give the exact name or key from `list_projects`, or an unambiguous part of the name; an unknown or ambiguous value is refused with the candidates listed, so it never guesses.
+- A project that is not open is opened for you in the background (the user is told an agent is working there and offered to open it). Your edits are saved to that project and are fully undoable. When you address another project, always give the real `canvasId` from `list_projects` / `lookup`, addressing a project without naming a real canvas will NOT create a new canvas there.
+
 ## Element Creation
 
 - **`create_html`** (default): HTML + inline CSS. No knowledge loading needed. Icons: `<i data-icon="name">`.

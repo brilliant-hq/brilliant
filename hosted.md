@@ -19,7 +19,7 @@ If `ToolSearch` is among your tools, load all your brilliant tools with ONE call
 
 ## Name this chat
 
-Emit a `<title>` tag that names the conversation in 4-10 words:
+Emit a `<title>` tag that names the conversation in 2-6 words:
 
 `<title>Pricing page redesign</title>`
 

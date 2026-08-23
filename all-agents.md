@@ -17,7 +17,8 @@ Load **all rows that apply**, most designs match 3-5 rows:
 | **Recreate from image** | `recreation/from-image` |
 | **Recreate from URL** | `recreation/from-web` |
 | **Modify existing elements** (parent/before/clone/replace/delete) | + `blueprint/directives` |
-| **Component library / multi-canvas project** (masters on one canvas, consumed on another) | + `blueprint/libraries` + `blueprint/components` |
+| **Multi-canvas structure** (masters on one canvas, consumed on another) | + `blueprint/libraries` + `blueprint/components` |
+| **Libraries** (another project's components/design systems at a pinned version: `libraries.yaml`, `@handle/project`, `lib()` refs, releases) | + `reference/libraries` + `blueprint/components` |
 | **Lines / arrows / flowcharts / dependency arrows / callouts** | + `blueprint/lines` |
 | **Shaders** | + `blueprint/shaders/{overview,...}` |
 | **Export to web with shaders** | + `webgl/overview` + relevant `webgl/*` shader |
@@ -42,7 +43,7 @@ RIGHT:  get_knowledge(keys: ["design-systems/core", "design/foundations", "desig
 ### Available keys
 
 - design-systems/{core, authoring, authoring-modes}
-- blueprint/{core, layout, layout-patterns, paint, text, styled-ranges, effects, vectors, components, libraries (multi-canvas projects: masters on one canvas consumed on another), lines (straight lines, arrows, flowchart/dependency arrows, callouts), arcs (progress rings, donut/pie charts, activity meters, partial circles), images, commands, directives}
+- blueprint/{core, layout, layout-patterns, paint, text, styled-ranges, effects, vectors, components, libraries (multi-canvas structure: masters on one canvas consumed on another; cross-project libraries live in reference/libraries), lines (straight lines, arrows, flowchart/dependency arrows, callouts), arcs (progress rings, donut/pie charts, activity meters, partial circles), images, commands, directives}
 - blueprint/gradients/{linear, radial, angular, diamond}
 - blueprint/shaders/{overview, metaballs, metal, irid, steel}
 - design/{foundations, colors, typography, shadows, backgrounds, gradients, brand, covers (the image a project presents itself with — read before designing one)}
@@ -52,12 +53,12 @@ RIGHT:  get_knowledge(keys: ["design-systems/core", "design/foundations", "desig
 - images/{prompts, templates, integration}
 - recreation/{from-image, from-web}
 - svg/{prompts, integration}
-- reference/{shortcuts, tools, ui, ui-walkthroughs, editing, canvas, frames, text, vectors, components, styling, effects, export, design-systems, crop, shaders, canvases, layout-guides, ai, ai-setup, feedback, image-filters, mcp-connections, mcp-external-servers}
+- reference/{shortcuts, tools, ui, ui-walkthroughs, editing, canvas, frames, text, vectors, components, libraries (cross-project libraries: @handle/project, releases, the Assets view), styling, effects, export, design-systems, crop, shaders, canvases, layout-guides, ai, ai-setup, feedback, image-filters, mcp-connections, mcp-external-servers}
 - webgl/{overview, setup, metaballs, liquid-metal, holographic, liquid-stainless-steel, dithering, reactive-grid, color-adjust, noise-grain, halftone, pixelate, duotone, posterize, dither}
 
 ## Canvas Exploration
 
-- `lookup`: find or read elements. Pass `scope` (canvas paths, element IDs, or `#refs`) to constrain, and/or filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) to narrow. Default `format: "summary"` returns compact metadata; use `"blueprint"` (with optional `depth`) for full element trees. Examples: `lookup({query: "Card"})` discovery across canvases · `lookup({scope: ["#dashboard"], query: "Button"})` search a subtree · `lookup({scope: ["#card"], format: "blueprint"})` inspect a specific element. **NEVER** call `lookup` with no input on large repos, at least one of `scope` or a filter is required.
+- `lookup`: find or read elements. Pass `scope` (canvas paths, element IDs, or `#refs`) to constrain, and/or filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) to narrow. Default `format: "summary"` returns compact metadata; use `"blueprint"` (with optional `depth`) for full element trees. A component instance reads back as its compact `inst()` line; add `expandInstances: true` (with `format: "blueprint"`) to also see its derived children with their real ids (read-only): target them with `lookup`/`execute_commands`, edit them via `override(...)` on the instance, never re-create them. Examples: `lookup({query: "Card"})` discovery across canvases · `lookup({scope: ["#dashboard"], query: "Button"})` search a subtree · `lookup({scope: ["#card"], format: "blueprint"})` inspect a specific element · `lookup({scope: ["#instance"], format: "blueprint", expandInstances: true})` see an instance's children. **NEVER** call `lookup` with no input on large repos, at least one of `scope` or a filter is required.
 - `export`: render or serialize elements. Raster `png`/`jpeg`/`webp` (visual check, inline image), `svg`/`pdf`, markup `html`/`htmlDoc`/`htmlFlex`/`react`, video `mp4`/`mov`, and `replay` (interactive recording session only).
 
 ## Rules

@@ -63,6 +63,8 @@ red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gra
 
 Shortcut is **Ctrl+Shift+C** on macOS and Linux (uses the Control key, not the Command key, even on macOS), remapped to **Alt+Shift+C on Windows**. Sample a color from anywhere on screen. A magnified pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
 
+**Token-preserving picks**: when the sampled pixel comes from a token-bound solid fill, the pick applies that design token (not the raw hex), resolved under the source element's active modes and brand. Even without a bound source, a sampled color that equals a design token's current resolved color (within a tiny per-channel tolerance) binds that token; a genuinely non-token color applies as plain hex. The same matching runs when you commit a color from the picker's wheel or type a hex/CSS value: land exactly on a token's color and the token binds instead of a raw value. Matching never happens mid-drag, only at commit.
+
 ### Color Picker Sections
 
 The color picker includes additional sections below the main controls:

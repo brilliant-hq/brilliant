@@ -28,7 +28,7 @@ the server cannot bind at all and shows a port-unavailable notice with a Retry,
 so the configured URL is not live until it binds.
 
 Supported clients include Claude Code, Cursor, VS Code (Copilot), Windsurf, Zed,
-Codex CLI, Gemini CLI, Antigravity, and OpenCode (opencode.ai). The roster keeps
+Codex CLI (the same connection also serves the ChatGPT desktop app, which reads the same ~/.codex/config.toml), Gemini CLI, Antigravity, and OpenCode (opencode.ai). The roster keeps
 growing; the MCP Connections list is the live source of truth for which tools
 Brilliant can connect right now.
 

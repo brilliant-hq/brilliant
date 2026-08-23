@@ -103,7 +103,7 @@ Every shader fill or stroke has a **Transform** section that adjusts how the pat
 - Toggle animation for a single fill with the play/pause button in its expanded view (this is the per-element "Toggle Shader Animation" command).
 - The **Speed** slider controls the rate (0 = frozen in place, not reset).
 - To globally pause or resume *all* shader animations across the canvas, run **"Toggle Shader Animations"** from the command palette. Neither toggle has a default keyboard shortcut.
-- On a busy canvas (many shaders, or heavy zooming) Brilliant may automatically pause shader animations to keep the app fast, and shows a one-time notice: *"Shader animations paused to keep things fast. Click the animations toggle to resume."* While that is in effect the **Toggle Shader Animations** control reads as off; running it once asks the engine to resume playing (it is not the same as your own manual pause). If the machine still can't keep up it will pause again.
+- On a busy canvas (many shaders, or heavy zooming) Brilliant may automatically pause shader animations to keep the app fast, and shows a one-time notice: *"Shader animations paused to keep things fast. Click the animations toggle to resume."* While that is in effect the **Toggle Shader Animations** control reads as off; running it once asks the engine to resume playing (it is not the same as your own manual pause) and resumes immediately instead of waiting. Left alone, Brilliant retries on its own and resumes automatically once the machine has headroom again; if it still can't keep up it will pause again, and the notice only appears the first time in a session.
 
 ## Combining with Other Fills
 

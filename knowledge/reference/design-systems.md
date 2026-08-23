@@ -42,6 +42,8 @@ A dimmed field with an "Inherited from..." tooltip means the value is not pinned
 
 The brand dropdown lists **Inherit** (clears the scope's override), **default** (pins to the project baseline), then each brand file found in `Styles/`. Hovering an option previews it live on the canvas without committing; clicking commits. The change is undoable (Cmd+Z).
 
+If the project depends on any **libraries**, their design systems appear in the same dropdown named by the library's handle: `@acme/design-kit` is that library's default look, `@acme/design-kit/marketing` one of its named brands. A library brand always resolves against the library's own tokens, so a library update re-themes everywhere it is used. See `reference/libraries`.
+
 ### Switching modes
 
 Each axis the active system declares gets its own dropdown (theme, density, accessibility, or any custom axis the system author defined). Options are **Inherit** plus that axis's declared values. Hover previews, click commits, Cmd+Z undoes. There is no default keyboard shortcut for switching modes, and no command-palette entry: the inspector axis dropdowns are the only way to change a mode.
@@ -147,4 +149,5 @@ Note: the **Reset Design System** command rewrites the *source file* with Brilli
 - Colors, fills, strokes, opacity, corner radius in the UI: `reference/styling`.
 - Effects (shadows, glows, blurs): `reference/effects`.
 - Components and instances: `reference/components`.
+- Library design systems and library instances (which default to the library's own tokens): `reference/libraries`.
 - Importing from Figma (connecting Figma, plugin vs URL, what else comes across): `reference/canvases`.
