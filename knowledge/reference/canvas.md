@@ -328,6 +328,7 @@ Drag from the ruler bar onto the canvas to create persistent horizontal or verti
 - Are selectable: click a guide to select it
 - Are deletable: select and press Delete, or use "Clear All Ruler Guides" via the command palette
 - Are per-canvas: each canvas has its own set
+- Are saved with the canvas: adding, moving, deleting or clearing a guide is a document change, so guides come back exactly where you left them
 
 ## Dimension Labels
 

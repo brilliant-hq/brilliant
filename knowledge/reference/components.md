@@ -106,6 +106,7 @@ This is the "flip a switch to a state" workflow: one instance, reconfigured by p
 |------|---------|
 | Filled diamond | Master component |
 | Diamond outline | Component instance |
+| Switch (filled / outline) | A **boolean slot**: the on/off wrapper a Figma boolean property imports as (a two-state component instance around a shown/hidden child). Filled = on, outline = off. It reads as a toggle rather than a duplicate layer; hovering names it a switch. |
 
 ## Overrides
 

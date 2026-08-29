@@ -83,7 +83,7 @@ Typography commands applied to a selected frame (not in edit mode) cascade to al
 
 Recently used fonts appear at the top when the search box is empty.
 
-**Available fonts:** about 300 curated Google Fonts plus all system fonts installed on your OS. Google Fonts load on demand (first use triggers a fetch, then cached). There is no in-app custom font upload; to use a font not in the list, install it as a system font and it appears in the picker. Text with no explicit family is Inter, which ships with the app: there is no separate "System Font" entry, and your platform's UI font (SF Pro Display on macOS, Segoe UI on Windows) is just another pickable family.
+**Available fonts:** about 300 curated Google Fonts plus all system fonts installed on your OS, plus any fonts installed into Brilliant's own font store. Google Fonts load on demand (first use triggers a fetch, then cached). To use a font not in the list, either install it as a system font or add the `.ttf`/`.otf` file directly via the Install Font Files command; installed fonts appear in the picker and make previously-outlined imported text convert back to real text on re-import. During a Figma import, Brilliant also fetches missing openly-licensed fonts automatically (Google Fonts and known open icon fonts such as remixicon) and notes each fetch in the migration report, so imported text stays editable instead of being outlined. Text with no explicit family is Inter, which ships with the app: there is no separate "System Font" entry, and your platform's UI font (SF Pro Display on macOS, Segoe UI on Windows) is just another pickable family.
 
 ### Font weight
 
@@ -161,7 +161,7 @@ A dropdown behind the Typography section's "..." button limits the text to a max
 
 ### OpenType features
 
-The "OpenType features" button in the Typography section opens a stay-open checklist of font features (each toggles independently; multiple can be on). Available toggles: Ligatures, Tabular Figures, Small Caps, Slashed Zero, Fractions. Effects depend on the current font actually supporting that feature.
+The "OpenType features" button in the Typography section opens a stay-open checklist of font features (each toggles independently; multiple can be on). Available toggles: Ligatures, Tabular Figures, Small Caps, Slashed Zero, Fractions. A feature the selected font can't actually express is greyed out with a "Not in this font" note and can't be toggled on, so a toggle never shows as checked while doing nothing (the bundled Inter, for example, has Tabular Figures, Slashed Zero, and Fractions but not Ligatures or Small Caps). A feature stays available whenever any selected text uses a font that supports it.
 
 ### Text direction
 
@@ -254,6 +254,6 @@ Do not promise these:
 - Find and replace within or across text elements.
 - Per-range line height, alignment, direction, case, OpenType features, or max-lines. (Per-range token bindings DO exist for color, opacity, and font family; size, weight, and line height bindings stay whole-element.)
 - Per-range shader or image fills (a shader or image color on a substring). Per-range gradients ARE supported.
-- Custom font upload (install as a system font instead).
+- A font-upload button in the picker (use the Install Font Files command or install as a system font; both routes make the family pickable).
 - Auto-shrink-to-fit (no automatic font scaling to fit a fixed box; truncation only clips with an ellipsis).
 - Vector edit mode directly on text (run Outline Text or Flatten first).

@@ -29,6 +29,8 @@ Jump rule: heading = 150-200% of body.
 
 Use the active DS's font tokens, `$font.family` (workhorse sans) and `$font.family.serif` (editorial accent, when the DS provides one). Most designs need only these: same-family pairing is safest; `$font.family.serif` as a single editorial heading + `$font.family` body is the high-contrast move.
 
+The default DS also answers `$font.family.sans`, an alias of `$font.family` on the same face, for when you want to name the sans out loud beside `$font.family.serif`. A DS the project authored itself may not define it: an unknown font token refuses and names the family tokens that DS does carry.
+
 Specific Google Fonts override the DS, `t("...",Playfair Display,...)` works inline and auto-loads. Reach for this only when the active DS doesn't fit the mood; switching DS is usually the better move (see `design-systems/core`).
 
 Importing from Figma: a commercial font that isn't bundled, on Google Fonts, or installed on your machine can't be served, so its text imports as pixel-true glyph outlines (not editable text) and the migration report lists it under Missing fonts. To get editable text back, install the `.ttf`/`.otf` with the Install Font Files command, then re-import the file from the Figma plugin. Brilliant never downloads commercial fonts for you.

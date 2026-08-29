@@ -517,6 +517,7 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Jump to home | Cmd+Ctrl+0 (id `jump_to_tab_0`) |
 | Jump to project tab 1 to 9 | Cmd+Ctrl+1 to Cmd+Ctrl+9 (ids `jump_to_tab_1` to `jump_to_tab_9`) |
 | Go home | (no default, id `go_home`) |
+| Activate a tab by name | (no default, id `activate_tab`, takes `{"value": "<session key, display name, or home>"}`) |
 | Toggle project search | (no default, id `toggle_project_search`) |
 
 The Cmd+Ctrl+0-9 jumps share their chord with the rotation levels via WhenClause: the jumps fire when nothing is selected, rotation when a selection is present.

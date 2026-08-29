@@ -222,7 +222,18 @@ The new auto layout frame is created Hug on both axes.
 
 ### Single-Frame In-Place Conversion
 
-When **Shift+A** is pressed with a **single non-auto-layout parent (Frame / Group / Mask / Boolean)** selected, that parent is converted to Auto Layout in place instead of being wrapped in a new frame. Children are sorted by spatial position along the inferred main axis. Padding is computed from the existing frame bounds. A single non-parent selection (a lone rectangle, vector, etc.) is wrapped in a new auto layout frame instead.
+**A single selected frame is never wrapped** (this matches Figma). Shift+A applies auto layout to the frame you selected, in place: same element, same id, same fills, strokes, corner radii and clipping, same children in the same order. Nothing new appears in the layers panel, and the HTML export gains no extra wrapper tag.
+
+| Selection | What Shift+A does |
+|-----------|-------------------|
+| A single parent (Frame / Group / Mask / Boolean) | Converts that parent to Auto Layout **in place** |
+| A single parent that is **already** Auto Layout | **Nothing.** No wrapper frame, no undo step |
+| A single non-parent (a lone rectangle, vector, text) | Wraps it in a new auto layout frame |
+| Several elements, or several frames | Wraps the selection in a new auto layout frame |
+
+On the in-place conversion, children are sorted by spatial position along the inferred main axis, and padding is computed from the existing frame bounds.
+
+Because the already-auto-layout case does nothing, Shift+A is safe to press twice, and safe on frames that arrived with auto layout already set (a Figma import, or a blueprint you built with `al`). To put an existing auto layout frame inside another one, group it first (Cmd+G), then press Shift+A on the group.
 
 ### Right Toolbar (Parent Section)
 
