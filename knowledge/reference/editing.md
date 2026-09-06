@@ -32,6 +32,8 @@ How a user manipulates elements directly on the canvas: selecting, moving, resiz
 
 Click and drag on empty space to create a selection rectangle. Top-level frames with children must be fully contained; nested frames, empty top-level frames, and non-frame elements only need to intersect (or for filled rectangles/frames, the rectangle must overlap the fill). Hold **Shift** to add to the existing selection. Hold **Cmd** to select through fills (deep-select: ignores element fills when computing hits).
 
+**Cmd+click reaches a region:** on a flattened multi-region vector (or an imported/boolean result), a plain click selects the whole shape while a **Cmd+click** selects just the region under the cursor (its fill fills the inspector, and a recolor or Delete then applies to that region only); Escape steps a region selection back to the whole shape before it clears.
+
 ### Navigating the Hierarchy
 
 | Action | Result |
@@ -114,7 +116,7 @@ While dragging, snap guides show alignment, spacing (gap matching), equidistant 
 
 ### Pixel Grid Snap
 
-Default ON. Rounds positions to whole-pixel boundaries on axes where element-snap did not win. Applies to drag move, arrow-key nudge, paste, corner resize, and creation. Edge resize and rotation are exempt. Toggle with **Shift+Cmd+'** (apostrophe). This is independent from the visual pixel-grid overlay toggled with **Cmd+'**.
+Default ON. Rounds landed positions to whole-pixel boundaries, including element-snap landings: with the grid on, aligning or centering against fractional geometry lands at the nearest whole pixel and the snap guides draw at that landed pixel (like Figma), so what you see is exactly where the element sits. With the grid off, snapping is exact: flush to a fractional edge means exactly flush. Applies to drag move, arrow-key nudge, paste, corner resize, and creation. Edge resize and rotation are exempt. Toggle with **Shift+Cmd+'** (apostrophe). This is independent from the visual pixel-grid overlay toggled with **Cmd+'**.
 
 ### Precise Positioning
 
@@ -413,7 +415,7 @@ Honest limits:
 - **Images need the Figma connection.** Photos and exported bitmaps used as image fills come across as real images only when Brilliant is connected to your Figma account. Without the connection they arrive as a labeled placeholder you can replace: drag the file in or paste the image on its own.
 - **An edited master is never silently overwritten or adopted.** If you changed a pasted component's fills, text, or structure and then paste the same design again, the paste adds a fresh master under a new name (with a note) instead of merging with your edited one.
 - **Rounded stars and polygons arrive with sharp corners.** The star or polygon shape itself comes across exactly; Figma's corner rounding on those shapes does not, and a labeled note tells you when that happened. Boolean shapes arrive as real boolean groups with live operands.
-- Available in the **desktop app today** (macOS). Pasting from Figma in the browser editor is coming later.
+- Available in the **desktop app today** (macOS and Windows). Pasting from Figma in the browser editor is coming later.
 
 ### Paste in another project
 

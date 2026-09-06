@@ -138,14 +138,14 @@ On Windows some macOS defaults are moved to free chords (their macOS chord colla
 
 | Action | Shortcut |
 |--------|----------|
-| Select all | Cmd+A (in vector edit mode: selects all nodes and handles) |
+| Select all | Cmd+A, also Edit > Select All. Acts on whatever is focused: the canvas selects all elements; in vector edit mode, all nodes and handles; with the file explorer focused, all explorer rows; in a text file, the whole document. |
 | Select previous sibling | Tab (id `select_previous_element`) |
 | Select next sibling | Shift+Tab (id `select_next_element`) |
 | Enter frame / edit element / enter vector edit mode | Enter |
 | Exit / cancel (context-aware: clears selection, exits vector mode, exits crop, etc.) | Escape |
 | Select parent frame | Shift+Enter |
 | Rename selected layer | Cmd+R |
-| Delete selected | Backspace or Del (ids `delete_command` / `delete_command_forward` — one action, two keys; Del is Fn+Delete on macOS) |
+| Delete selected | Backspace or Del — including numpad Del with NumLock off (ids `delete_command` / `delete_command_forward` / `delete_command_numpad_decimal` — one action, three keys; Del is Fn+Delete on macOS; numpad '.' with NumLock on still types) |
 | Hide / show selection | Cmd+Shift+H (id `toggle_visibility`; Figma parity. Plain Shift+H is flip-horizontally) |
 
 ### Escape Behavior (Context-Aware)
@@ -464,7 +464,8 @@ Rotation levels use a **clock position** metaphor: level 1 = 1 o'clock (30°), l
 | Toggle snap to pixel grid | Cmd+Shift+' |
 | Toggle rulers | Shift+U |
 | Clear all ruler guides | (no default, command id `clear_all_ruler_guides`) |
-| Toggle snap guides (alignment, spacing, equidistant) | (no default, command id `toggle_snap_guides`) |
+| Toggle snap guides (alignment, spacing, equidistant) | Cmd+Shift+; |
+| Suspend ALL snapping for one drag (guides + pixel grid) | Hold Cmd (Ctrl on Windows/Linux) while dragging |
 | Toggle dimension labels | (no default, command id `toggle_dimension_labels`) |
 | Toggle vector snapping | (no default, command id `toggle_vector_snapping_enabled`) |
 | Toggle vector snap to geometry / self / others / grids / path curves | (no default, ids `toggle_vector_snap_to_geometry`, `_self`, `_others`, `_grids`, `_path_curves`) |

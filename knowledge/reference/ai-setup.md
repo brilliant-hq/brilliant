@@ -57,14 +57,21 @@ On the AI Providers list:
   a slow shell startup outruns detection, set the `BRILLIANT_CODEX_PATH`
   environment variable to the codex binary and Brilliant will use it directly.
 - **Cursor** also has no key field: it signs in with your Cursor account, not an
-  API key. Install the Cursor CLI (`cursor-agent`), run `cursor-agent login` once
+  API key. The `cursor-agent` CLI is a **separate install from the Cursor desktop
+  app** (a common surprise: having the app does not give you the CLI). Install the
+  Cursor CLI (`cursor-agent`), run `cursor-agent login` once
   (or set a `CURSOR_API_KEY`), and Brilliant detects it on launch. A single
   **Cursor Agent** model then appears in the selector; it auto-routes to the best
   model for the task, the way `cursor-agent` does on its own. The settings row
-  reads "Not signed in" when the CLI is found but not logged in yet; run
+  reads "Not connected" when the CLI itself was not found (install it), and
+  "Not signed in" when the CLI is found but not logged in yet; run
   `cursor-agent login` in your terminal, then the circular-arrow button
   re-checks. If your `cursor-agent` lives somewhere unusual, set the
-  `BRILLIANT_CURSOR_AGENT_PATH` environment variable to its path.
+  `BRILLIANT_CURSOR_AGENT_PATH` environment variable to its path. If a chat fails
+  to start, the error names the actual cause rather than always pointing at
+  login: a sign-in problem still says to run `cursor-agent login`, but a process
+  that could not launch, a request cursor-agent rejected (a version mismatch),
+  or a no-response timeout each say so plainly, so you fix the right thing.
 - **Quiver** powers AI vector generation and vectorization, not chat. It is set
   the same way but is not a chat provider.
 

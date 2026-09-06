@@ -126,12 +126,12 @@ Figma import boundaries (each announced in the import warnings, never silent):
 
 ## Design System Commands
 
-Most are in the command palette under the design-system group. The two exceptions are **Set Design System** and **Set Design System Mode**: these do not appear in the palette and are driven only by the inspector dropdowns. Brand/mode/reset operations are undoable via the per-canvas undo stack (Cmd+Z).
+Most are in the command palette under the design-system group. The two exceptions are **Set Design System** and **Set Design System Mode**: these do not appear in the palette, and by hand are driven only by the inspector dropdowns. An AI agent sets the same brand and mode through the Blueprint `ds(name, axis(value))` form (the preferred path, e.g. `ds(, theme(dark))`), or by calling `set_design_system` / `set_design_system_mode` through `execute_commands`: the brand command takes `{value: <brand>}`, the mode command takes `{axis: <axis>, value: <mode>}` (an unknown axis or value is refused by name). Brand/mode/reset operations are undoable via the per-canvas undo stack (Cmd+Z).
 
 | Command (display name) | Purpose |
 |---|---|
-| Set Design System | Brand setter for the current scope (not in the palette; driven only by the inspector brand dropdown) |
-| Set Design System Mode | Per-axis mode setter (not in the palette; driven only by the inspector axis dropdowns) |
+| Set Design System | Brand setter for the current scope (not in the palette; by hand via the inspector brand dropdown) |
+| Set Design System Mode | Per-axis mode setter (not in the palette; by hand via the inspector axis dropdowns) |
 | Apply Typography Token | Apply a `typography.*` composite to selected text element(s) |
 | Apply Shadow Token | Apply a `shadow.*` composite to selected element(s) |
 | Unbind Tokens | Replace all token bindings on the selection with literal values and drop the binding |

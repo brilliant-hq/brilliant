@@ -27,6 +27,8 @@ The Text tool is click-to-place only. Dragging does not create a fixed-width box
 | Edit an existing text element | Double-click it, or select it and press **Enter** |
 | With the Text tool active | Click an existing text element to edit it directly |
 
+However you enter, whether you double-click it or select it and press **Enter**, the whole text starts selected, so your next keystroke replaces it (matching Figma). Once you are already editing, a **double-click** selects just the word under the cursor (see [Text Navigation While Editing](#text-navigation-while-editing)).
+
 ### While editing
 
 - Type to insert at the caret.
@@ -83,7 +85,7 @@ Typography commands applied to a selected frame (not in edit mode) cascade to al
 
 Recently used fonts appear at the top when the search box is empty.
 
-**Available fonts:** about 300 curated Google Fonts plus all system fonts installed on your OS, plus any fonts installed into Brilliant's own font store. Google Fonts load on demand (first use triggers a fetch, then cached). To use a font not in the list, either install it as a system font or add the `.ttf`/`.otf` file directly via the Install Font Files command; installed fonts appear in the picker and make previously-outlined imported text convert back to real text on re-import. During a Figma import, Brilliant also fetches missing openly-licensed fonts automatically (Google Fonts and known open icon fonts such as remixicon) and notes each fetch in the migration report, so imported text stays editable instead of being outlined. Text with no explicit family is Inter, which ships with the app: there is no separate "System Font" entry, and your platform's UI font (SF Pro Display on macOS, Segoe UI on Windows) is just another pickable family.
+**Available fonts:** about 300 curated Google Fonts plus all system fonts installed on your OS, plus any fonts installed into Brilliant's own font store. Google Fonts load on demand (first use triggers a fetch, then cached). To use a font not in the list, either install it as a system font or add the `.ttf`/`.otf` file directly via the Install Font Files command; installed fonts appear in the picker and make previously-outlined imported text convert back to real text on re-import. During a Figma import, Brilliant also fetches missing openly-licensed fonts automatically (Google Fonts and known open icon fonts such as remixicon) and notes each fetch in the migration report, so imported text stays editable instead of being outlined. Text with no explicit family is Inter, which ships with the app: there is no separate "System Font" entry, and your platform's UI font (SF Pro Display on macOS, Segoe UI on Windows) is just another pickable family. System families are listed under their real names as the font files themselves declare them — one entry per family (a family's bold/italic files never appear as separate entries), with the weight menu offering the weights actually installed.
 
 ### Font weight
 
@@ -106,7 +108,7 @@ The slant is the same whatever else you do to the text: skewing it, adding a str
 | Increase by 1px | **Shift+=** |
 | Decrease by 1px | **-** |
 
-Range 0.2 to 1000. Scaling a text element on the canvas adjusts font size proportionally. Shift+= and - step the size by 1px; with a range selected while editing, they step that range only. (Shift+= / - are shared with stroke width: on a non-text shape they nudge the stroke instead.)
+Range 0.2 to 20000. Scaling a text element on the canvas adjusts font size proportionally. Shift+= and - step the size by 1px; with a range selected while editing, they step that range only. (Shift+= / - are shared with stroke width: on a non-text shape they nudge the stroke instead.)
 
 ### Bold / Italic / Underline / Strikethrough
 

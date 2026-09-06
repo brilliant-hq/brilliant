@@ -4,6 +4,8 @@ Before any design task using Brilliant's DSL, load relevant knowledge.
 
 Over-load, never under-load (files are 5-50 lines). Max 6 keys per call, split across 2-4 calls. Many chats require 20-25 knowledge files.
 
+Requesting a key also auto-loads its prerequisites (its `assumes:` deps), listed under **Also auto-loaded** so nothing is bundled silently. Pass `includeDependencies: false` to load ONLY the keys you name (skipped prerequisites are listed so you can request them deliberately).
+
 CRITICAL: NEVER start designing via Brilliant's DSL before loading *a minimum of 12 knowledge keys*.
 
 Load **all rows that apply**, most designs match 3-5 rows:
@@ -58,8 +60,9 @@ RIGHT:  get_knowledge(keys: ["design-systems/core", "design/foundations", "desig
 
 ## Canvas Exploration
 
-- `lookup`: find or read elements. Pass `scope` (canvas paths, element IDs, or `#refs`) to constrain, and/or filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) to narrow. Default `format: "summary"` returns compact metadata; use `"blueprint"` (with optional `depth`) for full element trees. A component instance reads back as its compact `inst()` line; add `expandInstances: true` (with `format: "blueprint"`) to also see its derived children with their real ids (read-only): target them with `lookup`/`execute_commands`, edit them via `override(...)` on the instance, never re-create them. Examples: `lookup({query: "Card"})` discovery across canvases · `lookup({scope: ["#dashboard"], query: "Button"})` search a subtree · `lookup({scope: ["#card"], format: "blueprint"})` inspect a specific element · `lookup({scope: ["#instance"], format: "blueprint", expandInstances: true})` see an instance's children. **NEVER** call `lookup` with no input on large repos, at least one of `scope` or a filter is required.
+- `lookup`: find or read elements. Pass `scope` (canvas paths, element IDs, or `#refs`) to constrain, and/or filters (`query`, `textContent`, `type`, `fillColor`, `componentName`) to narrow. Default `format: "summary"` returns compact metadata; `"skeleton"` adds the design-system token refs an element uses while omitting geometry (the cheap read for a tiny property edit: find the id + which token to change); `"blueprint"` (with optional `depth`) returns full element trees with geometry. A component instance reads back as its compact `inst()` line; add `expandInstances: true` (with `format: "blueprint"`) to also see its derived children with their real ids (read-only): target them with `lookup`/`execute_commands`, edit them via `override(...)` on the instance, never re-create them. Examples: `lookup({query: "Card"})` discovery across canvases · `lookup({scope: ["#dashboard"], query: "Button"})` search a subtree · `lookup({scope: ["#card"], format: "blueprint"})` inspect a specific element · `lookup({scope: ["#instance"], format: "blueprint", expandInstances: true})` see an instance's children. **NEVER** call `lookup` with no input on large repos, at least one of `scope` or a filter is required.
 - `export`: render or serialize elements. Raster `png`/`jpeg`/`webp` (visual check, inline image), `svg`/`pdf`, markup `html`/`htmlDoc`/`htmlFlex`/`react`, video `mp4`/`mov`, and `replay` (interactive recording session only).
+- Blueprint reads print resolved geometry beside declared sizing (`hug:N`; `ext(w,h)` after `s()` on fill axes): trust those numbers over any inference from the sizing modes. When a user-provided screenshot conflicts with your reads, that conflict is a signal to RE-MEASURE (a fresh `lookup format:"blueprint"` of the exact elements plus a raster `export` of the region), not a question of which picture wins.
 
 ## Rules
 

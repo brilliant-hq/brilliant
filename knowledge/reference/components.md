@@ -106,7 +106,7 @@ This is the "flip a switch to a state" workflow: one instance, reconfigured by p
 |------|---------|
 | Filled diamond | Master component |
 | Diamond outline | Component instance |
-| Switch (filled / outline) | A **boolean slot**: the on/off wrapper a Figma boolean property imports as (a two-state component instance around a shown/hidden child). Filled = on, outline = off. It reads as a toggle rather than a duplicate layer; hovering names it a switch. |
+| Switch (filled / outline) | An instance of a two-state **on/off component set** (a set whose single property has the two values `on` and `off`), drawn as a switch so it reads as a toggle instead of two near-duplicate variant layers. Filled = on, outline = off; hovering names it a switch. This is a display convention over an ordinary component instance, not a distinct property type and not a kind of slot (slots are the per-instance-owned children above). It is what a Figma boolean property imports as, and the same switch shows for any such on/off set however it was built. There is no separate "boolean property" or authorable "boolean slot" in Brilliant today. |
 
 ## Overrides
 

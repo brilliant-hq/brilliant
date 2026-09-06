@@ -63,6 +63,8 @@ red, green, blue, yellow, orange, purple, pink, cyan, magenta, white, black, gra
 
 Shortcut is **Ctrl+Shift+C** on macOS and Linux (uses the Control key, not the Command key, even on macOS), remapped to **Alt+Shift+C on Windows**. Sample a color from anywhere on screen. A magnified pixel grid appears around the cursor. Click to apply, Escape to cancel. Sampling uses the system screen capture pipeline, so it works across other applications. The button on the left of the hue slider toggles the same mode from inside the color picker.
 
+**Picking onto a gradient**: a pick recolors one stop, it never flattens the gradient. If a stop is focused (click it in the gradient bar first) that stop takes the color; otherwise the first stop does. The stop keeps its own opacity. To turn a gradient into a flat color, use the solid paint type instead.
+
 **Token-preserving picks**: when the sampled pixel comes from a token-bound solid fill, the pick applies that design token (not the raw hex), resolved under the source element's active modes and brand. Even without a bound source, a sampled color that equals a design token's current resolved color (within a tiny per-channel tolerance) binds that token; a genuinely non-token color applies as plain hex. The same matching runs when you commit a color from the picker's wheel or type a hex/CSS value: land exactly on a token's color and the token binds instead of a raw value. Matching never happens mid-drag, only at commit.
 
 ### Color Picker Sections
@@ -132,7 +134,7 @@ Import an image via Cmd+Shift+O (Import), drag-and-drop from the OS file manager
 
 The design tokens, canvas colors, and recent colors sections remain visible below the image area. A replace button is also available in the expanded image fill config row.
 
-**Supported formats:** PNG, JPG / JPEG, GIF, BMP, WebP on all platforms. TIFF / TIF, HEIC / HEIF, and AVIF are additionally supported on macOS (converted to PNG via native NSImage decoding). On Windows / Linux those macOS-only formats are excluded from file pickers and drop targets.
+**Supported formats:** PNG, JPG / JPEG, GIF, BMP, WebP on all platforms. TIFF / TIF, HEIC / HEIF, and AVIF are additionally supported on macOS (converted to PNG via native NSImage decoding) and on Windows (converted via WIC; TIFF works out of the box, HEIC/HEIF and AVIF need the free Microsoft Store codec packs — "HEIF Image Extensions" / "AV1 Video Extension" — and a missing pack surfaces an install card instead of failing silently). On Linux those formats are excluded from file pickers and drop targets.
 
 **Resolution:** large, high-resolution source images (well beyond typical screen dimensions) render fine and stay clean at any zoom, the app downsamples them smoothly when zoomed out, so detailed images don't shimmer or alias.
 
@@ -180,7 +182,7 @@ Stack multiple fills on a single element. Rendered bottom-to-top in list order. 
 
 ### Vector Region Fills
 
-Vector elements with multiple enclosed regions (e.g. a path that crosses itself, or an outlined-and-flattened text glyph with counters) can be colored per region. Click a region while in vector edit mode to focus its fill, then change color in the picker. Each region keeps its own fill independently of the element's main fills list.
+Vector elements with multiple enclosed regions (e.g. a path that crosses itself, or an outlined-and-flattened text glyph with counters) can be colored per region. Cmd+click a region on the canvas (a plain click selects the whole shape), or click it while in vector edit mode, to focus its fill, then change color in the picker. Each region keeps its own fill independently of the element's main fills list.
 
 ### Text Fills
 

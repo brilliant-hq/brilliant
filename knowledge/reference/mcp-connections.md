@@ -58,9 +58,21 @@ Three equivalent paths:
    start a session). In the web editor it shows the exact command to copy and
    checks off automatically once the agent connects.
 
+**Safari cannot connect an agent.** In the web editor the agent reaches
+Brilliant over the user's own machine (a loopback connection to `127.0.0.1`),
+and Safari blocks that for every website, with no setting that turns it on. In
+Safari, both the in-chat flow and Settings → MCP Connections say so and point
+at Chrome, Edge, Firefox, or the desktop app rather than offering a connect
+that can never land. Chrome may ask once for local network permission on its
+first connect; granting it is a normal part of setup.
+
 After connecting, **the tool must be restarted** to pick up the new server
-(the UI shows a restart note). Then, inside that tool, the user asks it to
-design in Brilliant and it calls the `brilliant` MCP tools.
+(the UI shows a restart note). A restart alone shows nothing: **nothing happens
+until a chat starts.** Clients like Cursor and Codex spawn the `brilliant` MCP
+server only when a chat or session begins, not on launch, so the user must open
+the tool's AI chat (in Cursor, `Cmd+I`) or start a session and send a message.
+The `brilliant` tools connect on that first call, and Brilliant's own checklist
+ticks its last step then.
 
 ## What enabling actually does
 
@@ -95,4 +107,7 @@ preserved.
   points somewhere else (the config was hand-edited). Toggling on rewrites it to
   the correct local URL.
 - **Connected but the tool doesn't see Brilliant:** it usually needs a restart
-  after enabling, and Brilliant must be running.
+  after enabling, and Brilliant must be running. Remember that a restart alone
+  does nothing until a chat starts: the client spawns the server on the first
+  chat/session, so open its AI chat and send a message before expecting the
+  `brilliant` tools.

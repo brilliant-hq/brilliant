@@ -163,6 +163,5 @@ All Brilliant shaders are ported from SkSL (Flutter GLSL 460) to GLSL ES 3.0 (We
 1. `#version 300 es` + `precision highp float;` header
 2. `FlutterFragCoord()` replaced with `vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio)` where `pxRatio = max(uPixelRatio, 1.0)` (Y-flip for top-left origin; the division maps physical backing-store pixels to the logical element pixels patterns are defined in — the runtime passes `uResolutionX/Y` as logical size and `uPixelRatio` as `devicePixelRatio`)
 3. `layout(location=N)` removed from uniforms (WebGL binds by name)
-4. `uniform sampler2D uSDFTexture/uEdgeData` removed (web uses rect/circle shapes only)
-5. `elementSDF()` simplified to rect + circle analytical paths (no vector SDF textures)
-6. Shader body logic is **identical** to the in-app `.frag` source (the native engine renders these on canvas; SkSL survives only in the text-editing body and inspector previews)
+4. The web runtime supports rectangle and circle shapes directly; vector shapes are baked to an image
+5. Shader body logic is **identical** to the in-app `.frag` source (the native engine renders these on canvas; SkSL survives only in the text-editing body and inspector previews)

@@ -206,7 +206,9 @@ While moving, resizing, or creating elements, snap guides render as:
 - Solid lines: alignment snaps (edge or center aligned to a reference)
 - Dashed lines with labels: spacing, equidistant distribution, and size-match snaps
 
-Guide color adapts to theme (light gray on dark, dark gray on light). The snap engine is per-axis: X and Y snap independently and the closest valid target wins per axis. Once a winning position is determined, all guide types active at that exact position render together.
+Guide color adapts to theme (light gray on dark, dark gray on light). The snap engine is per-axis: X and Y snap independently and the closest valid target wins per axis. Once a winning position is determined, all guide types active at that exact position render together, and they keep rendering for as long as the element sits there: a guide describes where the element actually is, not where the pointer is.
+
+Once an axis snaps, it stays snapped until the pointer either leaves a widened release band or reaches a target that is strictly closer, so a small hand tremor never flips between two nearby targets. That is the same for every tool: moving, resizing, and drawing a new shape all hold the same way.
 
 ### Snap Types
 
@@ -220,15 +222,34 @@ Guide color adapts to theme (light gray on dark, dark gray on light). The snap e
 | Ruler guides | Snaps to dragged-out ruler guides |
 | Angle | Shift while drawing lines/arrows snaps to 45 degree increments; pen handle drag snaps to 15 degree |
 
+### What Brilliant offers as a snap target
+
+Snapping is deliberately selective: it offers fewer, better targets rather than pulling harder. Only these relationships capture the drag:
+
+- **Left to left, center to center, right to right** (and top/middle/bottom on the other axis). These are the canonical alignments and always capture at the full snap distance.
+- **Edge to the facing edge** (your left edge onto something's right edge) when the two elements are side by side. This is the flush, zero-gap placement, and it captures only when you aim at it: come within about 2px and it takes, drift past and it lets go. When the two elements are NOT side by side (different rows, different columns), the shared edge coordinate is treated as an ordinary alignment and captures at the full distance.
+- **The frame you are inside**, and any ruler guide or layout-grid line you placed. Those are always on offer, whatever else is nearby.
+
+An edge landing on something's *center* is not offered: it describes nothing you would ask for, and it used to turn a dense row of elements into a detent every few pixels.
+
+When many elements compete on one axis, the nearest and most recently touched ones win the right to offer targets: elements you just created, selected, or dragged rank above stale ones, and elements far above or below the row you are dragging in rank below the ones beside you.
+
 ### Per-Parent Snapping
 
-Snapping operates within the primary parent's coordinate space. Elements snap to siblings, never across frame boundaries. Frames themselves are valid snap targets when they are siblings.
+Snapping operates within the primary parent's coordinate space. Elements snap to siblings, never across frame boundaries. Frames themselves are valid snap targets when they are siblings. Elements scrolled out of view are never snap targets.
+
+### Hold Cmd to place freely
+
+Hold **Cmd** (Ctrl on Windows/Linux) while dragging and snapping switches off for as long as you hold it: no guides, no capture, and no pixel-grid rounding either. The element goes exactly where your hand goes. Let go mid-drag and snapping comes straight back, on the very next movement.
+
+This works on every drag: moving, resizing, drawing a new shape, and dragging vector nodes or pen handles. Cmd keeps its other meanings while you hold it (Cmd+click still selects into a group, Cmd+resize still holds an image's crop in place); those just happen unsnapped.
 
 ### Toggling Snaps
 
 | Action | How |
 |--------|-----|
-| Toggle snap guides | Command palette: "Toggle Snap Guides" (no default shortcut) |
+| Suspend snapping for one drag | Hold Cmd (Ctrl on Windows/Linux) while dragging |
+| Toggle snap guides | Cmd+Shift+; |
 | Toggle dimension labels | Command palette: "Toggle Dimension Labels" (no default shortcut) |
 | Toggle snap to pixel grid | Cmd+Shift+' |
 
@@ -307,7 +328,7 @@ Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and 
 | Toggle left toolbar | Cmd+Shift+Left | |
 | Toggle right toolbar | Cmd+Shift+Right | |
 | Toggle bottom toolbar | Cmd+Shift+Down | |
-| Toggle desktop icons | Ctrl+I | Hides/shows the macOS desktop icons (a real Finder toggle). macOS only: the command hard-returns off macOS, and the Ctrl+I chord is disabled on Windows (freed for Italic) |
+| Toggle desktop icons | Ctrl+I | Hides/shows the macOS desktop icons (a real Finder toggle). Overlay mode only: it restarts Finder for a clean overlay screenshot, and a trigger in a normal studio window is refused (enter overlay mode first). macOS only: the command hard-returns off macOS, and the Ctrl+I chord is disabled on Windows (freed for Italic) |
 | Clear all elements | C | Removes all elements from the active canvas (undoable) |
 
 Passthrough mode is overlay-only. Cmd+\ hides ALL app chrome (the left / right / bottom toolbars plus the top strip) in both window modes; press it again to bring everything back. In overlay the top strip's tabs are already suppressed, so an overlay drawing surface stays clear. The hidden state is not remembered across launches: a reboot always restores the chrome.
@@ -421,9 +442,17 @@ When enabled (default), moving, resizing, or creating elements automatically sna
 
 **Element snap takes priority.** If an element snaps to another element's edge (alignment snap), pixel grid snap is skipped on that axis. This ensures alignment guides work correctly while still rounding the other axis.
 
+### The grid wins for vector nodes
+
+While dragging **vector nodes** with pixel snapping on, the grid is the truth: the node always lands on a whole pixel. Snap targets that do not sit on a whole pixel are not offered at all, and curve, edge-length and edge-angle snaps land on the nearest whole pixel to their answer.
+
+This is what keeps node dragging steady. Without it, a node could be pinned to an off-grid neighbour on one axis while the grid rounded the other, leaving it on neither, and small hand movements made it jump back and forth.
+
+The trade: while pixel snapping is on you cannot align a node to a neighbour that sits at a fractional coordinate (common after importing or scaling artwork). Turn pixel snapping off (Shift+Cmd+') to align to it, or hold Cmd to place that one node freely.
+
 ### Toggle
 
-Shift+Cmd+' toggles snap-to-pixel-grid on/off.
+Shift+Cmd+' toggles snap-to-pixel-grid on/off. Holding Cmd during a drag suspends it (along with all other snapping) just for that drag.
 
 The snap setting is independent of the pixel grid overlay (visual only). Possible combinations:
 - Overlay on, snap off: see the grid, allow sub-pixel positioning

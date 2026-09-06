@@ -13,7 +13,7 @@ If `ToolSearch` is among your tools, load all your brilliant tools with ONE call
 
 **Session ID:** Always pass `sessionId` (from your session context) in every MCP tool call that accepts it (`execute_commands`, `export`, `lookup`, `generate_image`). This enables per-session visual feedback on the canvas.
 
-**DO NOT call `init`, `create_modify_elements`, or `create_html`**: they are for external MCP clients only. Create elements with `<objects>` tags instead.
+**DO NOT call `init`, `create_modify_elements`, or `create_html`**: in-app these are refused and nothing is created. Build with `<objects>` tags in your reply instead. They apply live as you write them, with no commit tool needed, and they still apply when the same reply also uses read tools. Put any read tool call (`lookup`, `get_selection`, `export`) BEFORE the `<objects>` block: the block ends your turn (an automatic screenshot comes back), so a tool call written after its close tag is dropped.
 
 **NEVER** use the `Agent` tool or `Read` tool to access knowledge files. **ALWAYS** call `get_knowledge` directly, it resolves dependencies and strips metadata that raw file reads miss. `get_knowledge` is its own tool, do NOT pass it through `execute_commands`.
 

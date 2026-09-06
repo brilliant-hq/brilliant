@@ -8,6 +8,8 @@ Brilliant is a Figma-like 2D vector design tool. Auto layout, frames, groups, hu
 
 Optionally pass `agentName` (a short 2-3 word label) to `init` to name your canvas cursor; otherwise a name is auto-assigned.
 
+If you **cannot read images**, pass `vision: false` to `init` (it defaults to true). Then whenever you request a preview (`previewRows` / `previewIds` on `create_modify_elements` or `execute_commands`) you get a compact **textual render summary** in place of the inline PNG: each element's bounds in its parent and in world space, layout/overflow checks, and a fill or text one-liner, so you can confirm your write landed without seeing it.
+
 ## Working across projects
 
 By default your session is bound to the project currently open on screen. You can reach **any** project the user owns, including ones that are not open.
@@ -25,6 +27,18 @@ They compose: build with `create_html`, iterate with Blueprint DSL.
 
 Session refs: `id="name"` in HTML → `#name` ref usable in both tools and `execute_commands`.
 Use `mcp__brilliant__*` tools only. Ignore other design servers (Paper, Pencil, etc.).
+
+**Which canvas your write lands on.** Always pass a real `canvasId` from `init` / `list_projects` / `lookup`. A canvasId that differs from an existing canvas only in letter-case or a trailing `.bl` targets that existing canvas (so `Main`, `main.bl`, and `main` all reach `main`). A canvasId that names nothing yet is CREATED as a new canvas, and the response tells you so: a `createdCanvas` field names the new canvas and a warning line says a new canvas was created. If you did not mean to make a new canvas, that field is your signal that the id was a typo, so check it against `get_canvases`. `execute_commands` verbs that do not act on a specific canvas (like `get_canvases`) add a `canvasIdIgnored` note if you hand them a canvasId that matches nothing, rather than accepting it silently.
+
+## Retrying a Create (`requestId` argument)
+
+`create_modify_elements` and `create_html` take an optional **`requestId`**: a stable, unique id you invent for one logical request. Pass it on the call, and if that call comes back as a timeout or a relay error, **retry with the same `requestId` and the same `sessionId`**. The retry then converges on the original: it joins the still-running original if it is still working, or replays what it returned, instead of creating the elements a second time.
+
+This matters because a heavy create can succeed on the app side and still time out on the way back to you. A blind retry duplicates everything it just built.
+
+- A result is remembered for **2 minutes** after the call completes, and only if it SUCCEEDED. A call that came back as an error is not remembered, so retrying it really does re-run.
+- Reuse a token **only for a genuine retry of the same request**. A new request needs a new id: the token is matched on its own, not on your content, so reusing one with a different blueprint inside those 2 minutes replays the old result and writes nothing.
+- Without a `requestId` there is no protection. If an error says the operation may still have applied, verify with `lookup` or `get_selection` before you retry a mutation.
 
 ## Design System (`designSystem` argument)
 

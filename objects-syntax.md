@@ -54,6 +54,7 @@ Output **one `<objects>` block at a time**, then review the feedback before cont
 ### Modify vs Create
 
 - **Modify flat, create indented.** `#ref` as first token = modify (always flat). No ID = create (indented under parent). To reparent: `#badge parent(#new_card)`.
+- **Re-stating a parent updates its children in place.** If you write a parent line that already exists and list its children under it, those children are matched against the ones already there (by ref, then by name, then by position among same-type siblings) and updated, not duplicated. So re-emitting a tree after an error is safe: nothing doubles. To genuinely ADD a copy, say so: `clone(#ref)`, or `parent(#ref)` on a new line. Listing fewer children than exist is read as an addition, not a replacement, and nothing is ever deleted by leaving it out (use `delete(#ref)` for that).
 - **To modify existing elements**, use flat `#ref` lines (not indented):
 ```
 #card f[(#FF0000)]                     ← flat modify, changes card's fill
@@ -112,7 +113,7 @@ Each line is processed as it streams. On the **first error**, processing stops:
 - Lines after the error are **discarded**
 - Lines before the error **were applied** and exist on canvas
 
-**To recover:** output a new `<objects>` block continuing from the failed line. Match the indentation, the parent stack is preserved across blocks.
+**To recover:** output a new `<objects>` block continuing from the failed line. The parent stack is preserved across blocks, and the error feedback names the open parents still on it plus the exact indent to continue under, so match that indent (or nest explicitly with `parent(#ref)`). An indented line that lands under no open parent halts loudly rather than silently creating an orphan at the canvas root. Do not reload knowledge after an error; fix the failing line and continue.
 
 ```
 WRONG, starting over after an error:

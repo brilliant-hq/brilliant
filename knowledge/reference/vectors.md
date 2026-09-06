@@ -210,6 +210,10 @@ While dragging a node, these snap types compete cooperatively:
 
 Hold **Shift** while dragging a node to snap the displacement angle to 15-degree increments (overrides the snap pipeline). Ghost dots appear on other vectors at the reference points that triggered the snap.
 
+Hold **Cmd** (Ctrl on Windows/Linux) while dragging a node or a handle and snapping stops entirely for as long as you hold it: no guides, no capture, no pixel rounding. Let go and it comes straight back.
+
+**The grid is the truth.** While **Snap to grids** is on (the default), a node always lands on a whole pixel. Targets that do not sit on a whole pixel are not offered at all, and curve, edge-length and edge-angle snaps land on the nearest whole pixel to their answer. This is what keeps node dragging steady: without it a node could be pinned to an off-grid neighbour on one axis while the grid rounded the other, and small hand movements made it jump back and forth. The trade is that a neighbour at a fractional coordinate (common after importing or scaling artwork) offers no target while the grid is on. Turn **Snap to grids** off to align to it, or hold Cmd for that one node.
+
 ### Handle Snapping
 
 While dragging a Bezier handle, handle-specific snaps and the alignment snap compete; the closest wins:

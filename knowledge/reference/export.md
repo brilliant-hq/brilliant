@@ -89,6 +89,7 @@ The Export panel appears when elements are selected.
 | **Background** | `Transparent`, `Canvas` (canvas background color) | `Transparent` |
 
 Notes:
+- **`Original` snaps to whole pixels.** The export region is aligned outward to the output pixel grid, so a selection whose bounds are fractional (a text box measured from font metrics, a drop shadow's soft edge, a shape nudged off a whole coordinate) exports one pixel wider or taller rather than being rendered at a slightly-off scale. That is what keeps pixel-aligned geometry crisp at 1x instead of anti-aliased; the extra row/column is export background. The `Width`/`Height` fields show the size you will actually get.
 - JPEG and MP4 have no alpha: a Transparent request falls back to Canvas. PNG and MOV (HEVC-with-alpha or ProRes 4444) keep alpha.
 - The UI ships JPEG at quality 90 with no slider, and WebP as lossy q=90 with no lossless toggle.
 - For SVG and PDF the Resolution row is hidden (vector output is resolution-independent).
@@ -111,6 +112,8 @@ Flow: select elements, choose MP4 or MOV in the format dropdown, configure the i
 | **Resolution** | Same presets as image export | Original (1x) |
 
 Codecs are constrained by format: MP4 offers H.264 and HEVC (no alpha); MOV offers HEVC (alpha) and ProRes 4444 (alpha, largest files). The codec dropdown adjusts automatically when you switch format. Only MOV with HEVC-with-alpha or ProRes 4444 supports a transparent background; MP4 always renders opaque (falls back to canvas color). On Windows only H.264/MP4 is available: no HEVC, no MOV, no alpha (the codec dropdown is fixed at H.264).
+
+Frame-size limits differ by platform. On macOS an MP4 (H.264) frame can be at most about 35 megapixels (roughly 5968 by 5968 pixels, with no side over 16384) and a MOV frame at most 8192 pixels on a side. On Windows the video encoder is tighter: no side above 4096 pixels. A larger frame is refused up front with a clear message (the fix is a smaller resolution), so a video export never quietly finishes an empty, playable-looking file.
 
 Video currently animates shader fills only (metaballs, liquid metal, holographic, etc.). Static elements look identical in every frame. There is no keyframe-timeline animation.
 
@@ -152,6 +155,10 @@ When you select **two or more frames** (or other top-level elements) and export 
 - Nesting: a selected element inside another selected frame is exported as part of that frame, not as its own file. Only "selection roots" (selected elements with no selected ancestor) become files.
 - SVG and PDF are separate concerns: PDF uses its multi-page mode; raster/SVG use this separate-files mode.
 
+## Hidden elements in the selection
+
+Selecting an element and exporting or copying it renders it **even when it is hidden**: an explicit selection is treated as intent, so its own hidden state (and any hidden frame above it) is ignored and it shows up in the output. Only a layer hidden *inside* a selected frame stays hidden, matching what you see on the canvas. So if an export or a Copy as comes back empty, the cause is that nothing in the selection resolves (stale or deleted ids), not that the selection was hidden.
+
 ## Copy to clipboard (Copy as)
 
 Copy the selection to the clipboard in several representations. Useful for pasting into code editors, docs, other design tools, or chat. Reach these from the command palette or the right-click `Copy as` submenu.
@@ -177,7 +184,9 @@ Clipboard notes:
 
 ## MCP export tool (for AI agents)
 
-AI agents can export programmatically via the MCP `export` tool. It handles raster (PNG, JPEG, WebP), vector (SVG, PDF), HTML/React markup, and video (MP4, MOV: use `duration`, up to 30s, and `fps`). Only **Replay** is UI/command only (it needs an interactive recording session, so the tool returns a clear error). For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. The full parameter schema is delivered with the tool itself.
+AI agents can export programmatically via the MCP `export` tool. It handles raster (PNG, JPEG, WebP), vector (SVG, PDF), HTML/React markup, and video (MP4, MOV: use `duration`, up to 30s, and `fps`). Only **Replay** is UI/command only (it needs an interactive recording session, so the tool returns a clear error). For UI mockups exported as WebP, pass `webpLossless: true` to avoid q=90 banding. Video frames are held to the same per-frame size budget as a raster export (each frame is read back at its fit/fill size), so an extreme target such as a wide `fill` over a tall design is refused with a message naming the per-frame megapixels, and the fix is smaller `width`/`height`, not fewer frames (every frame reads back the same size). Separately, a video's OUTPUT frame has a hard encoder ceiling that depends on the platform. On macOS an MP4 (H.264) frame can be at most about 35 megapixels (roughly 5968 by 5968 pixels, with no side over 16384) and a MOV (HEVC) frame at most 8192 pixels on a side. On Windows the limit is tighter: no side above 4096 pixels, and `format: mov` is unavailable at all (MOV is macOS-only), so on Windows a mov request is refused with a message pointing to `mp4`. A larger frame is refused before any frame renders (the platform encoder would otherwise finish a silent, video-less file), and the fix is a smaller `width`/`height` or a lower `scale`. The full parameter schema is delivered with the tool itself.
+
+**The export verifies what it wrote, and hands you what you need to verify it too.** Every successful `export` answers with the requested element id(s), the output path, the raster dimensions (for PNG/JPEG/WebP), and a content **sha256** of the bytes. When you write to an `outputPath`, the tool re-opens the file after writing and confirms the bytes on disk are exactly the bytes it rendered; a mismatch (a torn or failed write, or a stale previous export still at that path) is returned as a LOUD error naming both digests, never a green "Exported". A readback that produced no image (a lost or degraded GPU) is an error that also states plainly that **no file was written** to the path, so you never mistake a leftover file from an earlier export in the same directory for the frame you just asked for. And when you pass explicit `width`/`height`, a rendered image whose size is not what you requested is refused rather than saved. Use the reported sha256 to confirm two different frames did not come back with identical bytes: if you exported several frames into one directory, compare the digests in the responses (or re-hash the files): matching digests for frames that should differ means something went wrong and you should re-run, not ship.
 
 ## When rendering has stopped
 
@@ -218,7 +227,7 @@ Known gap: component boolean, text, and instance-swap properties do not transfer
 | Drag and drop | Drag image files onto the canvas |
 | Import from Figma | Command palette "Import from Figma" (opens the import section in the right toolbar; paste a Figma URL) |
 
-Supported image formats: PNG, JPEG, GIF, BMP, WebP. On macOS also TIFF, HEIC, HEIF, AVIF (converted natively). Imported images become rectangle elements with an image fill, placed at the canvas center.
+Supported image formats: PNG, JPEG, GIF, BMP, WebP. On macOS and Windows also TIFF, HEIC, HEIF, AVIF (converted natively — NSImage on macOS, WIC on Windows; Windows HEIC/AVIF need the free Microsoft Store codec packs, and a missing pack is announced with an install card). Imported images become rectangle elements with an image fill, placed at the canvas center.
 
 ### SVG
 
