@@ -529,9 +529,15 @@ elements it repaired, so a clean file reports zero. Saving also flags
 lingering fill problems in the background: that save-time check only looks at
 cross-axis sizes and never blocks saving.
 
-It also unfreezes component instance children on the same canvas whose
-fill/hug geometry was mistakenly frozen against their master: a frozen mark is
-released only on positive proof that the geometry is a pure layout result, and
-any genuinely placed override (a move, resize, rotation, or flip, however
-small) keeps its mark. Instances whose master lives on another canvas are out
-of scope. This is folded into the same single undo step.
+It also unfreezes component instance children whose fill/hug geometry was
+mistakenly frozen against their master: a frozen mark is released only on
+positive proof that the geometry is a pure layout result, and any genuinely
+placed override (a move, resize, rotation, or flip, however small) keeps its
+mark — as does an overridden text, which is never touched. Instances whose
+master lives on ANOTHER canvas are included: the master canvas is looked up and
+read, and an instance whose master cannot be reached (its canvas is missing, or
+it comes from a library that is not available here) is skipped and reported as
+skipped, never guessed at. All of it is folded into the same single undo step,
+and the `execute_commands` response reports how many marks were released, how
+many of those were on cross-canvas instances, and how many instances were
+skipped.
