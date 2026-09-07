@@ -48,6 +48,16 @@ On the AI Providers list:
   cannot run it, the row reads "Signed in · plan not eligible" (or "Signed in ·
   plan unverified" when no plan could be read) rather than "Not connected",
   since detection and sign-in both worked and only the plan disqualifies it.
+  If Claude Code is your only provider and its status check outright fails (for
+  example behind a corporate proxy or a custom certificate authority, where a
+  `claude` that works in your terminal can still fail when the app launches it),
+  the chat panel says so instead of sitting empty: it names the likely cause
+  (network or proxy, certificate, permission, sign-in, or an out-of-date
+  version) and shows a **Retry** button that re-checks. Brilliant runs that
+  check under your login shell's environment (the same PATH, proxy, and CA
+  settings your terminal uses), and re-checks once on its own the first time you
+  click into the chat box, so a fix you make in your terminal is picked up
+  without restarting the app.
 - **Codex** follows Claude Code and likewise has no key field: it signs in with
   a ChatGPT subscription, not an API key. Install with `npm install -g
   @openai/codex`, run `codex login` once, and Brilliant detects it on launch. Its
