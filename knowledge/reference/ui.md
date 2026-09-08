@@ -115,7 +115,7 @@ The header holds a live-collaboration participants cluster on the left and its c
 
 There is no sync-status indicator in this header. Sync health surfaces only when it is bad, as a notification plus a red notification dot on the top island (see "Top Toolbar" above).
 
-- **Participants cluster:** in a live collaboration session, the other people on the project appear as avatars on the left of the header. Each shows the person's photo (or a colored initial) and their name on hover; colors match their live cursors. Click a member to open their profile in a new tab. Absent when you are working solo.
+- **Participants cluster:** in a live collaboration session, the other people on the project appear as avatars on the left of the header. Each shows the person's photo (or a colored initial) and their name on hover; colors match their live cursors. Click a member to open their profile in a new tab. One avatar per person, even when they have several windows or tabs open. Absent when you are working solo.
 
 | Action | Shortcut |
 |--------|----------|
@@ -277,6 +277,8 @@ Each dropdown stores the most-recently-used variant as the head icon. Stroke-onl
 Inline after the tool buttons (separated by a divider). Width is 320 px. Press **/** to focus it, type a prompt, press **Enter** to send. **Escape** unfocuses (priority 9 in the Escape stack: see Escape Behavior in `shortcuts.md`). Focusing the input opens the AI chat panel and unfocuses the input (so input continues in the chat panel).
 
 A collapse/expand chevron toggles the input. When collapsed, only the connection indicator and the expand chevron remain. When the AI chat panel is open with an active session, the bottom toolbar shows the connection indicator instead of the full input (the chat input lives in the panel above).
+
+On a project you can only view (or a cloud project whose live sync has stopped and locked the tab read-only), the chat transcript stays fully readable: you can scroll it, select text, and use **Copy chat**. Only sending a new prompt is disabled; clicking the input explains why and offers the ways forward.
 
 The connection indicator is a small check-circle (connected) / x-circle (not connected) dot. **Click it** to jump straight to Settings -> AI Providers (Cmd+, then the AI Providers page), which is where all API keys are managed. **Hover** it to see a display-only popup of per-provider status: Claude Code, Codex, Anthropic, OpenAI, Google, OpenRouter, Quiver (plus a "Playground mode" row first when playground replay is the active path). Claude Code / Codex / Anthropic / OpenAI / Google / OpenRouter are chat providers; Quiver is an SVG generation provider (text-to-SVG and raster-to-SVG vectorization). Each row shows a green check when credentialed and a dim icon when not. The popup rows are status-only: they do not accept key input. The dot reads connected (green) if the Claude CLI is installed, any chat provider has credentials, or a replay/playground path is active.
 
