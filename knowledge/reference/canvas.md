@@ -321,7 +321,7 @@ Overlay mode is **opt-in** and **macOS-focused** (the `toggle_overlay_mode` and 
 |--------|----------|-------|
 | Toggle overlay mode | Ctrl+F | Global hotkey; macOS-focused, disabled on Windows |
 | Toggle passthrough | Ctrl+A | Overlay only: pointer events pass through to apps below |
-| Toggle presentation mode | Alt+P | Hides UI panels for a clean view |
+| Toggle presentation mode | Alt+P | Hides the on-canvas editing chrome (selection, resize and rotate handles, gradient controls, hover cues) so a recording reads clean; the panels stay. To hide the panels use Cmd+\ (Toggle UI) below. |
 | Toggle agent cursors | (none) | Named cursors for the user and AI agents (command palette: "Toggle Agent Cursors"; Settings → General) |
 | Toggle UI (all chrome) | Cmd+\ | Hide/show ALL app chrome: the left, right, and bottom toolbars AND the top strip (home / tabs / breadcrumb, plus the phantom title bar). Summoned surfaces stay reachable (command palette, tooltips, notifications), and pressing Cmd+\ again brings everything back, so nothing is unreachable. |
 | Toggle inspector sections | Cmd+/ | Collapse/expand all collapsible toolbar sections (the right-toolbar inspector groups) |

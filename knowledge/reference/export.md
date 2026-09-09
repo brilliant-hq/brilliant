@@ -194,6 +194,8 @@ Every export renders through the canvas engine, so if the engine stops for the s
 
 If **Restart rendering** did not bring the canvas back, exports keep refusing, and the message says what is still wrong (the graphics device is still lost, rendering is still degraded, or the engine is still producing no output) instead of a bare "no data produced". Restart rendering again once the canvas is drawing, then export. The MCP `export` tool answers with the same reason.
 
+If the graphics engine gets stuck in the middle of an export (a GPU read that never completes), the export now stops after about ten seconds and refuses with a message that names that state, instead of freezing the whole app. The canvas recovers on its own within a few seconds, and you can export again.
+
 On some machines rendering can't start at all because the computer's graphics hardware isn't supported or its graphics driver is out of date. The canvas then shows a distinct panel ("Brilliant can't render on this graphics hardware") rather than the transient one, and **Restart rendering** won't bring it back until the driver is updated (or the file is opened on a machine with a supported GPU). Exports refuse the same way in that state, so there's nothing productive to retry until the underlying graphics issue is resolved. The panel's **Report** button copies a diagnostic signature (the failure detail, the graphics backend, and the OS) to share in a support conversation.
 
 ## Other application formats

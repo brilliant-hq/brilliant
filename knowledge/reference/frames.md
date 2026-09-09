@@ -72,7 +72,7 @@ All parent types support:
 
 - **Frame** and **Auto Layout** support all sizing modes and accept reparenting (drag elements in/out).
 - **Group** is always Hug on both axes. Changing sizing from Hug on either axis auto-converts it to a **Frame**. Groups are NOT reparent targets; children cannot be dragged out during drag.
-- **Mask** is always Hug on both axes. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape. Only Vector masking is selectable in the UI.
+- **Mask** is always Hug on both axes. The **topmost child** (last in z-order) defines the clip path, is invisible in normal mode, and includes stroke geometry in the clip. Other children are clipped to the mask shape. If that topmost child is a group (or a frame with no fill of its own), the clip is the UNION of everything its subtree draws, not the group's bounding box, so gaps between the group's children stay masked out. Only Vector masking is selectable in the UI.
 - **Boolean** is always Hug on both axes. The combined path is rendered. Double-click to enter edit mode (children become editable; Subtract is z-order sensitive: front shapes subtract from the back).
 
 ## Frames

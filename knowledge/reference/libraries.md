@@ -48,7 +48,7 @@ my-kit:                        # a local folder library (no versions; see below)
   path: ../shared/kit
 ```
 
-Editing the file is live: saving a manifest change fetches what is missing and re-syncs affected instances. The version is an exact release; there are no version ranges.
+Editing the file is live: saving a manifest change fetches what is missing and re-syncs affected instances. An instance whose library is not declared here (or whose source canvas no longer exists) opens as a placeholder frame that keeps its stored state, with one notice naming what is missing; declaring the library (Add library in the Assets view, or an entry here) renders it on the next open. The version is an exact release; there are no version ranges.
 
 ## Using library components
 
