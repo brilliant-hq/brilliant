@@ -41,7 +41,8 @@ Pick the response from what the user is actually doing:
 5. **Post-failure** (the app already knows something broke): Brilliant raises
    its own calm popup after a rough session. You do not need to trigger this.
 6. **We asked** (a targeted prompt from the team): that arrives as its own
-   notification. Nothing for you to route.
+   notification. Nothing for you to route. It reaches the web editor the same
+   way it reaches the desktop app.
 
 ## Offer feedback, do not nag
 

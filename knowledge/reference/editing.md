@@ -373,7 +373,7 @@ Copies the selected elements to an **internal clipboard** (in-memory) and writes
 
 ### Cut
 
-Same as Copy plus removes the selected elements from the canvas. In vector edit mode, Cut copies and deletes the selected vector nodes only (not the whole element). Undoable.
+Same as Copy plus removes the selected elements from the canvas. Cut copies first (the internal clipboard and the system clipboard PNG) and only then removes, so the copy is never taken from an empty selection. If the system clipboard cannot be written (a toast says the copy is available for pasting in Brilliant), the internal copy still wins the next Paste in Brilliant; content you copy in another app AFTER the cut wins instead. In vector edit mode, Cut copies and deletes the selected vector nodes only (not the whole element). Undoable: Undo restores the removed elements.
 
 ### Paste
 

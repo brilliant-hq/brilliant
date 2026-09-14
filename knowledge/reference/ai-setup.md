@@ -1,14 +1,25 @@
 ---
 name: "knowledge-ai-setup"
-description: "Connecting an AI provider to Brilliant's integrated chat: BYOK API keys (Anthropic, OpenAI, Google, OpenRouter), the Claude Code CLI, the OpenAI Codex CLI (ChatGPT-subscription auth), the Cursor CLI (cursor-agent, Cursor-account auth), custom and self-hosted OpenAI-compatible endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more), choosing or adding extra models, where keys are stored, the demo (playground) mode and its two exits, the in-chat setup conversation, and what to do when a key is rejected. Setup and how-it-works, not the chat UI (see ai.md) or driving Brilliant from another tool (see mcp-connections.md)."
+description: "Brilliant AI is the zero-setup default; this page is the other lane: Connecting an AI provider to Brilliant's integrated chat: your own API keys (Anthropic, OpenAI, Google, OpenRouter), the Claude Code CLI, the OpenAI Codex CLI (ChatGPT-subscription auth), the Cursor CLI (cursor-agent, Cursor-account auth), custom and self-hosted OpenAI-compatible endpoints (LM Studio, Ollama, vLLM, GLM, DeepSeek, and more), choosing or adding extra models, where keys are stored, the demo (playground) mode, setting up your own AI from Settings or the upgrade wall, and what to do when a key is rejected. Setup and how-it-works, not the chat UI (see ai.md) or driving Brilliant from another tool (see mcp-connections.md)."
 ---
 
-# Connecting an AI provider (BYOK setup)
+# Connecting an AI provider (Your own AI setup)
 
-Brilliant chat is **bring-your-own-key (BYOK) only**. Every request goes straight
-from the app to the chosen provider using the user's own key or local CLI.
-Nothing routes through Brilliant servers, and there is no hosted/managed Brilliant
-AI to offer. The user pays their provider directly.
+**Brilliant AI** is the default: the first AI chat message just works, no setup,
+through a Brilliant-provided model (Gemini 3.8 Flash). Free includes Brilliant AI
+every month, and part of it can be used before you sign in; sign in to keep going,
+free, and what you used before signing in counts against your first month. Paid
+plans, monthly only (Personal $20, Pro $50, Max $100, Max
+20x $200), raise your usage in multiples of the base (5x, 10x, 20x), shown as an
+opaque meter (a percent used and a reset date) in Settings > Usage (type
+`/usage` in the chat for the same on demand) and on the account usage page. On
+Brilliant AI the request goes through Brilliant's servers to Google.
+
+This page covers **Your own AI**: bringing your own key or local CLI. Every such
+request goes straight from the app to the chosen provider using the user's own
+key or local CLI; a key you bring never routes through Brilliant servers, and the
+user pays their provider directly. Your own AI is free forever: unlimited over MCP,
+with a 10-messages-a-day cap on the Free plan for the built-in chat on your own key.
 
 Keys are stored locally in the OS credential store (macOS Keychain, Windows
 Credential Manager; in the web editor, that browser's local storage) and sent
@@ -21,15 +32,13 @@ OpenRouter all work with a pasted API key (the key lives in that browser's
 local storage and requests go straight to the provider). Claude Code / Codex /
 MCP connections need the desktop app.
 
-## Adding a key (Settings → AI Providers)
+## Adding a key (Settings → Your own AI)
 
-This is the primary setup surface. Open it via **Settings (Cmd+,) → AI
-Providers**, or by clicking the **connection indicator** in the bottom toolbar
-(the check/x circle beside the AI input) which jumps straight to that pane.
-Hovering the indicator shows a read-only status popup of every provider; it does
-not manage keys.
+This is the primary setup surface. Open it via **Settings (Cmd+,) → Your own AI**.
+It lists every provider and its connection status; keys are managed there, not on
+the bottom toolbar.
 
-On the AI Providers list:
+On the Your own AI list:
 
 - **Anthropic, OpenAI, Google, OpenRouter, Quiver** each have a row with an
   inline key field. Paste the key and it is validated against the provider before
@@ -38,8 +47,8 @@ On the AI Providers list:
 - **Google** can alternatively sign in with Google (a localhost OAuth flow)
   instead of a raw key.
 - **Claude Code** leads the list and has no key field: install the `claude` CLI
-  and Brilliant detects it automatically (on launch, when the AI Providers pane
-  opens, and on the in-chat setup's "check again") with no app restart needed
+  and Brilliant detects it automatically (on launch, when the Your own AI pane
+  opens, and on a manual re-check) with no app restart needed
   after installing. If the CLI is not signed in, run `claude auth login` in a
   terminal. If the row reads "Installed · login unverified, chat still works",
   only the sign-in check was inconclusive: the CLI is detected and chat runs
@@ -93,11 +102,12 @@ mistakes cannot pass silently: a wrong tool call halts with clear diagnostics,
 and the canvas feedback flags clipping elements, unreadable text, and similar
 issues visually, so the model corrects on the fly instead of needing to reason
 everything out up front. Worth trying as the default; switch thinking on for
-genuinely gnarly one-shot asks.
+genuinely gnarly one-shot asks. Brilliant AI already runs at its lightest
+thinking level unless you pick a higher one.
 
 ## Custom and self-hosted providers
 
-Any OpenAI-compatible endpoint can be added under **Settings → AI Providers →
+Any OpenAI-compatible endpoint can be added under **Settings → Your own AI →
 Custom Providers**. Each entry is a base URL plus an optional key; the models it
 exposes then appear in the chat model selector under that provider's name.
 
@@ -117,69 +127,60 @@ runtime currently serves (use the row's refresh button after pulling a new
 model). The key is optional: local runtimes usually need none, so leave the field
 blank. A bad key or unreachable URL surfaces an inline error instead of saving.
 
-## No provider yet: demo mode
+## Demo mode (playground)
 
-With no provider connected, chat opens in **demo mode** (called "playground" in
-settings): the session replays bundled recordings instead of calling a live
-model, so the user can see what the AI does before committing a key. The
-connection indicator still reads as connected while a demo is the active path.
+Brilliant AI is the default, so with no provider of your own connected the chat is not a
+demo: your first message enrolls in Brilliant AI and sends on your included usage. Demo
+mode (called "playground" in settings) is now an explicit choice, not the
+no-provider fallback: the session replays bundled recordings instead of calling a
+live model, so you can see what the AI does before spending Brilliant AI usage or
+committing a key.
 
-Two ways to leave demo mode:
+Enter and leave demo mode:
 
-1. **Connect a provider** anywhere (Settings, the connection indicator, or the
-   in-chat setup below). The open demo chat converts in place to a real session,
-   carrying any draft prompt.
-2. **Once a provider exists**, just send a real prompt; the demo session is
-   swapped for a live one and the prompt fires as the first real turn.
+1. A **Playground** toggle at the bottom of the Settings → Your own AI pane turns demo mode on and off.
+2. **Send a real prompt** to leave it: the demo session is swapped for a live one
+   (Brilliant AI by default, or a connected provider of your own) and the prompt fires as
+   the first real turn.
+3. **Connect a provider of your own** from a demo chat and it converts in place to a real
+   session on that provider, carrying any draft prompt.
 
-A **Playground** toggle in Settings → AI Providers puts a user who already has
-a provider back into demo mode. With no provider it reads on and disabled,
-since there is nothing else to chat with.
+The onboarding step is the only other way into a replay: it plays one recorded
+session on a mandatory prompt-pill tap. Because Brilliant AI is the
+always-available default, the Playground toggle is a deliberate choice rather
+than the no-provider fallback it used to be.
 
-The **web editor** works the same way in any project the user can edit: no
-provider means demo mode, and replays land real, undoable elements on the open
-project canvas and save normally. View-only visitors never get demo mode. The
-`/playground` page is the separate guided demo for visitors.
+The **web editor** works the same way in any project the user can edit, and demo
+replays land real, undoable elements on the open project canvas and save normally.
+View-only visitors never get demo mode. The `/playground` page is the separate
+guided demo for visitors.
 
-## Setting up from inside chat
+## Setting up your own AI (Brilliant AI is the default first send)
 
-Sending a free-form prompt with no provider connected starts a short in-chat
-setup conversation (the typed prompt is stashed and sent for real once a provider
-is live). The first question is **"How do you want to use AI with Brilliant?"**
-with three choices:
+The first-run **"How do you want to use AI with Brilliant?"** chooser is retired.
+Sending a free-form prompt no longer opens a setup conversation: the message
+enrolls in Brilliant AI and sends on your included usage. Your own AI is a **Settings** choice
+(the Your own AI pane above) and the **secondary action on the upgrade wall** shown
+when Brilliant AI usage runs out (that wall is a page on the command-palette shell,
+the same overlay as sign in, that offers the paid rungs; your own AI is never
+walled by usage). Paying happens in the editor too: a Personal purchase, or a
+bigger plan bought from a free or gifted account, opens a checkout page on the
+same overlay (it names the plan and its monthly price), the plan flips live, and
+the held message continues. On a paid subscription, picking a bigger plan on
+that wall switches you in place instead.
 
-- **Set it up with me** starts a quick guided wizard. It asks **"Which of these
-  do you already have?"** with four options: a coding agent (Claude Code, Cursor,
-  and more), a Claude or ChatGPT subscription, an AI API key, or "none of these,
-  or I'm not sure". Each routes to the matching setup: the coding-agent option
-  connects an external tool; the subscription option sets up Claude Code or Codex
-  (or, in the browser, a key instead); the API-key option opens the provider
-  picker (Anthropic / OpenAI / Google / OpenRouter, a custom OpenAI-compatible
-  endpoint, or help choosing, then paste a key); and "not sure" recommends the
-  cheapest sensible way to start with concrete next steps. Nothing dead-ends.
-- **Connect a coding agent (MCP)** is the fast lane to driving Brilliant from an
-  external tool such as Claude Code, Cursor, or Codex (see
-  [mcp-connections.md](./mcp-connections.md)).
-- **Open Settings** jumps to the AI Providers pane.
-
-Steps that involve out-of-app actions (installing a CLI, creating an API key, or
-connecting a coding agent) show as a **numbered checklist** with the current step
-highlighted, checking off as you go. The connect-a-coding-agent checklist shows
-the exact command to copy and checks off on its own once your agent connects. A
-pasted key never appears in the transcript or prompt history. Question options
-are clickable: clicking one sends its number, same as typing it. Choosing "Start
-over" always returns to that first question.
-
-In the web editor the same conversation stays honest about the browser:
-Anthropic, OpenAI, Google, and OpenRouter keys all work here. Claude Code,
-Codex, and connecting a coding agent are still offered, but picking one explains
-why it needs the desktop app and reroutes to the closest working path (Codex to
-an OpenRouter key, Claude Code to an Anthropic key).
+Choosing to set up your own AI opens the Your own AI pane, where a pasted key never
+appears in the transcript or prompt history. In the **web editor**, Anthropic,
+OpenAI, Google, and OpenRouter keys all work; Claude Code, Codex, and connecting a
+coding agent over MCP need the desktop app (the closest working browser path is an
+Anthropic or OpenRouter key). To drive Brilliant from an external tool such as
+Claude Code, Cursor, or Codex over MCP instead of chatting inside it, see
+[mcp-connections.md](./mcp-connections.md).
 
 ## When a key is rejected
 
 Keys are validated on save, so a bad key fails immediately with an inline error
-rather than later mid-chat. In the in-chat setup, a rejected key offers **paste
+rather than later mid-chat. When adding a key, a rejected key offers **paste
 again** or **try something else**. For a custom endpoint the retry keeps the base
 URL so only the key is re-entered. Common causes: the key was copied with
 surrounding whitespace, it lacks credit/billing on the provider side, or (custom)

@@ -8,9 +8,13 @@ description: "Connecting external MCP clients (Cursor, Claude Code, VS Code, Win
 Brilliant runs a local MCP server, so any external MCP client can call
 Brilliant's canvas tools. "MCP Connections" is the feature that registers
 Brilliant into another tool's config for the user. This is distinct from the
-integrated BYOK chat (that runs a provider *inside* Brilliant); here the user
-designs from *their own* tool. Brilliant is BYOK-only; nothing routes through
-Brilliant servers.
+integrated chat inside Brilliant; here the user designs from *their own* tool.
+MCP itself is local-only: nothing an external agent sends or receives over MCP
+routes through Brilliant's servers. (Inside Brilliant's own chat there are two
+lanes: Brilliant AI goes through Brilliant's servers to Google; your own AI goes
+straight to your provider.)
+
+External MCP agents never count against any cap and stay unlimited on every plan, including Free.
 
 Looking for the other direction (using external MCP servers *inside*
 Brilliant's own chat)? See `mcp-external-servers.md`.
@@ -50,9 +54,9 @@ Three equivalent paths:
    (`open_mcp_connections_settings`). Every supported tool also has its own
    always-available command, e.g. "Toggle Cursor MCP Connection"
    (`toggle_<client>_mcp`).
-3. **First-run / demo chat.** The in-chat setup's first question offers
-   **"Connect a coding agent (MCP)"** (and the guided wizard's coding-agent
-   option leads to the same place); picking it lists every supported tool as one
+3. **From the chat.** Choosing to bring your own AI (from Settings, or from the
+   door at a wall) opens the short setup conversation whose first question offers
+   **Connect a coding agent (MCP)**; picking it lists every supported tool as one
    flat list, and choosing one connects it. On desktop, connecting shows a
    numbered checklist (Brilliant writes the config, then restart the tool and
    start a session). In the web editor it shows the exact command to copy and
