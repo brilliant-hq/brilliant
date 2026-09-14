@@ -19,6 +19,8 @@ al(v, g(16), pad(24)) s(320, hug) f[(#FFFFFF)] rd(16) "Card" #card
 
 That is the whole mechanism: write text, drop into an `<objects>…</objects>` block, and the runtime streams those elements onto the canvas in real time as you type them. Once you have planned, the block itself is the next thing you emit; never run a tool to "prepare", "confirm", or checkpoint first.
 
+After `</objects>` call `objects_result` (pass your `sessionId`); anything else you write before that is paused and the result is handed to you. The result is what landed: the ref ids, the counts, notes, and a screenshot of your `previewIds`.
+
 
 `#ref` session refs work everywhere, `execute_commands`, `export`, and `lookup` all resolve refs. Refs can be numeric (`#1`) or named (`#card`).
 

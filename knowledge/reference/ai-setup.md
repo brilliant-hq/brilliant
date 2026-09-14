@@ -15,11 +15,14 @@ opaque meter (a percent used and a reset date) in Settings > Usage (type
 `/usage` in the chat for the same on demand) and on the account usage page. On
 Brilliant AI the request goes through Brilliant's servers to Google.
 
-If you picked a specific model earlier but its key is not on this device (a new
-browser, or one whose stored keys were cleared), new chats open on Brilliant AI in
-the meantime. Your earlier choice is remembered exactly as you left it: the moment
-you add that key back (right there in the session, no restart) it becomes your
-default again, and it is never replaced by some other model of that provider.
+If you picked a specific model earlier that you cannot use on this device (its key
+is not here, on a new browser or after stored keys were cleared, or a Claude Code /
+Codex / Cursor default in the web app, where there is no CLI to run, or on a computer
+where that CLI is not installed), new chats open on Brilliant AI in the meantime.
+Your earlier choice is remembered exactly as you left it: the moment it is usable
+again (you add that key back, or that CLI is installed, right there in the session,
+no restart) it becomes your default again, and it is never replaced by some other
+model of that provider.
 
 This page covers **Your own AI**: bringing your own key or local CLI. Every such
 request goes straight from the app to the chosen provider using the user's own
@@ -175,8 +178,9 @@ the same overlay as sign in, that offers the paid rungs; your own AI is never
 walled by usage). Paying happens in the editor too: a Personal purchase, or a
 bigger plan bought from a free or gifted account, opens a checkout page on the
 same overlay (it names the plan and its monthly price), the plan flips live, and
-the held message continues. On a paid subscription, picking a bigger plan on
-that wall switches you in place instead.
+the held message continues. On a live paid subscription, choosing a bigger plan from any upgrade
+door (the wall, Settings > Usage, or the header) opens the plan sheet and switches your rung in place,
+with no second checkout: the change takes effect right away and you pay only the difference.
 
 Choosing to set up your own AI opens the Your own AI pane, where a pasted key never
 appears in the transcript or prompt history. In the **web editor**, Anthropic,
