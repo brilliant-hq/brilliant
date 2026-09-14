@@ -8,12 +8,18 @@ description: "Brilliant AI is the zero-setup default; this page is the other lan
 **Brilliant AI** is the default: the first AI chat message just works, no setup,
 through a Brilliant-provided model (Gemini 3.8 Flash). Free includes Brilliant AI
 every month, and part of it can be used before you sign in; sign in to keep going,
-free, and what you used before signing in counts against your first month. Paid
+free, and signing in starts a full month. Paid
 plans, monthly only (Personal $20, Pro $50, Max $100, Max
 20x $200), raise your usage in multiples of the base (5x, 10x, 20x), shown as an
 opaque meter (a percent used and a reset date) in Settings > Usage (type
 `/usage` in the chat for the same on demand) and on the account usage page. On
 Brilliant AI the request goes through Brilliant's servers to Google.
+
+If you picked a specific model earlier but its key is not on this device (a new
+browser, or one whose stored keys were cleared), new chats open on Brilliant AI in
+the meantime. Your earlier choice is remembered exactly as you left it: the moment
+you add that key back (right there in the session, no restart) it becomes your
+default again, and it is never replaced by some other model of that provider.
 
 This page covers **Your own AI**: bringing your own key or local CLI. Every such
 request goes straight from the app to the chosen provider using the user's own
@@ -139,16 +145,19 @@ committing a key.
 Enter and leave demo mode:
 
 1. A **Playground** toggle at the bottom of the Settings → Your own AI pane turns demo mode on and off.
-2. **Send a real prompt** to leave it: the demo session is swapped for a live one
-   (Brilliant AI by default, or a connected provider of your own) and the prompt fires as
-   the first real turn.
+2. **Leave the demo** with the *Exit the demo* button on the card, or by turning the
+   Playground toggle back off. A typed prompt that matches no recording is NOT sent to a
+   model: it shows that Exit-the-demo card. A suggested prompt pill replays in place.
+   Leaving opens a live chat (Brilliant AI by default, or a connected provider of your own).
 3. **Connect a provider of your own** from a demo chat and it converts in place to a real
    session on that provider, carrying any draft prompt.
 
 The onboarding step is the only other way into a replay: it plays one recorded
-session on a mandatory prompt-pill tap. Because Brilliant AI is the
-always-available default, the Playground toggle is a deliberate choice rather
-than the no-provider fallback it used to be.
+session when you tap a prompt pill. That is the way to watch the demo, not the
+only way out of the onboarding window: opening a new chat ("+", Cmd+N, or
+/new-chat) also leaves it and lands a real Brilliant AI chat straight away.
+Because Brilliant AI is the always-available default, the Playground toggle is a
+deliberate choice rather than the no-provider fallback it used to be.
 
 The **web editor** works the same way in any project the user can edit, and demo
 replays land real, undoable elements on the open project canvas and save normally.
