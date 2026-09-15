@@ -209,20 +209,9 @@ fr p(0,0) s(1440,900) f[(#F8FAFC)] "Hero" #hero
 </objects>
 ```
 
-`undo("label")` reverts to a checkpoint without re-typing what came before:
-
-```
-<objects canvasId="...">
-undo("hero copy")               ← rolls back the CTAs that came after
-  al(h,g(14)) s(hug,hug) "CTA row v2" #ctas_v2
-    ...different button shape...
-</objects>
-```
-
 Tips:
 - Keep labels short and meaningful (3–5 words). They're how you'll address them.
 - Inline trailing form (`... #ctas   // CTAs in place`) is the densest. Standalone (`// hero copy` on its own line) also works.
-- The most recent ~8 checkpoints are surfaced in post-block feedback.
 - Reusing a label re-snapshots at the new position (most recent wins).
 
 ### Inline References
