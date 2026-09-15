@@ -6,8 +6,7 @@ This repo holds the agent and product documentation: how to connect to Brilliant
 
 ## What's here
 
-- **Connecting** ([`mcp.md`](mcp.md), [`http.md`](http.md), [`hosted.md`](hosted.md), [`subagent.md`](subagent.md), [`all-agents.md`](all-agents.md)): the entry points for each way an agent talks to Brilliant.
-- **Emitting Blueprint in a reply** ([`objects-syntax.md`](objects-syntax.md)): the `<objects>` tag form.
+- **Connecting** ([`agent.md`](agent.md)): the single source, composed per door (external MCP, HTTP/BYOK, hosted CLI, and sub-agent), for each way an agent talks to Brilliant. The `<objects>` tag form for emitting Blueprint in a reply lives in the same file.
 - **Authoring and design guidance** ([`knowledge/`](knowledge/)): design foundations, color, typography, layout blocks, effects, charts, images, WebGL shaders, design systems, and the product reference (canvas, tools, components, export, shortcuts, and more).
 - **Sharing feedback** ([`skills/feedback/`](skills/feedback/)): how the assistant helps you file a bug or request.
 
