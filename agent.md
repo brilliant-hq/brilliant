@@ -170,7 +170,7 @@ al(v, g($spacing.4), pad($spacing.6)) ds(dashboard-blue) p(100,100) s(hug,hug) f
 
 ### One Block, then its result
 
-After `</objects>` call `objects_result` (pass your `sessionId`); anything else you write before that is paused and the result is handed to you. A result carrying `breaker: true` ends your building for this turn: give the user an overview of what you have built and end your turn.
+After `</objects>` call `objects_result` (pass your `sessionId`); anything else you write before that is paused and the result is handed to you. A result whose `guidance` says the block changed nothing (the elements it re-emitted already held those values) is a warning: your next block must emit only lines that change the canvas. A result carrying `breaker: true` ends your building for this turn: give the user an overview of what you have built and end your turn.
 
 Output **one `<objects>` block at a time**.
 
@@ -194,6 +194,8 @@ Add a `// label` comment whenever ANY of:
 - A single section is non-trivial to recreate: multi-fill stack, nested instances, custom positioning.
 
 A single section, a flat-modify pass, or fewer than ~10 elements needs no checkpoint.
+
+When a block deletes anything, its result carries a `restore` hint naming the checkpoint that brings the deleted elements back. Use it, never ask the user for a backup.
 
 ```
 <objects canvasId="...">

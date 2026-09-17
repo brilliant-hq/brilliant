@@ -140,7 +140,7 @@ The structure of an instance is owned by its master, and Brilliant prevents inst
 - You cannot drag elements into an instance to add new children -- the drop is rejected
 - You cannot drag elements out of an instance to reparent them elsewhere
 - Adding, removing, or reordering children must be done on the master, and it propagates to every instance
-- The one exception is **slot content**: anything nested inside a slot is a normal drop target, because the instance owns it
+- The one exception is **slot content**, but only for CREATION: new content can land inside a slot subtree, while an EXISTING element cannot be reparented into a slot or anywhere else in an instance interior. A drag drop is rejected, and an AI modify halts at that line and deletes nothing. To put content into a slot, create it there or detach the instance first
 
 If you need an instance to fully diverge from its master, **detach** it first.
 

@@ -379,6 +379,8 @@ Same as Copy plus removes the selected elements from the canvas. Cut copies firs
 
 If the system clipboard is unchanged since the last copy, paste uses the faster internal clipboard; if it changed (you copied something in another app), paste reads from the system clipboard.
 
+On the web the same rule holds. Paste reads the browser clipboard to check, so content you copy elsewhere after a cut wins the next paste, and if that read is blocked (no clipboard permission) your own cut still comes back.
+
 **Internal paste:**
 
 - **At cursor (default):** Recreates the copied elements at the cursor position with fresh IDs, preserving the full hierarchy. Component masters become instances linked to the master; existing instances keep their master link.

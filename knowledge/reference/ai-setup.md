@@ -111,8 +111,8 @@ mistakes cannot pass silently: a wrong tool call halts with clear diagnostics,
 and the canvas feedback flags clipping elements, unreadable text, and similar
 issues visually, so the model corrects on the fly instead of needing to reason
 everything out up front. Worth trying as the default; switch thinking on for
-genuinely gnarly one-shot asks. Brilliant AI already runs at its lightest
-thinking level unless you pick a higher one.
+genuinely gnarly one-shot asks. Brilliant AI already defaults to thinking OFF (ai.md's thinking
+section is the home) unless you pick a higher level.
 
 ## Custom and self-hosted providers
 
@@ -173,12 +173,9 @@ The first-run **"How do you want to use AI with Brilliant?"** chooser is retired
 Sending a free-form prompt no longer opens a setup conversation: the message
 enrolls in Brilliant AI and sends on your included usage. Your own AI is a **Settings** choice
 (the Your own AI pane above) and the **secondary action on the upgrade wall** shown
-when Brilliant AI usage runs out (that wall is a page on the command-palette shell,
-the same overlay as sign in, that offers the paid rungs; your own AI is never
-walled by usage). Paying happens in the editor too: a Personal purchase, or a
-bigger plan bought from a free or gifted account, opens a checkout page on the
-same overlay (it names the plan and its monthly price), the plan flips live, and
-the held message continues. On a live paid subscription, choosing a bigger plan from any upgrade
+when Brilliant AI usage runs out (your own AI itself is never walled by usage).
+The wall page and the in-editor checkout that flips the plan live and resumes the
+held message are ai.md's (the one home). On a live paid subscription, choosing a bigger plan from any upgrade
 door (the wall, Settings > Usage, or the header) opens the plan sheet and switches your rung in place,
 with no second checkout: the change takes effect right away and you pay only the difference.
 
