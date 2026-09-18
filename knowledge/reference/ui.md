@@ -478,8 +478,12 @@ Tabs sit inline in the bottom toolbar after the tool buttons (sessions occupy th
 
 Feedback rides a **CTA notification** on the right-side notification rail (not a
 floating window): a title, a subtitle, one free-text field, a primary **Send**
-(Cmd+Enter / Ctrl+Enter) and a secondary **Cancel**. Because it carries a field
-and actions, the rail HOLDS the card until you act. There are no attachment
+(Cmd+Enter / Ctrl+Enter) and a secondary **Cancel**. The card reads left-aligned
+like a message, and the field is a real message box: it starts three rows tall,
+grows with what you type up to twelve rows, and you can drag the grip at its
+bottom-right corner to resize it (the height is remembered between opens). Enter
+and Shift+Enter add a newline, and Cmd+Enter / Ctrl+Enter sends. Because it
+carries a field and actions, the rail HOLDS the card until you act. There are no attachment
 checkboxes; v1 attaches nothing about your world.
 
 It opens from four doors: the **Send Feedback** command (command palette), an
