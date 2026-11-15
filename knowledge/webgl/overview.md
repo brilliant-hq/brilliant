@@ -70,16 +70,10 @@ brilliantFilter('filtered', 'photo', FRAG, {
 
 ## Mapping Blueprint Values to WebGL Config
 
-**Colors:** Blueprint tokens resolve to hex at render time. `metaballs($red.mid,$emerald.mid)` → `colors: ['<resolved red.500 hex>', '<resolved emerald.500 hex>']`. The WebGL config carries the resolved hex values; the blueprint side stays token-bound.
-
-**Params:** Blueprint `size(0.3),count(15),speed(1.0)` → `params: { uSize: 0.3, uCount: 15, uSpeed: 1.0 }`
-
-**UV Transform:** Blueprint `scale(2),uvrot(45)` → `scale: 2, rotation: 45`
-
-**Shape:** Blueprint `shape(0)` (Element) → `shape: 'rect'` (with corner radius from the frame). Blueprint `shape(2)` (None) → shape doesn't matter, set `shape: 'rect', cornerRadius: [0,0,0,0]`.
-
-**Corner radius:** Normalize to 0-1 range: `cornerRadius / min(width, height) * 2`. For example, `rd(16)` on a 200x100 element → `16 / 100 * 2 = 0.32` → `cornerRadius: [0.32, 0.32, 0.32, 0.32]`.
-
-**Frozen:** Blueprint `frozen` → `animate: false`
-
-**Interactive:** Only for `reactiveGrid` → `interactive: true`
+- **Colors:** Blueprint tokens resolve to hex at render time. `metaballs($red.mid,$emerald.mid)` → `colors: ['<resolved red.500 hex>', '<resolved emerald.500 hex>']`. The WebGL config carries the resolved hex values; the blueprint side stays token-bound.
+- **Params:** Blueprint `size(0.3),count(15),speed(1.0)` → `params: { uSize: 0.3, uCount: 15, uSpeed: 1.0 }`
+- **UV Transform:** Blueprint `scale(2),uvrot(45)` → `scale: 2, rotation: 45`
+- **Shape:** Blueprint `shape(0)` (Element) → `shape: 'rect'` (with corner radius from the frame). Blueprint `shape(2)` (None) → shape doesn't matter, set `shape: 'rect', cornerRadius: [0,0,0,0]`.
+- **Corner radius:** Normalize to 0-1 range: `cornerRadius / min(width, height) * 2`. For example, `rd(16)` on a 200x100 element → `16 / 100 * 2 = 0.32` → `cornerRadius: [0.32, 0.32, 0.32, 0.32]`.
+- **Frozen:** Blueprint `frozen` → `animate: false`
+- **Interactive:** Only for `reactiveGrid` → `interactive: true`

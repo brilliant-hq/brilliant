@@ -33,7 +33,7 @@ The default DS also answers `$font.family.sans`, an alias of `$font.family` on t
 
 Specific Google Fonts override the DS, `t("...",Playfair Display,...)` works inline and auto-loads. Reach for this only when the active DS doesn't fit the mood; switching DS is usually the better move (see `design-systems/core`).
 
-Importing from Figma: a commercial font that isn't bundled, on Google Fonts, or installed on your machine can't be served, so its text imports as pixel-true glyph outlines (not editable text) and the migration report lists it under Missing fonts. To get editable text back, install the `.ttf`/`.otf` with the Install Font Files command, then re-import the file from the Figma plugin. Brilliant never downloads commercial fonts for you.
+Importing from Figma: a font this machine can't serve is shown in a substitute and the text stays editable; the missing-fonts rows, picks, and installs are in `reference/canvases/figma-import-run` ("Fonts").
 
 ## Hierarchy
 

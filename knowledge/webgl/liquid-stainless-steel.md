@@ -272,8 +272,12 @@ void main() {
 
     // ─── User colors ───
     vec3 baseColor      = uColor0.rgb;
-    float baseAlpha     = uColor0.a;
     vec3 highlightColor = uColor1.rgb;
+    float baseAlpha      = uColor0.a;
+    // A slot past uColorCount is zero-filled on the wire (alpha 0 too): it
+    // takes slot 0's alpha, so a short palette renders with its first slot's
+    // coverage instead of fading toward the unused slots.
+    float highlightAlpha = uColorCount > 1.5 ? uColor1.a : baseAlpha;
 
     // ═══════════════════════════════════════════════════════
     // SHAPE SYSTEM, edge field & mask
@@ -382,9 +386,15 @@ void main() {
     vec3 envColor = mix(midMetal, brightMetal, envReflect);
     vec3 col = mix(metalBase, envColor, reflectivity * 0.5);
 
+    // Bright-tone share of the surface (the ramp's top band and the
+    // environment reflection), where the highlight color shows.
+    float brightShare = smoothstep(0.4, 1.0, totalDiffuse);
+    brightShare += (envReflect - brightShare) * (reflectivity * 0.5);
+
     // ─── Specular highlights ───
     vec3 specColor = mix(highlightColor, vec3(1.0), 0.6);
     col += specColor * totalSpec * (0.6 + (1.0 - roughness) * 0.8);
+    float specAmount = totalSpec * (0.6 + (1.0 - roughness) * 0.8);
 
     // ─── Ambient occlusion in creases ───
     float ao = smoothstep(-0.3, 0.3, heightNorm);
@@ -408,7 +418,15 @@ void main() {
     col = clamp(col, 0.0, 1.0);
 
     // ─── Alpha with shape mask ───
-    float alpha = baseAlpha * shapeMask;
+    // Slot alphas follow their colors: the highlight's share of the bright
+    // tone (0.3) and of the specular color (0.4) carries highlightAlpha, the
+    // rest baseAlpha. Clamping to the slot range pins equal slot alphas to that
+    // alpha bit-exactly whatever the shader compiler reassociates, so
+    // all-opaque fills render unchanged.
+    float highlightShare = clamp(0.3 * brightShare + 0.4 * specAmount, 0.0, 1.0);
+    float slotAlpha = mix(baseAlpha, highlightAlpha, highlightShare);
+    slotAlpha = clamp(slotAlpha, min(baseAlpha, highlightAlpha), max(baseAlpha, highlightAlpha));
+    float alpha = slotAlpha * shapeMask;
 
     // ─── Premultiplied alpha output ───
     fragColor = vec4(col * alpha, alpha);

@@ -18,6 +18,8 @@ assumes: webgl/setup
 | Speed | uSpeed | 0-3 | 1.0 | Animation speed |
 | Metaball Count | uMetaballCount | 2-30 | 5 | Number of metaballs (shape=1) |
 | Metaball Size | uMetaballSize | 0.1-3.0 | 1.0 | Metaball size multiplier (shape=1) |
+| Tint | uTint | 0-1 | 1.0 | How strongly color 1 tints the metal |
+| Highlight | uHighlight | 0-1 | 1.0 | Strength of the color 2 highlight bands |
 
 ## Colors
 
@@ -72,6 +74,8 @@ uniform float uAngle;
 uniform float uSpeed;
 uniform float uMetaballCount;
 uniform float uMetaballSize;
+uniform float uTint;
+uniform float uHighlight;
 
 uniform float uPixelRatio;
 
@@ -390,12 +394,16 @@ void main() {
 
     // ─── Recolor the metallic base toward the tint ───
     vec3 boostedTint = mix(color0.rgb, vec3(1.0), 0.15);
-    vec3 col = burnTowardTint(metallic, boostedTint, color0.a);
+    // Slot alpha is opacity only: the burn and highlight
+    // strengths are their own params (legacy files carry their old slot alphas
+    // there, migrateLegacyShaderAlpha), so the color never reads an alpha and
+    // the output stays linear in slot alpha.
+    vec3 col = burnTowardTint(metallic, boostedTint, clamp(uTint, 0.0, 1.0));
 
     // ─── Highlight / accent ───
     float highlightMask = bandG * bandG;
     highlightMask = highlightMask * highlightMask;
-    col += color1.rgb * highlightMask * color1.a * 0.25;
+    col += color1.rgb * highlightMask * clamp(uHighlight, 0.0, 1.0) * 0.25;
 
     // ─── Specular at bump peak ───
     float specular = bump * bump * bump * 0.35;
@@ -453,7 +461,9 @@ brilliantShader('c', FRAG, {
     uAngle: 65.0,
     uSpeed: 1.0,
     uMetaballCount: 8.0,
-    uMetaballSize: 1.0
+    uMetaballSize: 1.0,
+    uTint: 1.0,
+    uHighlight: 1.0
   },
   cornerRadius: [0.05, 0.05, 0.05, 0.05]
 });

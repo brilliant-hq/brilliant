@@ -18,7 +18,7 @@ send_feedback(message: "<the report, in the user's own framing>",
               attachments: ["screenshot", "version", "errors"])
 ```
 
-Propose only attachments that are actually relevant. Then **tell the user the composer is open and waiting for them to review and send** — do NOT say the feedback was sent. It has not been. You cannot send it; only their click can.
+Propose only attachments that are actually relevant. Then **tell the user the composer is open and waiting for them to review and send**. Do NOT say the feedback was sent. It has not been. You cannot send it; only their click can.
 
 Full user-facing detail: `get_knowledge(["reference/feedback"])`.
 
@@ -127,7 +127,7 @@ Before drafting, ask which extras (if any) to include. Default is **nothing** be
 Available extras:
 - **App version + OS**: read `version:` from `pubspec.yaml` and the user's OS.
 - **Canvas screenshot**: current view via `mcp__brilliant__export` (PNG). Skip this option if there's no active canvas.
-- **Selection details**: `mcp__brilliant__get_selection` followed by `mcp__brilliant__lookup` (`scope` set to the selected IDs, `format: "blueprint"`) for the selected elements. Skip if nothing is selected.
+- **Selection details**: `mcp__brilliant__get_selection` followed by `mcp__brilliant__read` of their canvas for the selected elements' rows. Skip if nothing is selected.
 
 Ask the user to pick which to include (a single question with these as options, or one quick yes/no each, whichever is less friction). If the user says "none" or skips, attach nothing.
 

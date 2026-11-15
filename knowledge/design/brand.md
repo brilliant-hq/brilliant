@@ -27,3 +27,13 @@ Logo's visual DNA should echo throughout. Pick 2-3 echo points:
 | Accent shape (dot, circle) | Section dividers, bullets |
 
 **The test:** Cover the logo. Can you still guess the brand's personality?
+
+## Cover Fundamentals
+
+- The name dominates, and must survive a tile a couple hundred pixels wide; everything else
+  is subordinate.
+- Scan, not read: no paragraphs, no fine print; at most a chip or two of metadata.
+- Edited density: two to four components shown large beat a specimen dump. Claim breadth in
+  words, show depth with a few real pieces.
+- Honest by construction: real frames, real components, nothing the project does not
+  contain.

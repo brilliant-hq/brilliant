@@ -1,6 +1,6 @@
 ---
 name: "knowledge-ui-walkthroughs"
-description: "Visually walk the user through Brilliant's own UI in chat: render an exact-state UI component to an image with render_ui, weave in the user's own data, and show it inline. Covers list_stagers discovery, state composition, highlights, and displaying the image in the chat."
+description: "Visually walk the user through Brilliant's own UI in chat: render an exact-state UI component to an image with render_ui, weave in the user's own data, and show it inline in the reply with a <media> tag. Covers list_stagers discovery, state composition, highlights, and showing the image in the chat."
 ---
 
 # Visual UI walkthroughs (render_ui)
@@ -16,7 +16,7 @@ Two tools power this. If they are not in your available tools, this feature is n
 
 1. Call `list_stagers` first to discover the component ids and read each `stateSchema`. Never guess the schema.
 2. Compose the `state` for the component you want, weaving in the user's own context from the conversation: their chat titles, their fill colors, the exact message text they are asking about. That is what makes the walkthrough THEIRS.
-3. Call `render_ui` with an absolute `outputPath` in a writable temp directory. On macOS/Linux `/tmp/brilliant-walkthrough-1.webp` works; on Windows `/tmp` does not exist and the write is refused, so use a real Windows temp path (for example one under `%TEMP%`) or another absolute path inside your writable working area. Then show the image inline (see "Showing the image" below).
+3. Call `render_ui` with an absolute `outputPath` in a writable temp directory. On macOS/Linux `/tmp/brilliant-walkthrough-1.webp` works; on Windows `/tmp` does not exist and the write is refused, so use a real Windows temp path (for example one under `%TEMP%`) or another absolute path inside your writable working area. Then show the image inline with a `<media>` tag (see "Showing the image" below).
 4. One concept per image. If you are explaining three things, render three focused images rather than one busy one.
 
 ## render_ui arguments
@@ -30,36 +30,18 @@ Two tools power this. If they are not in your available tools, this feature is n
 
 ## Showing the image
 
-To make the rendered image visible to the user in the Brilliant chat, embed it as a markdown image in your reply text, using the absolute path render_ui returned:
+Show the render inline in the Brilliant chat with a media tag on the exact `outputPath` render_ui returned (its result also carries the ready line as `media`):
 
-`![Fills section with your brand colors](file:///tmp/brilliant-walkthrough-1.webp)`
+`<media src="/tmp/brilliant-walkthrough-1.webp">The Fills section with your brand colors</media>`
 
-A bare absolute path also works: `![...](/tmp/brilliant-walkthrough-1.webp)`. The chat renders local file paths and `file://` URIs inline. A wrong or missing path renders as nothing (no broken-image icon), so use the exact `outputPath` from the render_ui result and render before you reference it.
+The chat shows an absolute path only when Brilliant itself wrote that file in this run (render_ui does), never any other path, so render first and then reference it. The picture is kept with the chat, so it still shows after the temp file is gone. A markdown image on that path (`![caption](/tmp/brilliant-walkthrough-1.webp)`) draws the same card. Write a caption that says what the image shows.
 
 ## Worked example
 
-The user asks how their chat history looks with a couple of recent chats and an active transcript. After `list_stagers` shows an `ai-chat-panel` component, render it with their real data:
-
-```
-render_ui({
-  component: "ai-chat-panel",
-  state: {
-    recentChats: ["Pricing page", "Onboarding flow"],
-    activeChat: {
-      title: "Dashboard redesign",
-      turns: [
-        {role: "user", text: "Make the sidebar narrower"},
-        {role: "ai", text: "Done. Reduced it to 240px."}
-      ]
-    }
-  },
-  outputPath: "/tmp/brilliant-chat-walkthrough.webp"
-})
-```
-
-Then in your reply: `![Your chat panel](file:///tmp/brilliant-chat-walkthrough.webp)` with a sentence explaining what to look at.
+`reference/ui-walkthroughs/example` renders the chat panel with the user's own chats and links it in the reply.
 
 ## Related
 
-- [ui.md](./ui.md): what each Brilliant UI panel is and does
-- [export.md](./export.md): exporting canvas elements (a different thing: render_ui captures Brilliant's own UI, export captures your design)
+- `reference/show-me`: light the real control on the user's screen instead (`show_ui`), when they should act on it now
+- `reference/ui`: what each Brilliant UI panel is and does
+- `reference/export`: exporting canvas elements (a different thing: render_ui captures Brilliant's own UI, export captures your design)

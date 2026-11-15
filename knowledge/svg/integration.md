@@ -24,8 +24,15 @@ Unlike `generate_image`, you do NOT pre-create a target element; just
 pass `canvasId`. The response returns `elementIds` for follow-up
 `execute_commands` (reposition, reparent, recolor).
 
+The art lands at the display size (about 400 px on its longest side at
+100% zoom, scaled uniformly from whatever viewBox the model used), as
+real vector geometry; resize it afterwards like any vector.
+
 ## Working with the result
 
+- **Intent line**: pass an optional `intent`, a short present-tense line
+  shown beside your cursor while the vector is drawn (e.g. `"Sketching a
+  fox logo"`). Without it the line is derived from the prompt.
 - **Reference images**: pass up to 4 `referenceElementIds` as style
   guidance (match an illustration style, carry a brand palette). Arrow
   keeps the reference's feel, not its exact shapes.
@@ -36,5 +43,8 @@ pass `canvasId`. The response returns `elementIds` for follow-up
 - **After `vectorize_image`**: the source raster is left intact for
   comparison; delete it via `execute_commands` if only the vector is wanted.
 
-Cost and rate limits are metered by Quiver; the response includes a
-`credits` count, and the client auto-retries on rate-limit with backoff.
+Generation runs on Quiver's Arrow 2 model. Cost and rate limits are
+metered by Quiver against the user's Quiver API Platform balance, and a
+rate-limited request is retried automatically. If Quiver reports a problem
+(a retired key, an empty balance, a refusal) the result says so with the
+fix; tell the user, never retry silently or substitute hand-drawn shapes.

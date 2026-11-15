@@ -36,3 +36,7 @@ Write 3-5 sentences describing: overall color scheme, major sections, text/brand
 5. Next section. Export, compare.
 6. Continue until complete.
 7. Final full export comparison.
+
+## When a Website Fetch Fails
+
+Sites may block fetches or use heavy JS. Ask user for screenshot → fall back to image recreation workflow.

@@ -1,6 +1,6 @@
 ---
 name: "knowledge-mcp-connections"
-description: "Connecting external MCP clients (Cursor, Claude Code, VS Code, Windsurf, Zed, Codex CLI, Gemini CLI, Antigravity, OpenCode) to Brilliant so a user can drive the canvas from their own coding tool: the MCP Connections settings page, the per-client toggle commands, the in-chat setup branch, what enabling writes to each tool's config, restart semantics, and how to verify or troubleshoot."
+description: "Connecting external MCP clients (Cursor, Claude Code, VS Code, Windsurf, Zed, Codex CLI, Gemini CLI, Antigravity, OpenCode, Amp, Muse Code) to Brilliant so a user can drive the canvas from their own coding tool: the MCP Connections settings page, the per-client toggle commands, the in-chat setup branch, what enabling writes to each tool's config, restart semantics, and how to verify or troubleshoot."
 ---
 
 # MCP Connections (drive Brilliant from your coding tool)
@@ -10,108 +10,23 @@ Brilliant's canvas tools. "MCP Connections" is the feature that registers
 Brilliant into another tool's config for the user. This is distinct from the
 integrated chat inside Brilliant; here the user designs from *their own* tool.
 MCP itself is local-only: nothing an external agent sends or receives over MCP
-routes through Brilliant's servers. (Inside Brilliant's own chat there are two
-lanes: Brilliant AI goes through Brilliant's servers to Google; your own AI goes
-straight to your provider.)
+routes through Brilliant's servers, except an image `generate_image` makes on
+Brilliant AI (no Google key of your own set). (Inside Brilliant's own chat there are two
+lanes: Brilliant AI goes through Brilliant's servers to Google; your own AI's text goes
+straight to your provider. Images draw on your Brilliant AI usage unless you add your
+own Google key, in either lane and over MCP alike.)
 
-External MCP agents never count against any cap and stay unlimited on every plan, including Free.
+External MCP agents never count against any cap and stay unlimited on every plan, including Free, except an image generated on Brilliant AI, which draws on your Brilliant AI usage and, on Free, runs up to three every five minutes. Image calls on Brilliant AI need the `sessionId` that `init` returns.
 
 Looking for the other direction (using external MCP servers *inside*
-Brilliant's own chat)? See `mcp-external-servers.md`.
-
-The server is a local HTTP endpoint, normally `http://127.0.0.1:3333/mcp`. At
-startup it takes the first free port of 3333, 3334, 3335. It supports multiple
-clients at once. **Brilliant must be running for a connected tool to reach
-it.** Within one run the port is stable: if the listener drops (for example
-across sleep/wake), Brilliant rebinds the **same** port rather than walking to a
-neighbor. Two caveats: (1) the port pool is shared with any OTHER running
-Brilliant instance, so if a second instance already holds 3333 this one lands on
-3334/3335, and a client hardcoded to 3333 reaches whichever instance owns 3333,
-not necessarily the one you are looking at; (2) if all three ports are taken,
-the server cannot bind at all and shows a port-unavailable notice with a Retry,
-so the configured URL is not live until it binds.
+Brilliant's own chat)? See `reference/mcp-external-servers`.
 
 Supported clients include Claude Code, Cursor, VS Code (Copilot), Windsurf, Zed,
-Codex CLI (the same connection also serves the ChatGPT desktop app, which reads the same ~/.codex/config.toml), Gemini CLI, Antigravity, and OpenCode (opencode.ai). The roster keeps
+Codex CLI (the same connection also serves the ChatGPT desktop app, which reads the same ~/.codex/config.toml), Gemini CLI, Antigravity, OpenCode (opencode.ai), Amp (ampcode.com), and Muse Code (Meta's `muse` CLI). The roster keeps
 growing; the MCP Connections list is the live source of truth for which tools
 Brilliant can connect right now.
 
-## How a user connects a tool
-
-Three equivalent paths:
-
-1. **Settings → MCP Connections.** One flat list showing every supported tool;
-   each row is just the tool name and a checkmark. The checkmark reflects one
-   thing: whether Brilliant is in that tool's MCP config. Flip it on to add
-   Brilliant, off to remove it. There is no install detection, so a tool you
-   haven't installed yet is still listed and still toggleable: enabling it just
-   writes the config, and the tool picks Brilliant up once it is installed. The
-   refresh button re-reads each config from disk. Tools that can't be supported
-   yet (Claude Desktop) show a reason instead of a toggle. A config hand-edited
-   to a different address shows as unchecked; toggling on rewrites it to the
-   correct local URL.
-2. **Command palette.** "MCP Connections" opens that settings page
-   (`open_mcp_connections_settings`). Every supported tool also has its own
-   always-available command, e.g. "Toggle Cursor MCP Connection"
-   (`toggle_<client>_mcp`).
-3. **From the chat.** Choosing to bring your own AI (from Settings, or from the
-   door at a wall) opens the short setup conversation whose first question offers
-   **Connect a coding agent (MCP)**; picking it lists every supported tool as one
-   flat list, and choosing one connects it. On desktop, connecting shows a
-   numbered checklist (Brilliant writes the config, then restart the tool and
-   start a session). In the web editor it shows the exact command to copy and
-   checks off automatically once the agent connects.
-
-**Safari cannot connect an agent.** In the web editor the agent reaches
-Brilliant over the user's own machine (a loopback connection to `127.0.0.1`),
-and Safari blocks that for every website, with no setting that turns it on. In
-Safari, both the in-chat flow and Settings → MCP Connections say so and point
-at Chrome, Edge, Firefox, or the desktop app rather than offering a connect
-that can never land. Chrome may ask once for local network permission on its
-first connect; granting it is a normal part of setup.
-
-After connecting, **the tool must be restarted** to pick up the new server
-(the UI shows a restart note). A restart alone shows nothing: **nothing happens
-until a chat starts.** Clients like Cursor and Codex spawn the `brilliant` MCP
-server only when a chat or session begins, not on launch, so the user must open
-the tool's AI chat (in Cursor, `Cmd+I`) or start a session and send a message.
-The `brilliant` tools connect on that first call, and Brilliant's own checklist
-ticks its last step then.
-
-## What enabling actually does
-
-Enabling writes a `brilliant` MCP server entry (pointing at the local URL) into
-**that tool's own config file**. That file is the source of truth; Brilliant
-stores no separate toggle state. The state shown is always read fresh from the
-file. Disabling removes only Brilliant's entry; other servers and comments are
-preserved.
-
-| Tool | Config file it writes | Notes |
-|------|----------------------|-------|
-| Claude Code | `~/.claude.json` | already may use Brilliant per-project too |
-| Cursor | `~/.cursor/mcp.json` | |
-| VS Code (Copilot) | `.../Code/User/mcp.json` | comments preserved |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` | |
-| Zed | `~/.config/zed/settings.json` (Windows: `%APPDATA%\Zed\settings.json`) | comments preserved |
-| Codex CLI | `~/.codex/config.toml` | Brilliant also auto-adds this on launch, but only when `~/.codex/` already exists (Codex installed); skipped otherwise so a non-Codex home is not touched |
-| Gemini CLI | `~/.gemini/settings.json` | |
-| Antigravity | `~/.gemini/antigravity/mcp_config.json` | |
-| OpenCode | `~/.config/opencode/opencode.json` | comments preserved |
-| Claude Desktop | (not writable) | disabled: its config supports only local stdio servers, not a remote URL |
-
-## Verifying and troubleshooting
-
-- **Verify:** in the connected tool, ask it to create or read something in
-  Brilliant. It should call `mcp__brilliant__*` tools and the result should
-  appear on the canvas. Brilliant must be open.
-- **Connecting a tool you haven't installed yet:** fine. The toggle just writes
-  Brilliant into that tool's config; the tool reads it once installed and
-  launched. There is nothing to "detect" first.
-- **Checkmark off even though the config has a `brilliant` entry:** the entry
-  points somewhere else (the config was hand-edited). Toggling on rewrites it to
-  the correct local URL.
-- **Connected but the tool doesn't see Brilliant:** it usually needs a restart
-  after enabling, and Brilliant must be running. Remember that a restart alone
-  does nothing until a chat starts: the client spawns the server on the first
-  chat/session, so open its AI chat and send a message before expecting the
-  `brilliant` tools.
+- `reference/mcp-connections/connecting`: the three ways to connect a tool, and the restart and first chat that make it live
+- `reference/mcp-connections/server`: the local server's address and ports, and why Safari cannot connect an agent
+- `reference/mcp-connections/enabling`: what enabling writes, and the config file per tool
+- `reference/mcp-connections/troubleshooting`: verifying a connection and fixing one that does not show up

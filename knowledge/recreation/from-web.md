@@ -9,23 +9,27 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 
 1. `web_fetch` the page. Read HTML structure, extract CSS values.
 2. Write down: color scheme (exact hex), font stack, sections, layout structure.
-3. Identify assets: logos, hero images, inline SVGs, image URLs.
 
 ## Rules
 
-1. **Extract, don't guess.** Get exact hex colors, fonts, weights, sizes, padding, gap, border-radius, box-shadow from CSS.
+1. **Extract, don't guess.** Get exact hex colors, fonts, weights, sizes, padding, gap, border-radius, box-shadow, `filter: blur()` and `drop-shadow()` from CSS (an `html` fence carries them as `shadow()` and `eblur()`, and folds a scale about its `transform-origin`).
 
 2. **Build every element.** 6 nav links → build 6. Count page elements, count output.
 
-3. **One section at a time.** Container + navbar first, `export`, compare. Then hero. Then each section.
+3. **Exact text.** Copy HTML text verbatim.
 
-4. **Exact text.** Copy HTML text verbatim.
+4. **Font matching.** Check CSS `font-family`. If Google Font is bundled, use it. If not, closest match.
 
-5. **Match proportions.** Use extracted CSS values. `padding: 80px 120px` → use those values.
+## What an `html` Fence Keeps From CSS
 
-6. **Export and compare** after each section.
+The canvas matches what a browser shows for these, so write the CSS as the site does:
 
-7. **Font matching.** Check CSS `font-family`. If Google Font is bundled, use it. If not, closest match.
+- `justify-content: space-around` and `space-evenly` are laid out as the browser lays them out (`sa` / `se` on the frame's main axis).
+- `text-align` only aligns: the text keeps the weight the CSS declares.
+- A `transparent` gradient stop fades to its neighbor color, never through black, and background layers stack as CSS paints them, the background color at the bottom.
+- An absolutely positioned child of a flex container leaves the flow and is placed against the container's padding box.
+- An icon inherits color (alpha included) and size from its nearest ancestor that declares them, through inline wrappers, and its own declaration wins.
+- `letter-spacing` keeps fractional px values, and `em` resolves against the element's own font size.
 
 ## Assets
 
@@ -43,6 +47,4 @@ assumes: blueprint/layout, blueprint/text, blueprint/effects, blueprint/componen
 6. Footer. Export, compare.
 7. Final full export pass.
 
-## When Fetch Fails
-
-Sites may block fetches or use heavy JS. Ask user for screenshot → fall back to image recreation workflow.
+When the fetch fails, see `recreation/from-image`.

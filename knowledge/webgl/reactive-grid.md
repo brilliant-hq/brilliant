@@ -108,7 +108,7 @@ vec2 rotate2D(vec2 p, float angle) {
 
 // Anti-aliased grid lines using fwidth (available in WebGL 2, not in SkSL)
 // Same pixelSize-normalized distance as the app shader (which cannot use
-// fwidth under SkSL) — byte-for-byte line weight parity with the canvas.
+// fwidth under SkSL): byte-for-byte line weight parity with the canvas.
 float gridPattern(vec2 p, float pixelSize) {
     vec2 grid = abs(fract(p - 0.5) - 0.5) / max(pixelSize * 2.0, 0.001);
     return min(grid.x, grid.y);

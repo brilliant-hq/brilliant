@@ -240,7 +240,9 @@ float fabricHeight(vec2 p, float t, float ca, float sa, float foldDensity, float
 // Iridescent Spectrum
 // ═══════════════════════════════════════════════════════════════════
 
-vec3 iridescentColor(float normalAngle, float curvature, vec3 col0, vec3 col1, vec3 col2, float spread) {
+// rgb: the spectral tint. a: its coverage, each slot alpha weighted exactly as
+// that slot's color.
+vec4 iridescentColor(float normalAngle, float curvature, vec4 col0, vec4 col1, vec4 col2, float spread) {
     float phase = normalAngle * (1.5 + spread * 3.0);
 
     float r = 0.5 + 0.5 * cos(phase * 6.28318);
@@ -249,14 +251,15 @@ vec3 iridescentColor(float normalAngle, float curvature, vec3 col0, vec3 col1, v
     vec3 spectrum = vec3(r, g, b);
 
     float total = r + g + b + 0.001;
-    vec3 tinted = col0 * (r / total) + col1 * (g / total) + col2 * (b / total);
+    vec3 tinted = col0.rgb * (r / total) + col1.rgb * (g / total) + col2.rgb * (b / total);
+    float coverage = (col0.a * r + col1.a * g + col2.a * b) / total;
 
     vec3 result = mix(tinted, spectrum, 0.25);
 
     float lum = dot(result, vec3(0.299, 0.587, 0.114));
     result = mix(vec3(lum), result, 1.2 + curvature * 0.6);
 
-    return clamp(result, 0.0, 1.0);
+    return vec4(clamp(result, 0.0, 1.0), coverage);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -294,10 +297,18 @@ void main() {
     uvAspect.x *= uRefAspect;
 
     // User colors
-    vec3 color0     = uColor0.rgb;
-    float baseAlpha = uColor0.a;
-    vec3 color1     = uColor1.rgb;
-    vec3 color2     = uColor2.rgb;
+    vec3 color0 = uColor0.rgb;
+    vec3 color1 = uColor1.rgb;
+    vec3 color2 = uColor2.rgb;
+    // A slot past uColorCount is zero-filled on the wire (alpha 0 too): it
+    // takes slot 0's alpha, so a short palette renders with its first slot's
+    // coverage instead of fading toward the unused slots.
+    float alpha0 = uColor0.a;
+    float alpha1 = uColorCount > 1.5 ? uColor1.a : alpha0;
+    float alpha2 = uColorCount > 2.5 ? uColor2.a : alpha0;
+    vec4 slot0 = uColor0;
+    vec4 slot1 = vec4(color1, alpha1);
+    vec4 slot2 = vec4(color2, alpha2);
 
     // ─── Parameters ───
     int shape       = int(clamp(uShape, 0.0, 2.0));
@@ -380,11 +391,12 @@ void main() {
     // ═══════════════════════════════════════════════════════
 
     float iriPhase = normalAngle + t * 0.05;
-    vec3 iriColor = iridescentColor(iriPhase, curvature, color0, color1, color2, spread);
+    vec4 iri1 = iridescentColor(iriPhase, curvature, slot0, slot1, slot2, spread);
 
     float iriPhase2 = normalAngle * 1.7 + t * 0.03 + 0.33;
-    vec3 iriColor2 = iridescentColor(iriPhase2, curvature, color1, color2, color0, spread * 0.7);
-    iriColor = mix(iriColor, iriColor2, 0.3);
+    vec4 iri2 = iridescentColor(iriPhase2, curvature, slot1, slot2, slot0, spread * 0.7);
+    vec3 iriColor = mix(iri1.rgb, iri2.rgb, 0.3);
+    float iriAlpha = mix(iri1.a, iri2.a, 0.3);
 
     // ═══════════════════════════════════════════════════════
     // 5. COMPOSE FINAL COLOR
@@ -394,6 +406,15 @@ void main() {
     metalBase *= 0.6 + metallic * 0.4;
 
     vec3 col = mix(metalBase, iriColor * totalDiffuse, intensity);
+
+    // Slot alphas follow their colors: coverage mixes exactly like the color
+    // (each slot alpha weighted where that slot's color shows). The weighted
+    // mean lies within the slot range; clamping to it pins equal slot alphas
+    // to that alpha bit-exactly however the compiler reassociates, so a fill
+    // whose slots share one alpha renders with exactly that alpha.
+    float metalAlpha = mix(alpha2, mix(alpha0, alpha1, 0.5), totalDiffuse);
+    float slotAlpha = mix(metalAlpha, iriAlpha, intensity);
+    slotAlpha = clamp(slotAlpha, min(alpha0, min(alpha1, alpha2)), max(alpha0, max(alpha1, alpha2)));
 
     vec3 specColor = mix(vec3(1.0), mix(color0, color1, 0.5), 0.15);
     col += specColor * spec * (0.5 + metallic * 0.8);
@@ -415,7 +436,7 @@ void main() {
     col = clamp(col, 0.0, 1.0);
 
     // ─── Alpha with shape mask ───
-    float alpha = baseAlpha * shapeMask;
+    float alpha = slotAlpha * shapeMask;
 
     // ─── Premultiplied alpha output ───
     fragColor = vec4(col * alpha, alpha);

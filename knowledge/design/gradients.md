@@ -3,11 +3,12 @@ assumes: blueprint/paint
 ---
 # Design Gradients
 
-For gradient syntax, see `blueprint/paint` and `blueprint/gradients/*`.
-
 ## When to Use
 
 Gradient CTAs = **never** (solid only, gradient CTAs are the #1 AI tell). Hero bg = maybe (subtle tonal shift). Card accent bar = maybe (small surface). Sparkline fill = yes (fading to transparent). Every surface = no (modern design = solid + whitespace).
+
+Gradients are the cheapest way to add warmth and depth; a
+neutral-on-neutral gradient is usually a missed opportunity.
 
 ## The Four Kinds
 
@@ -23,17 +24,9 @@ Linear is the default and the safe one. The other three are for specific moods; 
 
 `180` grounding · `135` energizing · `0` uplifting · `90` progressive
 
-## Multi-Stop Knee
-
-Two stops feel flat. Three create depth, the middle stop shifts character.
-Use design tokens so the gradient follows brand + mode switches:
-```
-f[(linear(180,stop($zinc.intense,0),stop($zinc.intense,0.6),stop($indigo.intense,1)))]
-```
-
 ## Gradient + Effect Stacking
 
-Gradient base + low-opacity shader for organic texture. Stops are tokens like every other slot, see `design-systems/core` "Modes":
+Gradient base + low-opacity shader for organic texture. Stops are tokens like every other slot (the explicit-mode law on `design-systems/core` names gradient stops and shader colors among the tokenizable slots):
 ```
 f[(linear(135,$pink.intense,$rose.intense)),(f2,metaballs($rose.intense,$pink.bold,opacity(0.15),speed(0.2)))]
 ```
@@ -41,12 +34,11 @@ f[(linear(135,$pink.intense,$rose.intense)),(f2,metaballs($rose.intense,$pink.bo
 ## Rules
 
 1. **Default is no gradient.** Only add when it genuinely improves.
-2. **Never gradient a CTA.** Solid dark or solid accent.
-3. **Never blue-purple.** The most recognizable AI gradient.
-4. **One good color, shifted.** Blue-to-slightly-more-purple always beats blue-to-orange.
-5. **One gradient per visual group.** Don't compete.
-6. **Per-stop opacity for overlays.** Specify on BOTH stops.
-7. **Angle matches reading direction.**
+2. **Never blue-purple.** The most recognizable AI gradient.
+3. **One good color, shifted.** Blue-to-slightly-more-purple always beats blue-to-orange.
+4. **One gradient per visual group.** Don't compete.
+5. **Per-stop opacity for overlays.** Specify on BOTH stops.
+6. **Angle matches reading direction.**
 
 ## By Mood
 

@@ -47,7 +47,7 @@ function brilliantShader(canvas, fragSrc, cfg={}) {
   const ro=new ResizeObserver(resize);ro.observe(canvas);resize();
 
   function render(now){
-    // Uniforms are LOGICAL (CSS) pixels — patterns are defined in element
+    // Uniforms are LOGICAL (CSS) pixels: patterns are defined in element
     // pixels, matching the app's canvas. The shader divides gl_FragCoord
     // (physical) by uPixelRatio.
     const t=anim?(now/1000-t0):tp, d=devicePixelRatio||1,
@@ -97,7 +97,7 @@ function brilliantFilter(canvas, sourceEl, fragSrc, cfg={}) {
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
 
-  // Layout size, not the transformed AABB — see the shader resize note.
+  // Layout size, not the transformed AABB (see the shader resize note).
   function resize(){const w=canvas.offsetWidth||canvas.getBoundingClientRect().width,h=canvas.offsetHeight||canvas.getBoundingClientRect().height,d=devicePixelRatio||1;canvas.width=w*d;canvas.height=h*d;gl.viewport(0,0,canvas.width,canvas.height);}
   const ro=new ResizeObserver(resize);ro.observe(canvas);resize();
 
@@ -161,7 +161,7 @@ function brilliantFilter(canvas, sourceEl, fragSrc, cfg={}) {
 All Brilliant shaders are ported from SkSL (Flutter GLSL 460) to GLSL ES 3.0 (WebGL 2). Changes:
 
 1. `#version 300 es` + `precision highp float;` header
-2. `FlutterFragCoord()` replaced with `vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio)` where `pxRatio = max(uPixelRatio, 1.0)` (Y-flip for top-left origin; the division maps physical backing-store pixels to the logical element pixels patterns are defined in — the runtime passes `uResolutionX/Y` as logical size and `uPixelRatio` as `devicePixelRatio`)
+2. `FlutterFragCoord()` replaced with `vec2(gl_FragCoord.x / pxRatio, uResolutionY - gl_FragCoord.y / pxRatio)` where `pxRatio = max(uPixelRatio, 1.0)` (Y-flip for top-left origin; the division maps physical backing-store pixels to the logical element pixels patterns are defined in; the runtime passes `uResolutionX/Y` as logical size and `uPixelRatio` as `devicePixelRatio`)
 3. `layout(location=N)` removed from uniforms (WebGL binds by name)
 4. The web runtime supports rectangle and circle shapes directly; vector shapes are baked to an image
 5. Shader body logic is **identical** to the in-app `.frag` source (the native engine renders these on canvas; SkSL survives only in the text-editing body and inspector previews)
